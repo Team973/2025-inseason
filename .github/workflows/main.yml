@@ -46,3 +46,4 @@ jobs:
       uses: check-spelling/check-spelling@v0.0.24
       with:
         checkout: true
+        config: .github/spelling/workflows/spelling
