@@ -85,7 +85,7 @@ public class DriveWithJoysticks implements DriveComposable {
     SmartDashboard.putNumber("Robot Rotation", rot);
     SmartDashboard.putNumber("Target Robot Angle", m_targetRobotAngle.getDegrees());
     SmartDashboard.putNumber(
-        "drive/drivewithjoysticks/Current Robot Angle", currentYaw.getDegrees());
+        "drive/driveWithJoysticks/Current Robot Angle", currentYaw.getDegrees());
     SmartDashboard.putString("Rotation Control", String.valueOf(m_rotationControl));
 
     m_driveInput = new ChassisSpeeds(xSpeed, ySpeed, rot);

@@ -54,8 +54,8 @@ public final class RobotInfo {
      */
     public static final double WHEELBASE_METERS = 0.57785;
 
-    public static final double OPENLOOP_RAMP = 0.0;
-    public static final double CLOSEDLOOP_RAMP = 0.0;
+    public static final double OPEN_LOOP_RAMP = 0.0;
+    public static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */
     public static final double ANGLE_KP = 8.0; // 10.0 at SD // 6.0
@@ -79,7 +79,7 @@ public final class RobotInfo {
 
     // public static final double FALCON_TRAP_FREE_SPEED = 6380.0;
     public static final double KRAKEN_TRAP_FREE_SPEED = 6000.0;
-    public static final double MAX_ACCELORATION_METERS_PER_SECOND = 3.0; // 4.3;
+    public static final double MAX_ACCELERATION_METERS_PER_SECOND = 3.0; // 4.3;
     public static final double MAX_VELOCITY_METERS_PER_SECOND =
         (KRAKEN_TRAP_FREE_SPEED / 60.0 * DRIVE_GEAR_RATIO * WHEEL_DIAMETER_METERS * Math.PI);
 
@@ -118,19 +118,19 @@ public final class RobotInfo {
             new Translation2d(-TRACKWIDTH_METERS / 2.0, -WHEELBASE_METERS / 2.0));
 
     public static final TrajectoryConfig TRAJECTORY_CONFIG =
-        new TrajectoryConfig(MAX_VELOCITY_METERS_PER_SECOND, MAX_ACCELORATION_METERS_PER_SECOND)
+        new TrajectoryConfig(MAX_VELOCITY_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND)
             .setKinematics(SWERVE_KINEMATICS);
     public static final TrajectoryConfig REVERSE_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(MAX_VELOCITY_METERS_PER_SECOND, MAX_ACCELORATION_METERS_PER_SECOND)
+        new TrajectoryConfig(MAX_VELOCITY_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND)
             .setKinematics(SWERVE_KINEMATICS)
             .setReversed(true);
     public static final TrajectoryConfig TESTING_TRAJECTORY_CONFIG =
         new TrajectoryConfig(
-                MAX_VELOCITY_METERS_PER_SECOND * 0.65, MAX_ACCELORATION_METERS_PER_SECOND * 0.65)
+                MAX_VELOCITY_METERS_PER_SECOND * 0.65, MAX_ACCELERATION_METERS_PER_SECOND * 0.65)
             .setKinematics(SWERVE_KINEMATICS);
     public static final TrajectoryConfig TESTING_REVERSE_TRAJECTORY_CONFIG =
         new TrajectoryConfig(
-                MAX_VELOCITY_METERS_PER_SECOND * 0.65, MAX_ACCELORATION_METERS_PER_SECOND * 0.65)
+                MAX_VELOCITY_METERS_PER_SECOND * 0.65, MAX_ACCELERATION_METERS_PER_SECOND * 0.65)
             .setKinematics(SWERVE_KINEMATICS)
             .setReversed(true);
   }

@@ -49,13 +49,13 @@ public class GreyPoseEstimator {
     m_driveController = m_DriveController;
 
     List<StatusSignal<Angle>> angleSignals = m_pigeon.getAngleStatusSignals();
-    List<StatusSignal<AngularVelocity>> angularVelocitySignlas =
+    List<StatusSignal<AngularVelocity>> angularVelocitySignals =
         m_pigeon.getAngularVelocityStatusSignals();
     m_yawGetter = angleSignals.get(0);
-    m_angularVelocity = angularVelocitySignlas.get(0);
+    m_angularVelocity = angularVelocitySignals.get(0);
     m_allStatusSignals =
         new BaseStatusSignal
-            [4 * m_swerveModules.length + angleSignals.size() + angularVelocitySignlas.size()];
+            [4 * m_swerveModules.length + angleSignals.size() + angularVelocitySignals.size()];
 
     int i = 0;
     for (SwerveModule mod : m_swerveModules) {
