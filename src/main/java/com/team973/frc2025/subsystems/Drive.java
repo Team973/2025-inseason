@@ -27,7 +27,7 @@ public class Drive implements Subsystem {
   };
 
   private final Logger m_logger;
-  private final Logger m_odometeryLogger;
+  private final Logger m_odometryLogger;
 
   private final SwerveModule[] m_swerveModules;
   private ChassisSpeeds m_currentChassisSpeeds;
@@ -42,22 +42,11 @@ public class Drive implements Subsystem {
 
   private final List<StatusSignal<?>> m_allStatusSignals = new ArrayList<>();
 
-  public static class AnglePresets {
-    public static final Rotation2d TOWARDS_HP = Rotation2d.fromDegrees(0.0);
-    public static final Rotation2d TOWARDS_DS = Rotation2d.fromDegrees(180.0);
-    public static final Rotation2d TOWARDS_MHP_RED = Rotation2d.fromDegrees(-90.0);
-    public static final Rotation2d TOWARDS_MHP_BLUE = Rotation2d.fromDegrees(90.0);
-    public static final Rotation2d TOWARDS_WS_BLUE = Rotation2d.fromDegrees(45.0);
-    public static final Rotation2d TOWARDS_WSR_BLUE = Rotation2d.fromDegrees(135.0);
-    public static final Rotation2d TOWARDS_WS_RED = Rotation2d.fromDegrees(-45.0);
-    public static final Rotation2d TOWARDS_WSR_RED = Rotation2d.fromDegrees(-135.0);
-  }
-
   public Drive(GreyPigeon pigeon, DriveController m_DriveController, Logger logger) {
     m_pigeon = pigeon;
     m_driveController = m_DriveController;
     m_logger = logger;
-    m_odometeryLogger = logger.subLogger("odometery-estimator");
+    m_odometryLogger = logger.subLogger("odometry-estimator");
 
     m_swerveModules =
         new SwerveModule[] {
@@ -147,10 +136,10 @@ public class Drive implements Subsystem {
   }
 
   public void dashboardUpdate() {
-    m_odometeryLogger.log("Update Frequency Mean", m_poseEstimator.getUpdateFrequencyMean());
-    m_odometeryLogger.log("Update Frequency StdDev", m_poseEstimator.getUpdateFrequencyStdDev());
-    m_odometeryLogger.log("Failed Cycles", m_poseEstimator.getFailedCycles());
-    m_odometeryLogger.log("Successful Cycles", m_poseEstimator.getSuccessfulCycles());
+    m_odometryLogger.log("Update Frequency Mean", m_poseEstimator.getUpdateFrequencyMean());
+    m_odometryLogger.log("Update Frequency StdDev", m_poseEstimator.getUpdateFrequencyStdDev());
+    m_odometryLogger.log("Failed Cycles", m_poseEstimator.getFailedCycles());
+    m_odometryLogger.log("Successful Cycles", m_poseEstimator.getSuccessfulCycles());
 
     double states[] = new double[8];
     int index = 0;
