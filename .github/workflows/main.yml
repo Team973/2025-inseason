@@ -47,3 +47,5 @@ jobs:
       with:
         checkout: true
         config: ".github/workflows/spelling"
+        extra_dictionaries: |
+          cspell:software-terms/dict/softwareTerms.txt
