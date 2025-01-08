@@ -1,0 +1,10 @@
+# Ignore URLs
+^https?://.*
+^http?://.*
+
+# Allow words preceded by A, B, X, Y, or Z
+# For buttons and axes
+^[ABXYZ][A-Za-z]+$
+
+# Ignore import statements
+^import\s.*
