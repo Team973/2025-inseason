@@ -3,7 +3,7 @@ http[^ ]+
 
 # Allow words preceded by A, B, X, Y, or Z
 # For buttons and axes
-^[ABXYZa-z]+
+^[ABXYZa-z]\w*
 
 # Ignore import statements
 ^import\s.*
