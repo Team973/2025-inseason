@@ -29,5 +29,4 @@ public class Claw {
     m_shooterRight.setControl(ControlMode.DutyCycleOut, 0);
     m_shooterLeft.setControl(ControlMode.DutyCycleOut, 0);
   }
-
 }

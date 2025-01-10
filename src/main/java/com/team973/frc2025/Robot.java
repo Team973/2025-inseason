@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
       new Joystick(0, Joystick.Type.SickStick, new Logger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, new Logger("coDriverStick"));
-  private final Claw m_Claw = new Claw(new Logger("Claw"));
+  private final Claw m_claw = new Claw(new Logger("Claw"));
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -87,11 +87,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     if (m_coDriverStick.getAButton()) {
-      m_Claw.shoot();
+      m_claw.shoot();
     } else if (m_coDriverStick.getBButton()) {
-      m_Claw.retract();
+      m_claw.retract();
     } else {
-      m_Claw.stop();
+      m_claw.stop();
     }
   }
 
