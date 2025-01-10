@@ -4,9 +4,10 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.subsystems.DriveController;
+import com.team973.lib.util.Joystick;
+import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -14,19 +15,38 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final Logger m_logger = new Logger("robot");
+  private final DriveController m_driveController = new DriveController(m_logger);
+
+  private final Joystick m_driverStick =
+      new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
+  private final Joystick m_coDriverStick =
+      new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
+
+  private void syncSensors() {
+    m_driveController.syncSensors();
+  }
+
+  private void updateSubsystems() {
+    m_driveController.update();
+  }
+
+  private void resetSubsystems() {
+    m_driveController.reset();
+  }
+
+  private void updateJoysticks() {
+    m_driverStick.update();
+    m_coDriverStick.update();
+  }
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
+    resetSubsystems();
+    m_driveController.startOdometrey();
   }
 
   /**
@@ -50,33 +70,31 @@ public class Robot extends TimedRobot {
    * chooser code above as well.
    */
   @Override
-  public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
-  }
+  public void autonomousInit() {}
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
-  }
+  public void autonomousPeriodic() {}
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
+  }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    syncSensors();
+
+    m_driveController.updateJoystickInput(
+        m_driverStick.getLeftXAxis() * 0.95,
+        m_driverStick.getLeftYAxis() * 0.95,
+        m_driverStick.getRightXAxis() * 0.8);
+
+    updateSubsystems();
+    updateJoysticks();
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
@@ -84,7 +102,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    syncSensors();
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
