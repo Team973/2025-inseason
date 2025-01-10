@@ -1,4 +1,4 @@
-package com.team973.frc2025.subsystem;
+package com.team973.frc2025.subsystems;
 
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
@@ -29,18 +29,5 @@ public class Claw {
     m_shooterRight.setControl(ControlMode.DutyCycleOut, 0);
     m_shooterLeft.setControl(ControlMode.DutyCycleOut, 0);
   }
-  //   public Robot() {}
-
-  //    if (m_coDriverStick.getAButton()){
-
-  //    } else if (m_coDriverStick.getBButton()) {
-  //     m_SuperStructure.outtake();
-  //    } else if(m_coDriverStick.getXButton()) {
-  //     m_SuperStructure.primeShooter();
-  //    } else if (m_coDriverStick.getYButton()){
-  //     m_SuperStructure.shoot();
-  //    } else {
-  //     m_SuperStructure.standStill();
-  //    }
 
 }

@@ -4,7 +4,7 @@
 
 package com.team973.frc2025;
 
-import com.team973.frc2025.subsystem.Claw;
+import com.team973.frc2025.subsystems.Claw;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
