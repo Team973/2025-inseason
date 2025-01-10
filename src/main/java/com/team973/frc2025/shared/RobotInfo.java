@@ -35,10 +35,10 @@ public final class RobotInfo {
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 13;
     public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 161.016;
 
-    public static final double DRIVE_GEAR_RATIO = ((14.0 / 42.0) * (32.0 / 14.0) * (15.0 / 45.0));
-    public static final double ANGLE_GEAR_RATIO = ((10.0 / 26.0) * (14.0 / 72.0));
+    public static final double DRIVE_GEAR_RATIO = (10.0 / 54.0) * (40.0 / 16.0) * (15.0 / 45.0); // x3:10,6.48:1
+    public static final double ANGLE_GEAR_RATIO = (10.0 / 22.0) * (16.0 / 88.0); // 12.1:1
 
-    public static final double WHEEL_DIAMETER_METERS = 0.1016 * (5.82 / 6.0) * (1.55 / 2.0);
+    public static final double WHEEL_DIAMETER_METERS = 0.1016;
     public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
 
     /**
