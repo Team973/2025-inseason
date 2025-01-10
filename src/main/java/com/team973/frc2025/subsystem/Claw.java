@@ -1,0 +1,46 @@
+package com.team973.frc2025.subsystem;
+
+import com.team973.lib.devices.GreyTalonFX;
+import com.team973.lib.devices.GreyTalonFX.ControlMode;
+import com.team973.lib.util.Logger;
+
+public class Claw {
+  private final Logger m_logger;
+  private final GreyTalonFX m_shooterRight;
+  private final GreyTalonFX m_shooterLeft;
+
+  public Claw(Logger logger) {
+    m_logger = logger;
+    m_shooterRight = new GreyTalonFX(36, "Canivore", new Logger("shooterRight"));
+    m_shooterLeft = new GreyTalonFX(35, "Canivore", new Logger("shooterLeft"));
+  }
+
+  public void shoot() {
+    m_shooterRight.setControl(ControlMode.DutyCycleOut, -0.1);
+    m_shooterLeft.setControl(ControlMode.DutyCycleOut, 0.1);
+  }
+
+  public void retract() {
+    m_shooterRight.setControl(ControlMode.DutyCycleOut, 0.1);
+    m_shooterLeft.setControl(ControlMode.DutyCycleOut, -0.1);
+  }
+
+  public void stop() {
+    m_shooterRight.setControl(ControlMode.DutyCycleOut, 0);
+    m_shooterLeft.setControl(ControlMode.DutyCycleOut, 0);
+  }
+  //   public Robot() {}
+
+  //    if (m_coDriverStick.getAButton()){
+
+  //    } else if (m_coDriverStick.getBButton()) {
+  //     m_SuperStructure.outtake();
+  //    } else if(m_coDriverStick.getXButton()) {
+  //     m_SuperStructure.primeShooter();
+  //    } else if (m_coDriverStick.getYButton()){
+  //     m_SuperStructure.shoot();
+  //    } else {
+  //     m_SuperStructure.standStill();
+  //    }
+
+}
