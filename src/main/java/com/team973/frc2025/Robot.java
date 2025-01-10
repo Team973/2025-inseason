@@ -35,6 +35,10 @@ public class Robot extends TimedRobot {
     m_driveController.reset();
   }
 
+  private void logSubsystems() {
+    m_driveController.log();
+  }
+
   private void updateJoysticks() {
     m_driverStick.update();
     m_coDriverStick.update();
@@ -57,7 +61,9 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    logSubsystems();
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different

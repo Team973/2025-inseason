@@ -3,17 +3,8 @@ package com.team973.lib.util;
 /** Base interface for all subsystems */
 public interface Subsystem {
 
-  /**
-   * Update NetworkTables values for the dashboard. Call this periodically when the robot is
-   * enabled. This isn't called when connected to FMS.
-   */
-  public void debugDashboardUpdate();
-
-  /**
-   * Update NetworkTables values for the dashboard. Call this periodically when the robot is
-   * enabled.
-   */
-  public void dashboardUpdate();
+  /** Log subsystem data. Called while the robot is on. */
+  public void log();
 
   /**
    * Update the sensors in the subsystem. This should be called before doing any calculations based

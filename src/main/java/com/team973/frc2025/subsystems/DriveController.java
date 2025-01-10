@@ -105,8 +105,8 @@ public class DriveController implements Subsystem {
   }
 
   @Override
-  public void debugDashboardUpdate() {
-    m_drive.debugDashboardUpdate();
+  public void log() {
+    m_drive.log();
 
     /*
     if (m_limelight.isTargetValid()) {
@@ -119,11 +119,6 @@ public class DriveController implements Subsystem {
       SmartDashboard.putNumber("Y", dist * Math.sin(Rotation2d.fromDegrees(theta).getRadians()));
     }
     */
-  }
-
-  @Override
-  public synchronized void dashboardUpdate() {
-    m_drive.dashboardUpdate();
   }
 
   @Override
