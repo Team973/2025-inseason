@@ -4,6 +4,9 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.subsystems.Claw;
+import com.team973.lib.util.Joystick;
+import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +21,12 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
+  private final Joystick m_driverStick =
+      new Joystick(0, Joystick.Type.SickStick, new Logger("driverStick"));
+  private final Joystick m_coDriverStick =
+      new Joystick(1, Joystick.Type.XboxController, new Logger("coDriverStick"));
+  private final Claw m_claw = new Claw(new Logger("Claw"));
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -76,7 +85,15 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    if (m_coDriverStick.getAButton()) {
+      m_claw.shoot();
+    } else if (m_coDriverStick.getBButton()) {
+      m_claw.retract();
+    } else {
+      m_claw.stop();
+    }
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
