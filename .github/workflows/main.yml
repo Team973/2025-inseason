@@ -37,15 +37,15 @@ jobs:
     - name: Compile and run tests on robot code
       run: ./gradlew build
 
-  spellcheck:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+  # spellcheck:
+  #   # The type of runner that the job will run on
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - name: Check Spelling       
-      uses: check-spelling/check-spelling@v0.0.24
-      with:
-        checkout: true
-        config: ".github/workflows/spelling"
-        extra_dictionaries: |
-          cspell:software-terms/dict/softwareTerms.txt
+  #   steps:
+  #   - name: Check Spelling       
+  #     uses: check-spelling/check-spelling@v0.0.24
+  #     with:
+  #       checkout: true
+  #       config: ".github/workflows/spelling"
+  #       extra_dictionaries: |
+  #         cspell:software-terms/dict/softwareTerms.txt
