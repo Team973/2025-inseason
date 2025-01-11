@@ -1,7 +1,9 @@
 package com.team973.frc2025;
 
+import com.team973.frc2025.auto.modes.ClawTestAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
 import com.team973.frc2025.auto.modes.TaxiAuto;
+import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.AutoCommand;
 import com.team973.lib.util.Logger;
@@ -11,20 +13,23 @@ import java.util.List;
 public class AutoManager {
   private AutoCommand m_currentMode;
   private final List<AutoMode> m_availableAutoModes =
-      Arrays.asList(AutoMode.NoAuto, AutoMode.TaxiAuto);
-  private int m_selectedMode = 1;
+      Arrays.asList(AutoMode.NoAuto, AutoMode.TaxiAuto, AutoMode.ClawTestAuto);
+  private int m_selectedMode = 0;
 
   public enum AutoMode {
     NoAuto,
     TaxiAuto,
+    ClawTestAuto,
   }
 
   private final AutoCommand m_noAuto;
   private final AutoCommand m_taxiAuto;
+  private final AutoCommand m_clawTestAuto;
 
-  public AutoManager(Logger logger, DriveController drive) {
+  public AutoManager(Logger logger, DriveController drive, Claw claw) {
     m_noAuto = new NoAuto(logger);
     m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive);
+    m_clawTestAuto = new ClawTestAuto(logger, claw);
   }
 
   public void increment() {
@@ -62,6 +67,9 @@ public class AutoManager {
         break;
       case TaxiAuto:
         m_currentMode = m_taxiAuto;
+        break;
+      case ClawTestAuto:
+        m_currentMode = m_clawTestAuto;
         break;
     }
   }

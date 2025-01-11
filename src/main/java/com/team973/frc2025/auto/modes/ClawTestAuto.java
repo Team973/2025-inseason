@@ -1,0 +1,24 @@
+package com.team973.frc2025.auto.modes;
+
+import com.team973.frc2025.auto.commands.ClawCommand;
+import com.team973.frc2025.auto.commands.util.DelayCommand;
+import com.team973.frc2025.auto.commands.util.SequentialCommand;
+import com.team973.frc2025.subsystems.Claw;
+import com.team973.frc2025.subsystems.Claw.ControlStatus;
+import com.team973.lib.util.Logger;
+
+public class ClawTestAuto extends SequentialCommand {
+
+  public ClawTestAuto(Logger logger, Claw claw) {
+    super(
+        logger,
+        new ClawCommand(claw, ControlStatus.Shoot),
+        new DelayCommand(1),
+        new ClawCommand(claw, ControlStatus.Stop),
+        new DelayCommand(1),
+        new ClawCommand(claw, ControlStatus.Retract),
+        new DelayCommand(1),
+        new ClawCommand(claw, ControlStatus.Stop),
+        new DelayCommand(1));
+  }
+}
