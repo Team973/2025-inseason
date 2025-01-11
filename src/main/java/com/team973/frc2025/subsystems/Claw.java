@@ -29,7 +29,7 @@ public class Claw implements Subsystem {
   }
 
   private boolean sensorSeeCoral() {
-    return !m_sensor.get();
+    return m_sensor.get();
   }
 
   public static enum ControlStatus {
