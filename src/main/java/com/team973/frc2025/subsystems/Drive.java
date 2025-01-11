@@ -140,6 +140,8 @@ public class Drive implements Subsystem {
     m_odometryLogger.log("Update Frequency StdDev", m_poseEstimator.getUpdateFrequencyStdDev());
     m_odometryLogger.log("Failed Cycles", m_poseEstimator.getFailedCycles());
     m_odometryLogger.log("Successful Cycles", m_poseEstimator.getSuccessfulCycles());
+    m_odometryLogger.log("X Pos", m_poseEstimator.getPoseMeters().getX());
+    m_odometryLogger.log("Y Pos", m_poseEstimator.getPoseMeters().getY());
 
     double states[] = new double[8];
     int index = 0;
