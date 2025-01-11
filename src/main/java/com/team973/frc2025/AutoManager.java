@@ -3,24 +3,24 @@ package com.team973.frc2025;
 import com.team973.frc2025.auto.modes.NoAuto;
 import com.team973.frc2025.auto.modes.TaxiAuto;
 import com.team973.frc2025.subsystems.DriveController;
-import com.team973.lib.util.AutoCommand;
+import com.team973.lib.util.AutoMode;
 import com.team973.lib.util.Logger;
+import edu.wpi.first.math.geometry.Pose2d;
 import java.util.Arrays;
 import java.util.List;
 
 public class AutoManager {
-  private AutoCommand m_currentMode;
-  private final List<AutoMode> m_availableAutoModes =
-      Arrays.asList(AutoMode.NoAuto, AutoMode.TaxiAuto);
+  private AutoMode m_currentMode;
+  private final List<Auto> m_availableAutos = Arrays.asList(Auto.NoAuto, Auto.TaxiAuto);
   private int m_selectedMode = 1;
 
-  public enum AutoMode {
+  public enum Auto {
     NoAuto,
     TaxiAuto,
   }
 
-  private final AutoCommand m_noAuto;
-  private final AutoCommand m_taxiAuto;
+  private final AutoMode m_noAuto;
+  private final AutoMode m_taxiAuto;
 
   public AutoManager(Logger logger, DriveController drive) {
     m_noAuto = new NoAuto(logger);
@@ -29,7 +29,7 @@ public class AutoManager {
 
   public void increment() {
     m_selectedMode += 1;
-    if (m_selectedMode >= m_availableAutoModes.size()) {
+    if (m_selectedMode >= m_availableAutos.size()) {
       m_selectedMode = 0;
     }
   }
@@ -37,12 +37,16 @@ public class AutoManager {
   public void decrement() {
     m_selectedMode -= 1;
     if (m_selectedMode < 0) {
-      m_selectedMode = m_availableAutoModes.size() - 1;
+      m_selectedMode = m_availableAutos.size() - 1;
     }
   }
 
-  public AutoMode getSelectedMode() {
-    return m_availableAutoModes.get(m_selectedMode);
+  public Auto getSelectedMode() {
+    return m_availableAutos.get(m_selectedMode);
+  }
+
+  public Pose2d getStartingPose() {
+    return m_currentMode.getStartingPose();
   }
 
   public void run() {
@@ -51,11 +55,11 @@ public class AutoManager {
   }
 
   public void init() {
-    selectAuto(m_availableAutoModes.get(m_selectedMode));
+    selectAuto(m_availableAutos.get(m_selectedMode));
     m_currentMode.init();
   }
 
-  private void selectAuto(AutoMode mode) {
+  private void selectAuto(Auto mode) {
     switch (mode) {
       case NoAuto:
         m_currentMode = m_noAuto;
