@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import choreo.trajectory.SwerveSample;
 import com.team973.frc2025.subsystems.composables.DriveWithJoysticks;
 import com.team973.frc2025.subsystems.composables.DriveWithTrajectory;
 import com.team973.lib.devices.GreyPigeon;
@@ -9,13 +10,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
 
 public class DriveController implements Subsystem {
   private final GreyPigeon m_pigeon;
   private final Drive m_drive;
-
-  private final Logger m_logger;
 
   private ControllerOption m_controllerOption = ControllerOption.DriveWithJoysticks;
 
@@ -46,7 +44,7 @@ public class DriveController implements Subsystem {
     m_pigeon = new GreyPigeon(logger.subLogger("pigeon"));
     m_drive = new Drive(m_pigeon, this, logger);
 
-    m_logger = logger.subLogger("controller");
+    logger = logger.subLogger("controller");
 
     m_driveWithJoysticks = new DriveWithJoysticks();
     m_driveWithTrajectory =
@@ -66,13 +64,8 @@ public class DriveController implements Subsystem {
         m_drive.getPigeon().getAngularVelocity());
   }
 
-  public synchronized void updateTrajectory(
-      Trajectory trajectory,
-      double timeSeconds,
-      Rotation2d rot2d,
-      Rotation2d rotationalVelocityPerSecond) {
-    m_driveWithTrajectory.updateTrajectory(
-        trajectory, timeSeconds, rot2d, rotationalVelocityPerSecond);
+  public void updateTrajectory(SwerveSample sample) {
+    m_driveWithTrajectory.updateTrajectory(sample, getPose());
   }
 
   public synchronized void setRotationControl(RotationControl rotationControl) {
@@ -107,18 +100,6 @@ public class DriveController implements Subsystem {
   @Override
   public void log() {
     m_drive.log();
-
-    /*
-    if (m_limelight.isTargetValid()) {
-      double dist = m_limelight.getHorizontalDist();
-      double theta = m_limelight.getXOffset() + m_drive.getPose().getRotation().getDegrees();
-
-      SmartDashboard.putNumber("Dist", dist);
-      SmartDashboard.putNumber("Theta", theta);
-      SmartDashboard.putNumber("X", dist * Math.cos(Rotation2d.fromDegrees(theta).getRadians()));
-      SmartDashboard.putNumber("Y", dist * Math.sin(Rotation2d.fromDegrees(theta).getRadians()));
-    }
-    */
   }
 
   @Override
