@@ -9,6 +9,7 @@ import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -17,8 +18,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
  */
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
-  private final DriveController m_driveController = new DriveController(m_logger);
+  private final DriveController m_driveController =
+      new DriveController(m_logger.subLogger("drive"));
   private final Claw m_claw = new Claw(new Logger("Claw"));
+
+  private final AutoManager m_autoManager = new AutoManager(m_logger, m_driveController);
 
   private final Joystick m_driverStick =
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
@@ -78,11 +82,20 @@ public class Robot extends TimedRobot {
    * chooser code above as well.
    */
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    m_autoManager.init();
+  }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    syncSensors();
+    // TODO: we're doing this badly to make it work
+    m_driveController.updateJoystickInput(0.0, 0.0, 0.0);
+    // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
+    m_autoManager.run();
+    updateSubsystems();
+  }
 
   /** This function is called once when teleop is enabled. */
   @Override
@@ -120,6 +133,16 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     syncSensors();
+
+    // TODO: we're doing this badly to make it work
+    m_driveController.updateJoystickInput(0.0, 0.0, 0.0);
+
+    if (m_coDriverStick.getAButtonPressed()) {
+      m_autoManager.increment();
+    } else if (m_coDriverStick.getBButtonPressed()) {
+      m_autoManager.decrement();
+    }
+    SmartDashboard.putString("DB/String 2", String.valueOf(m_autoManager.getSelectedMode()));
   }
 
   /** This function is called once when test mode is enabled. */
