@@ -105,7 +105,7 @@ public class SwerveModule {
   private void configAngleMotor() {
     var motorConfig = m_angleMotor.getCurrentConfig();
 
-    motorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     motorConfig.Slot0.kP = DriveInfo.ANGLE_KP;

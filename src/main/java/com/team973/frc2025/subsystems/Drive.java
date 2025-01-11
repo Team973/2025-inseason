@@ -135,7 +135,7 @@ public class Drive implements Subsystem {
     }
   }
 
-  public void dashboardUpdate() {
+  public void log() {
     m_odometryLogger.log("Update Frequency Mean", m_poseEstimator.getUpdateFrequencyMean());
     m_odometryLogger.log("Update Frequency StdDev", m_poseEstimator.getUpdateFrequencyStdDev());
     m_odometryLogger.log("Failed Cycles", m_poseEstimator.getFailedCycles());
@@ -154,8 +154,6 @@ public class Drive implements Subsystem {
     m_logger.log("Actual", states);
     m_pigeon.log();
   }
-
-  public void debugDashboardUpdate() {}
 
   @Override
   public void syncSensors() {
