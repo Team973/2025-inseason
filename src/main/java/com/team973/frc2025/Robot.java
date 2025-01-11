@@ -5,6 +5,7 @@
 package com.team973.frc2025;
 
 import com.team973.frc2025.subsystems.Claw;
+import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
@@ -31,6 +32,7 @@ public class Robot extends TimedRobot {
 
   private void updateSubsystems() {
     m_driveController.update();
+    m_claw.update();
   }
 
   private void resetSubsystems() {
@@ -39,6 +41,7 @@ public class Robot extends TimedRobot {
 
   private void logSubsystems() {
     m_driveController.log();
+    m_claw.log();
   }
 
   private void updateJoysticks() {
@@ -101,11 +104,13 @@ public class Robot extends TimedRobot {
         m_driverStick.getRightXAxis() * 0.8);
 
     if (m_coDriverStick.getAButton()) {
-      m_claw.shoot();
+      m_claw.setControl(ControlStatus.IntakeAndHold);
     } else if (m_coDriverStick.getBButton()) {
-      m_claw.retract();
-    } else {
-      m_claw.stop();
+      m_claw.setControl(ControlStatus.Stop);
+    } else if (m_coDriverStick.getXButton()) {
+      m_claw.setControl(ControlStatus.Shoot);
+    } else if (m_coDriverStick.getYButton()) {
+      m_claw.setControl(ControlStatus.Retract);
     }
 
     updateSubsystems();
