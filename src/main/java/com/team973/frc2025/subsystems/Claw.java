@@ -28,7 +28,7 @@ public class Claw implements Subsystem {
     m_motorLeft.setConfig(leftMotorConfig);
   }
 
-  private boolean sensorSeeCoral() {
+  public boolean sensorSeeCoral() {
     return m_sensor.get();
   }
 
