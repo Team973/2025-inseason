@@ -7,27 +7,37 @@ import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.AutoCommand;
 import com.team973.lib.util.CommandOnEvent;
 import com.team973.lib.util.Conversions;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import com.team973.lib.util.Logger;
+import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.Optional;
 
 public class DriveTrajectoryCommand extends AutoCommand {
   private final DriveController m_drive;
   private final Optional<Trajectory<SwerveSample>> m_trajectory;
-  private final Optional<Alliance> m_alliance;
   private final CommandOnEvent[] m_events;
+  private final Logger m_logger;
 
   private double m_startTime;
 
   public DriveTrajectoryCommand(
-      DriveController drive, String trajectoryName, CommandOnEvent... events) {
+      Logger logger, DriveController drive, String trajectoryName, CommandOnEvent... events) {
+    m_logger = logger;
     m_drive = drive;
     m_trajectory = Choreo.loadTrajectory(trajectoryName);
-    m_alliance = DriverStation.getAlliance();
     m_events = events;
+
+    m_logger.log("X Pos", 0.0);
+    m_logger.log("Y Pos", 0.0);
+    m_logger.log("Heading Deg", 0.0);
   }
 
-  public void log() {}
+  public void log() {
+    SwerveSample sample = m_trajectory.get().sampleAt(getTimeSecFromStart(), false).get();
+
+    m_logger.log("X Pos", sample.x);
+    m_logger.log("Y Pos", sample.y);
+    m_logger.log("Heading Deg", Rotation2d.fromRadians(sample.heading).getDegrees());
+  }
 
   public void init() {
     m_startTime = Conversions.Time.getSecTime();
@@ -35,7 +45,7 @@ public class DriveTrajectoryCommand extends AutoCommand {
   }
 
   public void run() {
-    if (m_trajectory.isEmpty() || m_alliance.isEmpty()) {
+    if (m_trajectory.isEmpty()) {
       return;
     }
 
@@ -43,8 +53,7 @@ public class DriveTrajectoryCommand extends AutoCommand {
     //   for (EventMarker event: m_trajectory.get().get)
     // }
 
-    m_drive.updateTrajectory(
-        m_trajectory.get().sampleAt(m_startSec, m_alliance.get().equals(Alliance.Red)).get());
+    m_drive.updateTrajectory(m_trajectory.get().sampleAt(getTimeSecFromStart(), false).get());
   }
 
   public boolean isCompleted() {

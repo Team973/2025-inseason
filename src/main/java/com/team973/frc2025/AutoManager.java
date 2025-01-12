@@ -12,7 +12,7 @@ import java.util.List;
 public class AutoManager {
   private AutoMode m_currentMode;
   private final List<Auto> m_availableAutos = Arrays.asList(Auto.NoAuto, Auto.TaxiAuto);
-  private int m_selectedMode = 1;
+  private int m_selectedMode = 0;
 
   public enum Auto {
     NoAuto,

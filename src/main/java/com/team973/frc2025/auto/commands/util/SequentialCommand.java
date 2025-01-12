@@ -66,6 +66,8 @@ public class SequentialCommand extends AutoCommand {
 
   public void log() {
     m_logger.log("Index", m_currentIndex);
+
+    m_cmdList.get(m_currentIndex).log();
   }
 
   public boolean isCompleted() {

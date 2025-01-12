@@ -115,6 +115,7 @@ public class Drive implements Subsystem {
   public void resetOdometry(Pose2d pose) {
     m_pigeon.setYawOffset(m_pigeon.getRawYaw().minus(pose.getRotation()));
     m_poseEstimator.resetPosition(pose);
+    syncSensors();
   }
 
   public void resetModules() {
@@ -142,6 +143,7 @@ public class Drive implements Subsystem {
     m_odometryLogger.log("Successful Cycles", m_poseEstimator.getSuccessfulCycles());
     m_odometryLogger.log("X Pos", m_poseEstimator.getPoseMeters().getX());
     m_odometryLogger.log("Y Pos", m_poseEstimator.getPoseMeters().getY());
+    m_odometryLogger.log("Heading Deg", m_poseEstimator.getPoseMeters().getRotation().getDegrees());
 
     double states[] = new double[8];
     int index = 0;
