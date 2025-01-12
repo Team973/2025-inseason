@@ -3,11 +3,11 @@ package com.team973.frc2025.auto.commands;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.lib.util.AutoCommand;
 
-public class WaitUntillClawSeesCoralCommand extends AutoCommand {
+public class WaitUntillCoralSeeStateCommand extends AutoCommand {
   private final Claw m_claw;
   private final boolean m_waitUntilSensorSeesCoral;
 
-  public WaitUntillClawSeesCoralCommand(Claw claw, boolean waitUntilSensorSeesCoral) {
+  public WaitUntillCoralSeeStateCommand(Claw claw, boolean waitUntilSensorSeesCoral) {
     m_claw = claw;
     m_waitUntilSensorSeesCoral = waitUntilSensorSeesCoral;
   }

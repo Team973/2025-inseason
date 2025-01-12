@@ -1,7 +1,7 @@
 package com.team973.frc2025.auto.modes;
 
 import com.team973.frc2025.auto.commands.ClawCommand;
-import com.team973.frc2025.auto.commands.WaitUntillClawSeesCoralCommand;
+import com.team973.frc2025.auto.commands.WaitUntillCoralSeeStateCommand;
 import com.team973.frc2025.auto.commands.util.DelayCommand;
 import com.team973.frc2025.auto.commands.util.SequentialCommand;
 import com.team973.frc2025.subsystems.Claw;
@@ -14,19 +14,19 @@ public class ClawTestAuto extends SequentialCommand {
     super(
         logger,
         new ClawCommand(claw, ControlStatus.Shoot),
-        new WaitUntillClawSeesCoralCommand(claw, true),
+        new WaitUntillCoralSeeStateCommand(claw, true),
         new ClawCommand(claw, ControlStatus.Retract),
-        new WaitUntillClawSeesCoralCommand(claw, false),
+        new WaitUntillCoralSeeStateCommand(claw, false),
         new ClawCommand(claw, ControlStatus.Shoot),
-        new WaitUntillClawSeesCoralCommand(claw, true),
+        new WaitUntillCoralSeeStateCommand(claw, true),
         new ClawCommand(claw, ControlStatus.Retract),
-        new WaitUntillClawSeesCoralCommand(claw, false),
+        new WaitUntillCoralSeeStateCommand(claw, false),
         new ClawCommand(claw, ControlStatus.Shoot),
-        new WaitUntillClawSeesCoralCommand(claw, true),
+        new WaitUntillCoralSeeStateCommand(claw, true),
         new ClawCommand(claw, ControlStatus.Retract),
-        new WaitUntillClawSeesCoralCommand(claw, false),
+        new WaitUntillCoralSeeStateCommand(claw, false),
         new ClawCommand(claw, ControlStatus.Shoot),
-        new WaitUntillClawSeesCoralCommand(claw, true),
+        new WaitUntillCoralSeeStateCommand(claw, true),
         new ClawCommand(claw, ControlStatus.Retract),
         new DelayCommand(1));
   }
