@@ -5,6 +5,7 @@
 package com.team973.lib.util;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -31,7 +32,7 @@ public class GreyHolonomicDriveController {
 
   private final PIDController m_xController;
   private final PIDController m_yController;
-  private final PIDController m_thetaController;
+  private final ProfiledPIDController m_thetaController;
 
   private boolean m_firstRun = true;
 
@@ -43,7 +44,7 @@ public class GreyHolonomicDriveController {
    * @param thetaController A profiled PID controller to respond to error in angle.
    */
   public GreyHolonomicDriveController(
-      PIDController xController, PIDController yController, PIDController thetaController) {
+      PIDController xController, PIDController yController, ProfiledPIDController thetaController) {
     m_xController = xController;
     m_yController = yController;
     m_thetaController = thetaController;
@@ -92,8 +93,7 @@ public class GreyHolonomicDriveController {
     // If this is the first run, then we need to reset the theta controller to the current pose's
     // heading.
     if (m_firstRun) {
-      // m_thetaController.reset(currentPose.getRotation().getRadians());
-      m_thetaController.reset();
+      m_thetaController.reset(currentPose.getRotation().getRadians());
       m_firstRun = false;
     }
 
@@ -157,7 +157,7 @@ public class GreyHolonomicDriveController {
    *
    * @return heading ProfiledPIDController
    */
-  public PIDController getThetaController() {
+  public ProfiledPIDController getThetaController() {
     return m_thetaController;
   }
 

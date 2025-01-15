@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class DriveWithJoysticks implements DriveComposable {
+public class DriveWithJoysticks extends DriveComposable {
   private ChassisSpeeds m_driveInput;
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(10);
 
