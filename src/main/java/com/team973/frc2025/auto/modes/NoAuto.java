@@ -8,4 +8,8 @@ public class NoAuto extends AutoMode {
   public NoAuto(Logger logger) {
     super(logger, new Pose2d());
   }
+
+  public String getName() {
+    return "No Auto";
+  }
 }

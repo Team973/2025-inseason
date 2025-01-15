@@ -149,7 +149,8 @@ public class Robot extends TimedRobot {
     } else if (m_coDriverStick.getBButtonPressed()) {
       m_autoManager.decrement();
     }
-    SmartDashboard.putString("DB/String 2", String.valueOf(m_autoManager.getSelectedMode()));
+    SmartDashboard.putString(
+        "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
   }
 
   /** This function is called once when test mode is enabled. */

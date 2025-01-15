@@ -14,4 +14,8 @@ public class TaxiAuto extends AutoMode {
         new Pose2d(7.6, 4, Rotation2d.fromDegrees(180)),
         new DriveTrajectoryCommand(logger.subLogger("C-4"), drive, "C-4"));
   }
+
+  public String getName() {
+    return "Taxi Auto";
+  }
 }

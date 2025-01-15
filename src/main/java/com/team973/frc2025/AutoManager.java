@@ -11,13 +11,8 @@ import java.util.List;
 
 public class AutoManager {
   private AutoMode m_currentMode;
-  private final List<Auto> m_availableAutos = Arrays.asList(Auto.NoAuto, Auto.TaxiAuto);
+  private final List<AutoMode> m_availableAutos;
   private int m_selectedMode = 0;
-
-  public enum Auto {
-    NoAuto,
-    TaxiAuto,
-  }
 
   private final AutoMode m_noAuto;
   private final AutoMode m_taxiAuto;
@@ -25,6 +20,8 @@ public class AutoManager {
   public AutoManager(Logger logger, DriveController drive) {
     m_noAuto = new NoAuto(logger);
     m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive);
+
+    m_availableAutos = Arrays.asList(m_noAuto, m_taxiAuto);
   }
 
   public void increment() {
@@ -41,7 +38,7 @@ public class AutoManager {
     }
   }
 
-  public Auto getSelectedMode() {
+  public AutoMode getSelectedMode() {
     return m_availableAutos.get(m_selectedMode);
   }
 
@@ -59,14 +56,7 @@ public class AutoManager {
     m_currentMode.init();
   }
 
-  private void selectAuto(Auto mode) {
-    switch (mode) {
-      case NoAuto:
-        m_currentMode = m_noAuto;
-        break;
-      case TaxiAuto:
-        m_currentMode = m_taxiAuto;
-        break;
-    }
+  private void selectAuto(AutoMode mode) {
+    m_currentMode = mode;
   }
 }

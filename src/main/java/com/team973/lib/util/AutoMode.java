@@ -14,4 +14,6 @@ public abstract class AutoMode extends SequentialCommand {
   public Pose2d getStartingPose() {
     return m_startingPose;
   }
+
+  public abstract String getName();
 }
