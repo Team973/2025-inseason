@@ -1,5 +1,7 @@
 package com.team973.frc2025.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
@@ -9,7 +11,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class Claw implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_clawMotor;
-  private final DigitalInput m_bannerSensorFront = new DigitalInput(0);
+  private final DigitalInput m_bannerSensorFront = new DigitalInput(1);
   private final DigitalInput m_bannerSensorBack = new DigitalInput(0);
   private ControlStatus m_mode = ControlStatus.Stop;
 
@@ -17,12 +19,10 @@ public class Claw implements Subsystem {
     m_logger = logger;
     m_clawMotor = new GreyTalonFX(36, "Canivore", new Logger("ClawMotor"));
 
-    // TalonFXConfiguration rightMotorConfig = new TalonFXConfiguration();
-    // rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    // m_motorRight.setConfig(rightMotorConfig);
-    // TalonFXConfiguration leftMotorConfig = new TalonFXConfiguration();
-    // leftMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    // m_motorLeft.setConfig(leftMotorConfig);
+    TalonFXConfiguration clawMotorConfig = new TalonFXConfiguration();
+    clawMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    m_clawMotor.setConfig(clawMotorConfig);
+    
   }
 
   public boolean frontBannerSensorSeesCoral() {
