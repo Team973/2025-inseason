@@ -12,6 +12,14 @@ public class WaitUntillCoralSeeStateCommand extends AutoCommand {
     m_waitUntilSensorSeesCoral = waitUntilSensorSeesCoral;
   }
 
+  public boolean coralCorrectPlace() {
+    if (m_claw.frontBannerSensorSeesCoral() && !m_claw.backBannerSensorSeesCoral()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @Override
   public void init() {}
 
@@ -20,8 +28,8 @@ public class WaitUntillCoralSeeStateCommand extends AutoCommand {
 
   @Override
   public boolean isCompleted() {
-    return (m_waitUntilSensorSeesCoral && m_claw.sensorSeeCoral())
-        || (!m_waitUntilSensorSeesCoral && !m_claw.sensorSeeCoral());
+    return (m_waitUntilSensorSeesCoral && coralCorrectPlace())
+        || (!m_waitUntilSensorSeesCoral && !coralCorrectPlace());
   }
 
   @Override
