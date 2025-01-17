@@ -48,7 +48,8 @@ public class GreyHolonomicDriveController {
     m_xController = xController;
     m_yController = yController;
     m_thetaController = thetaController;
-    m_thetaController.enableContinuousInput(0, Units.degreesToRadians(360.0));
+    m_thetaController.enableContinuousInput(
+        Units.degreesToRadians(-180.0), Units.degreesToRadians(180.0));
   }
 
   /**

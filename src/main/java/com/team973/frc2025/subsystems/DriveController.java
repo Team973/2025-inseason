@@ -1,9 +1,9 @@
 package com.team973.frc2025.subsystems;
 
-import choreo.trajectory.SwerveSample;
 import com.team973.frc2025.subsystems.composables.DriveWithJoysticks;
 import com.team973.frc2025.subsystems.composables.DriveWithTrajectory;
 import com.team973.lib.devices.GreyPigeon;
+import com.team973.lib.util.DriveComposable;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,10 +15,14 @@ public class DriveController implements Subsystem {
   private final GreyPigeon m_pigeon;
   private final Drive m_drive;
 
+  private final Logger m_logger;
+
   private ControllerOption m_controllerOption = ControllerOption.DriveWithJoysticks;
 
   private final DriveWithJoysticks m_driveWithJoysticks;
   private final DriveWithTrajectory m_driveWithTrajectory;
+
+  private ChassisSpeeds m_currentChassisSpeeds;
 
   public enum RotationControl {
     OpenLoop,
@@ -44,40 +48,26 @@ public class DriveController implements Subsystem {
     m_pigeon = new GreyPigeon(logger.subLogger("pigeon"));
     m_drive = new Drive(m_pigeon, this, logger);
 
-    logger = logger.subLogger("controller");
+    m_logger = logger.subLogger("controller");
 
     m_driveWithJoysticks = new DriveWithJoysticks();
     m_driveWithTrajectory =
         new DriveWithTrajectory(logger.subLogger("driveWithTrajectory"), m_drive);
+
+    m_currentChassisSpeeds = new ChassisSpeeds();
   }
 
   public void setControllerOption(ControllerOption controllerOption) {
     m_controllerOption = controllerOption;
+    getComposableFromControllerOption(controllerOption).init();
   }
 
-  public synchronized void updateJoystickInput(double xAxis, double yAxis, double rotAxis) {
-    m_driveWithJoysticks.updateJoystickInput(
-        xAxis,
-        yAxis,
-        rotAxis,
-        m_drive.getPigeon().getNormalizedYaw(),
-        m_drive.getPigeon().getAngularVelocity());
+  public DriveWithJoysticks getDriveWithJoysticks() {
+    return m_driveWithJoysticks;
   }
 
-  public void updateTrajectory(SwerveSample sample) {
-    m_driveWithTrajectory.updateTrajectory(sample, getPose());
-  }
-
-  public synchronized void setRotationControl(RotationControl rotationControl) {
-    m_driveWithJoysticks.setRotationControl(rotationControl);
-  }
-
-  public synchronized void resetDriveWithJoysticks(Rotation2d currentYaw) {
-    m_driveWithJoysticks.reset(currentYaw);
-  }
-
-  public synchronized void setHeldAngle(Rotation2d angle) {
-    m_driveWithJoysticks.setHeldAngle(angle);
+  public DriveWithTrajectory getDriveWithTrajectory() {
+    return m_driveWithTrajectory;
   }
 
   public synchronized GreyPigeon getPigeon() {
@@ -100,27 +90,42 @@ public class DriveController implements Subsystem {
   @Override
   public void log() {
     m_drive.log();
+
+    m_logger.log("chassis speeds/vx", m_currentChassisSpeeds.vxMetersPerSecond);
+    m_logger.log("chassis speeds/vy", m_currentChassisSpeeds.vyMetersPerSecond);
+    m_logger.log("chassis speeds/omega RadPS", m_currentChassisSpeeds.omegaRadiansPerSecond);
+  }
+
+  private DriveComposable getComposableFromControllerOption(ControllerOption option) {
+    switch (m_controllerOption) {
+      case DriveWithJoysticks:
+        return m_driveWithJoysticks;
+      case DriveWithTrajectory:
+        return m_driveWithTrajectory;
+      default:
+        return m_driveWithJoysticks;
+    }
   }
 
   @Override
   public synchronized void syncSensors() {
     m_drive.syncSensors();
+    m_driveWithTrajectory.updatePose(getPose());
+    m_driveWithJoysticks.updateAngle(
+        m_drive.getPigeon().getNormalizedYaw(), m_drive.getPigeon().getAngularVelocity());
   }
 
   @Override
   public synchronized void update() {
     ChassisSpeeds currentChassisSpeeds = new ChassisSpeeds();
 
-    switch (m_controllerOption) {
-      case DriveWithJoysticks:
-        currentChassisSpeeds = m_driveWithJoysticks.getOutput();
-        break;
-      case DriveWithTrajectory:
-        currentChassisSpeeds = m_driveWithTrajectory.getOutput();
-        break;
-    }
+    DriveComposable currentComposable = getComposableFromControllerOption(m_controllerOption);
+
+    currentChassisSpeeds = currentComposable.getOutput();
+
     if (currentChassisSpeeds != null) {
       m_drive.setChassisSpeeds(currentChassisSpeeds);
+      m_currentChassisSpeeds = currentChassisSpeeds;
     }
     m_drive.update();
   }

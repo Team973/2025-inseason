@@ -23,7 +23,8 @@ public class Robot extends TimedRobot {
       new DriveController(m_logger.subLogger("drive"));
   private final Claw m_claw = new Claw(new Logger("Claw"));
 
-  private final AutoManager m_autoManager = new AutoManager(m_logger, m_driveController, m_claw);
+  private final AutoManager m_autoManager =
+      new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 
   private final Joystick m_driverStick =
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
@@ -87,6 +88,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoManager.init();
+    m_driveController.resetOdometry(m_autoManager.getStartingPose());
   }
 
   /** This function is called periodically during autonomous. */
@@ -94,7 +96,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     syncSensors();
     // TODO: we're doing this badly to make it work
-    m_driveController.updateJoystickInput(0.0, 0.0, 0.0);
+    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
     // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
     m_autoManager.run();
     updateSubsystems();
@@ -111,10 +113,12 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     syncSensors();
 
-    m_driveController.updateJoystickInput(
-        m_driverStick.getLeftXAxis() * 0.95,
-        m_driverStick.getLeftYAxis() * 0.95,
-        m_driverStick.getRightXAxis() * 0.8);
+    m_driveController
+        .getDriveWithJoysticks()
+        .updateInput(
+            m_driverStick.getLeftXAxis() * 0.95,
+            m_driverStick.getLeftYAxis() * 0.95,
+            m_driverStick.getRightXAxis() * 0.8);
 
     if (m_coDriverStick.getAButton()) {
       m_claw.setControl(ControlStatus.IntakeAndHold);
@@ -140,14 +144,15 @@ public class Robot extends TimedRobot {
     syncSensors();
 
     // TODO: we're doing this badly to make it work
-    m_driveController.updateJoystickInput(0.0, 0.0, 0.0);
+    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
 
     if (m_coDriverStick.getAButtonPressed()) {
       m_autoManager.increment();
     } else if (m_coDriverStick.getBButtonPressed()) {
       m_autoManager.decrement();
     }
-    SmartDashboard.putString("DB/String 2", String.valueOf(m_autoManager.getSelectedMode()));
+    SmartDashboard.putString(
+        "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
   }
 
   /** This function is called once when test mode is enabled. */

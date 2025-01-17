@@ -278,5 +278,13 @@ public class SwerveModule {
 
     m_logger.log("Integrated", getState().angle.getDegrees());
     m_logger.log("Position", getPosition().distanceMeters);
+    m_logger.log(
+        "Target Drive Velocity RPS",
+        m_driveMechanism
+            .getRotorRotationFromOutputDistance(m_lastState.speedMetersPerSecond)
+            .getRotations());
+    m_logger.log(
+        "Target Angle Rot",
+        m_angleMechanism.getRotorRotationFromOutputRotation(m_lastState.angle).getRotations());
   }
 }

@@ -5,36 +5,32 @@ import com.team973.frc2025.auto.modes.NoAuto;
 import com.team973.frc2025.auto.modes.TaxiAuto;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.DriveController;
-import com.team973.lib.util.AutoCommand;
+import com.team973.lib.util.AutoMode;
 import com.team973.lib.util.Logger;
+import edu.wpi.first.math.geometry.Pose2d;
 import java.util.Arrays;
 import java.util.List;
 
 public class AutoManager {
-  private AutoCommand m_currentMode;
-  private final List<AutoMode> m_availableAutoModes =
-      Arrays.asList(AutoMode.NoAuto, AutoMode.TaxiAuto, AutoMode.ClawTestAuto);
+  private AutoMode m_currentMode;
+  private final List<AutoMode> m_availableAutos;
   private int m_selectedMode = 0;
 
-  public enum AutoMode {
-    NoAuto,
-    TaxiAuto,
-    ClawTestAuto,
-  }
-
-  private final AutoCommand m_noAuto;
-  private final AutoCommand m_taxiAuto;
-  private final AutoCommand m_clawTestAuto;
+  private final AutoMode m_noAuto;
+  private final AutoMode m_taxiAuto;
+  private final AutoMode m_clawTestAuto;
 
   public AutoManager(Logger logger, DriveController drive, Claw claw) {
     m_noAuto = new NoAuto(logger);
     m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive);
-    m_clawTestAuto = new ClawTestAuto(logger, claw);
+    m_clawTestAuto = new ClawTestAuto(logger.subLogger("claw"), claw);
+
+    m_availableAutos = Arrays.asList(m_noAuto, m_taxiAuto, m_clawTestAuto);
   }
 
   public void increment() {
     m_selectedMode += 1;
-    if (m_selectedMode >= m_availableAutoModes.size()) {
+    if (m_selectedMode >= m_availableAutos.size()) {
       m_selectedMode = 0;
     }
   }
@@ -42,12 +38,16 @@ public class AutoManager {
   public void decrement() {
     m_selectedMode -= 1;
     if (m_selectedMode < 0) {
-      m_selectedMode = m_availableAutoModes.size() - 1;
+      m_selectedMode = m_availableAutos.size() - 1;
     }
   }
 
   public AutoMode getSelectedMode() {
-    return m_availableAutoModes.get(m_selectedMode);
+    return m_availableAutos.get(m_selectedMode);
+  }
+
+  public Pose2d getStartingPose() {
+    return m_currentMode.getStartingPose();
   }
 
   public void run() {
@@ -56,21 +56,11 @@ public class AutoManager {
   }
 
   public void init() {
-    selectAuto(m_availableAutoModes.get(m_selectedMode));
+    selectAuto(m_availableAutos.get(m_selectedMode));
     m_currentMode.init();
   }
 
   private void selectAuto(AutoMode mode) {
-    switch (mode) {
-      case NoAuto:
-        m_currentMode = m_noAuto;
-        break;
-      case TaxiAuto:
-        m_currentMode = m_taxiAuto;
-        break;
-      case ClawTestAuto:
-        m_currentMode = m_clawTestAuto;
-        break;
-    }
+    m_currentMode = mode;
   }
 }
