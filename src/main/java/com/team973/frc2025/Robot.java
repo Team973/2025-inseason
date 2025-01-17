@@ -24,7 +24,7 @@ public class Robot extends TimedRobot {
   private final Claw m_claw = new Claw(new Logger("Claw"));
 
   private final AutoManager m_autoManager =
-      new AutoManager(m_logger.subLogger("auto"), m_driveController);
+      new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 
   private final Joystick m_driverStick =
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));

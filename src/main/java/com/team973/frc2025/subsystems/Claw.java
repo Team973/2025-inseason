@@ -28,8 +28,8 @@ public class Claw implements Subsystem {
     m_motorLeft.setConfig(leftMotorConfig);
   }
 
-  private boolean sensorSeeCoral() {
-    return !m_sensor.get();
+  public boolean sensorSeeCoral() {
+    return m_sensor.get();
   }
 
   public static enum ControlStatus {
