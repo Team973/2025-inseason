@@ -96,7 +96,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     syncSensors();
     // TODO: we're doing this badly to make it work
-    m_driveController.updateJoystickInput(0.0, 0.0, 0.0);
+    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
     // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
     m_autoManager.run();
     updateSubsystems();
@@ -113,10 +113,12 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     syncSensors();
 
-    m_driveController.updateJoystickInput(
-        m_driverStick.getLeftXAxis() * 0.95,
-        m_driverStick.getLeftYAxis() * 0.95,
-        m_driverStick.getRightXAxis() * 0.8);
+    m_driveController
+        .getDriveWithJoysticks()
+        .updateInput(
+            m_driverStick.getLeftXAxis() * 0.95,
+            m_driverStick.getLeftYAxis() * 0.95,
+            m_driverStick.getRightXAxis() * 0.8);
 
     if (m_coDriverStick.getAButton()) {
       m_claw.setControl(ControlStatus.IntakeAndHold);
@@ -142,7 +144,7 @@ public class Robot extends TimedRobot {
     syncSensors();
 
     // TODO: we're doing this badly to make it work
-    m_driveController.updateJoystickInput(0.0, 0.0, 0.0);
+    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
 
     if (m_coDriverStick.getAButtonPressed()) {
       m_autoManager.increment();

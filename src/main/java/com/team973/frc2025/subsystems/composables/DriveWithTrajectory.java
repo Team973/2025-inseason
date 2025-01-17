@@ -1,8 +1,10 @@
 package com.team973.frc2025.subsystems.composables;
 
 import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.Drive;
+import com.team973.lib.util.Conversions;
 import com.team973.lib.util.DriveComposable;
 import com.team973.lib.util.GreyHolonomicDriveController;
 import com.team973.lib.util.Logger;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import java.util.Optional;
 
 public class DriveWithTrajectory extends DriveComposable {
   private static final SwerveSample NULL_SAMPLE =
@@ -22,6 +25,10 @@ public class DriveWithTrajectory extends DriveComposable {
 
   private SwerveSample m_currentSample;
   private Pose2d m_currentPose;
+
+  private Trajectory<SwerveSample> m_trajectory;
+
+  private double m_trajectoryStartTime = Conversions.Time.getSecTime();
 
   public DriveWithTrajectory(Logger logger, Drive drive) {
     m_controller =
@@ -41,9 +48,21 @@ public class DriveWithTrajectory extends DriveComposable {
     log();
   }
 
-  public synchronized void updateTrajectory(SwerveSample sample, Pose2d pose) {
-    m_currentSample = sample;
+  public synchronized void updatePose(Pose2d pose) {
     m_currentPose = pose;
+  }
+
+  public synchronized void setTrajectory(Trajectory<SwerveSample> trajectory) {
+    m_trajectory = trajectory;
+    m_trajectoryStartTime = Conversions.Time.getSecTime();
+  }
+
+  public synchronized boolean isComplete() {
+    return m_trajectory.getTotalTime() <= getTimeSecFromStart();
+  }
+
+  public double getTimeSecFromStart() {
+    return Conversions.Time.getSecTime() - m_trajectoryStartTime;
   }
 
   public synchronized void log() {
@@ -72,9 +91,13 @@ public class DriveWithTrajectory extends DriveComposable {
   public synchronized ChassisSpeeds getOutput() {
     log();
 
-    if (m_currentPose == null || m_currentSample == null) {
+    Optional<SwerveSample> sample = m_trajectory.sampleAt(getTimeSecFromStart(), false);
+
+    if (m_currentPose == null || sample.isEmpty()) {
       return new ChassisSpeeds();
     }
+
+    m_currentSample = sample.get();
 
     if (getFirstRun()) {
       m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());

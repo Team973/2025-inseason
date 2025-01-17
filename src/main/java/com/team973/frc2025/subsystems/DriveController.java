@@ -1,6 +1,5 @@
 package com.team973.frc2025.subsystems;
 
-import choreo.trajectory.SwerveSample;
 import com.team973.frc2025.subsystems.composables.DriveWithJoysticks;
 import com.team973.frc2025.subsystems.composables.DriveWithTrajectory;
 import com.team973.lib.devices.GreyPigeon;
@@ -63,29 +62,12 @@ public class DriveController implements Subsystem {
     getComposableFromControllerOption(controllerOption).init();
   }
 
-  public synchronized void updateJoystickInput(double xAxis, double yAxis, double rotAxis) {
-    m_driveWithJoysticks.updateJoystickInput(
-        xAxis,
-        yAxis,
-        rotAxis,
-        m_drive.getPigeon().getNormalizedYaw(),
-        m_drive.getPigeon().getAngularVelocity());
+  public DriveWithJoysticks getDriveWithJoysticks() {
+    return m_driveWithJoysticks;
   }
 
-  public void updateTrajectory(SwerveSample sample) {
-    m_driveWithTrajectory.updateTrajectory(sample, getPose());
-  }
-
-  public synchronized void setRotationControl(RotationControl rotationControl) {
-    m_driveWithJoysticks.setRotationControl(rotationControl);
-  }
-
-  public synchronized void resetDriveWithJoysticks(Rotation2d currentYaw) {
-    m_driveWithJoysticks.reset(currentYaw);
-  }
-
-  public synchronized void setHeldAngle(Rotation2d angle) {
-    m_driveWithJoysticks.setHeldAngle(angle);
+  public DriveWithTrajectory getDriveWithTrajectory() {
+    return m_driveWithTrajectory;
   }
 
   public synchronized GreyPigeon getPigeon() {
@@ -128,6 +110,9 @@ public class DriveController implements Subsystem {
   @Override
   public synchronized void syncSensors() {
     m_drive.syncSensors();
+    m_driveWithTrajectory.updatePose(getPose());
+    m_driveWithJoysticks.updateAngle(
+        m_drive.getPigeon().getNormalizedYaw(), m_drive.getPigeon().getAngularVelocity());
   }
 
   @Override
