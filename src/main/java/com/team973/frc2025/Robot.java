@@ -125,7 +125,7 @@ public class Robot extends TimedRobot {
     } else if (m_coDriverStick.getBButton()) {
       m_claw.setControl(ControlStatus.Stop);
     } else if (m_coDriverStick.getXButton()) {
-      m_claw.setControl(ControlStatus.Shoot);
+      m_claw.setControl(ControlStatus.Score);
     } else if (m_coDriverStick.getYButton()) {
       m_claw.setControl(ControlStatus.Retract);
     }
