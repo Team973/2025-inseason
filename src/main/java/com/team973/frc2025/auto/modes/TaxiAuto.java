@@ -12,7 +12,7 @@ public class TaxiAuto extends AutoMode {
     super(
         logger,
         new Pose2d(7.6, 4, Rotation2d.fromDegrees(180)),
-        new DriveTrajectoryCommand(logger.subLogger("C-4"), drive, "C-4"));
+        new DriveTrajectoryCommand(drive, "C-4"));
   }
 
   public String getName() {
