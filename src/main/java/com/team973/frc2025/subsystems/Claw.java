@@ -21,8 +21,8 @@ public class Claw implements Subsystem {
 
   public Claw(Logger logger) {
     m_logger = logger;
-    m_motorRight = new GreyTalonFX(36, "Canivore", new Logger("shooterRight"));
-    m_motorLeft = new GreyTalonFX(35, "Canivore", new Logger("shooterLeft"));
+    m_motorRight = new GreyTalonFX(36, "Canivore", m_logger.subLogger("shooterRight"));
+    m_motorLeft = new GreyTalonFX(35, "Canivore", m_logger.subLogger("shooterLeft"));
 
     TalonFXConfiguration rightMotorConfig = defaultMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -35,9 +35,9 @@ public class Claw implements Subsystem {
   private static TalonFXConfiguration defaultMotorConfig() {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
     defaultMotorConfig.Slot0.kS = 0.0;
-    defaultMotorConfig.Slot0.kV = 0.0;
-    defaultMotorConfig.Slot0.kA = 0.0;
-    defaultMotorConfig.Slot0.kP = 1.0;
+    defaultMotorConfig.Slot0.kV = 0.15;
+    defaultMotorConfig.Slot0.kA = 0.01;
+    defaultMotorConfig.Slot0.kP = 4.0;
     defaultMotorConfig.Slot0.kI = 0.0;
     defaultMotorConfig.Slot0.kD = 0.0;
     defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
@@ -45,7 +45,7 @@ public class Claw implements Subsystem {
     defaultMotorConfig.MotionMagic.MotionMagicJerk = 160;
     // slot 1 is for velocity
     defaultMotorConfig.Slot1.kS = 0.0;
-    defaultMotorConfig.Slot1.kV = 0.05;
+    defaultMotorConfig.Slot1.kV = 0.15;
     defaultMotorConfig.Slot1.kA = 0.0;
     defaultMotorConfig.Slot1.kP = 0.1;
     defaultMotorConfig.Slot1.kI = 0.0;
@@ -81,34 +81,35 @@ public class Claw implements Subsystem {
     switch (m_mode) {
       case IntakeAndHold:
         if (sensorSeeCoral()) {
-          m_motorRight.setControl(ControlMode.PositionVoltage, 2);
-          m_motorLeft.setControl(ControlMode.PositionVoltage, 2);
+          m_motorRight.setControl(ControlMode.VelocityVoltage, 0, 1);
+          m_motorLeft.setControl(ControlMode.VelocityVoltage, 0, 1);
         } else if (!sensorSeeCoral()) {
-          m_motorRight.setControl(ControlMode.PositionVoltage, 2);
-          m_motorLeft.setControl(ControlMode.PositionVoltage, 2);
+          m_motorRight.setControl(ControlMode.VelocityVoltage, 3, 1);
+          m_motorLeft.setControl(ControlMode.VelocityVoltage, 3, 1);
         }
         break;
       case Shoot:
-        m_motorRight.setControl(ControlMode.PositionVoltage, 2);
-        m_motorLeft.setControl(ControlMode.PositionVoltage, 2);
+        m_motorRight.setControl(ControlMode.VelocityVoltage, 2, 1);
+        m_motorLeft.setControl(ControlMode.VelocityVoltage, 2, 1);
         break;
       case Stop:
-        m_motorRight.setControl(ControlMode.PositionVoltage, 2);
-        m_motorLeft.setControl(ControlMode.PositionVoltage, 2);
+        m_motorRight.setControl(ControlMode.VelocityVoltage, 0, 1);
+        m_motorLeft.setControl(ControlMode.VelocityVoltage, 0, 1);
         break;
       case Score:
         if (m_lastMode != m_mode) {
           m_rightTargetMotion = m_motorRight.getPosition().getValueAsDouble() + 4.5;
           m_leftTargetPostion = m_motorLeft.getPosition().getValueAsDouble() + 4.5;
         }
-        m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_rightTargetMotion);
-        m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion);
+        m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_rightTargetMotion, 0);
+        m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion, 0);
         break;
       case Retract:
-        m_motorRight.setControl(ControlMode.PositionVoltage, -2);
-        m_motorLeft.setControl(ControlMode.PositionVoltage, -2);
+        m_motorRight.setControl(ControlMode.VelocityVoltage, -2, 1);
+        m_motorLeft.setControl(ControlMode.VelocityVoltage, -2, 1);
         break;
     }
+    m_lastMode = m_mode;
   }
 
   public void setControl(ControlStatus mode) {
