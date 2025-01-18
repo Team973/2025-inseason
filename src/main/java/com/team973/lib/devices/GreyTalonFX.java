@@ -396,44 +396,55 @@ public class GreyTalonFX extends TalonFX {
       int slot,
       boolean overrideBrakeDurNeutral) {
 
-    ControlRequest motorOutput = new DutyCycleOut(0.0);
-
     var currentOutputParams =
         new OutputParams(
             controlMode, demand, enableFOC, feedForward, slot, overrideBrakeDurNeutral);
 
     if (m_lastOutputParams == null || !m_lastOutputParams.equals(currentOutputParams)) {
-      switch (controlMode) {
-        case DutyCycleOut:
-          motorOutput = new DutyCycleOut(demand);
-          break;
-        case MotionMagicDutyCycle:
-          motorOutput = new MotionMagicDutyCycle(demand);
-          break;
-        case MotionMagicVoltage:
-          motorOutput = new MotionMagicVoltage(demand);
-          break;
-        case PositionDutyCycle:
-          motorOutput = new PositionDutyCycle(demand);
-          break;
-        case PositionVoltage:
-          motorOutput = new PositionVoltage(demand);
-          break;
-        case VelocityDutyCycle:
-          motorOutput = new VelocityDutyCycle(demand);
-          break;
-        case VelocityVoltage:
-          motorOutput = new VelocityVoltage(demand);
-          break;
-        default:
-          // Uses the above DutyCycleOut set to 0.0
-          break;
-      }
-
       m_lastOutputParams = currentOutputParams;
-      m_lastControlCode = super.setControl(motorOutput);
+      m_lastControlCode = super.setControl(makeControlRequest(controlMode, demand, enableFOC, feedForward, slot));
     }
     return m_lastControlCode;
+  }
+
+  private ControlRequest makeControlRequest(
+      ControlMode controlMode, double demand, boolean enableFOC, double feedForward, int slot) {
+    switch (controlMode) {
+      case DutyCycleOut:
+        return new DutyCycleOut(demand);
+      case MotionMagicDutyCycle:
+        return new MotionMagicDutyCycle(demand)
+            .withEnableFOC(enableFOC)
+            .withFeedForward(feedForward)
+            .withSlot(slot);
+      case MotionMagicVoltage:
+        return new MotionMagicVoltage(demand)
+            .withEnableFOC(enableFOC)
+            .withFeedForward(feedForward)
+            .withSlot(slot);
+      case PositionDutyCycle:
+        return new PositionDutyCycle(demand)
+            .withEnableFOC(enableFOC)
+            .withFeedForward(feedForward)
+            .withSlot(slot);
+      case PositionVoltage:
+        return new PositionVoltage(demand)
+            .withEnableFOC(enableFOC)
+            .withFeedForward(feedForward)
+            .withSlot(slot);
+      case VelocityDutyCycle:
+        return new VelocityDutyCycle(demand)
+            .withEnableFOC(enableFOC)
+            .withFeedForward(feedForward)
+            .withSlot(slot);
+      case VelocityVoltage:
+        return new VelocityVoltage(demand)
+            .withEnableFOC(enableFOC)
+            .withFeedForward(feedForward)
+            .withSlot(slot);
+      default:
+        throw new IllegalArgumentException(controlMode.toString());
+    }
   }
 
   @Deprecated
