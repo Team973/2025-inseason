@@ -59,26 +59,27 @@ public class DriveTrajectoryCommand extends AutoCommand {
   }
 
   public void run() {
-    if (m_commandList.get(m_pendingEventIndex).timestamp
-            <= m_drive.getDriveWithTrajectory().getTimeSecFromStart()
-        && m_commandList.size() > 0) {
-      if (m_currentCommand != null) {
-        m_currentCommand.postComplete(true);
+    if (m_commandList.size() > m_pendingEventIndex) {
+      if (m_commandList.get(m_pendingEventIndex).timestamp
+          <= m_drive.getDriveWithTrajectory().getTimeSecFromStart()) {
+        if (m_currentCommand != null) {
+          m_currentCommand.postComplete(true);
+        }
+
+        m_currentCommand = m_events.get(m_commandList.get(m_pendingEventIndex).event);
+        m_currentCommand.init();
+
+        m_pendingEventIndex++;
       }
-
-      m_pendingEventIndex++;
-      m_currentCommand = m_events.get(m_commandList.get(m_pendingEventIndex).event);
-
-      m_currentCommand.init();
-    }
-
-    if (m_currentCommand.isCompleted() && m_currentCommand != null) {
-      m_currentCommand.postComplete(false);
-      m_currentCommand = null;
     }
 
     if (m_currentCommand != null) {
-      m_currentCommand.run();
+      if (m_currentCommand.isCompleted()) {
+        m_currentCommand.postComplete(false);
+        m_currentCommand = null;
+      } else {
+        m_currentCommand.run();
+      }
     }
   }
 
