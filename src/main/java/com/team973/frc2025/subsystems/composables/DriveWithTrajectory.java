@@ -76,6 +76,8 @@ public class DriveWithTrajectory extends DriveComposable {
 
     m_logger.log("sample/X", logSample.x);
     m_logger.log("sample/y", logSample.y);
+    m_logger.log("sample/vx", logSample.vx);
+    m_logger.log("sample/vy", logSample.vy);
     m_logger.log("sample/Heading Deg", Rotation2d.fromRadians(logSample.heading).getDegrees());
     m_logger.log("sample/Omega", logSample.omega);
 
