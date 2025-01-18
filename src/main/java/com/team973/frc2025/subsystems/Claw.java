@@ -45,9 +45,9 @@ public class Claw implements Subsystem {
     defaultMotorConfig.MotionMagic.MotionMagicJerk = 160;
     // slot 1 is for velocity
     defaultMotorConfig.Slot1.kS = 0.0;
-    defaultMotorConfig.Slot1.kV = 0.15;
+    defaultMotorConfig.Slot1.kV = 0.125 * 10.0 / 10.5;
     defaultMotorConfig.Slot1.kA = 0.0;
-    defaultMotorConfig.Slot1.kP = 0.1;
+    defaultMotorConfig.Slot1.kP = 0.3;
     defaultMotorConfig.Slot1.kI = 0.0;
     defaultMotorConfig.Slot1.kD = 0.0;
     defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
@@ -84,8 +84,8 @@ public class Claw implements Subsystem {
           m_motorRight.setControl(ControlMode.VelocityVoltage, 0, 1);
           m_motorLeft.setControl(ControlMode.VelocityVoltage, 0, 1);
         } else if (!sensorSeeCoral()) {
-          m_motorRight.setControl(ControlMode.VelocityVoltage, 3, 1);
-          m_motorLeft.setControl(ControlMode.VelocityVoltage, 3, 1);
+          m_motorRight.setControl(ControlMode.VelocityVoltage, 10, 1);
+          m_motorLeft.setControl(ControlMode.VelocityVoltage, 10, 1);
         }
         break;
       case Shoot:
@@ -105,8 +105,8 @@ public class Claw implements Subsystem {
         m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion, 0);
         break;
       case Retract:
-        m_motorRight.setControl(ControlMode.VelocityVoltage, -2, 1);
-        m_motorLeft.setControl(ControlMode.VelocityVoltage, -2, 1);
+        m_motorRight.setControl(ControlMode.VelocityVoltage, -5, 1);
+        m_motorLeft.setControl(ControlMode.VelocityVoltage, -5, 1);
         break;
     }
     m_lastMode = m_mode;
