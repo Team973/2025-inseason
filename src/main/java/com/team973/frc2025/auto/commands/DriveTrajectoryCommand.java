@@ -60,7 +60,8 @@ public class DriveTrajectoryCommand extends AutoCommand {
 
   public void run() {
     if (m_commandList.get(m_pendingEventIndex).timestamp
-        <= m_drive.getDriveWithTrajectory().getTimeSecFromStart()) {
+            <= m_drive.getDriveWithTrajectory().getTimeSecFromStart()
+        && m_commandList.size() > 0) {
       if (m_currentCommand != null) {
         m_currentCommand.postComplete(true);
       }
@@ -71,7 +72,7 @@ public class DriveTrajectoryCommand extends AutoCommand {
       m_currentCommand.init();
     }
 
-    if (m_currentCommand.isCompleted()) {
+    if (m_currentCommand.isCompleted() && m_currentCommand != null) {
       m_currentCommand.postComplete(false);
       m_currentCommand = null;
     }
