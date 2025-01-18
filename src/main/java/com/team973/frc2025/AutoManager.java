@@ -22,7 +22,7 @@ public class AutoManager {
 
   public AutoManager(Logger logger, DriveController drive, Claw claw) {
     m_noAuto = new NoAuto(logger);
-    m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive);
+    m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive, claw);
     m_clawTestAuto = new ClawTestAuto(logger.subLogger("claw"), claw);
 
     m_availableAutos = Arrays.asList(m_noAuto, m_taxiAuto, m_clawTestAuto);
