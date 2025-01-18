@@ -20,7 +20,7 @@ public class DriveTrajectoryCommand extends AutoCommand {
   private final HashMap<String, AutoCommand> m_events;
 
   private final List<EventMarker> m_commandList = new ArrayList<>();
-  private int m_currentCommandIndex = 0;
+  private int m_pendingEventIndex = 0;
 
   private AutoCommand m_currentCommand;
 
@@ -59,14 +59,14 @@ public class DriveTrajectoryCommand extends AutoCommand {
   }
 
   public void run() {
-    if (m_commandList.get(m_currentCommandIndex).timestamp
+    if (m_commandList.get(m_pendingEventIndex).timestamp
         <= m_drive.getDriveWithTrajectory().getTimeSecFromStart()) {
       if (m_currentCommand != null) {
         m_currentCommand.postComplete(true);
       }
 
-      m_currentCommandIndex++;
-      m_currentCommand = m_events.get(m_commandList.get(m_currentCommandIndex).event);
+      m_pendingEventIndex++;
+      m_currentCommand = m_events.get(m_commandList.get(m_pendingEventIndex).event);
 
       m_currentCommand.init();
     }
