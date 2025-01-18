@@ -2,6 +2,7 @@ package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
@@ -23,30 +24,39 @@ public class Claw implements Subsystem {
     m_motorRight = new GreyTalonFX(36, "Canivore", new Logger("shooterRight"));
     m_motorLeft = new GreyTalonFX(35, "Canivore", new Logger("shooterLeft"));
 
-    TalonFXConfiguration rightMotorConfig = new TalonFXConfiguration();
+    TalonFXConfiguration rightMotorConfig = defaultMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    rightMotorConfig.Slot0.kS = 0.0;
-    rightMotorConfig.Slot0.kV = 0.0;
-    rightMotorConfig.Slot0.kA = 0.0;
-    rightMotorConfig.Slot0.kP = 1.0;
-    rightMotorConfig.Slot0.kI = 0.0;
-    rightMotorConfig.Slot0.kD = 0.0;
-    rightMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
-    rightMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
-    rightMotorConfig.MotionMagic.MotionMagicJerk = 160;
     m_motorRight.setConfig(rightMotorConfig);
-    TalonFXConfiguration leftMotorConfig = new TalonFXConfiguration();
-    leftMotorConfig.Slot0.kS = 0.0;
-    leftMotorConfig.Slot0.kV = 0.0;
-    leftMotorConfig.Slot0.kA = 0.0;
-    leftMotorConfig.Slot0.kP = 1.0;
-    leftMotorConfig.Slot0.kI = 0.0;
-    leftMotorConfig.Slot0.kD = 0.0;
-    leftMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
-    leftMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
-    leftMotorConfig.MotionMagic.MotionMagicJerk = 160;
+    TalonFXConfiguration leftMotorConfig = defaultMotorConfig();
     leftMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     m_motorLeft.setConfig(leftMotorConfig);
+  }
+
+  private static TalonFXConfiguration defaultMotorConfig() {
+    TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
+    defaultMotorConfig.Slot0.kS = 0.0;
+    defaultMotorConfig.Slot0.kV = 0.0;
+    defaultMotorConfig.Slot0.kA = 0.0;
+    defaultMotorConfig.Slot0.kP = 1.0;
+    defaultMotorConfig.Slot0.kI = 0.0;
+    defaultMotorConfig.Slot0.kD = 0.0;
+    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
+    defaultMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
+    defaultMotorConfig.MotionMagic.MotionMagicJerk = 160;
+    // slot 1 is for velocity
+    defaultMotorConfig.Slot1.kS = 0.0;
+    defaultMotorConfig.Slot1.kV = 0.05;
+    defaultMotorConfig.Slot1.kA = 0.0;
+    defaultMotorConfig.Slot1.kP = 0.1;
+    defaultMotorConfig.Slot1.kI = 0.0;
+    defaultMotorConfig.Slot1.kD = 0.0;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
+    defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    return defaultMotorConfig;
   }
 
   public boolean motorAtTarget() {
@@ -71,20 +81,20 @@ public class Claw implements Subsystem {
     switch (m_mode) {
       case IntakeAndHold:
         if (sensorSeeCoral()) {
-          m_motorRight.setControl(ControlMode.DutyCycleOut, 0);
-          m_motorLeft.setControl(ControlMode.DutyCycleOut, 0);
+          m_motorRight.setControl(ControlMode.PositionVoltage, 2);
+          m_motorLeft.setControl(ControlMode.PositionVoltage, 2);
         } else if (!sensorSeeCoral()) {
-          m_motorRight.setControl(ControlMode.DutyCycleOut, 0.1);
-          m_motorLeft.setControl(ControlMode.DutyCycleOut, 0.1);
+          m_motorRight.setControl(ControlMode.PositionVoltage, 2);
+          m_motorLeft.setControl(ControlMode.PositionVoltage, 2);
         }
         break;
       case Shoot:
-        m_motorRight.setControl(ControlMode.DutyCycleOut, 0.1);
-        m_motorLeft.setControl(ControlMode.DutyCycleOut, 0.1);
+        m_motorRight.setControl(ControlMode.PositionVoltage, 2);
+        m_motorLeft.setControl(ControlMode.PositionVoltage, 2);
         break;
       case Stop:
-        m_motorRight.setControl(ControlMode.DutyCycleOut, 0);
-        m_motorLeft.setControl(ControlMode.DutyCycleOut, 0);
+        m_motorRight.setControl(ControlMode.PositionVoltage, 2);
+        m_motorLeft.setControl(ControlMode.PositionVoltage, 2);
         break;
       case Score:
         if (m_lastMode != m_mode) {
@@ -95,8 +105,8 @@ public class Claw implements Subsystem {
         m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion);
         break;
       case Retract:
-        m_motorRight.setControl(ControlMode.DutyCycleOut, -0.1);
-        m_motorLeft.setControl(ControlMode.DutyCycleOut, -0.1);
+        m_motorRight.setControl(ControlMode.PositionVoltage, -2);
+        m_motorLeft.setControl(ControlMode.PositionVoltage, -2);
         break;
     }
   }
