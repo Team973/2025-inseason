@@ -72,6 +72,7 @@ public class DriveTrajectoryCommand extends AutoCommand {
     }
 
     if (m_currentCommand.isCompleted()) {
+      m_currentCommand.postComplete(false);
       m_currentCommand = null;
     }
 
