@@ -18,7 +18,6 @@ public class DriveTrajectoryCommand extends AutoCommand {
   private final Optional<Trajectory<SwerveSample>> m_trajectory;
 
   private final HashMap<String, AutoCommand> m_events;
-  private final HashMap<Double, EventMarker> m_eventMarkers;
 
   private final List<EventMarker> m_commandList = new ArrayList<>();
   private int m_currentCommandIndex = 0;
@@ -31,14 +30,12 @@ public class DriveTrajectoryCommand extends AutoCommand {
     m_trajectory = Choreo.loadTrajectory(trajectoryName);
 
     m_events = new HashMap<>();
-    m_eventMarkers = new HashMap<>();
 
     for (CommandOnEvent event : events) {
       m_events.put(event.getEventName(), event.getCommand());
     }
 
     for (EventMarker marker : m_trajectory.get().events()) {
-      m_eventMarkers.put(marker.timestamp, marker);
       m_commandList.add(marker);
     }
 
