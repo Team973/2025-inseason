@@ -38,6 +38,7 @@ public class Robot extends TimedRobot {
   private void updateSubsystems() {
     m_driveController.update();
     m_claw.update();
+    m_logger.update();
   }
 
   private void resetSubsystems() {
