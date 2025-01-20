@@ -14,7 +14,8 @@ public class Logger {
    *
    * @param prefix The NetworkTables prefix for the logger. Displayed as a folder in AdvantageScope.
    * @param secondsPerLog The amount of time in seconds after logging before the next log is
-   *     allowed. This allows for down sampling to reduce loop overruns.
+   *     allowed. This allows for down sampling to reduce loop overruns. If set to 0.0, then logging
+   *     is allowed every robot cycle.
    */
   public Logger(String prefix, double secondsPerLog) {
     m_prefix = prefix;
