@@ -402,7 +402,8 @@ public class GreyTalonFX extends TalonFX {
 
     if (m_lastOutputParams == null || !m_lastOutputParams.equals(currentOutputParams)) {
       m_lastOutputParams = currentOutputParams;
-      m_lastControlCode = super.setControl(makeControlRequest(controlMode, demand, enableFOC, feedForward, slot));
+      m_lastControlCode =
+          super.setControl(makeControlRequest(controlMode, demand, enableFOC, feedForward, slot));
     }
     return m_lastControlCode;
   }
@@ -572,12 +573,12 @@ public class GreyTalonFX extends TalonFX {
   }
 
   public void log() {
-    m_logger.log("Velocity", this.getVelocity().getValueAsDouble());
-    m_logger.log("Acceleration", this.getAcceleration().getValueAsDouble());
-    m_logger.log("Stator Current", this.getStatorCurrent().getValueAsDouble());
-    m_logger.log("Supply Current", this.getSupplyCurrent().getValueAsDouble());
-    m_logger.log("Voltage", this.getMotorVoltage().getValueAsDouble());
-    m_logger.log("Position Rot", this.getPosition().getValueAsDouble());
+    m_logger.log("Velocity", () -> this.getVelocity().getValueAsDouble());
+    m_logger.log("Acceleration", () -> this.getAcceleration().getValueAsDouble());
+    m_logger.log("Stator Current", () -> this.getStatorCurrent().getValueAsDouble());
+    m_logger.log("Supply Current", () -> this.getSupplyCurrent().getValueAsDouble());
+    m_logger.log("Voltage", () -> this.getMotorVoltage().getValueAsDouble());
+    m_logger.log("Position Rot", () -> this.getPosition().getValueAsDouble());
   }
 
   public void debugSmartDashboard() {
