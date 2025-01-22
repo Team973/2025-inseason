@@ -4,14 +4,17 @@ import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 
 public class Logger {
   private final String m_prefix;
   private final double m_secondsPerLog;
 
-  private double m_nextAllowedLogTime;
+  private double m_nextAllowedLogTime = Conversions.Time.getSecTime();
 
-  private boolean m_logAllowed;
+  private boolean m_logAllowed = true;
 
   private List<Runnable> m_subLoggerUpdates = new ArrayList<>();
 
@@ -26,7 +29,6 @@ public class Logger {
   public Logger(String prefix, double secondsPerLog) {
     m_prefix = prefix;
     m_secondsPerLog = secondsPerLog;
-    m_nextAllowedLogTime = secondsPerLog;
 
     DogLog.setOptions(new DogLogOptions().withNtPublish(true));
     // TODO: solve why this doesn't work
@@ -121,11 +123,31 @@ public class Logger {
     }
   }
 
+  public void log(String key, DoubleSupplier valueSupplier) {
+    if (m_logAllowed) {
+      log(key, valueSupplier.getAsDouble());
+    }
+  }
+
+  public void log(String key, IntSupplier valueSupplier) {
+    if (m_logAllowed) {
+      log(key, valueSupplier.getAsInt());
+    }
+  }
+
+  public void log(String key, BooleanSupplier valueSupplier) {
+    if (m_logAllowed) {
+      log(key, valueSupplier.getAsBoolean());
+    }
+  }
+
   /**
    * Updates the logger. If the time since the last log is greater than the seconds per log, then
    * logging is allowed for the current cycle.
    */
   public void update() {
+    m_subLoggerUpdates.forEach((update) -> update.run());
+
     if (Conversions.Time.getSecTime() > m_nextAllowedLogTime) {
       m_nextAllowedLogTime += m_secondsPerLog;
       m_logAllowed = true;
@@ -133,7 +155,5 @@ public class Logger {
     }
 
     m_logAllowed = false;
-
-    m_subLoggerUpdates.forEach((update) -> update.run());
   }
 }
