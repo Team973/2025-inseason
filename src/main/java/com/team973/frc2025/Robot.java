@@ -5,8 +5,8 @@
 package com.team973.frc2025;
 
 import com.team973.frc2025.subsystems.Claw;
-import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.frc2025.subsystems.Elevator;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -22,6 +22,8 @@ public class Robot extends TimedRobot {
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive"));
   private final Claw m_claw = new Claw(new Logger("Claw"));
+
+  private final Elevator m_elevator = new Elevator(new Logger("elevator"));
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
@@ -121,13 +123,24 @@ public class Robot extends TimedRobot {
             m_driverStick.getRightXAxis() * 0.8);
 
     if (m_coDriverStick.getAButton()) {
-      m_claw.setControl(ControlStatus.IntakeAndHold);
+      m_claw.setControl(Claw.ControlStatus.IntakeAndHold);
     } else if (m_coDriverStick.getBButton()) {
-      m_claw.setControl(ControlStatus.Stop);
+      m_claw.setControl(Claw.ControlStatus.Stop);
     } else if (m_coDriverStick.getXButton()) {
-      m_claw.setControl(ControlStatus.Score);
+      m_claw.setControl(Claw.ControlStatus.Score);
     } else if (m_coDriverStick.getYButton()) {
-      m_claw.setControl(ControlStatus.Retract);
+      m_claw.setControl(Claw.ControlStatus.Retract);
+    }
+    if (m_coDriverStick.getPOVTop()) {
+      m_elevator.setControl(Elevator.ControlStatus.Level4);
+    } else if (m_coDriverStick.getPOVLeft()) {
+      m_elevator.setControl(Elevator.ControlStatus.Level3);
+    } else if (m_coDriverStick.getPOVRight()) {
+      m_elevator.setControl(Elevator.ControlStatus.Level2);
+    } else if (m_coDriverStick.getPOVBottom()) {
+      m_elevator.setControl(Elevator.ControlStatus.Level1);
+    } else {
+      m_elevator.setControl(Elevator.ControlStatus.Off);
     }
 
     updateSubsystems();

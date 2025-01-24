@@ -17,22 +17,22 @@ public class Claw implements Subsystem {
   private ControlStatus m_mode = ControlStatus.Stop;
   private ControlStatus m_lastMode = ControlStatus.Stop;
   private double m_leftTargetPostion = 0;
-  private double m_rightTargetMotion = 0;
+  private double m_rightTargetPotion = 0;
 
   public Claw(Logger logger) {
     m_logger = logger;
     m_motorRight = new GreyTalonFX(36, "Canivore", m_logger.subLogger("shooterRight"));
     m_motorLeft = new GreyTalonFX(35, "Canivore", m_logger.subLogger("shooterLeft"));
 
-    TalonFXConfiguration rightMotorConfig = defaultMotorConfig();
+    TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_motorRight.setConfig(rightMotorConfig);
-    TalonFXConfiguration leftMotorConfig = defaultMotorConfig();
+    TalonFXConfiguration leftMotorConfig = defaultClawMotorConfig();
     leftMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     m_motorLeft.setConfig(leftMotorConfig);
   }
 
-  private static TalonFXConfiguration defaultMotorConfig() {
+  public static TalonFXConfiguration defaultClawMotorConfig() {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
     defaultMotorConfig.Slot0.kS = 0.0;
     defaultMotorConfig.Slot0.kV = 0.15;
@@ -61,7 +61,7 @@ public class Claw implements Subsystem {
 
   public boolean motorAtTarget() {
     return (Math.abs(m_leftTargetPostion - m_motorLeft.getPosition().getValueAsDouble()) < 0.1
-        && Math.abs(m_rightTargetMotion - m_motorRight.getPosition().getValueAsDouble()) < 0.1);
+        && Math.abs(m_rightTargetPotion - m_motorRight.getPosition().getValueAsDouble()) < 0.1);
   }
 
   public boolean sensorSeeCoral() {
@@ -76,37 +76,37 @@ public class Claw implements Subsystem {
     Score,
   }
 
+  private void setClosedLoopElivator(double motorDemandNum) {
+    m_motorRight.setControl(ControlMode.VelocityVoltage, motorDemandNum, 1);
+    m_motorLeft.setControl(ControlMode.VelocityVoltage, motorDemandNum, 1);
+  }
+
   @Override
   public void update() {
     switch (m_mode) {
       case IntakeAndHold:
         if (sensorSeeCoral()) {
-          m_motorRight.setControl(ControlMode.VelocityVoltage, 0, 1);
-          m_motorLeft.setControl(ControlMode.VelocityVoltage, 0, 1);
+          setClosedLoopElivator(0);
         } else if (!sensorSeeCoral()) {
-          m_motorRight.setControl(ControlMode.VelocityVoltage, 10, 1);
-          m_motorLeft.setControl(ControlMode.VelocityVoltage, 10, 1);
+          setClosedLoopElivator(10);
         }
         break;
       case Shoot:
-        m_motorRight.setControl(ControlMode.VelocityVoltage, 2, 1);
-        m_motorLeft.setControl(ControlMode.VelocityVoltage, 2, 1);
+        setClosedLoopElivator(2);
         break;
       case Stop:
-        m_motorRight.setControl(ControlMode.VelocityVoltage, 0, 1);
-        m_motorLeft.setControl(ControlMode.VelocityVoltage, 0, 1);
+        setClosedLoopElivator(0);
         break;
       case Score:
         if (m_lastMode != m_mode) {
-          m_rightTargetMotion = m_motorRight.getPosition().getValueAsDouble() + 4.5;
+          m_rightTargetPotion = m_motorRight.getPosition().getValueAsDouble() + 4.5;
           m_leftTargetPostion = m_motorLeft.getPosition().getValueAsDouble() + 4.5;
         }
-        m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_rightTargetMotion, 0);
+        m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_rightTargetPotion, 0);
         m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion, 0);
         break;
       case Retract:
-        m_motorRight.setControl(ControlMode.VelocityVoltage, -5, 1);
-        m_motorLeft.setControl(ControlMode.VelocityVoltage, -5, 1);
+        setClosedLoopElivator(-5);
         break;
     }
     m_lastMode = m_mode;
@@ -122,7 +122,7 @@ public class Claw implements Subsystem {
     m_motorRight.log();
     m_motorLeft.log();
     m_logger.log("target postion left", m_leftTargetPostion);
-    m_logger.log("target postion right", m_rightTargetMotion);
+    m_logger.log("target postion right", m_rightTargetPotion);
     m_logger.log("target rotations hit", motorAtTarget());
   }
 

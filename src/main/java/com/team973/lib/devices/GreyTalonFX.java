@@ -402,7 +402,8 @@ public class GreyTalonFX extends TalonFX {
 
     if (m_lastOutputParams == null || !m_lastOutputParams.equals(currentOutputParams)) {
       m_lastOutputParams = currentOutputParams;
-      m_lastControlCode = super.setControl(makeControlRequest(controlMode, demand, enableFOC, feedForward, slot));
+      m_lastControlCode =
+          super.setControl(makeControlRequest(controlMode, demand, enableFOC, feedForward, slot));
     }
     return m_lastControlCode;
   }
