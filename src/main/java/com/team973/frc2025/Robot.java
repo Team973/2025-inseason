@@ -132,6 +132,12 @@ public class Robot extends TimedRobot {
       m_claw.setControl(ControlStatus.Retract);
     }
 
+    if (m_driverStick.getLeftBumperButton()) {
+      m_driveController.setControllerOption(
+          DriveController.ControllerOption.DriveWithLimelightReef);
+      m_driveController.getDriveWithLimelightReef().setTargetIDs(5);
+    }
+
     updateSubsystems();
     updateJoysticks();
   }
