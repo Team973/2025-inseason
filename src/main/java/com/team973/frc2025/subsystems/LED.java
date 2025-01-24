@@ -24,7 +24,7 @@
 //  ErrorCode faultsError = candle.getFaults(faults); // fills faults with the current CANdle
 // faults; returns the last error generated
 
-package frc.robot.subsystems;
+package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.led.CANdle;
