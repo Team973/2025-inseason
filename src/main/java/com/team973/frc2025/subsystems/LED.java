@@ -32,8 +32,9 @@ import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.CANdleFaults;
 import com.ctre.phoenix.led.RainbowAnimation;
+import com.team973.lib.util.Subsystem;
 
-public class LED {
+public class LED implements Subsystem {
   // double currentTimeStampMS = Conversions;
 
   int m_cycleCount = 0;
@@ -76,4 +77,12 @@ public class LED {
   }
 
   public void timeConcept() {}
+
+  public void update() {}
+
+  public void reset() {}
+
+  public void syncSensors() {}
+
+  public void log() {}
 }
