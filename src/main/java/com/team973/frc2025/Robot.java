@@ -147,7 +147,7 @@ public class Robot extends TimedRobot {
       m_elevator.setControl(Elevator.ControlStatus.Off);
     }
 
-    if (m_coDriverStick.getLeftBumper()) {
+    if (m_coDriverStick.getLeftBumperButton()) {
       m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
     } else if (m_coDriverStick.getLeftTrigger()) {
       m_arm.setArmTargetDeg(Arm.LOW_POSTION_DEG);
