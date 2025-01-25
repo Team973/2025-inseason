@@ -15,13 +15,21 @@ public class Elevator implements Subsystem {
   private final GreyTalonFX m_motorRight;
   private final GreyTalonFX m_motorLeft;
   private ControlStatus m_mode = ControlStatus.Off;
-  private ControlStatus m_lastMode = ControlStatus.Off;
   private double m_targetPostion;
   private double m_targetpositionLeway = 0.1;
+  double MOTOR_TO_ARM_GEAR_RATIO = 64 / 10;
 
   public static enum ControlStatus {
     TargetPostion,
     Off,
+  }
+
+  private double armToMotor(double armPostion) {
+    return armPostion * MOTOR_TO_ARM_GEAR_RATIO;
+  }
+
+  private double motorToArm(double motorPostion) {
+    return motorPostion / MOTOR_TO_ARM_GEAR_RATIO;
   }
 
   public static class Presets {
@@ -35,8 +43,8 @@ public class Elevator implements Subsystem {
   public Elevator(Logger logger) {
     m_logger = logger;
     m_motorRight =
-        new GreyTalonFX(10, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorBottom"));
-    m_motorLeft = new GreyTalonFX(50, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorTop"));
+        new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorBottom"));
+    m_motorLeft = new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorTop"));
 
     TalonFXConfiguration leftMotorConfig = defaultElevatorMotorConfig();
     // looking at it from the front left is clockwise and right is counter clockwise
@@ -97,7 +105,6 @@ public class Elevator implements Subsystem {
         m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
         break;
     }
-    m_lastMode = m_mode;
   }
 
   public void setControl(ControlStatus mode) {

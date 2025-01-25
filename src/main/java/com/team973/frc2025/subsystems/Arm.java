@@ -17,7 +17,7 @@ public class Arm implements Subsystem {
   public static final double HIGH_POSTION_DEG = 30;
   public static final double MEDIUM_POSTION_DEG = 0;
   public static final double LOW_POSTION_DEG = -30;
-  private static final double MOTOR_TO_ARM_GEAR_RATIO = 1;
+  private static final double MOTOR_TO_ARM_GEAR_RATIO = 56.0 / 10.0;
 
   public static enum ControlStatus {
     targetPostion,
