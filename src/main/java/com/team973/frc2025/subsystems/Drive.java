@@ -1,6 +1,5 @@
 package com.team973.frc2025.subsystems;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.frc2025.subsystems.swerve.SwerveModule;
@@ -15,8 +14,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Drive implements Subsystem {
   private static final Translation2d[] MODULE_LOCATIONS = {
@@ -34,17 +31,11 @@ public class Drive implements Subsystem {
   private Pose2d m_estimatedPose = new Pose2d();
   private Translation2d m_estimatedVelocity = new Translation2d();
   private GreyPoseEstimator m_poseEstimator;
-  private DriveController m_driveController;
 
   private final GreyPigeon m_pigeon;
 
-  private Rotation2d m_targetRobotAngle = new Rotation2d();
-
-  private final List<StatusSignal<?>> m_allStatusSignals = new ArrayList<>();
-
-  public Drive(GreyPigeon pigeon, DriveController m_DriveController, Logger logger) {
+  public Drive(GreyPigeon pigeon, DriveController driveController, Logger logger) {
     m_pigeon = pigeon;
-    m_driveController = m_DriveController;
     m_logger = logger;
     m_odometryLogger = logger.subLogger("odometry-estimator");
 
@@ -58,7 +49,7 @@ public class Drive implements Subsystem {
 
     m_currentChassisSpeeds = new ChassisSpeeds();
 
-    m_poseEstimator = new GreyPoseEstimator(m_pigeon, m_swerveModules, m_DriveController);
+    m_poseEstimator = new GreyPoseEstimator(m_pigeon, m_swerveModules, driveController);
   }
 
   public void startOdometrey() {
@@ -67,6 +58,10 @@ public class Drive implements Subsystem {
 
   public GreyPigeon getPigeon() {
     return m_pigeon;
+  }
+
+  public GreyPoseEstimator getPoseEstimator() {
+    return m_poseEstimator;
   }
 
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
