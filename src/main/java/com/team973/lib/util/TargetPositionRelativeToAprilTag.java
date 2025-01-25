@@ -1,5 +1,6 @@
 package com.team973.lib.util;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -27,6 +28,16 @@ public class TargetPositionRelativeToAprilTag {
     }
 
     return m_tag.getIDFromAlliance(Alliance.Blue);
+  }
+
+  public Pose3d getAprilTagPose() {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+
+    if (alliance.isPresent()) {
+      return m_tag.getPoseFromAlliance(alliance.get());
+    }
+
+    return m_tag.getPoseFromAlliance(Alliance.Blue);
   }
 
   public double getInitialDist() {
