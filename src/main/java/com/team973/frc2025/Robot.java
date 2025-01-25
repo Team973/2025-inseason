@@ -4,6 +4,7 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.Elevator;
@@ -24,6 +25,7 @@ public class Robot extends TimedRobot {
   private final Claw m_claw = new Claw(new Logger("Claw"));
 
   private final Elevator m_elevator = new Elevator(new Logger("elevator"));
+  private final Arm m_arm = new Arm(new Logger("Arm"));
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
@@ -141,6 +143,16 @@ public class Robot extends TimedRobot {
       m_elevator.setControl(Elevator.ControlStatus.Level1);
     } else {
       m_elevator.setControl(Elevator.ControlStatus.Off);
+    }
+
+    if (m_coDriverStick.getLeftBumper()) {
+      m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
+    } else if (m_coDriverStick.getLeftTrigger()) {
+      m_arm.setArmTargetDeg(Arm.LOW_POSTION_DEG);
+    } else if (m_coDriverStick.getStartButton()) {
+      m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
+    } else {
+      m_arm.setControl(Arm.ControlStatus.Stow);
     }
 
     updateSubsystems();

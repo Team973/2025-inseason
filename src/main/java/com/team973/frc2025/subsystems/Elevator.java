@@ -78,8 +78,10 @@ public class Elevator implements Subsystem {
   }
 
   public boolean motorAtTarget() {
-    return (Math.abs(m_leftTargetPostion - m_motorLeft.getPosition().getValueAsDouble()) < m_targetpositionLeway
-        && Math.abs(m_rightTargetPostion - m_motorRight.getPosition().getValueAsDouble()) < m_targetpositionLeway);
+    return (Math.abs(m_leftTargetPostion - m_motorLeft.getPosition().getValueAsDouble())
+            < m_targetpositionLeway
+        && Math.abs(m_rightTargetPostion - m_motorRight.getPosition().getValueAsDouble())
+            < m_targetpositionLeway);
   }
 
   private void setTargetPostion(double targetPostion) {
@@ -88,7 +90,6 @@ public class Elevator implements Subsystem {
     m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion, 0);
     m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_rightTargetPostion, 0);
   }
-
 
   @Override
   public void update() {
