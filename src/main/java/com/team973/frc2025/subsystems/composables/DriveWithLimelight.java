@@ -9,6 +9,7 @@ import com.team973.lib.util.TargetPositionRelativeToAprilTag;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -79,23 +80,23 @@ public class DriveWithLimelight extends DriveComposable {
   public void setTargetPosition(TargetPositionRelativeToAprilTag target) {
     m_target = target;
 
-    Pose2d aprilTagLocation =
-        new Pose2d(); // m_poseEstimator.getAprilTagLocation(target.getAprilTagID());
+    Pose3d aprilTagLocation = target.getAprilTagPose();
 
     m_targetInitialPose =
         new Pose2d(
             aprilTagLocation
                 .getTranslation()
+                .toTranslation2d()
                 .plus(new Translation2d(target.getInitialDist(), new Rotation2d())),
-            aprilTagLocation.getRotation().plus(target.getTargetAngle()));
+            aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
     m_targetFinalPose =
         new Pose2d(
             aprilTagLocation
                 .getTranslation()
+                .toTranslation2d()
                 .plus(new Translation2d(target.getFinalDist(), new Rotation2d())),
-            aprilTagLocation.getRotation().plus(target.getTargetAngle()));
+            aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
 
-    // m_poseEstimator.setAprilTag(target.getAprilTagID());
     m_targetMode = TargetMode.Initial;
   }
 
