@@ -2,13 +2,18 @@ package com.team973.frc2025.subsystems;
 
 import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
+import com.team973.frc2025.subsystems.swerve.MegaTagSupplier;
+import com.team973.frc2025.subsystems.swerve.OdometrySupplier;
 import com.team973.frc2025.subsystems.swerve.SwerveModule;
 import com.team973.lib.devices.GreyPigeon;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -24,7 +29,6 @@ public class Drive implements Subsystem {
   };
 
   private final Logger m_logger;
-  private final Logger m_odometryLogger;
 
   private final SwerveModule[] m_swerveModules;
   private ChassisSpeeds m_currentChassisSpeeds;
@@ -32,13 +36,19 @@ public class Drive implements Subsystem {
   private Translation2d m_estimatedVelocity = new Translation2d();
   private GreyPoseEstimator m_poseEstimator;
 
+  private GreyPoseEstimator m_fusedEstimator;
+  private DriveController m_driveController;
+
   private final GreyPigeon m_pigeon;
+
+  private Rotation2d m_targetRobotAngle = new Rotation2d();
+  private final OdometrySupplier m_odometrySupplier;
+  private final MegaTagSupplier m_backLLSupplier;
 
   public Drive(GreyPigeon pigeon, DriveController driveController, Logger logger) {
     m_pigeon = pigeon;
+    m_driveController = driveController;
     m_logger = logger;
-    m_odometryLogger = logger.subLogger("odometry-estimator");
-
     m_swerveModules =
         new SwerveModule[] {
           new SwerveModule(0, DriveInfo.FRONT_LEFT_CONSTANTS, logger.subLogger("swerve/mod0")),
@@ -46,14 +56,31 @@ public class Drive implements Subsystem {
           new SwerveModule(2, DriveInfo.BACK_LEFT_CONSTANTS, logger.subLogger("swerve/mod2")),
           new SwerveModule(3, DriveInfo.BACK_RIGHT_CONSTANTS, logger.subLogger("swerve/mod3"))
         };
+    m_odometrySupplier =
+        new OdometrySupplier(m_pigeon, m_swerveModules, logger.subLogger("providers/odometry"));
+    m_odometrySupplier.start();
 
     m_currentChassisSpeeds = new ChassisSpeeds();
 
-    m_poseEstimator = new GreyPoseEstimator(m_pigeon, m_swerveModules, driveController);
+    m_poseEstimator =
+        new GreyPoseEstimator(
+            m_pigeon, m_driveController, m_odometrySupplier, logger.subLogger("estimators/main"));
+
+    m_backLLSupplier =
+        new MegaTagSupplier(
+            "back",
+            m_pigeon,
+            // TODO: Waiting on these measurements
+            new Pose3d(new Translation3d(10, 10, 10), new Rotation3d(0.0, 0.0, 0.0)));
+
+    m_fusedEstimator =
+        new GreyPoseEstimator(
+            m_pigeon, m_driveController, m_odometrySupplier, logger.subLogger("estimators/fused"));
+    m_backLLSupplier.addReceiver(m_fusedEstimator);
   }
 
   public void startOdometrey() {
-    m_poseEstimator.start();
+    m_odometrySupplier.start();
   }
 
   public GreyPigeon getPigeon() {
@@ -138,13 +165,6 @@ public class Drive implements Subsystem {
   }
 
   public void log() {
-    m_odometryLogger.log("Update Frequency Mean", m_poseEstimator.getUpdateFrequencyMean());
-    m_odometryLogger.log("Update Frequency StdDev", m_poseEstimator.getUpdateFrequencyStdDev());
-    m_odometryLogger.log("Failed Cycles", m_poseEstimator.getFailedCycles());
-    m_odometryLogger.log("Successful Cycles", m_poseEstimator.getSuccessfulCycles());
-    m_odometryLogger.log("X Pos", m_poseEstimator.getPoseMeters().getX());
-    m_odometryLogger.log("Y Pos", m_poseEstimator.getPoseMeters().getY());
-    m_odometryLogger.log("Heading Deg", m_poseEstimator.getPoseMeters().getRotation().getDegrees());
 
     double states[] = new double[8];
     int index = 0;
@@ -158,6 +178,9 @@ public class Drive implements Subsystem {
 
     m_logger.log("Actual", states);
     m_pigeon.log();
+    m_poseEstimator.log();
+    m_fusedEstimator.log();
+    m_odometrySupplier.log();
   }
 
   @Override
