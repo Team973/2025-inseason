@@ -7,6 +7,8 @@ package com.team973.frc2025;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.frc2025.subsystems.DriveController.ControllerOption;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -133,9 +135,12 @@ public class Robot extends TimedRobot {
     }
 
     if (m_driverStick.getLeftBumperButton()) {
-      m_driveController.setControllerOption(
-          DriveController.ControllerOption.DriveWithLimelightReef);
-      m_driveController.getDriveWithLimelightReef().setTargetIDs(5);
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetPosition(DriveWithLimelight.TargetPositions.HPL);
+    } else {
+      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
     }
 
     updateSubsystems();
