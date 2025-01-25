@@ -17,6 +17,7 @@ public class Elevator implements Subsystem {
   private ControlStatus m_lastMode = ControlStatus.Off;
   private double m_rightTargetPostion;
   private double m_leftTargetPostion;
+  private double m_targetpositionLeway = 0.1;
 
   public static enum ControlStatus {
     Level1,
@@ -40,56 +41,54 @@ public class Elevator implements Subsystem {
         new GreyTalonFX(10, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorBottom"));
     m_motorLeft = new GreyTalonFX(50, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorTop"));
 
-    TalonFXConfiguration leftMotorConfig = defaultElivatorMotorConfig();
+    TalonFXConfiguration leftMotorConfig = defaultElevatorMotorConfig();
     // looking at it from the front left is clockwise and right is counter clockwise
     leftMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_motorLeft.setConfig(leftMotorConfig);
-    TalonFXConfiguration rightMotorConfig = defaultElivatorMotorConfig();
+    TalonFXConfiguration rightMotorConfig = defaultElevatorMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     m_motorRight.setConfig(rightMotorConfig);
   }
 
-  private static TalonFXConfiguration defaultElivatorMotorConfig() {
-    TalonFXConfiguration defaultElivatorMotorConfig = new TalonFXConfiguration();
-    defaultElivatorMotorConfig.Slot0.kS = 0.0;
-    defaultElivatorMotorConfig.Slot0.kV = 0.15;
-    defaultElivatorMotorConfig.Slot0.kA = 0.01;
-    defaultElivatorMotorConfig.Slot0.kP = 4.0;
-    defaultElivatorMotorConfig.Slot0.kI = 0.0;
-    defaultElivatorMotorConfig.Slot0.kD = 0.0;
-    defaultElivatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
-    defaultElivatorMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
-    defaultElivatorMotorConfig.MotionMagic.MotionMagicJerk = 160;
+  private static TalonFXConfiguration defaultElevatorMotorConfig() {
+    TalonFXConfiguration defaultElevatorMotorConfig = new TalonFXConfiguration();
+    defaultElevatorMotorConfig.Slot0.kS = 0.0;
+    defaultElevatorMotorConfig.Slot0.kV = 0.15;
+    defaultElevatorMotorConfig.Slot0.kA = 0.01;
+    defaultElevatorMotorConfig.Slot0.kP = 4.0;
+    defaultElevatorMotorConfig.Slot0.kI = 0.0;
+    defaultElevatorMotorConfig.Slot0.kD = 0.0;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 160;
     // slot 1 is for velocity
-    defaultElivatorMotorConfig.Slot1.kS = 0.0;
-    defaultElivatorMotorConfig.Slot1.kV = 0.125 * 10.0 / 10.5;
-    defaultElivatorMotorConfig.Slot1.kA = 0.0;
-    defaultElivatorMotorConfig.Slot1.kP = 0.3;
-    defaultElivatorMotorConfig.Slot1.kI = 0.0;
-    defaultElivatorMotorConfig.Slot1.kD = 0.0;
-    defaultElivatorMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
-    defaultElivatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultElivatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
-    defaultElivatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    defaultElivatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
-    defaultElivatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    return defaultElivatorMotorConfig;
+    defaultElevatorMotorConfig.Slot1.kS = 0.0;
+    defaultElevatorMotorConfig.Slot1.kV = 0.125 * 10.0 / 10.5;
+    defaultElevatorMotorConfig.Slot1.kA = 0.0;
+    defaultElevatorMotorConfig.Slot1.kP = 0.3;
+    defaultElevatorMotorConfig.Slot1.kI = 0.0;
+    defaultElevatorMotorConfig.Slot1.kD = 0.0;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 10;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
+    defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    return defaultElevatorMotorConfig;
   }
 
   public boolean motorAtTarget() {
-    return (Math.abs(m_leftTargetPostion - m_motorLeft.getPosition().getValueAsDouble()) < 0.1
-        && Math.abs(m_rightTargetPostion - m_motorRight.getPosition().getValueAsDouble()) < 0.1);
+    return (Math.abs(m_leftTargetPostion - m_motorLeft.getPosition().getValueAsDouble()) < m_targetpositionLeway
+        && Math.abs(m_rightTargetPostion - m_motorRight.getPosition().getValueAsDouble()) < m_targetpositionLeway);
   }
 
   private void setTargetPostion(double targetPostion) {
     m_leftTargetPostion = targetPostion;
     m_rightTargetPostion = targetPostion;
-  }
-
-  private void setClosedLoop() {
     m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion, 0);
     m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_rightTargetPostion, 0);
   }
+
 
   @Override
   public void update() {
@@ -97,25 +96,21 @@ public class Elevator implements Subsystem {
       case Level1:
         if (m_lastMode != m_mode) {
           setTargetPostion(0.0);
-          setClosedLoop();
         }
         break;
       case Level2:
         if (m_lastMode != m_mode) {
           setTargetPostion(0.0);
-          setClosedLoop();
         }
         break;
       case Level3:
         if (m_lastMode != m_mode) {
           setTargetPostion(0.0);
-          setClosedLoop();
         }
         break;
       case Level4:
         if (m_lastMode != m_mode) {
           setTargetPostion(0.0);
-          setClosedLoop();
         }
 
         break;

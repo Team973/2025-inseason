@@ -1,6 +1,7 @@
 package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.lib.devices.GreyTalonFX;
@@ -30,6 +31,8 @@ public class Claw implements Subsystem {
     TalonFXConfiguration leftMotorConfig = defaultClawMotorConfig();
     leftMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     m_motorLeft.setConfig(leftMotorConfig);
+
+    m_motorLeft.setControl(new Follower(m_motorRight.getDeviceID(), true));
   }
 
   public static TalonFXConfiguration defaultClawMotorConfig() {
@@ -76,7 +79,7 @@ public class Claw implements Subsystem {
     Score,
   }
 
-  private void setClosedLoopElivator(double motorDemandNum) {
+  private void setClosedLoopClaw(double motorDemandNum) {
     m_motorRight.setControl(ControlMode.VelocityVoltage, motorDemandNum, 1);
     m_motorLeft.setControl(ControlMode.VelocityVoltage, motorDemandNum, 1);
   }
@@ -86,16 +89,16 @@ public class Claw implements Subsystem {
     switch (m_mode) {
       case IntakeAndHold:
         if (sensorSeeCoral()) {
-          setClosedLoopElivator(0);
+          setClosedLoopClaw(0);
         } else if (!sensorSeeCoral()) {
-          setClosedLoopElivator(10);
+          setClosedLoopClaw(10);
         }
         break;
       case Shoot:
-        setClosedLoopElivator(2);
+        setClosedLoopClaw(2);
         break;
       case Stop:
-        setClosedLoopElivator(0);
+        setClosedLoopClaw(0);
         break;
       case Score:
         if (m_lastMode != m_mode) {
@@ -106,7 +109,7 @@ public class Claw implements Subsystem {
         m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion, 0);
         break;
       case Retract:
-        setClosedLoopElivator(-5);
+        setClosedLoopClaw(-5);
         break;
     }
     m_lastMode = m_mode;
