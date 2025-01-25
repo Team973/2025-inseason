@@ -13,9 +13,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class DriveController implements Subsystem {
-  private static final Pose2d SCORING_POSITION_FROM_REEF = new Pose2d(0, 0, new Rotation2d());
-  private static final Pose2d SCORING_POSITION_FROM_HP = new Pose2d(0, 0, new Rotation2d());
-
   private final GreyPigeon m_pigeon;
   private final Drive m_drive;
 
@@ -25,8 +22,7 @@ public class DriveController implements Subsystem {
 
   private final DriveWithJoysticks m_driveWithJoysticks;
   private final DriveWithTrajectory m_driveWithTrajectory;
-  private final DriveWithLimelight m_driveWithLimelightReef;
-  private final DriveWithLimelight m_driveWithLimelightHP;
+  private final DriveWithLimelight m_driveWithLimelight;
 
   private ChassisSpeeds m_currentChassisSpeeds;
 
@@ -38,8 +34,7 @@ public class DriveController implements Subsystem {
   public enum ControllerOption {
     DriveWithJoysticks,
     DriveWithTrajectory,
-    DriveWithLimelightReef,
-    DriveWithLimelightHP,
+    DriveWithLimelight,
   }
 
   public static class AnglePresets {
@@ -62,9 +57,7 @@ public class DriveController implements Subsystem {
     m_driveWithTrajectory =
         new DriveWithTrajectory(logger.subLogger("driveWithTrajectory"), m_drive);
 
-    m_driveWithLimelightReef = new DriveWithLimelight(SCORING_POSITION_FROM_REEF);
-
-    m_driveWithLimelightHP = new DriveWithLimelight(SCORING_POSITION_FROM_HP);
+    m_driveWithLimelight = new DriveWithLimelight(m_drive.getPoseEstimator());
 
     m_currentChassisSpeeds = new ChassisSpeeds();
   }
@@ -82,12 +75,8 @@ public class DriveController implements Subsystem {
     return m_driveWithTrajectory;
   }
 
-  public DriveWithLimelight getDriveWithLimelightReef() {
-    return m_driveWithLimelightReef;
-  }
-
-  public DriveWithLimelight getDriveWithLimelightHP() {
-    return m_driveWithLimelightHP;
+  public DriveWithLimelight getDriveWithLimelight() {
+    return m_driveWithLimelight;
   }
 
   public synchronized GreyPigeon getPigeon() {
@@ -122,10 +111,8 @@ public class DriveController implements Subsystem {
         return m_driveWithJoysticks;
       case DriveWithTrajectory:
         return m_driveWithTrajectory;
-      case DriveWithLimelightReef:
-        return m_driveWithLimelightReef;
-      case DriveWithLimelightHP:
-        return m_driveWithLimelightHP;
+      case DriveWithLimelight:
+        return m_driveWithLimelight;
       default:
         return m_driveWithJoysticks;
     }
