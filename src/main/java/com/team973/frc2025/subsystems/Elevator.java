@@ -24,11 +24,11 @@ public class Elevator implements Subsystem {
     Off,
   }
 
-  private double armToMotor(double armPostion) {
+  private double elevatorToMotor(double armPostion) {
     return armPostion * MOTOR_TO_ARM_GEAR_RATIO;
   }
 
-  private double motorToArm(double motorPostion) {
+  private double motorToElevator(double motorPostion) {
     return motorPostion / MOTOR_TO_ARM_GEAR_RATIO;
   }
 
@@ -98,7 +98,7 @@ public class Elevator implements Subsystem {
   public void update() {
     switch (m_mode) {
       case TargetPostion:
-        m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_targetPostion, 0);
+        m_motorRight.setControl(ControlMode.MotionMagicVoltage, elevatorToMotor(m_targetPostion), 0);
         break;
       case Off:
         m_motorLeft.setControl(ControlMode.DutyCycleOut, 0, 0);
@@ -113,6 +113,7 @@ public class Elevator implements Subsystem {
 
   @Override
   public void log() {
+    m_logger.log("armPostion", motorToElevator(m_motorRight.getPosition().getValueAsDouble()));
     m_logger.log("target postion reached", motorAtTarget());
     m_logger.log("target postion", m_targetPostion);
     m_motorLeft.log();
