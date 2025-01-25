@@ -136,13 +136,13 @@ public class Robot extends TimedRobot {
       m_claw.setControl(Claw.ControlStatus.Retract);
     }
     if (m_coDriverStick.getPOVTop()) {
-      m_elevator.setControl(Elevator.ControlStatus.Level4);
+      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_4);
     } else if (m_coDriverStick.getPOVLeft()) {
-      m_elevator.setControl(Elevator.ControlStatus.Level3);
+      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_3);
     } else if (m_coDriverStick.getPOVRight()) {
-      m_elevator.setControl(Elevator.ControlStatus.Level2);
+      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_2);
     } else if (m_coDriverStick.getPOVBottom()) {
-      m_elevator.setControl(Elevator.ControlStatus.Level1);
+      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_1);
     } else {
       m_elevator.setControl(Elevator.ControlStatus.Off);
     }

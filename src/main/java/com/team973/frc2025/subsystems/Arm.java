@@ -12,7 +12,6 @@ public class Arm implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_armMotor;
   private ControlStatus m_mode = ControlStatus.Stow;
-  private ControlStatus m_lastMode = ControlStatus.Stow;
   private double m_armTargetPostion;
 
   public static final double HIGH_POSTION_DEG = 30;
@@ -35,7 +34,7 @@ public class Arm implements Subsystem {
 
   public Arm(Logger logger) {
     m_logger = logger;
-    m_armMotor = new GreyTalonFX(10, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
+
     // clockwise postive when looking at it from the shaft, is on inside of the left point so that
     // the shaft is pointing left, up is positve, gear ratio is odd
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
@@ -48,6 +47,7 @@ public class Arm implements Subsystem {
     armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
     armMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
     armMotorConfig.MotionMagic.MotionMagicJerk = 160;
+    m_armMotor = new GreyTalonFX(10, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
     armMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_armMotor.setConfig(armMotorConfig);
   }
@@ -65,14 +65,11 @@ public class Arm implements Subsystem {
   public void update() {
     switch (m_mode) {
       case targetPostion:
-        if (m_lastMode != m_mode)
-          m_armMotor.setControl(ControlMode.MotionMagicVoltage, armToMotor(m_armTargetPostion), 0);
+        m_armMotor.setControl(ControlMode.MotionMagicVoltage, armToMotor(m_armTargetPostion), 0);
         break;
       case Stow:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
     }
-
-    m_lastMode = m_mode;
   }
 
   public void setControl(ControlStatus mode) {

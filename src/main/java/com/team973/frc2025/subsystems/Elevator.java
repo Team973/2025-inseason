@@ -16,15 +16,11 @@ public class Elevator implements Subsystem {
   private final GreyTalonFX m_motorLeft;
   private ControlStatus m_mode = ControlStatus.Off;
   private ControlStatus m_lastMode = ControlStatus.Off;
-  private double m_rightTargetPostion;
-  private double m_leftTargetPostion;
+  private double m_targetPostion;
   private double m_targetpositionLeway = 0.1;
 
   public static enum ControlStatus {
-    Level1,
-    Level2,
-    Level3,
-    Level4,
+    TargetPostion,
     Off,
   }
 
@@ -81,42 +77,20 @@ public class Elevator implements Subsystem {
   }
 
   public boolean motorAtTarget() {
-    return (Math.abs(m_leftTargetPostion - m_motorLeft.getPosition().getValueAsDouble())
-            < m_targetpositionLeway
-        && Math.abs(m_rightTargetPostion - m_motorRight.getPosition().getValueAsDouble())
-            < m_targetpositionLeway);
+    return (Math.abs(m_targetPostion - m_motorRight.getPosition().getValueAsDouble())
+        < m_targetpositionLeway);
   }
 
-  private void setTargetPostion(double targetPostion) {
-    m_leftTargetPostion = targetPostion;
-    m_rightTargetPostion = targetPostion;
-    m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion, 0);
-    m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_rightTargetPostion, 0);
+  public void setTargetPostion(double targetPostion) {
+    m_targetPostion = targetPostion;
+    m_mode = ControlStatus.TargetPostion;
   }
 
   @Override
   public void update() {
     switch (m_mode) {
-      case Level1:
-        if (m_lastMode != m_mode) {
-          setTargetPostion(0.0);
-        }
-        break;
-      case Level2:
-        if (m_lastMode != m_mode) {
-          setTargetPostion(0.0);
-        }
-        break;
-      case Level3:
-        if (m_lastMode != m_mode) {
-          setTargetPostion(0.0);
-        }
-        break;
-      case Level4:
-        if (m_lastMode != m_mode) {
-          setTargetPostion(0.0);
-        }
-
+      case TargetPostion:
+        m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_targetPostion, 0);
         break;
       case Off:
         m_motorLeft.setControl(ControlMode.DutyCycleOut, 0, 0);
@@ -132,9 +106,8 @@ public class Elevator implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log("target rotations hit", motorAtTarget());
-    m_logger.log("target postion left", m_leftTargetPostion);
-    m_logger.log("target postion right", m_rightTargetPostion);
+    m_logger.log("target postion reached", motorAtTarget());
+    m_logger.log("target postion", m_targetPostion);
     m_motorLeft.log();
     m_motorRight.log();
   }
