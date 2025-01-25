@@ -98,17 +98,14 @@ public class Elevator implements Subsystem {
   public void update() {
     switch (m_mode) {
       case TargetPostion:
-        m_motorRight.setControl(ControlMode.MotionMagicVoltage, elevatorToMotor(m_targetPostion), 0);
+        m_motorRight.setControl(
+            ControlMode.MotionMagicVoltage, elevatorToMotor(m_targetPostion), 0);
         break;
       case Off:
         m_motorLeft.setControl(ControlMode.DutyCycleOut, 0, 0);
         m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
         break;
     }
-  }
-
-  public void setControl(ControlStatus mode) {
-    m_mode = mode;
   }
 
   @Override

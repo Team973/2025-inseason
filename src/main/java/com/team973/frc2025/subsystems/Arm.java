@@ -34,9 +34,7 @@ public class Arm implements Subsystem {
 
   public Arm(Logger logger) {
     m_logger = logger;
-
-    // clockwise postive when looking at it from the shaft, is on inside of the left point so that
-    // the shaft is pointing left, up is positve, gear ratio is odd
+    m_armMotor = new GreyTalonFX(10, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.15;
@@ -47,7 +45,8 @@ public class Arm implements Subsystem {
     armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
     armMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
     armMotorConfig.MotionMagic.MotionMagicJerk = 160;
-    m_armMotor = new GreyTalonFX(10, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
+    // clockwise postive when looking at it from the shaft, is on inside of the left point so that
+    // the shaft is pointing left, up is positve, gear ratio is odd
     armMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_armMotor.setConfig(armMotorConfig);
   }
@@ -72,8 +71,8 @@ public class Arm implements Subsystem {
     }
   }
 
-  public void setControl(ControlStatus mode) {
-    m_mode = mode;
+  public void setStow() {
+    m_mode = ControlStatus.Stow;
   }
 
   @Override

@@ -144,7 +144,7 @@ public class Robot extends TimedRobot {
     } else if (m_coDriverStick.getPOVBottom()) {
       m_elevator.setTargetPostion(Elevator.Presets.LEVEL_1);
     } else {
-      m_elevator.setControl(Elevator.ControlStatus.Off);
+      m_elevator.setTargetPostion(Elevator.Presets.OFF);
     }
 
     if (m_coDriverStick.getLeftBumperButton()) {
@@ -154,7 +154,7 @@ public class Robot extends TimedRobot {
     } else if (m_coDriverStick.getStartButton()) {
       m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
     } else {
-      m_arm.setControl(Arm.ControlStatus.Stow);
+      m_arm.setStow();
     }
 
     updateSubsystems();
