@@ -1,6 +1,7 @@
 package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
@@ -48,6 +49,8 @@ public class Elevator implements Subsystem {
     TalonFXConfiguration rightMotorConfig = defaultElevatorMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     m_motorRight.setConfig(rightMotorConfig);
+
+    m_motorLeft.setControl(new Follower(m_motorRight.getDeviceID(), true));
   }
 
   private static TalonFXConfiguration defaultElevatorMotorConfig() {
