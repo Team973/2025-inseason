@@ -4,9 +4,7 @@ import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.lib.util.AprilTag;
 import com.team973.lib.util.DriveComposable;
-import com.team973.lib.util.GreyHolonomicDriveController;
 import com.team973.lib.util.TargetPositionRelativeToAprilTag;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -16,8 +14,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class DriveWithLimelight extends DriveComposable {
-  private final GreyHolonomicDriveController m_controller;
   private final GreyPoseEstimator m_poseEstimator;
+
+  private final ProfiledPIDController m_xController;
+  private final ProfiledPIDController m_yController;
+  private final ProfiledPIDController m_thetaController;
 
   private TargetPositionRelativeToAprilTag m_target = null;
 
@@ -65,16 +66,15 @@ public class DriveWithLimelight extends DriveComposable {
   public DriveWithLimelight(GreyPoseEstimator poseEstimator) {
     m_poseEstimator = poseEstimator;
 
-    m_controller =
-        new GreyHolonomicDriveController(
-            new PIDController(0, 0, 0),
-            new PIDController(0, 0, 0),
-            new ProfiledPIDController(
-                0.1,
-                0,
-                0,
-                new TrapezoidProfile.Constraints(
-                    DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 3.0)));
+    m_xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0.3, 0.5));
+    m_yController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0.3, 0.5));
+    m_thetaController =
+        new ProfiledPIDController(
+            0.1,
+            0,
+            0,
+            new TrapezoidProfile.Constraints(
+                DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 3.0));
   }
 
   public void setTargetPosition(TargetPositionRelativeToAprilTag target) {
@@ -112,30 +112,22 @@ public class DriveWithLimelight extends DriveComposable {
     switch (m_targetMode) {
       case Initial:
         return new ChassisSpeeds(
-            m_controller
-                .getXController()
-                .calculate(m_poseEstimator.getPoseMeters().getX(), m_targetInitialPose.getX()),
-            m_controller
-                .getYController()
-                .calculate(m_poseEstimator.getPoseMeters().getY(), m_targetInitialPose.getY()),
-            m_controller
-                .getThetaController()
-                .calculate(
-                    m_poseEstimator.getPoseMeters().getRotation().getDegrees(),
-                    m_targetInitialPose.getRotation().getDegrees()));
+            m_xController.calculate(
+                m_poseEstimator.getPoseMeters().getX(), m_targetInitialPose.getX()),
+            m_yController.calculate(
+                m_poseEstimator.getPoseMeters().getY(), m_targetInitialPose.getY()),
+            m_thetaController.calculate(
+                m_poseEstimator.getPoseMeters().getRotation().getDegrees(),
+                m_targetInitialPose.getRotation().getDegrees()));
       case Final:
         return new ChassisSpeeds(
-            m_controller
-                .getXController()
-                .calculate(m_poseEstimator.getPoseMeters().getX(), m_targetFinalPose.getX()),
-            m_controller
-                .getYController()
-                .calculate(m_poseEstimator.getPoseMeters().getY(), m_targetFinalPose.getY()),
-            m_controller
-                .getThetaController()
-                .calculate(
-                    m_poseEstimator.getPoseMeters().getRotation().getDegrees(),
-                    m_targetFinalPose.getRotation().getDegrees()));
+            m_xController.calculate(
+                m_poseEstimator.getPoseMeters().getX(), m_targetFinalPose.getX()),
+            m_yController.calculate(
+                m_poseEstimator.getPoseMeters().getY(), m_targetFinalPose.getY()),
+            m_thetaController.calculate(
+                m_poseEstimator.getPoseMeters().getRotation().getDegrees(),
+                m_targetFinalPose.getRotation().getDegrees()));
       default:
         return new ChassisSpeeds(0, 0, 0);
     }
