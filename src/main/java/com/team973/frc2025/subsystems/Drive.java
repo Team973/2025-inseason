@@ -71,7 +71,13 @@ public class Drive implements Subsystem {
             "back",
             m_pigeon,
             // TODO: Waiting on these measurements
-            new Pose3d(new Translation3d(10, 10, 10), new Rotation3d(0.0, 0.0, 0.0)));
+            new Pose3d(
+                new Translation3d(-0.3683, 0.0, 1.1811),
+                new Rotation3d(
+                    0.0,
+                    Rotation2d.fromDegrees(30.5).getRadians(),
+                    Rotation2d.fromDegrees(180).getRadians())),
+            logger.subLogger("providers/ll-back"));
 
     m_fusedEstimator =
         new GreyPoseEstimator(
@@ -143,6 +149,7 @@ public class Drive implements Subsystem {
   public void resetOdometry(Pose2d pose) {
     m_pigeon.setYawOffset(m_pigeon.getRawYaw().minus(pose.getRotation()));
     m_poseEstimator.resetPosition(pose);
+    m_fusedEstimator.resetPosition(pose);
     syncSensors();
   }
 
@@ -180,11 +187,13 @@ public class Drive implements Subsystem {
     m_pigeon.log();
     m_poseEstimator.log();
     m_fusedEstimator.log();
+    m_backLLSupplier.log();
     m_odometrySupplier.log();
   }
 
   @Override
   public void syncSensors() {
+    m_backLLSupplier.syncSensors();
     m_estimatedPose = m_poseEstimator.getPoseMeters();
     m_estimatedVelocity = m_poseEstimator.getVelocityMetersPerSeconds();
   }

@@ -2,6 +2,7 @@ package com.team973.frc2025.subsystems.swerve;
 
 import com.team973.lib.devices.GreyPigeon;
 import com.team973.lib.devices.LimelightHelpers;
+import com.team973.lib.util.Logger;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,15 +27,20 @@ public class MegaTagSupplier {
   private final GreyPigeon m_pigeon;
   private List<MegaTagReceiver> m_receivers = new ArrayList<MegaTagReceiver>();
   private Alliance m_alliance;
+  private final Logger m_logger;
+  private final Logger m_cycleStatsLogger;
   // Until we get our seed heading and our alliance (which requires us)
   // to wait for a message from the driver station, we cannot with any
   // confidence provide pose data.
   private boolean m_allianceInitialized;
   private boolean m_headingInitialized;
 
-  public MegaTagSupplier(String llName, GreyPigeon pigeon, Pose3d cameraPoseRobotSpace) {
+  public MegaTagSupplier(
+      String llName, GreyPigeon pigeon, Pose3d cameraPoseRobotSpace, Logger logger) {
     m_llName = llName;
     m_pigeon = pigeon;
+    m_logger = logger;
+    m_cycleStatsLogger = logger.subLogger("cycle stats", 0.25);
 
     LimelightHelpers.setCameraPose_RobotSpace(
         llName,
@@ -76,14 +82,41 @@ public class MegaTagSupplier {
     doCycle();
   }
 
-  private void doCycle() {
+  public void log() {
+    m_cycleStatsLogger.log("rejected needs init", () -> getRejectedNeedsInit());
+    m_cycleStatsLogger.log("rejected too spinny", () -> getRejectedTooSpinny());
+    m_cycleStatsLogger.log("rejected no tags", () -> getRejectedNoTags());
+    m_cycleStatsLogger.log("data received", () -> getDataReceived());
+  }
+
+  private synchronized double getRejectedNeedsInit() {
+    return m_rejectedNeedsInit;
+  }
+
+  private synchronized double getRejectedTooSpinny() {
+    return m_rejectedTooSpinny;
+  }
+
+  private synchronized double getRejectedNoTags() {
+    return m_rejectedNoTags;
+  }
+
+  private synchronized double getDataReceived() {
+    return m_dataReceived;
+  }
+
+  private double m_rejectedNeedsInit, m_rejectedTooSpinny, m_rejectedNoTags, m_dataReceived;
+
+  public synchronized void doCycle() {
     if (!m_allianceInitialized || !m_headingInitialized) {
       // Reject any measurements from before we set these values.
+      m_rejectedNeedsInit++;
       return;
     }
 
     if (Math.abs(m_pigeon.getAngularVelocity().getDegrees()) > 720) {
       // llDocs strongly recommend ignoring visiond data while we are rotating quickly
+      m_rejectedTooSpinny++;
       return;
     }
 
@@ -96,6 +129,7 @@ public class MegaTagSupplier {
 
     if (mt2.tagCount == 0) {
       // If there's no tags then how could we trust this measurement?
+      m_rejectedNoTags++;
       return;
     }
 
@@ -108,5 +142,6 @@ public class MegaTagSupplier {
     for (MegaTagReceiver receiver : m_receivers) {
       receiver.observeVisionData(m_llName, mt2.pose, mt2.timestampSeconds, confidenceStdDev);
     }
+    m_dataReceived++;
   }
 }
