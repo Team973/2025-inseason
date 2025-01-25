@@ -20,9 +20,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
+
   private final DriveController m_driveController =
-      new DriveController(m_logger.subLogger("drive"));
-  private final Claw m_claw = new Claw(new Logger("Claw"));
+      new DriveController(m_logger.subLogger("drive", 0.05));
+  private final Claw m_claw = new Claw(new Logger("claw", 0.2));
 
   private final Elevator m_elevator = new Elevator(new Logger("elevator"));
   private final Arm m_arm = new Arm(new Logger("Arm"));
@@ -51,6 +52,7 @@ public class Robot extends TimedRobot {
   private void logSubsystems() {
     m_driveController.log();
     m_claw.log();
+    m_logger.update();
   }
 
   private void updateJoysticks() {
