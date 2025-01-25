@@ -28,7 +28,8 @@ public class Arm implements Subsystem {
   private double armToMotor(double armPostion) {
     return armPostion * MOTOR_TO_ARM_GEAR_RATIO;
   }
-  private double motorToArm(double motorPostion){
+
+  private double motorToArm(double motorPostion) {
     return motorPostion / MOTOR_TO_ARM_GEAR_RATIO;
   }
 
@@ -64,8 +65,8 @@ public class Arm implements Subsystem {
   public void update() {
     switch (m_mode) {
       case targetPostion:
-      if (m_lastMode != m_mode)  
-      m_armMotor.setControl(ControlMode.MotionMagicVoltage, armToMotor(m_armTargetPostion), 0);
+        if (m_lastMode != m_mode)
+          m_armMotor.setControl(ControlMode.MotionMagicVoltage, armToMotor(m_armTargetPostion), 0);
         break;
       case Stow:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
@@ -80,7 +81,7 @@ public class Arm implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log("armPostion",motorToArm(m_armMotor.getPosition().getValueAsDouble()));
+    m_logger.log("armPostion", motorToArm(m_armMotor.getPosition().getValueAsDouble()));
     m_armMotor.log();
   }
 
