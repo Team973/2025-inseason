@@ -143,6 +143,11 @@ public class GreyPoseEstimator {
     log();
   }
 
+  public boolean isNear(Pose2d other, double distanceTolerance, double angleTolerance) {
+    return getPoseMeters().getTranslation().getDistance(other.getTranslation()) < distanceTolerance
+        && getPoseMeters().getRotation().minus(other.getRotation()).getDegrees() < angleTolerance;
+  }
+
   private synchronized void log() {
     SmartDashboard.putNumberArray(
         "swerve/odometry",
