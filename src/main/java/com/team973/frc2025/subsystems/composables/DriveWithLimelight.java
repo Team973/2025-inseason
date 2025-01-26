@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 
 public class DriveWithLimelight extends DriveComposable {
   private final GreyPoseEstimator m_poseEstimator;
@@ -80,7 +81,10 @@ public class DriveWithLimelight extends DriveComposable {
             0,
             0,
             new TrapezoidProfile.Constraints(
-                DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 3.0));
+                DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * 0.1, 2.0));
+
+    m_thetaController.enableContinuousInput(
+        Units.degreesToRadians(-180.0), Units.degreesToRadians(180.0));
 
     m_logger = logger;
   }
@@ -121,7 +125,9 @@ public class DriveWithLimelight extends DriveComposable {
 
     m_logger.log("X Controller Target Position", m_xController.getSetpoint().position);
     m_logger.log("Y Controller Target Position", m_yController.getSetpoint().position);
-    m_logger.log("Theta Controller Target Position", m_thetaController.getSetpoint().position);
+    m_logger.log(
+        "Theta Controller Target Position Deg",
+        Math.toDegrees(m_thetaController.getSetpoint().position));
   }
 
   public ChassisSpeeds getOutput() {
@@ -142,8 +148,8 @@ public class DriveWithLimelight extends DriveComposable {
             m_yController.calculate(
                 m_poseEstimator.getPoseMeters().getY(), m_targetInitialPose.getY()),
             m_thetaController.calculate(
-                m_poseEstimator.getPoseMeters().getRotation().getDegrees(),
-                m_targetInitialPose.getRotation().getDegrees()));
+                m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+                m_targetInitialPose.getRotation().getRadians()));
       case Final:
         return new ChassisSpeeds(
             m_xController.calculate(
@@ -151,8 +157,8 @@ public class DriveWithLimelight extends DriveComposable {
             m_yController.calculate(
                 m_poseEstimator.getPoseMeters().getY(), m_targetFinalPose.getY()),
             m_thetaController.calculate(
-                m_poseEstimator.getPoseMeters().getRotation().getDegrees(),
-                m_targetFinalPose.getRotation().getDegrees()));
+                m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+                m_targetFinalPose.getRotation().getRadians()));
       default:
         throw new IllegalArgumentException(m_targetMode.toString());
     }

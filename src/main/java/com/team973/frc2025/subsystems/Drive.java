@@ -41,10 +41,10 @@ public class Drive implements Subsystem {
 
     m_swerveModules =
         new SwerveModule[] {
-          new SwerveModule(0, DriveInfo.FRONT_LEFT_CONSTANTS, logger.subLogger("mod0")),
-          new SwerveModule(1, DriveInfo.FRONT_RIGHT_CONSTANTS, logger.subLogger("mod1")),
-          new SwerveModule(2, DriveInfo.BACK_LEFT_CONSTANTS, logger.subLogger("mod2")),
-          new SwerveModule(3, DriveInfo.BACK_RIGHT_CONSTANTS, logger.subLogger("mod3"))
+          new SwerveModule(0, DriveInfo.FRONT_LEFT_CONSTANTS, logger.subLogger("swerve/mod0")),
+          new SwerveModule(1, DriveInfo.FRONT_RIGHT_CONSTANTS, logger.subLogger("swerve/mod1")),
+          new SwerveModule(2, DriveInfo.BACK_LEFT_CONSTANTS, logger.subLogger("swerve/mod2")),
+          new SwerveModule(3, DriveInfo.BACK_RIGHT_CONSTANTS, logger.subLogger("swerve/mod3"))
         };
 
     m_currentChassisSpeeds = new ChassisSpeeds();
