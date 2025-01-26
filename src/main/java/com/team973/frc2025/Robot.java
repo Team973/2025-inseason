@@ -138,7 +138,12 @@ public class Robot extends TimedRobot {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
           .getDriveWithLimelight()
-          .setTargetPosition(DriveWithLimelight.TargetPositions.HPL);
+          .setTargetPosition(DriveWithLimelight.TargetPositions.TWO_L);
+    } else if (m_driverStick.getRightBumperButton()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetPosition(DriveWithLimelight.TargetPositions.ONE_L);
     } else {
       m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
     }

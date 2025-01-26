@@ -55,10 +55,11 @@ public class DriveController implements Subsystem {
 
     m_driveWithJoysticks = new DriveWithJoysticks();
     m_driveWithTrajectory =
-        new DriveWithTrajectory(logger.subLogger("driveWithTrajectory"), m_drive);
+        new DriveWithTrajectory(m_logger.subLogger("driveWithTrajectory"), m_drive);
 
     m_driveWithLimelight =
-        new DriveWithLimelight(m_drive.getPoseEstimator(), logger.subLogger("driveWithLimelight"));
+        new DriveWithLimelight(
+            m_drive.getPoseEstimator(), m_logger.subLogger("driveWithLimelight"));
 
     m_currentChassisSpeeds = new ChassisSpeeds();
   }
@@ -100,10 +101,13 @@ public class DriveController implements Subsystem {
   @Override
   public void log() {
     m_drive.log();
+    m_driveWithTrajectory.log();
+    m_driveWithLimelight.log();
 
     m_logger.log("chassis speeds/vx", m_currentChassisSpeeds.vxMetersPerSecond);
     m_logger.log("chassis speeds/vy", m_currentChassisSpeeds.vyMetersPerSecond);
     m_logger.log("chassis speeds/omega RadPS", m_currentChassisSpeeds.omegaRadiansPerSecond);
+    m_logger.log("controller", m_controllerOption.toString());
   }
 
   private DriveComposable getComposableFromControllerOption(ControllerOption option) {
