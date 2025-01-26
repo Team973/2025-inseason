@@ -38,9 +38,9 @@ public class DriveWithLimelight extends DriveComposable {
 
   public static class TargetPositions {
     public static final TargetPositionRelativeToAprilTag HPL =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(1), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(1), 0, 0, Rotation2d.fromDegrees(180));
     public static final TargetPositionRelativeToAprilTag HPR =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(2), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(2), 0, 0, Rotation2d.fromDegrees(180));
     public static final TargetPositionRelativeToAprilTag ONE_L =
         new TargetPositionRelativeToAprilTag(AprilTag.fromRed(7), 0, 0, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag ONE_R =
