@@ -152,7 +152,7 @@ public class DriveWithLimelight extends DriveComposable {
                 m_poseEstimator.getPoseMeters().getRotation().getDegrees(),
                 m_targetFinalPose.getRotation().getDegrees()));
       default:
-        return new ChassisSpeeds(0, 0, 0);
+        throw new IllegalArgumentException(m_targetMode.toString());
     }
   }
 }
