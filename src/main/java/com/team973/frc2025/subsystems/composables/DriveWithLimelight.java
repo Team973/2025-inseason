@@ -136,6 +136,11 @@ public class DriveWithLimelight extends DriveComposable {
       return new ChassisSpeeds(0, 0, 0);
     }
 
+    if (getFirstRun()) {
+      m_thetaController.reset(m_poseEstimator.getPoseMeters().getRotation().getRadians());
+      firstRunComplete();
+    }
+
     if (Drive.comparePoses(m_poseEstimator.getPoseMeters(), m_targetInitialPose, 0.1, 5)) {
       m_targetMode = TargetMode.Final;
     }
