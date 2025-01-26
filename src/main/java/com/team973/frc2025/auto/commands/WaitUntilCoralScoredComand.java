@@ -18,7 +18,7 @@ public class WaitUntilCoralScoredComand extends AutoCommand {
 
   @Override
   public boolean isCompleted() {
-    return m_claw.motorAtTarget();
+    return m_claw.algeScoreComplete();
   }
 
   @Override
