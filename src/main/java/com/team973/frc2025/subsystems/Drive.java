@@ -107,6 +107,12 @@ public class Drive implements Subsystem {
     return m_estimatedVelocity;
   }
 
+  public static boolean comparePoses(
+      Pose2d poseA, Pose2d poseB, double distanceTolerance, double angleTolerance) {
+    return poseA.getTranslation().getDistance(poseB.getTranslation()) < distanceTolerance
+        && poseA.getRotation().minus(poseB.getRotation()).getDegrees() < angleTolerance;
+  }
+
   public void resetOdometry(Pose2d pose) {
     m_pigeon.setYawOffset(m_pigeon.getRawYaw().minus(pose.getRotation()));
     m_poseEstimator.resetPosition(pose);
