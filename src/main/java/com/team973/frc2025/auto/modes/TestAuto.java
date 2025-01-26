@@ -10,18 +10,21 @@ import com.team973.lib.util.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class TaxiAuto extends AutoMode {
-  public TaxiAuto(Logger logger, DriveController drive, Claw claw) {
+public class TestAuto extends AutoMode {
+  public TestAuto(Logger logger, DriveController drive) {
     super(
         logger,
         new Pose2d(7.6, 4, Rotation2d.fromDegrees(180)),
         new DriveTrajectoryCommand(
             drive,
-            "C-4",
-            new CommandOnEvent("shoot", new ClawCommand(claw, Claw.ControlStatus.Shoot))));
+            "PF-HP-L2",
+            new CommandOnEvent("Shoot", new ClawCommand(null, Claw.ControlStatus.Shoot))),
+        new DriveTrajectoryCommand(drive, "PF-L2-HP"),
+        new DriveTrajectoryCommand(drive, "PF-HP-R2"),
+        new DriveTrajectoryCommand(drive, "PF-R2-HP"));
   }
 
   public String getName() {
-    return "Taxi Auto";
+    return "Test Auto";
   }
 }

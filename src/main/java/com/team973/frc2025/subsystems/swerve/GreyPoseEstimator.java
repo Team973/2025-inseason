@@ -97,6 +97,7 @@ public class GreyPoseEstimator {
 
   public synchronized void resetPosition(Pose2d pose) {
     m_swerveOdometry.resetPosition(m_pigeon.getYaw(), getPositions(), pose);
+    log();
   }
 
   private int m_successfulCycles = 0;
@@ -139,6 +140,10 @@ public class GreyPoseEstimator {
     m_driveController.syncSensors();
     m_driveController.update();
 
+    log();
+  }
+
+  private synchronized void log() {
     SmartDashboard.putNumberArray(
         "swerve/odometry",
         ImmutableList.of(

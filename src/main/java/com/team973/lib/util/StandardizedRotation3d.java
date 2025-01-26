@@ -1,7 +1,5 @@
 package com.team973.lib.util;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Quaternion;
@@ -41,8 +39,7 @@ public class StandardizedRotation3d extends Rotation3d {
    *
    * @param q The quaternion.
    */
-  @JsonCreator
-  public StandardizedRotation3d(@JsonProperty(required = true, value = "quaternion") Quaternion q) {
+  public StandardizedRotation3d(Quaternion q) {
     super(q);
   }
 

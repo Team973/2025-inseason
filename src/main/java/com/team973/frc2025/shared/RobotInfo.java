@@ -46,29 +46,29 @@ public final class RobotInfo {
      * The left-to-right distance between the drivetrain wheels Should be measured from center to
      * center.
      */
-    public static final double TRACKWIDTH_METERS = 0.61595;
+    public static final double TRACKWIDTH_METERS = 0.635;
 
     /**
      * The front-to-back distance between the drivetrain wheels. Should be measured from center to
      * center.
      */
-    public static final double WHEELBASE_METERS = 0.57785;
+    public static final double WHEELBASE_METERS = 0.635;
 
     public static final double OPEN_LOOP_RAMP = 0.0;
     public static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */
-    public static final double ANGLE_KP = 8.0; // 10.0 at SD // 6.0
+    public static final double ANGLE_KP = 8.0;
     public static final double ANGLE_KI = 0.0;
     public static final double ANGLE_KD = 0.0;
     public static final double ANGLE_KF = 0.0;
     public static final double ANGLE_KV = 0.0;
 
     /* Drive Motor PID Values */
-    public static final double DRIVE_KP = 0.25; // 0.35;
+    public static final double DRIVE_KP = 0.35;
     public static final double DRIVE_KI = 0.0;
     public static final double DRIVE_KD = 0.0;
-    public static final double DRIVE_KF = 0.148; // 0.18;
+    public static final double DRIVE_KF = 0.148 * 0.82;
 
     /* Motor Inverts */
     public static final boolean DRIVE_MOTOR_INVERT = true;
