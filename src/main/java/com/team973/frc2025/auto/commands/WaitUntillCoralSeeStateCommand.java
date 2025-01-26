@@ -13,11 +13,7 @@ public class WaitUntillCoralSeeStateCommand extends AutoCommand {
   }
 
   public boolean coralCorrectPlace() {
-    if (m_claw.frontBannerSensorSeesCoral() && !m_claw.backBannerSensorSeesCoral()) {
-      return true;
-    } else {
-      return false;
-    }
+    return (m_claw.frontBannerSensorSeesCoral() && !m_claw.backBannerSensorSeesCoral());
   }
 
   @Override

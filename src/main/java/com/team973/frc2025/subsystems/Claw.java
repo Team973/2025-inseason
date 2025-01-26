@@ -24,14 +24,14 @@ public class Claw implements Subsystem {
 
   public Claw(Logger logger) {
     m_logger = logger;
-    m_clawMotor = new GreyTalonFX(99, RobotInfo.CANIVORE_CANBUS, new Logger("AlgeMotor"));
-    m_algeMotor = new GreyTalonFX(36, RobotInfo.CANIVORE_CANBUS, new Logger("ClawMotor"));
-    TalonFXConfiguration rightMotorConfig = defaultMotorConfig();
-    rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    m_clawMotor.setConfig(rightMotorConfig);
-    TalonFXConfiguration leftMotorConfig = defaultMotorConfig();
-    leftMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    m_algeMotor.setConfig(leftMotorConfig);
+    m_clawMotor = new GreyTalonFX(37, RobotInfo.CANIVORE_CANBUS, new Logger("claw motor"));
+    m_algeMotor = new GreyTalonFX(36, RobotInfo.CANIVORE_CANBUS, new Logger("claw motor"));
+    TalonFXConfiguration clawMotorConfig = defaultMotorConfig();
+    clawMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    m_clawMotor.setConfig(clawMotorConfig);
+    TalonFXConfiguration algeMotorCongfig = defaultMotorConfig();
+    algeMotorCongfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    m_algeMotor.setConfig(algeMotorCongfig);
   }
 
   private static TalonFXConfiguration defaultMotorConfig() {
@@ -73,14 +73,16 @@ public class Claw implements Subsystem {
     return m_bannerSensorBack.get();
   }
 
-  public boolean motorAtTarget() {
-    return (Math.abs(m_algeTargetPostion - m_clawMotor.getPosition().getValueAsDouble()) < 0.1
-        && Math.abs(m_clawTargetPostion - m_algeMotor.getPosition().getValueAsDouble()) < 0.1);
+  public boolean clawScoreComplete() {
+    return (Math.abs(m_clawTargetPostion - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
+  }
+
+  public boolean algeScoreComplete() {
+    return (Math.abs(m_algeTargetPostion - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
   }
 
   public static enum ControlStatus {
     AlgeIntakeHold,
-    AlgeScore,
     IntakeAndHold,
     Shoot,
     Stop,
@@ -93,42 +95,37 @@ public class Claw implements Subsystem {
     switch (m_mode) {
       case AlgeIntakeHold:
         if (!algeSensorSeesAlge()) {
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, 1);
+          m_algeMotor.setControl(ControlMode.DutyCycleOut, 1);
         } else {
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-        }
-        break;
-      case AlgeScore:
-        if (m_lastMode != m_mode) {
-          m_clawTargetPostion = m_clawMotor.getPosition().getValueAsDouble() + 4.5;
+          m_algeMotor.setControl(ControlMode.DutyCycleOut, 0);
         }
         break;
       case IntakeAndHold:
         if (frontBannerSensorSeesCoral() && !backBannerSensorSeesCoral()) {
-          m_algeMotor.setControl(ControlMode.DutyCycleOut, 0);
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
         } else if (!frontBannerSensorSeesCoral() && !backBannerSensorSeesCoral()) {
-          m_algeMotor.setControl(ControlMode.DutyCycleOut, -0.05);
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, -0.05);
         } else if (!frontBannerSensorSeesCoral() && backBannerSensorSeesCoral()) {
-          m_algeMotor.setControl(ControlMode.DutyCycleOut, 0.05);
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0.05);
         } else if (frontBannerSensorSeesCoral() && backBannerSensorSeesCoral()) {
-          m_algeMotor.setControl(ControlMode.DutyCycleOut, 0.05);
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0.05);
         }
         break;
       case Shoot:
-        m_algeMotor.setControl(ControlMode.VelocityVoltage, 2, 1);
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 2, 1);
         break;
       case Stop:
-        m_algeMotor.setControl(ControlMode.VelocityVoltage, 0, 1);
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 0, 1);
         break;
       case Score:
         if (m_lastMode != m_mode) {
           m_clawTargetPostion = m_clawMotor.getPosition().getValueAsDouble() + 4.5;
           m_algeTargetPostion = m_algeMotor.getPosition().getValueAsDouble() + 4.5;
         }
-        m_algeMotor.setControl(ControlMode.MotionMagicVoltage, m_algeTargetPostion, 0);
+        m_clawMotor.setControl(ControlMode.MotionMagicVoltage, m_algeTargetPostion, 0);
         break;
       case Retract:
-        m_algeMotor.setControl(ControlMode.VelocityVoltage, -5, 1);
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, -5, 1);
         break;
     }
     m_lastMode = m_mode;
@@ -148,7 +145,7 @@ public class Claw implements Subsystem {
     m_clawMotor.log();
     m_logger.log("target postion left", m_algeTargetPostion);
     m_logger.log("target postion right", m_clawTargetPostion);
-    m_logger.log("target rotations hit", motorAtTarget());
+    m_logger.log("target rotations hit", clawScoreComplete());
   }
 
   @Override
