@@ -4,6 +4,7 @@ import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.lib.util.AprilTag;
 import com.team973.lib.util.DriveComposable;
+import com.team973.lib.util.Logger;
 import com.team973.lib.util.TargetPositionRelativeToAprilTag;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,6 +20,8 @@ public class DriveWithLimelight extends DriveComposable {
   private final ProfiledPIDController m_xController;
   private final ProfiledPIDController m_yController;
   private final ProfiledPIDController m_thetaController;
+
+  private final Logger m_logger;
 
   private TargetPositionRelativeToAprilTag m_target = null;
 
@@ -63,7 +66,7 @@ public class DriveWithLimelight extends DriveComposable {
         new TargetPositionRelativeToAprilTag(AprilTag.fromRed(6), 0, 0, new Rotation2d());
   }
 
-  public DriveWithLimelight(GreyPoseEstimator poseEstimator) {
+  public DriveWithLimelight(GreyPoseEstimator poseEstimator, Logger logger) {
     m_poseEstimator = poseEstimator;
 
     m_xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0.3, 0.5));
@@ -75,6 +78,8 @@ public class DriveWithLimelight extends DriveComposable {
             0,
             new TrapezoidProfile.Constraints(
                 DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 3.0));
+
+    m_logger = logger;
   }
 
   public void setTargetPosition(TargetPositionRelativeToAprilTag target) {
@@ -98,6 +103,22 @@ public class DriveWithLimelight extends DriveComposable {
             aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
 
     m_targetMode = TargetMode.Initial;
+  }
+
+  public void log() {
+    m_logger.log("Target Mode", m_targetMode.toString());
+
+    m_logger.log("Target Initial Pose/x", m_targetInitialPose.getX());
+    m_logger.log("Target Initial Pose/y", m_targetInitialPose.getY());
+    m_logger.log("Target Initial Pose/degrees", m_targetInitialPose.getRotation().getDegrees());
+
+    m_logger.log("Target Final Pose/x", m_targetFinalPose.getX());
+    m_logger.log("Target Final Pose/y", m_targetFinalPose.getY());
+    m_logger.log("Target Final Pose/degrees", m_targetFinalPose.getRotation().getDegrees());
+
+    m_logger.log("X Controller Target Position", m_xController.getSetpoint().position);
+    m_logger.log("Y Controller Target Position", m_yController.getSetpoint().position);
+    m_logger.log("Theta Controller Target Position", m_thetaController.getSetpoint().position);
   }
 
   public ChassisSpeeds getOutput() {

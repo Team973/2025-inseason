@@ -57,7 +57,8 @@ public class DriveController implements Subsystem {
     m_driveWithTrajectory =
         new DriveWithTrajectory(logger.subLogger("driveWithTrajectory"), m_drive);
 
-    m_driveWithLimelight = new DriveWithLimelight(m_drive.getPoseEstimator());
+    m_driveWithLimelight =
+        new DriveWithLimelight(m_drive.getPoseEstimator(), logger.subLogger("driveWithLimelight"));
 
     m_currentChassisSpeeds = new ChassisSpeeds();
   }
