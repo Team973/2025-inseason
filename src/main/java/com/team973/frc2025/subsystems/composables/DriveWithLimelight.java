@@ -1,6 +1,7 @@
 package com.team973.frc2025.subsystems.composables;
 
 import com.team973.frc2025.shared.RobotInfo.DriveInfo;
+import com.team973.frc2025.subsystems.Drive;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.lib.util.AprilTag;
 import com.team973.lib.util.DriveComposable;
@@ -122,11 +123,12 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public ChassisSpeeds getOutput() {
-    if (m_target == null || m_poseEstimator.isNear(m_targetFinalPose, 0.1, 5)) {
+    if (m_target == null
+        || Drive.comparePoses(m_poseEstimator.getPoseMeters(), m_targetFinalPose, 0.1, 5)) {
       return new ChassisSpeeds(0, 0, 0);
     }
 
-    if (m_poseEstimator.isNear(m_targetInitialPose, 0.1, 5)) {
+    if (Drive.comparePoses(m_poseEstimator.getPoseMeters(), m_targetInitialPose, 0.1, 5)) {
       m_targetMode = TargetMode.Final;
     }
 
