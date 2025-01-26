@@ -95,20 +95,20 @@ public class Claw implements Subsystem {
     switch (m_mode) {
       case AlgeIntakeHold:
         if (!algeSensorSeesAlge()) {
-          m_algeMotor.setControl(ControlMode.DutyCycleOut, 1);
+          m_algeMotor.setControl(ControlMode.VelocityVoltage, 1, 1);
         } else {
-          m_algeMotor.setControl(ControlMode.DutyCycleOut, 0);
+          m_algeMotor.setControl(ControlMode.VelocityVoltage, 0, 1);
         }
         break;
       case IntakeAndHold:
         if (frontBannerSensorSeesCoral() && !backBannerSensorSeesCoral()) {
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 0, 1);
         } else if (!frontBannerSensorSeesCoral() && !backBannerSensorSeesCoral()) {
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, -0.05);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 1, 1);
         } else if (!frontBannerSensorSeesCoral() && backBannerSensorSeesCoral()) {
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0.05);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -1, 1);
         } else if (frontBannerSensorSeesCoral() && backBannerSensorSeesCoral()) {
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0.05);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 1, 1);
         }
         break;
       case Shoot:
@@ -116,13 +116,15 @@ public class Claw implements Subsystem {
         break;
       case Stop:
         m_clawMotor.setControl(ControlMode.VelocityVoltage, 0, 1);
+        m_algeMotor.setControl(ControlMode.VelocityVoltage, 0, 1);
         break;
       case Score:
         if (m_lastMode != m_mode) {
           m_clawTargetPostion = m_clawMotor.getPosition().getValueAsDouble() + 4.5;
           m_algeTargetPostion = m_algeMotor.getPosition().getValueAsDouble() + 4.5;
         }
-        m_clawMotor.setControl(ControlMode.MotionMagicVoltage, m_algeTargetPostion, 0);
+        m_clawMotor.setControl(ControlMode.MotionMagicVoltage, m_clawTargetPostion, 0);
+        m_algeMotor.setControl(ControlMode.MotionMagicVoltage, m_algeTargetPostion, 0);
         break;
       case Retract:
         m_clawMotor.setControl(ControlMode.VelocityVoltage, -5, 1);
