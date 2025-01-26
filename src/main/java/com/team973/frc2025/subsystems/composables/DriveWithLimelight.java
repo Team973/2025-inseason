@@ -38,33 +38,35 @@ public class DriveWithLimelight extends DriveComposable {
 
   public static class TargetPositions {
     public static final TargetPositionRelativeToAprilTag HPL =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(1), 0, 0, Rotation2d.fromDegrees(180));
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(1), 0.5, 0.0, Rotation2d.fromDegrees(180));
     public static final TargetPositionRelativeToAprilTag HPR =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(2), 0, 0, Rotation2d.fromDegrees(180));
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(2), 0.5, 0.0, Rotation2d.fromDegrees(180));
     public static final TargetPositionRelativeToAprilTag ONE_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(7), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(7), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag ONE_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(7), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(7), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag TWO_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(8), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(8), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag TWO_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(8), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(8), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag THREE_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(9), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(9), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag THREE_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(9), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(9), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag FOUR_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(10), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(10), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag FOUR_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(10), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(10), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag FIVE_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(11), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(11), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag FIVE_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(11), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(11), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag SIX_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(6), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(6), 0.6, 0.1, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag SIX_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(6), 0, 0, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(6), 0.6, 0.1, new Rotation2d());
   }
 
   public DriveWithLimelight(GreyPoseEstimator poseEstimator, Logger logger) {
