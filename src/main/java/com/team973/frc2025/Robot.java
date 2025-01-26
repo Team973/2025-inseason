@@ -4,6 +4,7 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.DriveController;
@@ -23,6 +24,7 @@ public class Robot extends TimedRobot {
       new DriveController(m_logger.subLogger("drive"));
   private final Claw m_claw = new Claw(new Logger("Claw"));
 
+  private final CANdleManger m_CaNdleManger = new CANdleManger(new Logger("candle manger"));
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 
@@ -33,20 +35,26 @@ public class Robot extends TimedRobot {
 
   private void syncSensors() {
     m_driveController.syncSensors();
+    m_claw.syncSensors();
+    m_CaNdleManger.syncSensors();
   }
 
   private void updateSubsystems() {
     m_driveController.update();
     m_claw.update();
+    m_CaNdleManger.update();
   }
 
   private void resetSubsystems() {
     m_driveController.reset();
+    m_claw.reset();
+    m_CaNdleManger.reset();
   }
 
   private void logSubsystems() {
     m_driveController.log();
     m_claw.log();
+    m_CaNdleManger.log();
   }
 
   private void updateJoysticks() {
@@ -142,6 +150,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     syncSensors();
+    m_CaNdleManger.update();
 
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
