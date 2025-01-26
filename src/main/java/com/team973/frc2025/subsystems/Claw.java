@@ -76,7 +76,7 @@ public class Claw implements Subsystem {
     Score,
   }
 
-  private void setClosedLoopClaw(double motorDemandNum) {
+  private void velocityRPS(double motorDemandNum) {
     m_motorRight.setControl(ControlMode.VelocityVoltage, motorDemandNum, 1);
     m_motorLeft.setControl(ControlMode.VelocityVoltage, motorDemandNum, 1);
   }
@@ -86,16 +86,16 @@ public class Claw implements Subsystem {
     switch (m_mode) {
       case IntakeAndHold:
         if (sensorSeeCoral()) {
-          setClosedLoopClaw(0);
+          velocityRPS(0);
         } else if (!sensorSeeCoral()) {
-          setClosedLoopClaw(10);
+          velocityRPS(10);
         }
         break;
       case Shoot:
-        setClosedLoopClaw(2);
+        velocityRPS(2);
         break;
       case Stop:
-        setClosedLoopClaw(0);
+        velocityRPS(0);
         break;
       case Score:
         if (m_lastMode != m_mode) {
@@ -106,7 +106,7 @@ public class Claw implements Subsystem {
         m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion, 0);
         break;
       case Retract:
-        setClosedLoopClaw(-5);
+        velocityRPS(-5);
         break;
     }
     m_lastMode = m_mode;

@@ -18,6 +18,8 @@ public class Arm implements Subsystem {
   public static final double MEDIUM_POSTION_DEG = 0;
   public static final double LOW_POSTION_DEG = -30;
   private static final double MOTOR_TO_ARM_GEAR_RATIO = 56.0 / 10.0;
+  private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
+  private static final double FEED_FORWARD_MAX_VOLT = 0.1;
 
   public static enum ControlStatus {
     targetPostion,
@@ -60,11 +62,19 @@ public class Arm implements Subsystem {
     return (Math.abs(m_armTargetPostion - m_armMotor.getPosition().getValueAsDouble()) < 0.1);
   }
 
+  private static double getFeedForwardTargetAngle(double targetAngle) {
+    return FEED_FORWARD_MAX_VOLT * Math.cos(targetAngle - CENTER_GRAVITY_OFFSET_DEG);
+  }
+
   @Override
   public void update() {
     switch (m_mode) {
       case targetPostion:
-        m_armMotor.setControl(ControlMode.MotionMagicVoltage, armToMotor(m_armTargetPostion), 0);
+        m_armMotor.setControl(
+            ControlMode.MotionMagicVoltage,
+            armToMotor(m_armTargetPostion),
+            getFeedForwardTargetAngle(m_armTargetPostion),
+            0);
         break;
       case Stow:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);

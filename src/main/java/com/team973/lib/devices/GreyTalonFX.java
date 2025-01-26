@@ -313,6 +313,20 @@ public class GreyTalonFX extends TalonFX {
   /**
    * Set the output of the TalonFX with optimized FOC.
    *
+   * @param controlMode The control mode to use.
+   * @param demand The demand to use.
+   * @param pidSlot The PID slot to use.
+   * @param feedForward The feed forward to use.
+   * @return Status Code of the request, 0 is OK.
+   */
+  public StatusCode setControl(
+      ControlMode controlMode, double demand, double feedForward, int pidSlot) {
+    return setControl(controlMode, demand, optimizedFOC(), feedForward, pidSlot, false);
+  }
+
+  /**
+   * Set the output of the TalonFX with optimized FOC.
+   *
    * <p>By default PID Slot 0 is used
    *
    * @param controlMode The control mode to use.
