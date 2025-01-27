@@ -89,7 +89,9 @@ public class DriveWithTrajectory extends DriveComposable {
     m_logger.log("Theta Velocity Error", m_controller.getThetaController().getVelocityError());
   }
 
-  public void init() {}
+  public void init() {
+    m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
+  }
 
   @Override
   public synchronized ChassisSpeeds getOutput() {
@@ -100,11 +102,6 @@ public class DriveWithTrajectory extends DriveComposable {
     }
 
     m_currentSample = sample.get();
-
-    if (getFirstRun()) {
-      m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
-      firstRunComplete();
-    }
 
     return new ChassisSpeeds(
         m_currentSample.vx

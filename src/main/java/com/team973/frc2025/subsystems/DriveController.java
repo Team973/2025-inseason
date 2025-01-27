@@ -67,7 +67,7 @@ public class DriveController implements Subsystem {
   public void setControllerOption(ControllerOption controllerOption) {
     if (controllerOption != m_controllerOption) {
       m_controllerOption = controllerOption;
-      getComposableFromControllerOption(controllerOption).start();
+      getComposableFromControllerOption(controllerOption).init();
     }
   }
 
