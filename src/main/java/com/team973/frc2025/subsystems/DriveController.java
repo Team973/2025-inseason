@@ -65,8 +65,10 @@ public class DriveController implements Subsystem {
   }
 
   public void setControllerOption(ControllerOption controllerOption) {
-    m_controllerOption = controllerOption;
-    getComposableFromControllerOption(controllerOption).init();
+    if (controllerOption != m_controllerOption) {
+      m_controllerOption = controllerOption;
+      getComposableFromControllerOption(controllerOption).start();
+    }
   }
 
   public DriveWithJoysticks getDriveWithJoysticks() {
