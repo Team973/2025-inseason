@@ -89,6 +89,8 @@ public class DriveWithTrajectory extends DriveComposable {
     m_logger.log("Theta Velocity Error", m_controller.getThetaController().getVelocityError());
   }
 
+  public void init() {}
+
   @Override
   public synchronized ChassisSpeeds getOutput() {
     Optional<SwerveSample> sample = m_trajectory.sampleAt(getTimeSecFromStart(), false);

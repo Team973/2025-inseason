@@ -1,6 +1,5 @@
 package com.team973.frc2025.subsystems.composables;
 
-import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.Drive;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.lib.util.AprilTag;
@@ -38,6 +37,11 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public static class TargetPositions {
+    public static final TargetPositionRelativeToAprilTag TEST_ONE =
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(0), 0, 0, new Rotation2d());
+    public static final TargetPositionRelativeToAprilTag TEST_TWO =
+        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(-1), 0, 0, new Rotation2d());
+
     public static final TargetPositionRelativeToAprilTag HPL =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(1), 0.5, 0.0, Rotation2d.fromDegrees(180));
@@ -73,15 +77,12 @@ public class DriveWithLimelight extends DriveComposable {
   public DriveWithLimelight(GreyPoseEstimator poseEstimator, Logger logger) {
     m_poseEstimator = poseEstimator;
 
-    m_xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0.3, 0.5));
-    m_yController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0.3, 0.5));
+    m_xController =
+        new ProfiledPIDController(1.0, 0, 0, new TrapezoidProfile.Constraints(0.2, 0.5));
+    m_yController =
+        new ProfiledPIDController(1.0, 0, 0, new TrapezoidProfile.Constraints(0.2, 0.5));
     m_thetaController =
-        new ProfiledPIDController(
-            0.1,
-            0,
-            0,
-            new TrapezoidProfile.Constraints(
-                DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * 0.1, 2.0));
+        new ProfiledPIDController(8.0, 0, 0, new TrapezoidProfile.Constraints(0.5, 0.5));
 
     m_thetaController.enableContinuousInput(
         Units.degreesToRadians(-180.0), Units.degreesToRadians(180.0));
@@ -130,15 +131,16 @@ public class DriveWithLimelight extends DriveComposable {
         Math.toDegrees(m_thetaController.getSetpoint().position));
   }
 
+  public void init() {
+    m_xController.reset(m_poseEstimator.getVelocityMetersPerSeconds().getX());
+    m_yController.reset(m_poseEstimator.getVelocityMetersPerSeconds().getY());
+    m_thetaController.reset(m_poseEstimator.getVelocityMetersPerSeconds().getAngle().getRadians());
+  }
+
   public ChassisSpeeds getOutput() {
     if (m_target == null
         || Drive.comparePoses(m_poseEstimator.getPoseMeters(), m_targetFinalPose, 0.1, 5)) {
       return new ChassisSpeeds(0, 0, 0);
-    }
-
-    if (getFirstRun()) {
-      m_thetaController.reset(m_poseEstimator.getPoseMeters().getRotation().getRadians());
-      firstRunComplete();
     }
 
     if (Drive.comparePoses(m_poseEstimator.getPoseMeters(), m_targetInitialPose, 0.1, 5)) {
