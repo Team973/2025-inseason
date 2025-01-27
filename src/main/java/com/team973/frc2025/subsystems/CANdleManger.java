@@ -5,6 +5,8 @@ import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class CANdleManger implements Subsystem {
   private final Logger m_logger;
@@ -22,13 +24,17 @@ public class CANdleManger implements Subsystem {
   }
 
   @Override
-  public void log() {}
+  public void log() {
+    m_logger.log("current time us", RobotController.getFPGATime());
+    SmartDashboard.putNumber("current time secs", RobotController.getFPGATime() / 1000.0 / 1000.0);
+  }
 
   @Override
   public void syncSensors() {}
 
   @Override
   public void update() {
+    log();
     m_candle.setLEDs(255, 254, 253);
   }
 

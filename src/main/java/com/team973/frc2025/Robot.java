@@ -52,9 +52,9 @@ public class Robot extends TimedRobot {
   }
 
   private void logSubsystems() {
-    m_driveController.log();
-    m_claw.log();
-    m_CaNdleManger.log();
+    // m_driveController.log();
+    // m_claw.log();
+    // m_CaNdleManger.log();
   }
 
   private void updateJoysticks() {
