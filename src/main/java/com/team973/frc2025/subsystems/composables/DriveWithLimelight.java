@@ -78,9 +78,9 @@ public class DriveWithLimelight extends DriveComposable {
     m_poseEstimator = poseEstimator;
 
     m_xController =
-        new ProfiledPIDController(1.0, 0, 0, new TrapezoidProfile.Constraints(0.2, 0.5));
+        new ProfiledPIDController(12.0, 0, 0, new TrapezoidProfile.Constraints(0.1, 0.05));
     m_yController =
-        new ProfiledPIDController(1.0, 0, 0, new TrapezoidProfile.Constraints(0.2, 0.5));
+        new ProfiledPIDController(12.0, 0, 0, new TrapezoidProfile.Constraints(0.1, 0.05));
     m_thetaController =
         new ProfiledPIDController(8.0, 0, 0, new TrapezoidProfile.Constraints(0.5, 0.5));
 
