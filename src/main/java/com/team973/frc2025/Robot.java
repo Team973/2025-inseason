@@ -8,6 +8,7 @@ import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -20,6 +21,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
+
+  private final Joystick m_stick;
 
   private final Climb m_climb = new Climb(new Logger("climb manager"));
 
@@ -43,7 +46,7 @@ public class Robot extends TimedRobot {
   private void updateSubsystems() {
     m_driveController.update();
     m_climb.update();
-    m_claw.update();
+    // m_claw.update();
   }
 
   private void resetSubsystems() {
@@ -53,7 +56,7 @@ public class Robot extends TimedRobot {
 
   private void logSubsystems() {
     m_driveController.log();
-    m_claw.log();
+    // m_claw.log();
     m_logger.update();
     m_climb.log();
   }
@@ -70,6 +73,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     resetSubsystems();
     m_driveController.startOdometrey();
+    m_stick = new Joystick(2, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
   }
 
   /**
@@ -82,6 +86,15 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     logSubsystems();
+    if (m_stick.getAButton()) {
+      m_climb.m_climb.setControl(ControlMode.DutyCycleOut, -0.1);
+    } else if (m_stick.getBButton()) {
+      m_climb.m_climb.setControl(ControlMode.DutyCycleOut, 0.1);
+    } else if (m_stick.getXButton()) {
+      // Do something only for the first robot cycle that the X button is not held
+    } else {
+      m_climb.m_climb.setControl(ControlMode.DutyCycleOut, 0);
+    }
   }
 
   /**
