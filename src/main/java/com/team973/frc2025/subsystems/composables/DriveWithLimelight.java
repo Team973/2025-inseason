@@ -132,9 +132,9 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void init() {
-    m_xController.reset(m_poseEstimator.getVelocityMetersPerSeconds().getX());
-    m_yController.reset(m_poseEstimator.getVelocityMetersPerSeconds().getY());
-    m_thetaController.reset(m_poseEstimator.getVelocityMetersPerSeconds().getAngle().getRadians());
+    m_xController.reset(m_poseEstimator.getPoseMeters().getX());
+    m_yController.reset(m_poseEstimator.getPoseMeters().getY());
+    m_thetaController.reset(m_poseEstimator.getPoseMeters().getRotation().getRadians());
   }
 
   public ChassisSpeeds getOutput() {
