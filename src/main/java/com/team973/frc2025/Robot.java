@@ -6,6 +6,7 @@ package com.team973.frc2025;
 
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
+import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
@@ -19,6 +20,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
+
+  private final Climb m_climb = new Climb(new Logger("climb manager"));
 
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
@@ -34,21 +37,25 @@ public class Robot extends TimedRobot {
 
   private void syncSensors() {
     m_driveController.syncSensors();
+    m_climb.syncSensors();
   }
 
   private void updateSubsystems() {
     m_driveController.update();
+    m_climb.update();
     m_claw.update();
   }
 
   private void resetSubsystems() {
     m_driveController.reset();
+    m_climb.reset();
   }
 
   private void logSubsystems() {
     m_driveController.log();
     m_claw.log();
     m_logger.update();
+    m_climb.log();
   }
 
   private void updateJoysticks() {
