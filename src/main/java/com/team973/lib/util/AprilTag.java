@@ -32,7 +32,7 @@ public class AprilTag {
       new HashMap<>() {
         {
           put(-1, new Pose3d(0.5, 0, 0, new Rotation3d(0, 0, 0)));
-          put(0, new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0)));
+          put(0, new Pose3d(0, 0, 0, new Rotation3d(0, 0, Math.toRadians(180))));
           put(1, new Pose3d(16.6972, 0.65532, 1.4859, new Rotation3d(0, 0, Math.toRadians(126))));
           put(2, new Pose3d(16.6972, 7.39648, 1.4859, new Rotation3d(0, 0, Math.toRadians(234))));
           put(3, new Pose3d(11.56081, 8.05561, 1.30175, new Rotation3d(0, 0, Math.toRadians(270))));
