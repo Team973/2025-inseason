@@ -31,6 +31,8 @@ public class DriveWithLimelight extends DriveComposable {
 
   private TargetMode m_targetMode = TargetMode.Initial;
 
+  private int m_targetReefFace = 0;
+
   private enum TargetMode {
     Initial,
     Final
@@ -108,6 +110,16 @@ public class DriveWithLimelight extends DriveComposable {
         Units.degreesToRadians(-180.0), Units.degreesToRadians(180.0));
 
     m_logger = logger;
+  }
+
+  public void incrementTargetReefFace(int increment) {
+    m_targetReefFace += increment;
+
+    if (m_targetReefFace > 6) {
+        m_targetReefFace = 1;
+    } else if (m_targetReefFace < 1) {
+        m_targetReefFace = 6;
+    }
   }
 
   public void setTargetPosition(TargetPositionRelativeToAprilTag target) {
