@@ -11,6 +11,8 @@ import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -110,6 +112,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
+    m_driveController.resetOdometry(new Pose2d(13.0, 4.0259, new Rotation2d()));
   }
 
   /** This function is called periodically during operator control. */
@@ -136,14 +139,16 @@ public class Robot extends TimedRobot {
 
     if (m_driverStick.getLeftBumperButton()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController.getDriveWithLimelight().setReadyToTargetFinalPose(!m_claw.sensorSeeCoral());
       m_driveController
           .getDriveWithLimelight()
-          .setTargetPosition(DriveWithLimelight.TargetPositions.TEST_ONE);
+          .setTargetPosition(DriveWithLimelight.TargetPositions.ONE_L);
     } else if (m_driverStick.getRightBumperButton()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController.getDriveWithLimelight().setReadyToTargetFinalPose(!m_claw.sensorSeeCoral());
       m_driveController
           .getDriveWithLimelight()
-          .setTargetPosition(DriveWithLimelight.TargetPositions.TEST_TWO);
+          .setTargetPosition(DriveWithLimelight.TargetPositions.ONE_R);
     } else {
       m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
     }
