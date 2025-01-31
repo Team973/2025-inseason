@@ -8,7 +8,6 @@ import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
-import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -86,15 +85,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     logSubsystems();
-    if (m_stick.getAButton()) {
-      m_climb.m_climb.setControl(ControlMode.DutyCycleOut, -0.1);
-    } else if (m_stick.getBButton()) {
-      m_climb.m_climb.setControl(ControlMode.DutyCycleOut, 0.1);
-    } else if (m_stick.getXButton()) {
-      // Do something only for the first robot cycle that the X button is not held
-    } else {
-      m_climb.m_climb.setControl(ControlMode.DutyCycleOut, 0);
-    }
   }
 
   /**
@@ -141,6 +131,14 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftXAxis() * 0.95,
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
+
+    if (m_stick.getAButtonPressed()) {
+      m_climb.setControlMode(Climb.ControlMode.ClimbHigh);
+    } else if (m_stick.getBButtonPressed()) {
+      m_climb.setControlMode(Climb.ControlMode.ClimbLow);
+    } else if (m_stick.getXButtonPressed()) {
+      m_climb.setControlMode(Climb.ControlMode.Stow);
+    }
 
     if (m_coDriverStick.getAButton()) {
       m_claw.setControl(ControlStatus.IntakeAndHold);
