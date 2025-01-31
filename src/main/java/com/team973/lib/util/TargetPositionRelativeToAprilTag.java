@@ -2,20 +2,21 @@ package com.team973.lib.util;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Optional;
 
 public class TargetPositionRelativeToAprilTag {
   private final AprilTag m_tag;
-  private final double m_initialDist;
+  private final Translation2d m_initalTarget;
   private final double m_finalDist;
   private final Rotation2d m_targetAngle;
 
   public TargetPositionRelativeToAprilTag(
-      AprilTag tag, double initialDist, double finalDist, Rotation2d targetAngle) {
+      AprilTag tag, Translation2d initialTarget, double finalDist, Rotation2d targetAngle) {
     m_tag = tag;
-    m_initialDist = initialDist;
+    m_initalTarget = initialTarget;
     m_finalDist = finalDist;
     m_targetAngle = targetAngle;
   }
@@ -40,8 +41,8 @@ public class TargetPositionRelativeToAprilTag {
     return m_tag.getPoseFromAlliance(Alliance.Blue);
   }
 
-  public double getInitialDist() {
-    return m_initialDist;
+  public Translation2d getInitialTarget() {
+    return m_initalTarget;
   }
 
   public double getFinalDist() {
