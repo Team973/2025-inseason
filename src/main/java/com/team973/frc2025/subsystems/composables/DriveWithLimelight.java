@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -37,42 +38,61 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public static class TargetPositions {
+    private static final Translation2d LEFT_REEF_INITIAL_TARGET = new Translation2d(0.0, 0.6);
+    private static final Translation2d RIGHT_REEF_INITIAL_TARGET = new Translation2d(0.0, 0.6);
+    private static final double REEF_FINAL_DIST = 0.1;
+
+    private static final Translation2d HP_INITIAL_TARGET = new Translation2d(0.0, 0.5);
+
     public static final TargetPositionRelativeToAprilTag TEST_ONE =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(0), 0.2, 0, Rotation2d.fromDegrees(180));
+            AprilTag.fromRed(0), new Translation2d(0.0, 0.2), 0, Rotation2d.fromDegrees(180));
     public static final TargetPositionRelativeToAprilTag TEST_TWO =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(-1), 0.3, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(-1), new Translation2d(0.0, 0.3), 0.1, new Rotation2d());
 
     public static final TargetPositionRelativeToAprilTag HPL =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(1), 0.5, 0.0, Rotation2d.fromDegrees(180));
+            AprilTag.fromRed(1), HP_INITIAL_TARGET, 0.0, Rotation2d.fromDegrees(180));
     public static final TargetPositionRelativeToAprilTag HPR =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(2), 0.5, 0.0, Rotation2d.fromDegrees(180));
+            AprilTag.fromRed(2), HP_INITIAL_TARGET, 0.0, Rotation2d.fromDegrees(180));
     public static final TargetPositionRelativeToAprilTag ONE_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(7), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(7), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag ONE_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(7), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(7), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag TWO_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(8), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(8), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag TWO_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(8), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(8), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag THREE_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(9), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(9), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag THREE_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(9), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(9), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag FOUR_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(10), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(10), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag FOUR_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(10), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(10), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag FIVE_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(11), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(11), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag FIVE_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(11), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(11), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag SIX_L =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(6), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(6), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag SIX_R =
-        new TargetPositionRelativeToAprilTag(AprilTag.fromRed(6), 0.6, 0.1, new Rotation2d());
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(6), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
   }
 
   public DriveWithLimelight(GreyPoseEstimator poseEstimator, Logger logger) {
@@ -102,25 +122,30 @@ public class DriveWithLimelight extends DriveComposable {
                   .toTranslation2d()
                   .plus(
                       new Translation2d(
-                          target.getInitialDist(),
+                          target.getInitialTarget().getX(),
                           aprilTagLocation
                               .getRotation()
                               .toRotation2d()
-                              .plus(Rotation2d.fromDegrees(180)))),
-              aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
-      m_targetFinalPose =
-          new Pose2d(
-              aprilTagLocation
-                  .getTranslation()
-                  .toTranslation2d()
+                              .plus(Rotation2d.fromDegrees(90.0))))
                   .plus(
                       new Translation2d(
-                          target.getFinalDist(),
+                          target.getInitialTarget().getY(),
                           aprilTagLocation
                               .getRotation()
                               .toRotation2d()
                               .plus(Rotation2d.fromDegrees(180)))),
               aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
+
+      m_targetFinalPose =
+          m_targetInitialPose.plus(
+              new Transform2d(
+                  new Translation2d(
+                      target.getFinalDist(),
+                      aprilTagLocation
+                          .getRotation()
+                          .toRotation2d()
+                          .plus(Rotation2d.fromDegrees(180))),
+                  new Rotation2d()));
 
       m_targetMode = TargetMode.Initial;
       m_target = target;
