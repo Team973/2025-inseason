@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class CANdleManger implements Subsystem {
   private final Logger m_logger;
   private final CANdle m_candle = new CANdle(18, "rio");
-  private double m_mod = 0;
+  private double BLINKPEIOD_MS = 333;
 
   public CANdleManger(Logger logger) {
     m_logger = logger;
@@ -29,13 +29,13 @@ public class CANdleManger implements Subsystem {
   //   }
 
   private double modTimeMilisecs() {
-    return RobotController.getFPGATime() / 1000.0 % m_mod;
+    return RobotController.getFPGATime() / 1000.0 % BLINKPEIOD_MS;
   }
 
   private void bliningLights() {
-    if (modTimeMilisecs() >= 500) {
+    if (modTimeMilisecs() >= 0.5 * BLINKPEIOD_MS) {
       m_candle.setLEDs(0, 0, 0);
-    } else if (modTimeMilisecs() <= 499) {
+    } else if (modTimeMilisecs() <= 0.5 * BLINKPEIOD_MS) {
       m_candle.setLEDs(255, 255, 200);
     }
   }
