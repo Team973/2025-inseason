@@ -8,7 +8,6 @@ import com.team973.lib.util.Logger;
 import com.team973.lib.util.TargetPositionRelativeToAprilTag;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -114,54 +113,11 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void setTargetPosition(TargetPositionRelativeToAprilTag target) {
-    if (m_target != target) {
-      Pose3d aprilTagLocation = target.getAprilTagPose();
+    m_targetInitialPose = target.getInitialTargetPose();
+    m_targetFinalPose = target.getFinalTargetPose();
 
-      m_targetInitialPose =
-          new Pose2d(
-              aprilTagLocation
-                  .getTranslation()
-                  .toTranslation2d()
-                  .plus(
-                      new Translation2d(
-                          target.getInitialTarget().getX(),
-                          aprilTagLocation
-                              .getRotation()
-                              .toRotation2d()
-                              .plus(Rotation2d.fromDegrees(90.0))))
-                  .plus(
-                      new Translation2d(
-                          target.getInitialTarget().getY(),
-                          aprilTagLocation
-                              .getRotation()
-                              .toRotation2d()
-                              .plus(Rotation2d.fromDegrees(180)))),
-              aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
-
-      m_targetFinalPose =
-          new Pose2d(
-              aprilTagLocation
-                  .getTranslation()
-                  .toTranslation2d()
-                  .plus(
-                      new Translation2d(
-                          target.getInitialTarget().getX(),
-                          aprilTagLocation
-                              .getRotation()
-                              .toRotation2d()
-                              .plus(Rotation2d.fromDegrees(90.0))))
-                  .plus(
-                      new Translation2d(
-                          target.getFinalDist(),
-                          aprilTagLocation
-                              .getRotation()
-                              .toRotation2d()
-                              .plus(Rotation2d.fromDegrees(180)))),
-              aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
-
-      m_targetMode = TargetMode.Initial;
-      m_target = target;
-    }
+    m_targetMode = TargetMode.Initial;
+    m_target = target;
   }
 
   public void log() {
