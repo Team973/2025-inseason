@@ -4,6 +4,8 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.subsystems.Claw;
+import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
@@ -21,10 +23,10 @@ public class Robot extends TimedRobot {
 
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
-  // private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
+  private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
 
-  // private final AutoManager m_autoManager =
-  // new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
+  private final AutoManager m_autoManager =
+  new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 
   private final Joystick m_driverStick =
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
@@ -37,7 +39,7 @@ public class Robot extends TimedRobot {
 
   private void updateSubsystems() {
     m_driveController.update();
-    // m_claw.update();
+    m_claw.update();
   }
 
   private void resetSubsystems() {
@@ -46,7 +48,7 @@ public class Robot extends TimedRobot {
 
   private void logSubsystems() {
     m_driveController.log();
-    // m_claw.log();
+    m_claw.log();
     m_logger.update();
   }
 
@@ -88,8 +90,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    // m_autoManager.init();
-    // m_driveController.resetOdometry(m_autoManager.getStartingPose());
+    m_autoManager.init();
+    m_driveController.resetOdometry(m_autoManager.getStartingPose());
   }
 
   /** This function is called periodically during autonomous. */
@@ -121,15 +123,15 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
-    // if (m_coDriverStick.getAButton()) {
-    //   m_claw.setControl(ControlStatus.IntakeAndHold);
-    // } else if (m_coDriverStick.getBButton()) {
-    //   //m_claw.setControl(ControlStatus.Stop);
-    // } else if (m_coDriverStick.getXButton()) {
-    //   m_claw.setControl(ControlStatus.Score);
-    // } else if (m_coDriverStick.getYButton()) {
-    //   m_claw.setControl(ControlStatus.Retract);
-    // }
+    if (m_coDriverStick.getAButton()) {
+      m_claw.setControl(ControlStatus.IntakeAndHold);
+    } else if (m_coDriverStick.getBButton()) {
+      //m_claw.setControl(ControlStatus.Stop);
+    } else if (m_coDriverStick.getXButton()) {
+      m_claw.setControl(ControlStatus.Score);
+    } else if (m_coDriverStick.getYButton()) {
+      m_claw.setControl(ControlStatus.Retract);
+    }
 
     if (m_driverStick.getLeftBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
