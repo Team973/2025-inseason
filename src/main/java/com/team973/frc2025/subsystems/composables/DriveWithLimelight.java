@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.function.BooleanSupplier;
 
 public class DriveWithLimelight extends DriveComposable {
   private static final double TARGET_DISTANCE_TOLERANCE_METERS = 0.03;
@@ -32,17 +33,16 @@ public class DriveWithLimelight extends DriveComposable {
   private Pose2d m_targetInitialPose = new Pose2d();
   private Pose2d m_targetFinalPose = new Pose2d();
 
-  private TargetMode m_targetMode = TargetMode.Initial;
-  private TargetReefSide m_targetReefSide = TargetReefSide.Left;
-
   private int m_targetReefFace = 0;
+
+  private BooleanSupplier m_targetFinalPoseGate = () -> true;
+
+  private TargetMode m_targetMode = TargetMode.Initial;
 
   public enum TargetReefSide {
     Left,
     Right
   }
-
-  private boolean m_readyToTargetFinalPose = true;
 
   private enum TargetMode {
     Initial,
@@ -133,59 +133,48 @@ public class DriveWithLimelight extends DriveComposable {
     }
   }
 
-  public void setTargetReefSide(TargetReefSide side) {
-    m_targetReefSide = side;
-  }
-
-  public TargetPositionRelativeToAprilTag getTargetReefPosition() {
+  public TargetPositionRelativeToAprilTag getTargetReefPosition(TargetReefSide side) {
     switch (m_targetReefFace) {
       case 1:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.ONE_L
-            : TargetPositions.ONE_R;
+        return side == TargetReefSide.Left ? TargetPositions.ONE_L : TargetPositions.ONE_R;
       case 2:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.TWO_L
-            : TargetPositions.TWO_R;
+        return side == TargetReefSide.Left ? TargetPositions.TWO_L : TargetPositions.TWO_R;
       case 3:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.THREE_L
-            : TargetPositions.THREE_R;
+        return side == TargetReefSide.Left ? TargetPositions.THREE_L : TargetPositions.THREE_R;
       case 4:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.FOUR_L
-            : TargetPositions.FOUR_R;
+        return side == TargetReefSide.Left ? TargetPositions.FOUR_L : TargetPositions.FOUR_R;
       case 5:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.FIVE_L
-            : TargetPositions.FIVE_R;
+        return side == TargetReefSide.Left ? TargetPositions.FIVE_L : TargetPositions.FIVE_R;
       case 6:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.SIX_L
-            : TargetPositions.SIX_R;
+        return side == TargetReefSide.Left ? TargetPositions.SIX_L : TargetPositions.SIX_R;
       default:
         throw new IllegalArgumentException("Invalid reef face: " + m_targetReefFace);
     }
   }
 
-  public void setReadyToTargetFinalPose(boolean ready) {
-    m_readyToTargetFinalPose = ready;
-  }
-
   private void setTargetMode(TargetMode targetMode) {
-    if (targetMode == TargetMode.Final && m_readyToTargetFinalPose) {
+    if (targetMode == TargetMode.Final && m_targetFinalPoseGate.getAsBoolean()) {
       m_targetMode = TargetMode.Final;
     } else {
       m_targetMode = TargetMode.Initial;
     }
   }
 
-  public void setTargetPosition(TargetPositionRelativeToAprilTag target) {
-    m_targetInitialPose = target.getInitialTargetPose();
-    m_targetFinalPose = target.getFinalTargetPose();
+  public void targetReefPosition(TargetReefSide side, BooleanSupplier targetFinalPoseGate) {
+    m_targetInitialPose = getTargetReefPosition(side).getInitialTargetPose();
+    m_targetFinalPose = getTargetReefPosition(side).getFinalTargetPose();
 
     setTargetMode(TargetMode.Initial);
-    m_target = target;
+    m_target = getTargetReefPosition(side);
+    m_targetFinalPoseGate = targetFinalPoseGate;
+  }
+
+  public void targetReefPosition(TargetReefSide side) {
+    targetReefPosition(
+        side,
+        () -> {
+          return true;
+        });
   }
 
   public void log() {

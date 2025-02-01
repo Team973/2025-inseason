@@ -11,8 +11,6 @@ import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -112,7 +110,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
-    m_driveController.resetOdometry(new Pose2d(13.0, 4.0259, new Rotation2d()));
   }
 
   /** This function is called periodically during operator control. */
@@ -127,23 +124,19 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
-    if (m_driverStick.getLeftBumperButton()) {
+    if (m_driverStick.getLeftBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
           .getDriveWithLimelight()
-          .setTargetReefSide(DriveWithLimelight.TargetReefSide.Left);
-      m_driveController
-          .getDriveWithLimelight()
-          .setTargetPosition(m_driveController.getDriveWithLimelight().getTargetReefPosition());
-    } else if (m_driverStick.getRightBumperButton()) {
+          .targetReefPosition(
+              DriveWithLimelight.TargetReefSide.Left, () -> !m_claw.sensorSeeCoral());
+    } else if (m_driverStick.getRightBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
           .getDriveWithLimelight()
-          .setTargetReefSide(DriveWithLimelight.TargetReefSide.Right);
-      m_driveController
-          .getDriveWithLimelight()
-          .setTargetPosition(m_driveController.getDriveWithLimelight().getTargetReefPosition());
-    } else {
+          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right);
+    } else if (m_driverStick.getLeftBumperButtonReleased()
+        || m_driverStick.getRightBumperButtonReleased()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
     }
 
