@@ -102,7 +102,7 @@ public class Robot extends TimedRobot {
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
     // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
-    // m_autoManager.run();
+    m_autoManager.run();
     updateSubsystems();
   }
 
