@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveWithLimelight extends DriveComposable {
   private final GreyPoseEstimator m_poseEstimator;
@@ -30,8 +31,14 @@ public class DriveWithLimelight extends DriveComposable {
   private Pose2d m_targetFinalPose = new Pose2d();
 
   private TargetMode m_targetMode = TargetMode.Initial;
+  private TargetReefSide m_targetReefSide = TargetReefSide.Left;
 
   private int m_targetReefFace = 0;
+
+  public enum TargetReefSide {
+    Left,
+    Right
+  }
 
   private enum TargetMode {
     Initial,
@@ -116,9 +123,44 @@ public class DriveWithLimelight extends DriveComposable {
     m_targetReefFace += increment;
 
     if (m_targetReefFace > 6) {
-        m_targetReefFace = 1;
+      m_targetReefFace = 1;
     } else if (m_targetReefFace < 1) {
-        m_targetReefFace = 6;
+      m_targetReefFace = 6;
+    }
+  }
+
+  public void setTargetReefSide(TargetReefSide side) {
+    m_targetReefSide = side;
+  }
+
+  public TargetPositionRelativeToAprilTag getTargetReefPosition() {
+    switch (m_targetReefFace) {
+      case 1:
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.ONE_L
+            : TargetPositions.ONE_R;
+      case 2:
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.TWO_L
+            : TargetPositions.TWO_R;
+      case 3:
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.THREE_L
+            : TargetPositions.THREE_R;
+      case 4:
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.FOUR_L
+            : TargetPositions.FOUR_R;
+      case 5:
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.FIVE_L
+            : TargetPositions.FIVE_R;
+      case 6:
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.SIX_L
+            : TargetPositions.SIX_R;
+      default:
+        throw new IllegalArgumentException("Invalid reef face: " + m_targetReefFace);
     }
   }
 
@@ -174,6 +216,8 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void log() {
+    SmartDashboard.putString("DB/String 0", "Reef Face: " + m_targetReefFace);
+
     m_logger.log("Target Mode", m_targetMode.toString());
 
     m_logger.log("Target Initial Pose/x", m_targetInitialPose.getX());

@@ -124,6 +124,26 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
+    if (m_driverStick.getLeftBumperButton()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetReefSide(DriveWithLimelight.TargetReefSide.Left);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetPosition(m_driveController.getDriveWithLimelight().getTargetReefPosition());
+    } else if (m_driverStick.getRightBumperButton()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetReefSide(DriveWithLimelight.TargetReefSide.Right);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetPosition(m_driveController.getDriveWithLimelight().getTargetReefPosition());
+    } else {
+      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+    }
+
     if (m_coDriverStick.getAButton()) {
       m_claw.setControl(ControlStatus.IntakeAndHold);
     } else if (m_coDriverStick.getBButton()) {
@@ -134,18 +154,10 @@ public class Robot extends TimedRobot {
       m_claw.setControl(ControlStatus.Retract);
     }
 
-    if (m_driverStick.getLeftBumperButton()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .setTargetPosition(DriveWithLimelight.TargetPositions.TEST_ONE);
-    } else if (m_driverStick.getRightBumperButton()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .setTargetPosition(DriveWithLimelight.TargetPositions.TEST_TWO);
-    } else {
-      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+    if (m_coDriverStick.getPOVRight()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
+    } else if (m_coDriverStick.getPOVLeft()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
     }
 
     updateSubsystems();
