@@ -9,14 +9,14 @@ import java.util.Optional;
 
 public class TargetPositionRelativeToAprilTag {
   private final AprilTag m_tag;
-  private final Translation2d m_initalTarget;
+  private final Translation2d m_initialTarget;
   private final double m_finalDist;
   private final Rotation2d m_targetAngle;
 
   public TargetPositionRelativeToAprilTag(
       AprilTag tag, Translation2d initialTarget, double finalDist, Rotation2d targetAngle) {
     m_tag = tag;
-    m_initalTarget = initialTarget;
+    m_initialTarget = initialTarget;
     m_finalDist = finalDist;
     m_targetAngle = targetAngle;
   }
@@ -42,7 +42,7 @@ public class TargetPositionRelativeToAprilTag {
   }
 
   public Translation2d getInitialTarget() {
-    return m_initalTarget;
+    return m_initialTarget;
   }
 
   public double getFinalDist() {
