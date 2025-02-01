@@ -16,6 +16,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 public class DriveWithLimelight extends DriveComposable {
+  private static final double TARGET_DISTANCE_TOLERANCE_METERS = 0.03;
+  private static final double TARGET_ANGLE_TOLERANCE_DEG = 5.0;
+
   private final GreyPoseEstimator m_poseEstimator;
 
   private final ProfiledPIDController m_xController;
@@ -190,7 +193,11 @@ public class DriveWithLimelight extends DriveComposable {
       return new ChassisSpeeds(0, 0, 0);
     }
 
-    if (Drive.comparePoses(m_poseEstimator.getPoseMeters(), m_targetInitialPose, 0.03, 5)) {
+    if (Drive.comparePoses(
+        m_poseEstimator.getPoseMeters(),
+        m_targetInitialPose,
+        TARGET_DISTANCE_TOLERANCE_METERS,
+        TARGET_ANGLE_TOLERANCE_DEG)) {
       m_targetMode = TargetMode.Final;
     }
 
