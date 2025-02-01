@@ -25,6 +25,7 @@ public class Robot extends TimedRobot {
   private final Claw m_claw = new Claw(new Logger("Claw"));
 
   private final CANdleManger m_CaNdleManger = new CANdleManger(new Logger("candle manger"));
+
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 

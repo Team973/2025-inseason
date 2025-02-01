@@ -3,14 +3,19 @@ package com.team973.frc2025.subsystems;
 import com.ctre.phoenix.led.*;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class CANdleManger implements Subsystem {
   private final Logger m_logger;
   private final CANdle m_candle = new CANdle(18, "rio");
+  private final BlinkingSignaler m_redBlinker =
+      new BlinkingSignaler(
+          new Logger("Blinking Signaler"), RobotInfo.Colors.RED, RobotInfo.Colors.OFF, 500);
+  private final BlinkingSignaler m_blueBlinker =
+      new BlinkingSignaler(
+          new Logger("Blinking Signaler"), RobotInfo.Colors.BLUE, RobotInfo.Colors.OFF, 1000);
   private double BLINKPEIOD_MS = 333;
 
   public CANdleManger(Logger logger) {
@@ -24,37 +29,15 @@ public class CANdleManger implements Subsystem {
     m_candle.configAllSettings(configAll, 100);
   }
 
-  //   public static int flashPerMiliSec(int flashesPerMiliSec){
-
-  //   }
-
-  private double modTimeMilisecs() {
-    return RobotController.getFPGATime() / 1000.0 % BLINKPEIOD_MS;
-  }
-
-  private void bliningLights() {
-    if (modTimeMilisecs() >= 0.5 * BLINKPEIOD_MS) {
-      m_candle.setLEDs(0, 0, 0);
-    } else if (modTimeMilisecs() <= 0.5 * BLINKPEIOD_MS) {
-      m_candle.setLEDs(255, 255, 200);
-    }
-  }
-
   @Override
-  public void log() {
-    m_logger.log("current time us", RobotController.getFPGATime());
-    SmartDashboard.putNumber("current time secs", RobotController.getFPGATime() / 1000.0 / 1000.0);
-    SmartDashboard.putNumber("current time mili mod", modTimeMilisecs());
-    SmartDashboard.putNumber("current time mili", RobotController.getFPGATime() / 1000.0);
-  }
+  public void log() {}
 
   @Override
   public void syncSensors() {}
 
   @Override
   public void update() {
-    log();
-    bliningLights();
+    m_blueBlinker.setCandle(m_candle).update();
   }
 
   @Override
