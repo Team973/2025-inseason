@@ -18,25 +18,26 @@ public final class RobotInfo {
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 2;
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 3;
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 4;
-    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -311.133; // 47.813; // 54.141;
+    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 264.902;
 
     public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 8;
     public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 9;
     public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 10;
-    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -328.096; // 34.277; // 30.498;
+    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 153.721;
 
     public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 5;
     public static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
     public static final int BACK_LEFT_MODULE_STEER_ENCODER = 7;
-    public static final double BACK_LEFT_MODULE_STEER_OFFSET = -171.299; // -169.893; // 191.162;
+    public static final double BACK_LEFT_MODULE_STEER_OFFSET = 50.713;
 
     public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 11;
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 12;
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 13;
-    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 156.533; // 157.324; // 161.016;
+    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 100.107;
 
     public static final double DRIVE_GEAR_RATIO =
-        (10.0 / 54.0) * (40.0 / 16.0) * (15.0 / 45.0); // x3:10,6.48:1
+        (10.0 / 54.0) * (40.0 / 16.0) * (15.0 / 45.0); // x3:10, 6.48:1
+
     public static final double ANGLE_GEAR_RATIO = (10.0 / 22.0) * (16.0 / 88.0); // 12.1:1
 
     public static final double WHEEL_DIAMETER_METERS = 0.1016;
@@ -46,13 +47,13 @@ public final class RobotInfo {
      * The left-to-right distance between the drivetrain wheels Should be measured from center to
      * center.
      */
-    public static final double TRACKWIDTH_METERS = 0.635;
+    public static final double TRACKWIDTH_METERS = 0.5334;
 
     /**
      * The front-to-back distance between the drivetrain wheels. Should be measured from center to
      * center.
      */
-    public static final double WHEELBASE_METERS = 0.635;
+    public static final double WHEELBASE_METERS = 0.5334;
 
     public static final double OPEN_LOOP_RAMP = 0.0;
     public static final double CLOSED_LOOP_RAMP = 0.0;

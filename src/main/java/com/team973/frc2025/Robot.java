@@ -4,15 +4,12 @@
 
 package com.team973.frc2025;
 
-import com.team973.frc2025.subsystems.Claw;
-import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -24,10 +21,10 @@ public class Robot extends TimedRobot {
 
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
-  private final Claw m_claw = new Claw(new Logger("claw", 0.2));
+  // private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
 
-  private final AutoManager m_autoManager =
-      new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
+  // private final AutoManager m_autoManager =
+  // new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 
   private final Joystick m_driverStick =
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
@@ -40,7 +37,7 @@ public class Robot extends TimedRobot {
 
   private void updateSubsystems() {
     m_driveController.update();
-    m_claw.update();
+    // m_claw.update();
   }
 
   private void resetSubsystems() {
@@ -49,7 +46,7 @@ public class Robot extends TimedRobot {
 
   private void logSubsystems() {
     m_driveController.log();
-    m_claw.log();
+    // m_claw.log();
     m_logger.update();
   }
 
@@ -91,8 +88,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoManager.init();
-    m_driveController.resetOdometry(m_autoManager.getStartingPose());
+    // m_autoManager.init();
+    // m_driveController.resetOdometry(m_autoManager.getStartingPose());
   }
 
   /** This function is called periodically during autonomous. */
@@ -102,7 +99,7 @@ public class Robot extends TimedRobot {
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
     // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
-    m_autoManager.run();
+    // m_autoManager.run();
     updateSubsystems();
   }
 
@@ -124,15 +121,15 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
-    if (m_coDriverStick.getAButton()) {
-      m_claw.setControl(ControlStatus.IntakeAndHold);
-    } else if (m_coDriverStick.getBButton()) {
-      m_claw.setControl(ControlStatus.Stop);
-    } else if (m_coDriverStick.getXButton()) {
-      m_claw.setControl(ControlStatus.Score);
-    } else if (m_coDriverStick.getYButton()) {
-      m_claw.setControl(ControlStatus.Retract);
-    }
+    // if (m_coDriverStick.getAButton()) {
+    //   m_claw.setControl(ControlStatus.IntakeAndHold);
+    // } else if (m_coDriverStick.getBButton()) {
+    //   //m_claw.setControl(ControlStatus.Stop);
+    // } else if (m_coDriverStick.getXButton()) {
+    //   m_claw.setControl(ControlStatus.Score);
+    // } else if (m_coDriverStick.getYButton()) {
+    //   m_claw.setControl(ControlStatus.Retract);
+    // }
 
     if (m_driverStick.getLeftBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
@@ -165,13 +162,13 @@ public class Robot extends TimedRobot {
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
 
-    if (m_coDriverStick.getAButtonPressed()) {
-      m_autoManager.increment();
-    } else if (m_coDriverStick.getBButtonPressed()) {
-      m_autoManager.decrement();
-    }
-    SmartDashboard.putString(
-        "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
+    //   if (m_coDriverStick.getAButtonPressed()) {
+    //     m_autoManager.increment();
+    //   } else if (m_coDriverStick.getBButtonPressed()) {
+    //     m_autoManager.decrement();
+    //   }
+    //   SmartDashboard.putString(
+    //       "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
   }
 
   /** This function is called once when test mode is enabled. */
