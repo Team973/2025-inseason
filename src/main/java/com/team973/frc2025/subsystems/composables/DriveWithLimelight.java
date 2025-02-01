@@ -8,7 +8,6 @@ import com.team973.lib.util.Logger;
 import com.team973.lib.util.TargetPositionRelativeToAprilTag;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -17,6 +16,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveWithLimelight extends DriveComposable {
+  private static final double TARGET_DISTANCE_TOLERANCE_METERS = 0.03;
+  private static final double TARGET_ANGLE_TOLERANCE_DEG = 5.0;
+
   private final GreyPoseEstimator m_poseEstimator;
 
   private final ProfiledPIDController m_xController;
@@ -179,59 +181,15 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void setTargetPosition(TargetPositionRelativeToAprilTag target) {
-    if (m_target != target) {
-      Pose3d aprilTagLocation = target.getAprilTagPose();
+    m_targetInitialPose = target.getInitialTargetPose();
+    m_targetFinalPose = target.getFinalTargetPose();
 
-      m_targetInitialPose =
-          new Pose2d(
-              aprilTagLocation
-                  .getTranslation()
-                  .toTranslation2d()
-                  .plus(
-                      new Translation2d(
-                          target.getInitialTarget().getX(),
-                          aprilTagLocation
-                              .getRotation()
-                              .toRotation2d()
-                              .plus(Rotation2d.fromDegrees(90.0))))
-                  .plus(
-                      new Translation2d(
-                          target.getInitialTarget().getY(),
-                          aprilTagLocation
-                              .getRotation()
-                              .toRotation2d()
-                              .plus(Rotation2d.fromDegrees(180)))),
-              aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
-
-      m_targetFinalPose =
-          new Pose2d(
-              aprilTagLocation
-                  .getTranslation()
-                  .toTranslation2d()
-                  .plus(
-                      new Translation2d(
-                          target.getInitialTarget().getX(),
-                          aprilTagLocation
-                              .getRotation()
-                              .toRotation2d()
-                              .plus(Rotation2d.fromDegrees(90.0))))
-                  .plus(
-                      new Translation2d(
-                          target.getFinalDist(),
-                          aprilTagLocation
-                              .getRotation()
-                              .toRotation2d()
-                              .plus(Rotation2d.fromDegrees(180)))),
-              aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
-
-      setTargetMode(TargetMode.Initial);
-      m_target = target;
-    }
+    setTargetMode(TargetMode.Initial);
+    m_target = target;
   }
 
   public void log() {
     SmartDashboard.putString("DB/String 0", "Reef Face: " + m_targetReefFace);
-
     m_logger.log("Target Mode", m_targetMode.toString());
 
     m_logger.log("Target Initial Pose/x", m_targetInitialPose.getX());
@@ -260,7 +218,11 @@ public class DriveWithLimelight extends DriveComposable {
       return new ChassisSpeeds(0, 0, 0);
     }
 
-    if (Drive.comparePoses(m_poseEstimator.getPoseMeters(), m_targetInitialPose, 0.03, 5)) {
+    if (Drive.comparePoses(
+        m_poseEstimator.getPoseMeters(),
+        m_targetInitialPose,
+        TARGET_DISTANCE_TOLERANCE_METERS,
+        TARGET_ANGLE_TOLERANCE_DEG)) {
       setTargetMode(TargetMode.Final);
     }
 
