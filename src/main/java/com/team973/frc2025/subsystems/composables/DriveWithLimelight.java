@@ -40,6 +40,8 @@ public class DriveWithLimelight extends DriveComposable {
     Right
   }
 
+  private boolean m_readyToTargetFinalPose = true;
+
   private enum TargetMode {
     Initial,
     Final
@@ -164,6 +166,18 @@ public class DriveWithLimelight extends DriveComposable {
     }
   }
 
+  public void setReadyToTargetFinalPose(boolean ready) {
+    m_readyToTargetFinalPose = ready;
+  }
+
+  private void setTargetMode(TargetMode targetMode) {
+    if (targetMode == TargetMode.Final && m_readyToTargetFinalPose) {
+      m_targetMode = TargetMode.Final;
+    } else {
+      m_targetMode = TargetMode.Initial;
+    }
+  }
+
   public void setTargetPosition(TargetPositionRelativeToAprilTag target) {
     if (m_target != target) {
       Pose3d aprilTagLocation = target.getAprilTagPose();
@@ -210,7 +224,7 @@ public class DriveWithLimelight extends DriveComposable {
                               .plus(Rotation2d.fromDegrees(180)))),
               aprilTagLocation.getRotation().toRotation2d().plus(target.getTargetAngle()));
 
-      m_targetMode = TargetMode.Initial;
+      setTargetMode(TargetMode.Initial);
       m_target = target;
     }
   }
@@ -247,7 +261,7 @@ public class DriveWithLimelight extends DriveComposable {
     }
 
     if (Drive.comparePoses(m_poseEstimator.getPoseMeters(), m_targetInitialPose, 0.03, 5)) {
-      m_targetMode = TargetMode.Final;
+      setTargetMode(TargetMode.Final);
     }
 
     switch (m_targetMode) {
