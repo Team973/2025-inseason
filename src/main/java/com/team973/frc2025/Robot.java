@@ -7,7 +7,9 @@ package com.team973.frc2025;
 import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -23,7 +25,7 @@ public class Robot extends TimedRobot {
 
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
-  private final Claw m_claw = new Claw(new Logger("claw", 0.2));
+  private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
 
   private final Elevator m_elevator = new Elevator(new Logger("elevator"));
   private final Arm m_arm = new Arm(new Logger("Arm"));
@@ -155,6 +157,21 @@ public class Robot extends TimedRobot {
       m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
     } else {
       m_arm.setStow();
+    }
+
+    if (m_driverStick.getLeftBumperButtonPressed()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetPosition(DriveWithLimelight.TargetPositions.TEST_ONE);
+    } else if (m_driverStick.getRightBumperButtonPressed()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetPosition(DriveWithLimelight.TargetPositions.TEST_TWO);
+    } else if (m_driverStick.getRightBumperButtonReleased()
+        || m_driverStick.getLeftBumperButtonReleased()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
     }
 
     updateSubsystems();
