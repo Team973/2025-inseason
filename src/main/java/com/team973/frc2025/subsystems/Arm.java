@@ -2,6 +2,7 @@ package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
@@ -13,6 +14,7 @@ public class Arm implements Subsystem {
   private final GreyTalonFX m_armMotor;
   private ControlStatus m_mode = ControlStatus.Stow;
   private double m_armTargetPostion;
+  private double m_manualArmPower;
 
   public static final double HIGH_POSTION_DEG = 30;
   public static final double MEDIUM_POSTION_DEG = 0;
@@ -22,7 +24,8 @@ public class Arm implements Subsystem {
   private static final double FEED_FORWARD_MAX_VOLT = 0.1;
 
   public static enum ControlStatus {
-    targetPostion,
+    Manual,
+    TargetPostion,
     Stow,
   }
 
@@ -47,15 +50,23 @@ public class Arm implements Subsystem {
     armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
     armMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
     armMotorConfig.MotionMagic.MotionMagicJerk = 160;
+    armMotorConfig.Voltage.PeakForwardVoltage = 4;
+    armMotorConfig.Voltage.PeakReverseVoltage = -4;
     // clockwise postive when looking at it from the shaft, is on inside of the left point so that
     // the shaft is pointing left, up is positve, gear ratio is odd
     armMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    armMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_armMotor.setConfig(armMotorConfig);
+  }
+
+  public void setArmMotorManualOutput(double joystick) {
+    m_mode = ControlStatus.Manual;
+    m_manualArmPower = joystick * 0.1;
   }
 
   public void setArmTargetDeg(double setPostionDeg) {
     m_armTargetPostion = setPostionDeg;
-    m_mode = ControlStatus.targetPostion;
+    m_mode = ControlStatus.TargetPostion;
   }
 
   public boolean motorAtTarget() {
@@ -69,7 +80,10 @@ public class Arm implements Subsystem {
   @Override
   public void update() {
     switch (m_mode) {
-      case targetPostion:
+      case Manual:
+        m_armMotor.setControl(ControlMode.DutyCycleOut, m_manualArmPower, 0);
+        break;
+      case TargetPostion:
         m_armMotor.setControl(
             ControlMode.MotionMagicVoltage,
             armToMotor(m_armTargetPostion),
@@ -89,6 +103,9 @@ public class Arm implements Subsystem {
   public void log() {
     m_logger.log("armPostion", motorToArm(m_armMotor.getPosition().getValueAsDouble()));
     m_armMotor.log();
+    m_logger.log("armTargetPostionDeg", m_armTargetPostion);
+    m_logger.log("armMode", m_mode.toString());
+    m_logger.log("motorArmError", m_armMotor.getClosedLoopError().getValueAsDouble());
   }
 
   @Override

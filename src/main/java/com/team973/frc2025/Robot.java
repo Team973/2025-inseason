@@ -152,15 +152,17 @@ public class Robot extends TimedRobot {
       m_elevator.setModeOff();
     }
 
-    // if (m_coDriverStick.getLeftBumperButton()) {
-    //   m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
-    // } else if (m_coDriverStick.getLeftTrigger()) {
-    //   m_arm.setArmTargetDeg(Arm.LOW_POSTION_DEG);
-    // } else if (m_coDriverStick.getStartButton()) {
-    //   m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
-    // } else {
-    //   m_arm.setStow();
-    // }
+    if (m_coDriverStick.getLeftBumperButton()) {
+      m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
+    } else if (m_coDriverStick.getLeftTrigger()) {
+      m_arm.setArmTargetDeg(Arm.LOW_POSTION_DEG);
+    } else if (m_coDriverStick.getStartButton()) {
+      m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
+    } else if (m_coDriverStick.getRightBumperButton()) {
+      m_arm.setArmMotorManualOutput(m_coDriverStick.getRightXAxis());
+    } else {
+      m_arm.setStow();
+    }
 
     if (m_driverStick.getLeftBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
