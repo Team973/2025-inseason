@@ -4,6 +4,7 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.DriveController;
@@ -25,6 +26,8 @@ public class Robot extends TimedRobot {
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
+
+  private final Arm m_arm = new Arm(m_logger.subLogger("arm",0.2));
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
@@ -132,6 +135,18 @@ public class Robot extends TimedRobot {
       m_claw.setControl(ControlStatus.Score);
     } else if (m_coDriverStick.getYButton()) {
       m_claw.setControl(ControlStatus.Retract);
+    }
+
+    if (m_coDriverStick.getLeftBumperButton()) {
+      m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
+    } else if (m_coDriverStick.getLeftTrigger()) {
+      m_arm.setArmTargetDeg(Arm.LOW_POSTION_DEG);
+    } else if (m_coDriverStick.getStartButton()) {
+      m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
+    } else if (m_coDriverStick.getRightBumperButton()) {
+      m_arm.setArmMotorManualOutput(m_coDriverStick.getRightXAxis());
+    } else {
+      m_arm.setStow();
     }
 
     if (m_driverStick.getLeftBumperButtonPressed()) {
