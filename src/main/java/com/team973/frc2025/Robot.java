@@ -129,7 +129,6 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftXAxis() * 0.95,
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
-
     if (m_coDriverStick.getAButton()) {
       m_claw.setControl(Claw.ControlStatus.IntakeAndHold);
     } else if (m_coDriverStick.getBButton()) {
@@ -147,19 +146,21 @@ public class Robot extends TimedRobot {
       m_elevator.setTargetPostion(Elevator.Presets.LEVEL_2);
     } else if (m_coDriverStick.getPOVBottom()) {
       m_elevator.setTargetPostion(Elevator.Presets.LEVEL_1);
+    } else if (m_coDriverStick.getLeftBumperButton()) {
+      m_elevator.setmotorManualOutput(m_coDriverStick.getLeftYAxis());
     } else {
-      m_elevator.setTargetPostion(Elevator.Presets.OFF);
+      m_elevator.setModeOff();
     }
 
-    if (m_coDriverStick.getLeftBumperButton()) {
-      m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
-    } else if (m_coDriverStick.getLeftTrigger()) {
-      m_arm.setArmTargetDeg(Arm.LOW_POSTION_DEG);
-    } else if (m_coDriverStick.getStartButton()) {
-      m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
-    } else {
-      m_arm.setStow();
-    }
+    // if (m_coDriverStick.getLeftBumperButton()) {
+    //   m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
+    // } else if (m_coDriverStick.getLeftTrigger()) {
+    //   m_arm.setArmTargetDeg(Arm.LOW_POSTION_DEG);
+    // } else if (m_coDriverStick.getStartButton()) {
+    //   m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
+    // } else {
+    //   m_arm.setStow();
+    // }
 
     if (m_driverStick.getLeftBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);

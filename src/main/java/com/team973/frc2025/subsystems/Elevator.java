@@ -16,17 +16,24 @@ public class Elevator implements Subsystem {
   private final GreyTalonFX m_motorRight;
   private final GreyTalonFX m_motorLeft;
   private ControlStatus m_mode = ControlStatus.Off;
-  private double m_targetPostion;
+  private double m_targetPostionHeightinches;
   private double m_targetpositionLeway = 0.1;
   double MOTOR_GEAR_RATIO = 10.0 / 56.0;
+  private double m_manualPower;
 
   public static enum ControlStatus {
+    Manual,
     TargetPostion,
     Off,
   }
 
-  private double heightInchesToMotorRotations(double armPostion) {
-    return armPostion / MOTOR_GEAR_RATIO / 5.0 / 36.0 / Conversions.Distance.INCH_PER_MM;
+  public void setmotorManualOutput(double joystick) {
+    m_manualPower = joystick * 0.1;
+    m_mode = ControlStatus.Manual;
+  }
+
+  private double heightInchesToMotorRotations(double postionHeight) {
+    return postionHeight / MOTOR_GEAR_RATIO / 5.0 / 36.0 / Conversions.Distance.INCH_PER_MM;
   }
 
   private double motorRotationsToHeightInches(double motorPostion) {
@@ -59,49 +66,61 @@ public class Elevator implements Subsystem {
 
   private static TalonFXConfiguration defaultElevatorMotorConfig() {
     TalonFXConfiguration defaultElevatorMotorConfig = new TalonFXConfiguration();
+    // slot zero is for motion maginc
     defaultElevatorMotorConfig.Slot0.kS = 0.0;
     defaultElevatorMotorConfig.Slot0.kV = 0.15;
     defaultElevatorMotorConfig.Slot0.kA = 0.01;
     defaultElevatorMotorConfig.Slot0.kP = 4.0;
     defaultElevatorMotorConfig.Slot0.kI = 0.0;
     defaultElevatorMotorConfig.Slot0.kD = 0.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 160;
-    // slot 1 is for velocity
+    // slot one is velocity
     defaultElevatorMotorConfig.Slot1.kS = 0.0;
-    defaultElevatorMotorConfig.Slot1.kV = 0.125 * 10.0 / 10.5;
+    defaultElevatorMotorConfig.Slot1.kV = 0.0;
     defaultElevatorMotorConfig.Slot1.kA = 0.0;
-    defaultElevatorMotorConfig.Slot1.kP = 0.3;
+    defaultElevatorMotorConfig.Slot1.kP = 1.0;
     defaultElevatorMotorConfig.Slot1.kI = 0.0;
     defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 5;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 16;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 20;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 160;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 5;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 10;
     defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     defaultElevatorMotorConfig.Voltage.PeakForwardVoltage = 4;
-    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = 4;
+    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = -4;
     defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
-    defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     return defaultElevatorMotorConfig;
   }
 
+  public void setModeOff() {
+    m_mode = ControlStatus.Off;
+  }
+
   public boolean motorAtTarget() {
-    return (Math.abs(m_targetPostion - m_motorRight.getPosition().getValueAsDouble())
+    return (Math.abs(
+            m_targetPostionHeightinches
+                - motorRotationsToHeightInches(m_motorRight.getPosition().getValueAsDouble()))
         < m_targetpositionLeway);
   }
 
-  public void setTargetPostion(double targetPostion) {
-    m_targetPostion = targetPostion;
+  public void setTargetPostion(double targetPostionHeightinches) {
+    m_targetPostionHeightinches = targetPostionHeightinches;
     m_mode = ControlStatus.TargetPostion;
   }
 
   @Override
   public void update() {
     switch (m_mode) {
+      case Manual:
+        m_motorRight.setControl(ControlMode.DutyCycleOut, m_manualPower, 0);
+        break;
       case TargetPostion:
         m_motorRight.setControl(
-            ControlMode.MotionMagicVoltage, heightInchesToMotorRotations(m_targetPostion), 0);
+            ControlMode.MotionMagicVoltage,
+            heightInchesToMotorRotations(m_targetPostionHeightinches),
+            0);
         break;
       case Off:
         m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
@@ -112,12 +131,16 @@ public class Elevator implements Subsystem {
   @Override
   public void log() {
     m_logger.log(
-        "armPostionInches",
+        "currentPostionHeightInches",
         motorRotationsToHeightInches(m_motorRight.getPosition().getValueAsDouble()));
-    m_logger.log("target postion reached", motorAtTarget());
-    m_logger.log("target postion", m_targetPostion);
+    m_logger.log("targetPostionReached", motorAtTarget());
+    m_logger.log("targetPostionHeightInches", m_targetPostionHeightinches);
     m_motorLeft.log();
     m_motorRight.log();
+    m_logger.log("elevatorMode", m_mode.toString());
+    m_logger.log(
+        "motorErrorInches",
+        motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
   }
 
   @Override
