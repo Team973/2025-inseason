@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
+import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 
@@ -17,34 +18,33 @@ public class Elevator implements Subsystem {
   private ControlStatus m_mode = ControlStatus.Off;
   private double m_targetPostion;
   private double m_targetpositionLeway = 0.1;
-  double MOTOR_TO_ARM_GEAR_RATIO = 64 / 10;
+  double MOTOR_GEAR_RATIO = 10.0 / 56.0;
 
   public static enum ControlStatus {
     TargetPostion,
     Off,
   }
 
-  private double elevatorToMotor(double armPostion) {
-    return armPostion * MOTOR_TO_ARM_GEAR_RATIO;
+  private double heightInchesToMotorRotations(double armPostion) {
+    return armPostion / MOTOR_GEAR_RATIO / 5.0 / 36.0 / Conversions.Distance.INCH_PER_MM;
   }
 
-  private double motorToElevator(double motorPostion) {
-    return motorPostion / MOTOR_TO_ARM_GEAR_RATIO;
+  private double motorRotationsToHeightInches(double motorPostion) {
+    return motorPostion * MOTOR_GEAR_RATIO * 5.0 * 36.0 * Conversions.Distance.INCH_PER_MM;
   }
 
   public static class Presets {
-    public static final double LEVEL_1 = 0;
-    public static final double LEVEL_2 = 0;
-    public static final double LEVEL_3 = 0;
-    public static final double LEVEL_4 = 0;
+    public static final double LEVEL_1 = 0.0;
+    public static final double LEVEL_2 = 12.0;
+    public static final double LEVEL_3 = 1.0;
+    public static final double LEVEL_4 = 26.0;
     public static final double OFF = 0;
   }
 
   public Elevator(Logger logger) {
     m_logger = logger;
-    m_motorRight =
-        new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorBottom"));
-    m_motorLeft = new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorTop"));
+    m_motorRight = new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorRight"));
+    m_motorLeft = new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft"));
 
     TalonFXConfiguration leftMotorConfig = defaultElevatorMotorConfig();
     // looking at it from the front left is clockwise and right is counter clockwise
@@ -75,10 +75,12 @@ public class Elevator implements Subsystem {
     defaultElevatorMotorConfig.Slot1.kP = 0.3;
     defaultElevatorMotorConfig.Slot1.kI = 0.0;
     defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 5;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 10;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 5;
     defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage = 4;
+    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = 4;
     defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
     defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     return defaultElevatorMotorConfig;
@@ -99,10 +101,9 @@ public class Elevator implements Subsystem {
     switch (m_mode) {
       case TargetPostion:
         m_motorRight.setControl(
-            ControlMode.MotionMagicVoltage, elevatorToMotor(m_targetPostion), 0);
+            ControlMode.MotionMagicVoltage, heightInchesToMotorRotations(m_targetPostion), 0);
         break;
       case Off:
-        m_motorLeft.setControl(ControlMode.DutyCycleOut, 0, 0);
         m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
         break;
     }
@@ -110,7 +111,9 @@ public class Elevator implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log("armPostion", motorToElevator(m_motorRight.getPosition().getValueAsDouble()));
+    m_logger.log(
+        "armPostionInches",
+        motorRotationsToHeightInches(m_motorRight.getPosition().getValueAsDouble()));
     m_logger.log("target postion reached", motorAtTarget());
     m_logger.log("target postion", m_targetPostion);
     m_motorLeft.log();

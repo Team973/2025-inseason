@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
       new DriveController(m_logger.subLogger("drive", 0.05));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
 
-  private final Elevator m_elevator = new Elevator(new Logger("elevator"));
+  private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
   private final Arm m_arm = new Arm(new Logger("Arm"));
 
   private final AutoManager m_autoManager =
@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
   private void updateSubsystems() {
     m_driveController.update();
     m_claw.update();
+    m_elevator.update();
   }
 
   private void resetSubsystems() {
@@ -54,6 +55,7 @@ public class Robot extends TimedRobot {
   private void logSubsystems() {
     m_driveController.log();
     m_claw.log();
+    m_elevator.log();
     m_logger.update();
   }
 
