@@ -17,6 +17,7 @@ import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class OdometrySupplier {
   private boolean m_started = false;
 
   private Logger m_logger;
+  private Logger m_perfLogger;
 
   public OdometrySupplier(GreyPigeon pigeon, SwerveModule[] swerveModules, Logger logger) {
     m_thread = new Thread(this::run);
@@ -54,6 +56,7 @@ public class OdometrySupplier {
     m_pigeon = pigeon;
     m_swerveModules = swerveModules;
     m_logger = logger;
+    m_perfLogger = logger.subLogger("perf", 0.25);
 
     List<StatusSignal<Angle>> angleSignals = m_pigeon.getAngleStatusSignals();
     List<StatusSignal<AngularVelocity>> angularVelocitySignals =
@@ -118,6 +121,17 @@ public class OdometrySupplier {
   private int m_failedCycles = 0;
 
   public void run() {
+    try {
+      doRun();
+    } catch (Exception ex) {
+      System.out.printf(
+          "OdometrySupplier thread died.\n%s\n%s\n", ex.getMessage(), ex.getStackTrace());
+      ex.printStackTrace();
+      DriverStation.reportError(ex.getMessage(), ex.getStackTrace());
+    }
+  }
+
+  public void doRun() {
     // Ref
     // https://api.ctr-electronics.com/phoenix6/release/java/src-html/com/ctre/phoenix6/mechanisms/swerve/SwerveDrivetrain.html#line.184
     Threads.setCurrentThreadPriority(true, 1);

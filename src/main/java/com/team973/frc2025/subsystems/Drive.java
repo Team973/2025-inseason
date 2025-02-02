@@ -44,6 +44,7 @@ public class Drive implements Subsystem {
   private Rotation2d m_targetRobotAngle = new Rotation2d();
   private final OdometrySupplier m_odometrySupplier;
   private final MegaTagSupplier m_backLLSupplier;
+  private final MegaTagSupplier m_frontLLSupplier;
 
   public Drive(GreyPigeon pigeon, DriveController driveController, Logger logger) {
     m_pigeon = pigeon;
@@ -58,7 +59,6 @@ public class Drive implements Subsystem {
         };
     m_odometrySupplier =
         new OdometrySupplier(m_pigeon, m_swerveModules, logger.subLogger("providers/odometry"));
-    m_odometrySupplier.start();
 
     m_currentChassisSpeeds = new ChassisSpeeds();
 
@@ -68,7 +68,7 @@ public class Drive implements Subsystem {
 
     m_backLLSupplier =
         new MegaTagSupplier(
-            "back",
+            "limelight-back",
             m_pigeon,
             // TODO: Waiting on these measurements
             new Pose3d(
@@ -78,11 +78,18 @@ public class Drive implements Subsystem {
                     Rotation2d.fromDegrees(30.5).getRadians(),
                     Rotation2d.fromDegrees(180).getRadians())),
             logger.subLogger("providers/ll-back"));
+    m_frontLLSupplier =
+        new MegaTagSupplier(
+            "limelight-front",
+            m_pigeon,
+            new Pose3d(new Translation3d(0.324, 0.0, 0.178), new Rotation3d(0.0, 0.0, 0.0)),
+            logger.subLogger("providers/ll-front"));
 
     m_fusedEstimator =
         new GreyPoseEstimator(
             m_pigeon, m_driveController, m_odometrySupplier, logger.subLogger("estimators/fused"));
     m_backLLSupplier.addReceiver(m_fusedEstimator);
+    m_frontLLSupplier.addReceiver(m_fusedEstimator);
   }
 
   public void startOdometrey() {

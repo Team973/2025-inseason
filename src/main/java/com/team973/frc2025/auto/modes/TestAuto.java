@@ -15,7 +15,7 @@ public class TestAuto extends AutoMode {
   public TestAuto(Logger logger, DriveController drive, Claw claw) {
     super(
         logger,
-        new Pose2d(5, 5, Rotation2d.fromDegrees(180)),
+        new Pose2d(2.2, 0.78, Rotation2d.fromDegrees(225)),
         new ClawCommand(claw, Claw.ControlStatus.IntakeAndHold),
         new WaitUntillCoralSeeStateCommand(claw, true),
         new DriveTrajectoryCommand(drive, "PF-HP-L2"),

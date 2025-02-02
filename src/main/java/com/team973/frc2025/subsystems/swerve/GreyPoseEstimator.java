@@ -57,19 +57,22 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
   }
 
   @Override
-  public synchronized void observeOdometryData(
+  public void observeOdometryData(
       double sampleTime, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    if (m_poseEstimator == null) {
-      m_poseEstimator =
-          new SwerveDrivePoseEstimator(
-              RobotInfo.DriveInfo.SWERVE_KINEMATICS,
-              gyroAngle,
-              modulePositions,
-              new Pose2d(0, 0, gyroAngle));
-    } else {
-      m_poseEstimator.updateWithTime(sampleTime, gyroAngle, modulePositions);
+
+    synchronized (this) {
+      if (m_poseEstimator == null) {
+        m_poseEstimator =
+            new SwerveDrivePoseEstimator(
+                RobotInfo.DriveInfo.SWERVE_KINEMATICS,
+                gyroAngle,
+                modulePositions,
+                new Pose2d(0, 0, gyroAngle));
+      } else {
+        m_poseEstimator.updateWithTime(sampleTime, gyroAngle, modulePositions);
+      }
+      m_lastPoseMeters = m_poseEstimator.getEstimatedPosition();
     }
-    m_lastPoseMeters = m_poseEstimator.getEstimatedPosition();
     m_driveController.syncSensors();
     m_driveController.update();
   }

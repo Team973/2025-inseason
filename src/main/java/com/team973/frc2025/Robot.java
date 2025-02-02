@@ -221,6 +221,8 @@ public class Robot extends TimedRobot {
     }
     SmartDashboard.putString(
         "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
+
+    m_driveController.resetOdometry(m_autoManager.getSelectedMode().getStartingPose());
   }
 
   /** This function is called once when test mode is enabled. */
