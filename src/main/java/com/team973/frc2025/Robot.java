@@ -63,6 +63,7 @@ public class Robot extends TimedRobot {
   private void updateJoysticks() {
     m_driverStick.update();
     m_coDriverStick.update();
+    m_stick.update();
   }
 
   /**
@@ -138,6 +139,9 @@ public class Robot extends TimedRobot {
       m_climb.setControlMode(Climb.ControlMode.ClimbLow);
     } else if (m_stick.getXButtonPressed()) {
       m_climb.setControlMode(Climb.ControlMode.Stow);
+    } else if (m_stick.getYButton()) {
+      m_climb.setControlMode(Climb.ControlMode.JoystickMode);
+      m_climb.setManualPower(m_stick.getLeftYAxis());
     }
 
     if (m_coDriverStick.getAButton()) {
