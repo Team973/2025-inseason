@@ -76,7 +76,30 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    if (m_driverStick.getLeftBumperButtonPressed()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .targetReefPosition(
+              DriveWithLimelight.TargetReefSide.Left, () -> !m_claw.sensorSeeCoral());
+    } else if (m_driverStick.getRightBumperButtonPressed()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right);
+    } else if (m_driverStick.getLeftBumperButtonReleased()
+        || m_driverStick.getRightBumperButtonReleased()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+    }
+
+    if (m_coDriverStick.getPOVRightPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
+    } else if (m_coDriverStick.getPOVLeftPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
+    }
+
     logSubsystems();
+    updateJoysticks();
   }
 
   /**
@@ -124,22 +147,6 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
-    if (m_driverStick.getLeftBumperButtonPressed()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .targetReefPosition(
-              DriveWithLimelight.TargetReefSide.Left, () -> !m_claw.sensorSeeCoral());
-    } else if (m_driverStick.getRightBumperButtonPressed()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right);
-    } else if (m_driverStick.getLeftBumperButtonReleased()
-        || m_driverStick.getRightBumperButtonReleased()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-    }
-
     if (m_coDriverStick.getAButton()) {
       m_claw.setControl(ControlStatus.IntakeAndHold);
     } else if (m_coDriverStick.getBButton()) {
@@ -150,14 +157,7 @@ public class Robot extends TimedRobot {
       m_claw.setControl(ControlStatus.Retract);
     }
 
-    if (m_coDriverStick.getPOVRight()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
-    } else if (m_coDriverStick.getPOVLeft()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
-    }
-
     updateSubsystems();
-    updateJoysticks();
   }
 
   /** This function is called once when the robot is disabled. */

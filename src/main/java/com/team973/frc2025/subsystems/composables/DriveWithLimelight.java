@@ -33,7 +33,7 @@ public class DriveWithLimelight extends DriveComposable {
   private Pose2d m_targetInitialPose = new Pose2d();
   private Pose2d m_targetFinalPose = new Pose2d();
 
-  private int m_targetReefFace = 0;
+  private int m_targetReefFace = 1;
 
   private BooleanSupplier m_targetFinalPoseGate = () -> true;
 
@@ -194,6 +194,21 @@ public class DriveWithLimelight extends DriveComposable {
     m_logger.log(
         "Theta Controller Target Position Deg",
         Math.toDegrees(m_thetaController.getSetpoint().position));
+
+    SmartDashboard.putNumberArray(
+        "Target Initial Pose",
+        new double[] {
+          m_targetInitialPose.getX(),
+          m_targetInitialPose.getY(),
+          m_targetInitialPose.getRotation().getDegrees()
+        });
+    SmartDashboard.putNumberArray(
+        "Target Final Pose",
+        new double[] {
+          m_targetFinalPose.getX(),
+          m_targetFinalPose.getY(),
+          m_targetFinalPose.getRotation().getDegrees()
+        });
   }
 
   public void init() {

@@ -29,7 +29,7 @@ public class TargetPositionRelativeToAprilTag {
       return m_tag.getPoseFromAlliance(alliance.get());
     }
 
-    return m_tag.getPoseFromAlliance(Alliance.Blue);
+    return m_tag.getPoseFromAlliance(Alliance.Red);
   }
 
   public Pose2d getInitialTargetPose() {
