@@ -13,7 +13,7 @@ public class Arm implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_armMotor;
   private ControlStatus m_mode = ControlStatus.Stow;
-  private double m_armTargetPostion;
+  private double m_armTargetPostionDeg;
   private double m_manualArmPower;
 
   public static final double HIGH_POSTION_DEG = 30;
@@ -29,17 +29,17 @@ public class Arm implements Subsystem {
     Stow,
   }
 
-  private double armToMotor(double armPostion) {
+  private double armDegToMotorRotations(double armPostion) {
     return armPostion * MOTOR_TO_ARM_GEAR_RATIO;
   }
 
-  private double motorToArm(double motorPostion) {
+  private double motorRotationsToArmDeg(double motorPostion) {
     return motorPostion / MOTOR_TO_ARM_GEAR_RATIO;
   }
 
   public Arm(Logger logger) {
     m_logger = logger;
-    m_armMotor = new GreyTalonFX(10, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
+    m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.15;
@@ -65,16 +65,19 @@ public class Arm implements Subsystem {
   }
 
   public void setArmTargetDeg(double setPostionDeg) {
-    m_armTargetPostion = setPostionDeg;
+    m_armTargetPostionDeg = setPostionDeg;
     m_mode = ControlStatus.TargetPostion;
   }
 
-  public boolean motorAtTarget() {
-    return (Math.abs(m_armTargetPostion - m_armMotor.getPosition().getValueAsDouble()) < 0.1);
+  public boolean motorAtTargetRotation() {
+    return (Math.abs(
+            armDegToMotorRotations(m_armTargetPostionDeg)
+                - m_armMotor.getPosition().getValueAsDouble())
+        < 0.1);
   }
 
-  private static double getFeedForwardTargetAngle(double targetAngle) {
-    return FEED_FORWARD_MAX_VOLT * Math.cos(targetAngle - CENTER_GRAVITY_OFFSET_DEG);
+  private static double getFeedForwardTargetAngle(double armAngleDeg) {
+    return FEED_FORWARD_MAX_VOLT * Math.cos(armAngleDeg - CENTER_GRAVITY_OFFSET_DEG);
   }
 
   @Override
@@ -86,8 +89,8 @@ public class Arm implements Subsystem {
       case TargetPostion:
         m_armMotor.setControl(
             ControlMode.MotionMagicVoltage,
-            armToMotor(m_armTargetPostion),
-            getFeedForwardTargetAngle(m_armTargetPostion),
+            armDegToMotorRotations(m_armTargetPostionDeg),
+            getFeedForwardTargetAngle(m_armTargetPostionDeg),
             0);
         break;
       case Stow:
@@ -101,11 +104,18 @@ public class Arm implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log("armPostion", motorToArm(m_armMotor.getPosition().getValueAsDouble()));
+    m_logger.log(
+        "armDegPostion", motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble()));
     m_armMotor.log();
-    m_logger.log("armTargetPostionDeg", m_armTargetPostion);
+    m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
     m_logger.log("armMode", m_mode.toString());
-    m_logger.log("motorArmError", m_armMotor.getClosedLoopError().getValueAsDouble());
+    m_logger.log(
+        "motorArmErrorDeg",
+        motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
+    m_logger.log(
+        "ArmFeedForwardTarget",
+        getFeedForwardTargetAngle(
+            motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble())));
   }
 
   @Override
