@@ -13,14 +13,13 @@ public class Claw implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_motorRight;
   private final GreyTalonFX m_motorLeft;
-  private final DigitalInput m_sensor;
+  private final DigitalInput m_sensor = new DigitalInput(0);
   private ControlStatus m_mode = ControlStatus.Stop;
   private ControlStatus m_lastMode = ControlStatus.Stop;
   private double m_leftTargetPostion = 0;
   private double m_rightTargetMotion = 0;
 
   public Claw(Logger logger) {
-    m_sensor = new DigitalInput(0);
     m_logger = logger;
     m_motorRight = new GreyTalonFX(36, "Canivore", m_logger.subLogger("shooterRight"));
     m_motorLeft = new GreyTalonFX(35, "Canivore", m_logger.subLogger("shooterLeft"));
