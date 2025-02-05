@@ -13,7 +13,7 @@ public class Conveyor implements Subsystem {
 
   public Conveyor(Logger logger) {
     m_logger = logger;
-    m_conveyor = new GreyTalonFX(36, "Canivore", m_logger.subLogger("motor"));
+    m_conveyor = new GreyTalonFX(36, "Canivore", m_logger.subLogger("conveyor motor"));
   }
 
   public enum ControlMode {

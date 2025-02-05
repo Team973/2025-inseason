@@ -26,7 +26,7 @@ public class Climb implements Subsystem {
 
   public Climb(Logger logger) {
     m_logger = logger;
-    m_climb = new GreyTalonFX(35, "Canivore", m_logger.subLogger("motor"));
+    m_climb = new GreyTalonFX(35, "Canivore", m_logger.subLogger("climb motor"));
     m_climb.setConfig(defaultMotorConfig());
   }
 

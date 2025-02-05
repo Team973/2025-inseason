@@ -52,7 +52,7 @@ public class Robot extends TimedRobot {
     m_driveController.update();
     m_climb.update();
     m_conveyor.update();
-    // m_claw.update();
+    m_claw.update();
   }
 
   private void resetSubsystems() {
@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
 
   private void logSubsystems() {
     m_driveController.log();
-    // m_claw.log();
+    m_claw.log();
     m_logger.update();
     m_climb.log();
     m_conveyor.log();
