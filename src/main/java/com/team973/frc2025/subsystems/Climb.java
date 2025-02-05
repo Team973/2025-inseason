@@ -22,7 +22,7 @@ public class Climb implements Subsystem {
 
   private double m_manualPower = 0;
 
-  private ControlMode m_controlMode = ControlMode.Stow;
+  private ControlMode m_controlMode = ControlMode.OffState;
 
   public Climb(Logger logger) {
     m_logger = logger;
@@ -35,7 +35,7 @@ public class Climb implements Subsystem {
     defaultMotorConfig.Slot0.kS = 0.0;
     defaultMotorConfig.Slot0.kV = 0.0;
     defaultMotorConfig.Slot0.kA = 0.0;
-    defaultMotorConfig.Slot0.kP = 3.2;
+    defaultMotorConfig.Slot0.kP = 6.4;
     defaultMotorConfig.Slot0.kI = 0.0;
     defaultMotorConfig.Slot0.kD = 0.04;
     defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 32;
@@ -45,7 +45,7 @@ public class Climb implements Subsystem {
     defaultMotorConfig.Slot1.kS = 0.0;
     defaultMotorConfig.Slot1.kV = 0;
     defaultMotorConfig.Slot1.kA = 0.0;
-    defaultMotorConfig.Slot1.kP = 3.2;
+    defaultMotorConfig.Slot1.kP = 6.4;
     defaultMotorConfig.Slot1.kI = 0.0;
     defaultMotorConfig.Slot1.kD = 0.04;
     defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
@@ -61,7 +61,7 @@ public class Climb implements Subsystem {
   public enum ControlMode {
     ClimbLow,
     ClimbHigh,
-    Stow,
+    OffState,
     JoystickMode,
   }
 
@@ -89,7 +89,7 @@ public class Climb implements Subsystem {
   @Override
   public void update() {
     switch (m_controlMode) {
-      case Stow:
+      case OffState:
         m_climb.setControl(GreyTalonFX.ControlMode.DutyCycleOut, 0, 0);
         break;
       case ClimbLow:

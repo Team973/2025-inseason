@@ -138,10 +138,12 @@ public class Robot extends TimedRobot {
     } else if (m_stick.getBButtonPressed()) {
       m_climb.setControlMode(Climb.ControlMode.ClimbLow);
     } else if (m_stick.getXButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.Stow);
+      m_climb.setControlMode(Climb.ControlMode.OffState);
     } else if (m_stick.getYButton()) {
       m_climb.setControlMode(Climb.ControlMode.JoystickMode);
       m_climb.setManualPower(m_stick.getLeftYAxis());
+    } else if (m_stick.getYButtonReleased()) {
+      m_climb.setControlMode(Climb.ControlMode.OffState);
     }
 
     if (m_coDriverStick.getAButton()) {
