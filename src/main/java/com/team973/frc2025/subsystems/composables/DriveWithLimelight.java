@@ -118,7 +118,7 @@ public class DriveWithLimelight extends DriveComposable {
         new ProfiledPIDController(8.0, 0, 0, new TrapezoidProfile.Constraints(0.5, 0.5));
 
     m_thetaController.enableContinuousInput(
-        Units.degreesToRadians(-180.0), Units.degreesToRadians(180.0));
+        Units.degreesToRadians(0.0), Units.degreesToRadians(360.0));
 
     m_logger = logger;
   }
@@ -200,14 +200,14 @@ public class DriveWithLimelight extends DriveComposable {
         new double[] {
           m_targetInitialPose.getX(),
           m_targetInitialPose.getY(),
-          m_targetInitialPose.getRotation().getDegrees()
+          m_targetInitialPose.getRotation().getRadians()
         });
     SmartDashboard.putNumberArray(
         "Target Final Pose",
         new double[] {
           m_targetFinalPose.getX(),
           m_targetFinalPose.getY(),
-          m_targetFinalPose.getRotation().getDegrees()
+          m_targetFinalPose.getRotation().getRadians()
         });
   }
 
