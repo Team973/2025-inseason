@@ -1,5 +1,7 @@
 package com.team973.frc2025.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
@@ -11,9 +13,13 @@ public class Conveyor implements Subsystem {
 
   private ControlMode m_controlMode = ControlMode.ConveyorOff;
 
+  private final TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+
   public Conveyor(Logger logger) {
     m_logger = logger;
     m_conveyor = new GreyTalonFX(36, "Canivore", m_logger.subLogger("conveyor motor"));
+    motorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    m_conveyor.setConfig(motorConfig);
   }
 
   public enum ControlMode {
