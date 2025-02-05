@@ -7,6 +7,7 @@ package com.team973.frc2025;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.Climb;
+import com.team973.frc2025.subsystems.Conveyor;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
@@ -23,7 +24,11 @@ public class Robot extends TimedRobot {
 
   private final Joystick m_stick;
 
-  private final Climb m_climb = new Climb(new Logger("climb manager"));
+  private final Joystick m_teststick;
+
+  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
+
+  private final Conveyor m_conveyor = new Conveyor(m_logger.subLogger("conveyor manager"));
 
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
@@ -40,11 +45,13 @@ public class Robot extends TimedRobot {
   private void syncSensors() {
     m_driveController.syncSensors();
     m_climb.syncSensors();
+    m_conveyor.syncSensors();
   }
 
   private void updateSubsystems() {
     m_driveController.update();
     m_climb.update();
+    m_conveyor.update();
     // m_claw.update();
   }
 
@@ -58,12 +65,14 @@ public class Robot extends TimedRobot {
     // m_claw.log();
     m_logger.update();
     m_climb.log();
+    m_conveyor.log();
   }
 
   private void updateJoysticks() {
     m_driverStick.update();
     m_coDriverStick.update();
     m_stick.update();
+    m_teststick.update();
   }
 
   /**
@@ -74,6 +83,7 @@ public class Robot extends TimedRobot {
     resetSubsystems();
     m_driveController.startOdometrey();
     m_stick = new Joystick(2, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
+    m_teststick = new Joystick(3, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
   }
 
   /**
@@ -144,6 +154,14 @@ public class Robot extends TimedRobot {
       m_climb.setManualPower(m_stick.getLeftYAxis());
     } else if (m_stick.getYButtonReleased()) {
       m_climb.setControlMode(Climb.ControlMode.OffState);
+    }
+
+    if (m_teststick.getAButtonPressed()) {
+      m_conveyor.setControlMode(Conveyor.ControlMode.ConveyorForward);
+    } else if (m_teststick.getBButtonPressed()) {
+      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorBackward));
+    } else if (m_teststick.getXButtonPressed()) {
+      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorOff));
     }
 
     if (m_coDriverStick.getAButton()) {
