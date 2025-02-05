@@ -6,6 +6,8 @@ package com.team973.frc2025;
 
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
+import com.team973.frc2025.subsystems.Climb;
+import com.team973.frc2025.subsystems.Conveyor;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
@@ -22,6 +24,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
 
+  private final Joystick m_stick;
+
+  private final Joystick m_teststick;
+
+  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
+
+  private final Conveyor m_conveyor = new Conveyor(m_logger.subLogger("conveyor manager"));
+
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
@@ -36,26 +46,35 @@ public class Robot extends TimedRobot {
 
   private void syncSensors() {
     m_driveController.syncSensors();
+    m_climb.syncSensors();
+    m_conveyor.syncSensors();
   }
 
   private void updateSubsystems() {
     m_driveController.update();
+    m_climb.update();
+    m_conveyor.update();
     m_claw.update();
   }
 
   private void resetSubsystems() {
     m_driveController.reset();
+    m_climb.reset();
   }
 
   private void logSubsystems() {
     m_driveController.log();
     m_claw.log();
     m_logger.update();
+    m_climb.log();
+    m_conveyor.log();
   }
 
   private void updateJoysticks() {
     m_driverStick.update();
     m_coDriverStick.update();
+    m_stick.update();
+    m_teststick.update();
   }
 
   /**
@@ -65,6 +84,8 @@ public class Robot extends TimedRobot {
   public Robot() {
     resetSubsystems();
     m_driveController.startOdometrey();
+    m_stick = new Joystick(2, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
+    m_teststick = new Joystick(3, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
   }
 
   /**
@@ -123,6 +144,27 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftXAxis() * 0.95,
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
+
+    if (m_stick.getAButtonPressed()) {
+      m_climb.setControlMode(Climb.ControlMode.ClimbHigh);
+    } else if (m_stick.getBButtonPressed()) {
+      m_climb.setControlMode(Climb.ControlMode.ClimbLow);
+    } else if (m_stick.getXButtonPressed()) {
+      m_climb.setControlMode(Climb.ControlMode.OffState);
+    } else if (m_stick.getYButton()) {
+      m_climb.setControlMode(Climb.ControlMode.JoystickMode);
+      m_climb.setManualPower(m_stick.getLeftYAxis());
+    } else if (m_stick.getYButtonReleased()) {
+      m_climb.setControlMode(Climb.ControlMode.OffState);
+    }
+
+    if (m_teststick.getAButtonPressed()) {
+      m_conveyor.setControlMode(Conveyor.ControlMode.ConveyorForward);
+    } else if (m_teststick.getBButtonPressed()) {
+      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorBackward));
+    } else if (m_teststick.getXButtonPressed()) {
+      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorOff));
+    }
 
     if (m_coDriverStick.getAButton()) {
       m_claw.setControl(ControlStatus.IntakeAndHold);
