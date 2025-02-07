@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
           .getDriveWithLimelight()
-          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right);
+          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right, () -> true);
     } else if (m_driverStick.getLeftBumperButtonReleased()
         || m_driverStick.getRightBumperButtonReleased()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);

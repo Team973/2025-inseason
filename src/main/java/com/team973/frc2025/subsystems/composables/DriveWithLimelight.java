@@ -169,14 +169,6 @@ public class DriveWithLimelight extends DriveComposable {
     m_targetFinalPoseGate = targetFinalPoseGate;
   }
 
-  public void targetReefPosition(TargetReefSide side) {
-    targetReefPosition(
-        side,
-        () -> {
-          return true;
-        });
-  }
-
   public void log() {
     SmartDashboard.putString("DB/String 0", "Reef Face: " + m_targetReefFace);
     m_logger.log("Target Mode", m_targetMode.toString());
