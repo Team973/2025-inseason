@@ -29,7 +29,7 @@ public class TargetPositionRelativeToAprilTag {
       return m_tag.getPoseFromAlliance(alliance.get());
     }
 
-    return m_tag.getPoseFromAlliance(Alliance.Blue);
+    return m_tag.getPoseFromAlliance(Alliance.Red);
   }
 
   public Pose2d getInitialTargetPose() {
@@ -46,12 +46,12 @@ public class TargetPositionRelativeToAprilTag {
                         .plus(Rotation2d.fromDegrees(90.0))))
             .plus(
                 new Translation2d(
-                    m_initialTarget.getY(),
-                    getAprilTagPose()
-                        .getRotation()
-                        .toRotation2d()
-                        .plus(Rotation2d.fromDegrees(180)))),
-        getAprilTagPose().getRotation().toRotation2d().plus(m_targetAngle));
+                    m_initialTarget.getY(), getAprilTagPose().getRotation().toRotation2d())),
+        getAprilTagPose()
+            .getRotation()
+            .toRotation2d()
+            .plus(Rotation2d.fromDegrees(180))
+            .plus(m_targetAngle));
   }
 
   public Pose2d getFinalTargetPose() {
@@ -66,13 +66,11 @@ public class TargetPositionRelativeToAprilTag {
                         .getRotation()
                         .toRotation2d()
                         .plus(Rotation2d.fromDegrees(90.0))))
-            .plus(
-                new Translation2d(
-                    m_finalDist,
-                    getAprilTagPose()
-                        .getRotation()
-                        .toRotation2d()
-                        .plus(Rotation2d.fromDegrees(180)))),
-        getAprilTagPose().getRotation().toRotation2d().plus(m_targetAngle));
+            .plus(new Translation2d(m_finalDist, getAprilTagPose().getRotation().toRotation2d())),
+        getAprilTagPose()
+            .getRotation()
+            .toRotation2d()
+            .plus(Rotation2d.fromDegrees(180))
+            .plus(m_targetAngle));
   }
 }
