@@ -5,7 +5,6 @@
 package com.team973.frc2025;
 
 import com.team973.frc2025.subsystems.Claw;
-import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.Conveyor;
 import com.team973.frc2025.subsystems.DriveController;
@@ -166,35 +165,20 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
-    if (m_stick.getAButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.ClimbHigh);
-    } else if (m_stick.getBButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.ClimbLow);
-    } else if (m_stick.getXButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.OffState);
-    } else if (m_stick.getYButton()) {
-      m_climb.setControlMode(Climb.ControlMode.JoystickMode);
-      m_climb.setManualPower(m_stick.getLeftYAxis());
-    } else if (m_stick.getYButtonReleased()) {
-      m_climb.setControlMode(Climb.ControlMode.OffState);
-    }
-
-    if (m_teststick.getAButtonPressed()) {
-      m_conveyor.setControlMode(Conveyor.ControlMode.ConveyorForward);
-    } else if (m_teststick.getBButtonPressed()) {
-      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorBackward));
-    } else if (m_teststick.getXButtonPressed()) {
-      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorOff));
-    }
-
     if (m_coDriverStick.getAButton()) {
-      m_claw.setControl(ControlStatus.IntakeAndHold);
-    } else if (m_coDriverStick.getBButton()) {
-      m_claw.setControl(ControlStatus.Stop);
+      m_superstructure.setState(Superstructure.State.Intake);
     } else if (m_coDriverStick.getXButton()) {
-      m_claw.setControl(ControlStatus.Score);
-    } else if (m_coDriverStick.getYButton()) {
-      m_claw.setControl(ControlStatus.Retract);
+      m_superstructure.setState(Superstructure.State.Score);
+    } else if (m_coDriverStick.getBButton()) {
+      m_superstructure.setState(Superstructure.State.Climb);
+    } else {
+      m_superstructure.setState(Superstructure.State.Off);
+    }
+
+    if (m_coDriverStick.getPOVTopPressed()) {
+      m_superstructure.incrementTargetReefLevel(1);
+    } else if (m_coDriverStick.getPOVBottomPressed()) {
+      m_superstructure.incrementTargetReefLevel(-1);
     }
 
     updateSubsystems();
