@@ -140,19 +140,19 @@ public class Robot extends TimedRobot {
     } else if (m_coDriverStick.getYButton()) {
       m_claw.setControl(Claw.ControlStatus.Retract);
     }
-    if (m_coDriverStick.getPOVTop()) {
-      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_4);
-    } else if (m_coDriverStick.getPOVLeft()) {
-      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_3);
-    } else if (m_coDriverStick.getPOVRight()) {
-      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_2);
-    } else if (m_coDriverStick.getPOVBottom()) {
-      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_1);
-    } else if (m_coDriverStick.getLeftBumperButton()) {
-      m_elevator.setmotorManualOutput(m_coDriverStick.getLeftYAxis());
-    } else {
-      m_elevator.setModeOff();
-    }
+    // if (m_coDriverStick.getPOVTop()) {
+    //   m_elevator.setTargetPostion(Elevator.Presets.LEVEL_4);
+    // } else if (m_coDriverStick.getPOVLeft()) {
+    //   m_elevator.setTargetPostion(Elevator.Presets.LEVEL_3);
+    // } else if (m_coDriverStick.getPOVRight()) {
+    //   m_elevator.setTargetPostion(Elevator.Presets.LEVEL_2);
+    // } else if (m_coDriverStick.getPOVBottom()) {
+    //   m_elevator.setTargetPostion(Elevator.Presets.LEVEL_1);
+    // } else if (m_coDriverStick.getLeftBumperButton()) {
+    //   m_elevator.setmotorManualOutput(m_coDriverStick.getLeftYAxis());
+    // } else {
+    //   m_elevator.setModeOff();
+    // }
 
     if (m_coDriverStick.getLeftBumperButton()) {
       m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
@@ -161,7 +161,7 @@ public class Robot extends TimedRobot {
     } else if (m_coDriverStick.getStartButton()) {
       m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
     } else if (m_coDriverStick.getRightBumperButton()) {
-      m_arm.setArmMotorManualOutput(m_coDriverStick.getRightXAxis());
+      m_arm.setArmMotorManualOutput(m_coDriverStick.getRightYAxis() * -1.0);
     } else {
       m_arm.setStow();
     }

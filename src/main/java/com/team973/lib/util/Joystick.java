@@ -173,6 +173,14 @@ public class Joystick extends XboxController {
     }
   }
 
+  public double getRightYAxis() {
+    if (m_type == Type.SickStick) {
+      return super.getRawAxis(3);
+    } else {
+      return super.getRawAxis(5);
+    }
+  }
+
   /**
    * @return If the POV is equal to 0.
    */

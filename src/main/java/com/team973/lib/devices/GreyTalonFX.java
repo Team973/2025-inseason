@@ -39,6 +39,7 @@ public class GreyTalonFX extends TalonFX {
 
   public enum ControlMode {
     DutyCycleOut,
+    VoltageOut,
     MotionMagicDutyCycle,
     MotionMagicVoltage,
     PositionDutyCycle,
@@ -427,6 +428,8 @@ public class GreyTalonFX extends TalonFX {
     switch (controlMode) {
       case DutyCycleOut:
         return new DutyCycleOut(demand);
+      case VoltageOut:
+        return new VoltageOut(demand);
       case MotionMagicDutyCycle:
         return new MotionMagicDutyCycle(demand)
             .withEnableFOC(enableFOC)

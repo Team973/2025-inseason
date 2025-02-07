@@ -16,12 +16,12 @@ public class Arm implements Subsystem {
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
 
-  public static final double HIGH_POSTION_DEG = 30;
-  public static final double MEDIUM_POSTION_DEG = 0;
-  public static final double LOW_POSTION_DEG = -30;
-  private static final double MOTOR_TO_ARM_GEAR_RATIO = 56.0 / 10.0;
+  public static final double HIGH_POSTION_DEG = 0;
+  public static final double MEDIUM_POSTION_DEG = -30;
+  public static final double LOW_POSTION_DEG = -60;
+  private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
-  private static final double FEED_FORWARD_MAX_VOLT = 0.1;
+  private static final double FEED_FORWARD_MAX_VOLT = 0.5;
 
   public static enum ControlStatus {
     Manual,
@@ -29,12 +29,12 @@ public class Arm implements Subsystem {
     Stow,
   }
 
-  private double armDegToMotorRotations(double armPostion) {
-    return armPostion * MOTOR_TO_ARM_GEAR_RATIO;
+  private double armDegToMotorRotations(double armPostionDeg) {
+    return armPostionDeg / 360.0 / ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
 
   private double motorRotationsToArmDeg(double motorPostion) {
-    return motorPostion / MOTOR_TO_ARM_GEAR_RATIO;
+    return motorPostion * ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
   public Arm(Logger logger) {
@@ -42,21 +42,26 @@ public class Arm implements Subsystem {
     m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
-    armMotorConfig.Slot0.kV = 0.15;
-    armMotorConfig.Slot0.kA = 0.01;
-    armMotorConfig.Slot0.kP = 4.0;
+    armMotorConfig.Slot0.kV = 0.0;
+    armMotorConfig.Slot0.kA = 0.0;
+    armMotorConfig.Slot0.kP = 8.0;
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
-    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
-    armMotorConfig.MotionMagic.MotionMagicJerk = 160;
-    armMotorConfig.Voltage.PeakForwardVoltage = 4;
-    armMotorConfig.Voltage.PeakReverseVoltage = -4;
+    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 64.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 80.0;
+    armMotorConfig.MotionMagic.MotionMagicJerk = 160.0;
+    armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
+    armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    armMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
+    armMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    armMotorConfig.Voltage.PeakForwardVoltage = 12.0;
+    armMotorConfig.Voltage.PeakReverseVoltage = -12.0;
     // clockwise postive when looking at it from the shaft, is on inside of the left point so that
     // the shaft is pointing left, up is positve, gear ratio is odd
-    armMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    armMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     armMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_armMotor.setConfig(armMotorConfig);
+    m_armMotor.setPosition(armDegToMotorRotations(-90.0));
   }
 
   public void setArmMotorManualOutput(double joystick) {
@@ -76,21 +81,24 @@ public class Arm implements Subsystem {
         < 0.1);
   }
 
-  private static double getFeedForwardTargetAngle(double armAngleDeg) {
-    return FEED_FORWARD_MAX_VOLT * Math.cos(armAngleDeg - CENTER_GRAVITY_OFFSET_DEG);
+  private double getFeedForwardTargetAngle() {
+    double armAngleDeg = motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble());
+    return FEED_FORWARD_MAX_VOLT
+        * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
 
   @Override
   public void update() {
     switch (m_mode) {
       case Manual:
-        m_armMotor.setControl(ControlMode.DutyCycleOut, m_manualArmPower, 0);
+        m_armMotor.setControl(
+            ControlMode.VoltageOut, (m_manualArmPower * 12.0) + getFeedForwardTargetAngle(), 0);
         break;
       case TargetPostion:
         m_armMotor.setControl(
             ControlMode.MotionMagicVoltage,
             armDegToMotorRotations(m_armTargetPostionDeg),
-            getFeedForwardTargetAngle(m_armTargetPostionDeg),
+            getFeedForwardTargetAngle(),
             0);
         break;
       case Stow:
@@ -112,10 +120,8 @@ public class Arm implements Subsystem {
     m_logger.log(
         "motorArmErrorDeg",
         motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
-    m_logger.log(
-        "ArmFeedForwardTarget",
-        getFeedForwardTargetAngle(
-            motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble())));
+    m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
+    m_logger.log("manualPower", m_manualArmPower);
   }
 
   @Override
