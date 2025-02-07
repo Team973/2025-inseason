@@ -10,6 +10,7 @@ import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.Conveyor;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
+import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
@@ -28,13 +29,14 @@ public class Robot extends TimedRobot {
 
   private final Joystick m_teststick;
 
-  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
-
-  private final Conveyor m_conveyor = new Conveyor(m_logger.subLogger("conveyor manager"));
-
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
+
+  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
+  private final Conveyor m_conveyor = new Conveyor(m_logger.subLogger("conveyor manager"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
+
+  private final Superstructure m_superstructure = new Superstructure(m_claw, m_conveyor, m_climb);
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
@@ -46,28 +48,24 @@ public class Robot extends TimedRobot {
 
   private void syncSensors() {
     m_driveController.syncSensors();
-    m_climb.syncSensors();
-    m_conveyor.syncSensors();
+    m_superstructure.syncSensors();
   }
 
   private void updateSubsystems() {
     m_driveController.update();
-    m_climb.update();
-    m_conveyor.update();
-    m_claw.update();
+    m_superstructure.update();
   }
 
   private void resetSubsystems() {
     m_driveController.reset();
-    m_climb.reset();
+    m_superstructure.reset();
   }
 
   private void logSubsystems() {
     m_driveController.log();
-    m_claw.log();
+    m_superstructure.log();
+
     m_logger.update();
-    m_climb.log();
-    m_conveyor.log();
   }
 
   private void updateJoysticks() {
