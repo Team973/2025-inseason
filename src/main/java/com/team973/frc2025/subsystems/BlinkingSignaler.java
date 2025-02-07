@@ -32,11 +32,15 @@ public class BlinkingSignaler implements Subsystem {
 
   private void blinkingLights() {
     if (modTimeMilisecs() >= 0.5 * m_blinkPeriodMs) {
-      m_candle.setLEDs((int) m_colorA.red, (int) m_colorA.green, (int) m_colorA.blue);
-      m_candle.setLEDs(255, 0, 0);
+      m_candle.setLEDs(
+          (int) (m_colorA.red * 255.0),
+          (int) (m_colorA.green * 255.0),
+          (int) (m_colorA.blue * 255.0));
     } else if (modTimeMilisecs() <= 0.5 * m_blinkPeriodMs) {
-      // m_candle.setLEDs((int) m_colorB.red, (int) m_colorB.green, (int) m_colorB.blue);
-      m_candle.setLEDs(0, 0, 0);
+      m_candle.setLEDs(
+          (int) (m_colorB.red * 255.0),
+          (int) (m_colorB.green * 255.0),
+          (int) (m_colorB.blue * 255.0));
     }
   }
 
