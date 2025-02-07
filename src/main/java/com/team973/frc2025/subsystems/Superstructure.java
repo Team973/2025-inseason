@@ -60,8 +60,19 @@ public class Superstructure implements Subsystem {
   public void update() {
     switch (m_state) {
       case Intake:
-        m_claw.setControl(Claw.ControlStatus.IntakeAndHold);
-        m_conveyor.setControlMode(Conveyor.ControlMode.ConveyorForward);
+        if (!m_claw
+            .sensorSeeCoral()) { // TODO: conveyor.getFrontSensor() && !conveyor.getBackSensor()
+          m_claw.setControl(Claw.ControlStatus.Stop);
+          m_conveyor.setControlMode(Conveyor.ControlMode.ConveyorOff);
+        } else if (m_claw
+            .sensorSeeCoral()) { // TODO: !conveyor.getFrontSensor() && claw.sensorSeesCoral()
+          m_claw.setControl(Claw.ControlStatus.Retract);
+          m_conveyor.setControlMode(Conveyor.ControlMode.ConveyorBackward);
+        } else {
+          m_claw.setControl(Claw.ControlStatus.Intake);
+          m_conveyor.setControlMode(Conveyor.ControlMode.ConveyorForward);
+        }
+
         m_claw.setControl(Claw.ControlStatus.Stop);
         break;
       case Score:

@@ -69,7 +69,7 @@ public class Claw implements Subsystem {
   }
 
   public static enum ControlStatus {
-    IntakeAndHold,
+    Intake,
     Shoot,
     Stop,
     Retract,
@@ -79,14 +79,9 @@ public class Claw implements Subsystem {
   @Override
   public void update() {
     switch (m_mode) {
-      case IntakeAndHold:
-        if (sensorSeeCoral()) {
-          m_motorRight.setControl(ControlMode.VelocityVoltage, 0, 1);
-          m_motorLeft.setControl(ControlMode.VelocityVoltage, 0, 1);
-        } else if (!sensorSeeCoral()) {
-          m_motorRight.setControl(ControlMode.VelocityVoltage, 10, 1);
-          m_motorLeft.setControl(ControlMode.VelocityVoltage, 10, 1);
-        }
+      case Intake:
+        m_motorRight.setControl(ControlMode.VelocityVoltage, 10, 1);
+        m_motorLeft.setControl(ControlMode.VelocityVoltage, 10, 1);
         break;
       case Shoot:
         m_motorRight.setControl(ControlMode.VelocityVoltage, 2, 1);
