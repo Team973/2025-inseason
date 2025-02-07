@@ -195,12 +195,14 @@ public class Drive implements Subsystem {
     m_poseEstimator.log();
     m_fusedEstimator.log();
     m_backLLSupplier.log();
+    m_frontLLSupplier.log();
     m_odometrySupplier.log();
   }
 
   @Override
   public void syncSensors() {
     m_backLLSupplier.syncSensors();
+    m_frontLLSupplier.syncSensors();
     m_estimatedPose = m_poseEstimator.getPoseMeters();
     m_estimatedVelocity = m_poseEstimator.getVelocityMetersPerSeconds();
   }

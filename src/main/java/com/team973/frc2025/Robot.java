@@ -216,13 +216,13 @@ public class Robot extends TimedRobot {
 
     if (m_coDriverStick.getAButtonPressed()) {
       m_autoManager.increment();
+      m_driveController.resetOdometry(m_autoManager.getSelectedMode().getStartingPose());
     } else if (m_coDriverStick.getBButtonPressed()) {
       m_autoManager.decrement();
+      m_driveController.resetOdometry(m_autoManager.getSelectedMode().getStartingPose());
     }
     SmartDashboard.putString(
         "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
-
-    m_driveController.resetOdometry(m_autoManager.getSelectedMode().getStartingPose());
   }
 
   /** This function is called once when test mode is enabled. */

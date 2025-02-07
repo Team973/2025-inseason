@@ -63,7 +63,7 @@ public class MegaTagSupplier {
     LimelightHelpers.SetRobotOrientation(
         m_llName,
         // Yaw (heading)
-        m_pigeon.getYaw().getRadians(),
+        m_pigeon.getYaw().getDegrees(),
         m_pigeon.getAngularVelocity().getDegrees(),
         // Pitch (hopefully not)
         0.0,
@@ -137,6 +137,11 @@ public class MegaTagSupplier {
       mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(m_llName);
     }
 
+    if (mt2 == null) {
+      m_rejectedNoTags++;
+      return;
+    }
+
     if (mt2.tagCount == 0) {
       // If there's no tags then how could we trust this measurement?
       m_rejectedNoTags++;
@@ -148,7 +153,7 @@ public class MegaTagSupplier {
     // 0.2 based on a handful of criteria. Higher numbers mean less trustworthy samples.
     // Ref
     // github.com/Team254/FRC-2024-Public/src/main/java/com/team254/frc2024/subsystems/vision/VisionSubsystem.java
-    Matrix<N3, N1> confidenceStdDev = VecBuilder.fill(2.0, 2.0, 9999999);
+    Matrix<N3, N1> confidenceStdDev = VecBuilder.fill(0.5, 0.5, 9999999);
     for (MegaTagReceiver receiver : m_receivers) {
       receiver.observeVisionData(m_llName, mt2.pose, mt2.timestampSeconds, confidenceStdDev);
     }

@@ -100,7 +100,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
         new double[] {
           pose.getTranslation().getX(),
           pose.getTranslation().getY(),
-          pose.getRotation().getDegrees()
+          pose.getRotation().getRadians()
         });
   }
 }
