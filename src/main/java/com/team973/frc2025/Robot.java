@@ -148,12 +148,13 @@ public class Robot extends TimedRobot {
       m_driveController
           .getDriveWithLimelight()
           .targetReefPosition(
-              DriveWithLimelight.TargetReefSide.Left, () -> !m_claw.sensorSeeCoral());
+              DriveWithLimelight.TargetReefSide.Left, () -> m_superstructure.readyToScore());
     } else if (m_driverStick.getRightBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
           .getDriveWithLimelight()
-          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right, () -> true);
+          .targetReefPosition(
+              DriveWithLimelight.TargetReefSide.Right, () -> m_superstructure.readyToScore());
     } else if (m_driverStick.getLeftBumperButtonReleased()
         || m_driverStick.getRightBumperButtonReleased()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);

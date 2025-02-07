@@ -39,6 +39,10 @@ public class Superstructure implements Subsystem {
     }
   }
 
+  public boolean readyToScore() {
+    return true; // TODO: check armivator position
+  }
+
   public void log() {
     SmartDashboard.putString("DB/String 1", "Reef Level: " + m_targetReefLevel);
 
