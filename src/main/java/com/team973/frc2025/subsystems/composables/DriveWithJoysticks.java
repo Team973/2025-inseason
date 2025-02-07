@@ -84,20 +84,20 @@ public class DriveWithJoysticks extends DriveComposable {
 
     m_lastRot = rot;
 
-    // if (m_rotationControl == RotationControl.ClosedLoop) {
-    //   double diff = m_targetRobotAngle.minus(m_currentYaw).getDegrees();
-    //   if (diff > 180) {
-    //     diff -= 360;
-    //   } else if (diff < -180) {
-    //     diff += 360;
-    //   }
+    if (m_rotationControl == RotationControl.ClosedLoop) {
+      double diff = m_targetRobotAngle.minus(m_currentYaw).getDegrees();
+      if (diff > 180) {
+        diff -= 360;
+      } else if (diff < -180) {
+        diff += 360;
+      }
 
-    //   SmartDashboard.putNumber("Angle Diff", diff);
+      SmartDashboard.putNumber("Angle Diff", diff);
 
-    //   rot =
-    //       m_rotationController.calculate(
-    //           m_currentYaw.getDegrees(), m_currentYaw.getDegrees() + diff);
-    // }
+      rot =
+          m_rotationController.calculate(
+              m_currentYaw.getDegrees(), m_currentYaw.getDegrees() + diff);
+    }
 
     SmartDashboard.putNumber("Robot Rotation", rot);
     SmartDashboard.putNumber("Target Robot Angle", m_targetRobotAngle.getDegrees());
