@@ -94,28 +94,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    if (m_driverStick.getLeftBumperButtonPressed()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .targetReefPosition(
-              DriveWithLimelight.TargetReefSide.Left, () -> !m_claw.sensorSeeCoral());
-    } else if (m_driverStick.getRightBumperButtonPressed()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right, () -> true);
-    } else if (m_driverStick.getLeftBumperButtonReleased()
-        || m_driverStick.getRightBumperButtonReleased()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-    }
-
-    if (m_coDriverStick.getPOVRightPressed()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
-    } else if (m_coDriverStick.getPOVLeftPressed()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
-    }
-
     logSubsystems();
     updateJoysticks();
   }
@@ -165,6 +143,22 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
+    if (m_driverStick.getLeftBumperButtonPressed()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .targetReefPosition(
+              DriveWithLimelight.TargetReefSide.Left, () -> !m_claw.sensorSeeCoral());
+    } else if (m_driverStick.getRightBumperButtonPressed()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right, () -> true);
+    } else if (m_driverStick.getLeftBumperButtonReleased()
+        || m_driverStick.getRightBumperButtonReleased()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+    }
+
     if (m_coDriverStick.getAButton()) {
       m_superstructure.setState(Superstructure.State.Intake);
     } else if (m_coDriverStick.getXButton()) {
@@ -179,6 +173,10 @@ public class Robot extends TimedRobot {
       m_superstructure.incrementTargetReefLevel(1);
     } else if (m_coDriverStick.getPOVBottomPressed()) {
       m_superstructure.incrementTargetReefLevel(-1);
+    } else if (m_coDriverStick.getPOVRightPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
+    } else if (m_coDriverStick.getPOVLeftPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
     }
 
     updateSubsystems();
