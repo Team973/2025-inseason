@@ -33,7 +33,8 @@ public class Robot extends TimedRobot {
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
 
-  private final Superstructure m_superstructure = new Superstructure(m_claw, m_climb);
+  private final Superstructure m_superstructure =
+      new Superstructure(m_claw, m_climb, m_driveController);
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
@@ -146,26 +147,36 @@ public class Robot extends TimedRobot {
       m_driveController
           .getDriveWithLimelight()
           .targetReefPosition(
-              DriveWithLimelight.TargetReefSide.Left, () -> m_superstructure.readyToScore());
+              DriveWithLimelight.TargetReefSide.Left,
+              () -> m_superstructure.readyToScore(),
+              () -> m_superstructure.finishedScoring());
     } else if (m_driverStick.getRightBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
           .getDriveWithLimelight()
           .targetReefPosition(
-              DriveWithLimelight.TargetReefSide.Right, () -> m_superstructure.readyToScore());
+              DriveWithLimelight.TargetReefSide.Right,
+              () -> m_superstructure.readyToScore(),
+              () -> m_superstructure.finishedScoring());
     } else if (m_driverStick.getLeftBumperButtonReleased()
         || m_driverStick.getRightBumperButtonReleased()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
     }
 
-    if (m_coDriverStick.getAButton()) {
-      m_superstructure.setState(Superstructure.State.IntakeCoral);
+    if (m_coDriverStick.getYButton()) {
+      m_superstructure.setState(Superstructure.State.Manual);
+
+      if (m_coDriverStick.getXButtonPressed()) {
+        m_superstructure.setManualScore(true);
+      } else if (m_coDriverStick.getXButtonReleased()) {
+        m_superstructure.setManualScore(false);
+      }
     } else if (m_coDriverStick.getXButton()) {
       m_superstructure.setState(Superstructure.State.ScoreCoral);
     } else if (m_coDriverStick.getBButton()) {
       m_superstructure.setState(Superstructure.State.Climb);
     } else {
-      m_superstructure.setState(Superstructure.State.Off);
+      m_superstructure.setState(Superstructure.State.IntakeCoral);
     }
 
     if (m_coDriverStick.getPOVTopPressed()) {

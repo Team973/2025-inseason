@@ -130,6 +130,10 @@ public class Claw implements Subsystem {
     return getCoralSensor() && !getFrontSensor();
   }
 
+  public boolean getHasCoral() {
+    return getBackSensor() || getFrontSensor() || getCoralSensor();
+  }
+
   @Override
   public void update() {
     switch (m_mode) {

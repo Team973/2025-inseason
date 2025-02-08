@@ -6,10 +6,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Superstructure implements Subsystem {
   private final Claw m_claw;
   private final Climb m_climb;
+  private final DriveController m_driveController;
 
   private State m_state = State.Off;
+  private State m_lastState = State.Off;
 
   private int m_targetReefLevel = 1;
+
+  private boolean m_manualScore = false;
 
   public enum State {
     IntakeCoral,
@@ -17,16 +21,22 @@ public class Superstructure implements Subsystem {
     ScoreCoral,
     ScoreAlgae,
     Climb,
+    Manual,
     Off
   }
 
-  public Superstructure(Claw claw, Climb climb) {
+  public Superstructure(Claw claw, Climb climb, DriveController driveController) {
     m_claw = claw;
     m_climb = climb;
+    m_driveController = driveController;
   }
 
   public void setState(State state) {
     m_state = state;
+  }
+
+  public void setManualScore(boolean score) {
+    m_manualScore = score;
   }
 
   public void incrementTargetReefLevel(int increment) {
@@ -37,6 +47,10 @@ public class Superstructure implements Subsystem {
     } else if (m_targetReefLevel < 1) {
       m_targetReefLevel = 4;
     }
+  }
+
+  public boolean finishedScoring() {
+    return !m_claw.getHasCoral();
   }
 
   public boolean readyToScore() {
@@ -66,7 +80,17 @@ public class Superstructure implements Subsystem {
         m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
       case ScoreCoral:
-        m_claw.setControl(Claw.ControlStatus.ScoreCoral);
+        if (finishedScoring()
+            && m_driveController.getDriveWithLimelight().reachedTargetInitialPose()) {
+          m_claw.setControl(Claw.ControlStatus.IntakeCoral);
+        } else if (finishedScoring()) {
+          m_claw.setControl(Claw.ControlStatus.Off);
+        } else if (m_driveController.getDriveWithLimelight().reachedTargetFinalPose()) {
+          m_claw.setControl(Claw.ControlStatus.ScoreCoral);
+        } else {
+          m_claw.setControl(Claw.ControlStatus.HoldCoral);
+        }
+
         m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
       case ScoreAlgae:
@@ -77,11 +101,26 @@ public class Superstructure implements Subsystem {
         m_claw.setControl(Claw.ControlStatus.Off);
         m_climb.setControlMode(Climb.ControlMode.ClimbLow);
         break;
+      case Manual:
+        if (m_lastState != m_state) {
+          m_manualScore = false;
+        }
+
+        if (m_manualScore) {
+          m_claw.setControl(Claw.ControlStatus.ScoreCoral);
+        } else {
+          m_claw.setControl(Claw.ControlStatus.HoldCoral);
+        }
+
+        m_climb.setControlMode(Climb.ControlMode.OffState);
+        break;
       case Off:
         m_claw.setControl(Claw.ControlStatus.Off);
         m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
     }
+
+    m_lastState = m_state;
 
     m_claw.update();
     m_climb.log();

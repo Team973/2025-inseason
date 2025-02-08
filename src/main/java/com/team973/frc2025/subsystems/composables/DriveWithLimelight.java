@@ -36,6 +36,7 @@ public class DriveWithLimelight extends DriveComposable {
   private int m_targetReefFace = 1;
 
   private BooleanSupplier m_targetFinalPoseGate = () -> true;
+  private BooleanSupplier m_reTargetInitialPoseGate = () -> false;
 
   private TargetMode m_targetMode = TargetMode.Initial;
 
@@ -46,7 +47,8 @@ public class DriveWithLimelight extends DriveComposable {
 
   private enum TargetMode {
     Initial,
-    Final
+    Final,
+    ReInitial
   }
 
   public static class TargetPositions {
@@ -155,18 +157,24 @@ public class DriveWithLimelight extends DriveComposable {
   private void setTargetMode(TargetMode targetMode) {
     if (targetMode == TargetMode.Final && m_targetFinalPoseGate.getAsBoolean()) {
       m_targetMode = TargetMode.Final;
-    } else {
+    } else if (targetMode == TargetMode.ReInitial && m_reTargetInitialPoseGate.getAsBoolean()) {
+      m_targetMode = TargetMode.ReInitial;
+    } else if (targetMode == TargetMode.Initial) {
       m_targetMode = TargetMode.Initial;
     }
   }
 
-  public void targetReefPosition(TargetReefSide side, BooleanSupplier targetFinalPoseGate) {
+  public void targetReefPosition(
+      TargetReefSide side,
+      BooleanSupplier targetFinalPoseGate,
+      BooleanSupplier reTargetInitialPoseGate) {
     m_targetInitialPose = getTargetReefPosition(side).getInitialTargetPose();
     m_targetFinalPose = getTargetReefPosition(side).getFinalTargetPose();
 
     setTargetMode(TargetMode.Initial);
     m_target = getTargetReefPosition(side);
     m_targetFinalPoseGate = targetFinalPoseGate;
+    m_reTargetInitialPoseGate = reTargetInitialPoseGate;
   }
 
   public void log() {
@@ -203,6 +211,22 @@ public class DriveWithLimelight extends DriveComposable {
         });
   }
 
+  public boolean reachedTargetInitialPose() {
+    return Drive.comparePoses(
+        m_poseEstimator.getPoseMeters(),
+        m_targetInitialPose,
+        TARGET_DISTANCE_TOLERANCE_METERS,
+        TARGET_ANGLE_TOLERANCE_DEG);
+  }
+
+  public boolean reachedTargetFinalPose() {
+    return Drive.comparePoses(
+        m_poseEstimator.getPoseMeters(),
+        m_targetFinalPose,
+        TARGET_DISTANCE_TOLERANCE_METERS,
+        TARGET_ANGLE_TOLERANCE_DEG);
+  }
+
   public void init() {
     m_xController.reset(m_poseEstimator.getPoseMeters().getX());
     m_yController.reset(m_poseEstimator.getPoseMeters().getY());
@@ -214,15 +238,14 @@ public class DriveWithLimelight extends DriveComposable {
       return new ChassisSpeeds(0, 0, 0);
     }
 
-    if (Drive.comparePoses(
-        m_poseEstimator.getPoseMeters(),
-        m_targetInitialPose,
-        TARGET_DISTANCE_TOLERANCE_METERS,
-        TARGET_ANGLE_TOLERANCE_DEG)) {
+    if (reachedTargetInitialPose()) {
       setTargetMode(TargetMode.Final);
+    } else if (reachedTargetFinalPose()) {
+      setTargetMode(TargetMode.ReInitial);
     }
 
     switch (m_targetMode) {
+      case ReInitial:
       case Initial:
         return new ChassisSpeeds(
             m_xController.calculate(
