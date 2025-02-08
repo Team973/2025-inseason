@@ -19,7 +19,7 @@ public class Arm implements Subsystem {
   private static final double HIGH_POSTION_DEG = 0;
   private static final double MEDIUM_POSTION_DEG = -30;
   private static final double LOW_POSTION_DEG = -60;
-  public static final double STOW_POSITION_DEG = -60;
+  public static final double STOW_POSITION_DEG = -90;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
