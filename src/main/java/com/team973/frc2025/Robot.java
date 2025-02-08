@@ -81,6 +81,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    if (m_coDriverStick.getRightBumperButton()) {
+      m_CaNdleManger.m_activeSignaler = m_CaNdleManger.m_blueBlinker;
+    } else if (m_coDriverStick.getLeftBumperButton()) {
+      m_CaNdleManger.m_activeSignaler = m_CaNdleManger.m_redBlinker;
+    } else {
+      m_CaNdleManger.m_activeSignaler = m_CaNdleManger.m_offBlinker;
+    }
     logSubsystems();
   }
 
