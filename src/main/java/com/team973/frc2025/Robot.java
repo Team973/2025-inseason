@@ -4,10 +4,12 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
+import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
@@ -35,6 +37,8 @@ public class Robot extends TimedRobot {
 
   private final Superstructure m_superstructure =
       new Superstructure(m_claw, m_climb, m_driveController);
+  private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
