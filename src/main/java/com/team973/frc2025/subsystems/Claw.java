@@ -63,16 +63,9 @@ public class Claw implements Subsystem {
     leftMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     m_motorLeft.setConfig(leftMotorConfig);
 
-    TalonFXConfiguration conveyorConfig = new TalonFXConfiguration(); // TODO
+    TalonFXConfiguration conveyorConfig = defaultClawMotorConfig();
 
-    conveyorConfig.Slot0.kP = 0.0;
-
-    conveyorConfig.CurrentLimits.StatorCurrentLimit = 0;
-    conveyorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    conveyorConfig.CurrentLimits.SupplyCurrentLimit = 0;
-    conveyorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-
-    conveyorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    conveyorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // TODO
 
     m_conveyor.setConfig(conveyorConfig);
   }
