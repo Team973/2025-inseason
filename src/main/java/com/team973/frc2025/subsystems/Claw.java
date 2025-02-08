@@ -65,7 +65,7 @@ public class Claw implements Subsystem {
 
     TalonFXConfiguration conveyorConfig = defaultClawMotorConfig();
 
-    conveyorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // TODO
+    conveyorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     m_conveyor.setConfig(conveyorConfig);
   }
