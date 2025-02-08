@@ -163,6 +163,12 @@ public class Claw implements Subsystem {
             ControlMode.MotionMagicVoltage, m_rightTargetMotion, MOTION_MAGIC_PID_SLOT);
         m_motorLeft.setControl(
             ControlMode.MotionMagicVoltage, m_leftTargetPostion, MOTION_MAGIC_PID_SLOT);
+
+        if (motorAtTarget() && m_coralSensor.get()) {
+          m_motorRight.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
+          m_motorLeft.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
+        }
+
         m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
         break;
       case ScoreAlgae:
