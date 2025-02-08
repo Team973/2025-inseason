@@ -6,7 +6,6 @@ package com.team973.frc2025;
 
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
-import com.team973.frc2025.subsystems.Conveyor;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Superstructure;
@@ -32,10 +31,9 @@ public class Robot extends TimedRobot {
       new DriveController(m_logger.subLogger("drive", 0.05));
 
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
-  private final Conveyor m_conveyor = new Conveyor(m_logger.subLogger("conveyor manager"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
 
-  private final Superstructure m_superstructure = new Superstructure(m_claw, m_conveyor, m_climb);
+  private final Superstructure m_superstructure = new Superstructure(m_claw, m_climb);
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
@@ -161,9 +159,9 @@ public class Robot extends TimedRobot {
     }
 
     if (m_coDriverStick.getAButton()) {
-      m_superstructure.setState(Superstructure.State.Intake);
+      m_superstructure.setState(Superstructure.State.IntakeCoral);
     } else if (m_coDriverStick.getXButton()) {
-      m_superstructure.setState(Superstructure.State.Score);
+      m_superstructure.setState(Superstructure.State.ScoreCoral);
     } else if (m_coDriverStick.getBButton()) {
       m_superstructure.setState(Superstructure.State.Climb);
     } else {
