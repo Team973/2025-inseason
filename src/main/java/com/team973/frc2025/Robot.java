@@ -44,6 +44,8 @@ public class Robot extends TimedRobot {
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
 
+  private boolean m_manualScoringMode = false;
+
   private void syncSensors() {
     m_driveController.syncSensors();
     m_superstructure.syncSensors();
@@ -62,6 +64,8 @@ public class Robot extends TimedRobot {
   private void logSubsystems() {
     m_driveController.log();
     m_superstructure.log();
+
+    SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
 
     m_logger.update();
   }
@@ -131,6 +135,14 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     syncSensors();
 
+    if (m_coDriverStick.getYButtonPressed()) {
+      m_manualScoringMode = !m_manualScoringMode;
+
+      if (!m_manualScoringMode) {
+        m_superstructure.setState(Superstructure.State.IntakeCoral);
+      }
+    }
+
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(
@@ -138,45 +150,44 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
-    if (m_driverStick.getLeftBumperButton() && !m_coDriverStick.getYButton()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .targetReefPosition(
-              DriveWithLimelight.TargetReefSide.Left,
-              () -> m_superstructure.readyToScore(),
-              () -> m_superstructure.finishedScoring());
-      m_superstructure.setState(Superstructure.State.ScoreCoral);
-    } else if (m_driverStick.getRightBumperButton() && !m_coDriverStick.getYButton()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .targetReefPosition(
-              DriveWithLimelight.TargetReefSide.Right,
-              () -> m_superstructure.readyToScore(),
-              () -> m_superstructure.finishedScoring());
-      m_superstructure.setState(Superstructure.State.ScoreCoral);
+    if (m_manualScoringMode) {
+      if (m_driverStick.getLeftBumperButton() || m_driverStick.getRightBumperButton()) {
+        m_superstructure.setState(Superstructure.State.Manual);
+
+        if (m_driverStick.getLeftTriggerPressed()) {
+          m_superstructure.setManualScore(true);
+        } else if (m_driverStick.getLeftTriggerReleased()) {
+          m_superstructure.setManualScore(false);
+        }
+
+        if (m_driverStick.getRightTriggerPressed()) {
+          m_superstructure.setManualArmivator(true);
+        } else if (m_driverStick.getRightTriggerReleased()) {
+          m_superstructure.setManualArmivator(false);
+        }
+      }
     } else {
-      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-    }
-
-    if (m_coDriverStick.getYButton()
-        && (m_driverStick.getLeftBumperButton() || m_driverStick.getRightBumperButton())) {
-      m_superstructure.setState(Superstructure.State.Manual);
-
-      if (m_driverStick.getLeftTriggerPressed()) {
-        m_superstructure.setManualScore(true);
-      } else if (m_driverStick.getLeftTriggerReleased()) {
-        m_superstructure.setManualScore(false);
+      if (m_driverStick.getLeftBumperButton()) {
+        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+        m_driveController
+            .getDriveWithLimelight()
+            .targetReefPosition(
+                DriveWithLimelight.TargetReefSide.Left,
+                () -> m_superstructure.readyToScore(),
+                () -> m_superstructure.finishedScoring());
+        m_superstructure.setState(Superstructure.State.ScoreCoral);
+      } else if (m_driverStick.getRightBumperButton()) {
+        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+        m_driveController
+            .getDriveWithLimelight()
+            .targetReefPosition(
+                DriveWithLimelight.TargetReefSide.Right,
+                () -> m_superstructure.readyToScore(),
+                () -> m_superstructure.finishedScoring());
+        m_superstructure.setState(Superstructure.State.ScoreCoral);
+      } else {
+        m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
       }
-
-      if (m_driverStick.getRightTriggerPressed()) {
-        m_superstructure.setManualArmivator(true);
-      } else if (m_driverStick.getRightTriggerReleased()) {
-        m_superstructure.setManualArmivator(false);
-      }
-    } else if (m_coDriverStick.getYButtonReleased()) {
-      m_superstructure.setState(Superstructure.State.IntakeCoral);
     }
 
     if (m_coDriverStick.getPOVTopPressed()) {
