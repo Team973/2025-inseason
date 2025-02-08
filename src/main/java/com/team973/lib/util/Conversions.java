@@ -71,6 +71,8 @@ public class Conversions {
 
     /** m/in. */
     public static final double METERS_PER_INCH = 1.0 / INCHES_PER_METER;
+
+    public static final double INCH_PER_MM = 0.0394;
   }
 
   public static class Angle {

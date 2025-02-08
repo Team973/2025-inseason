@@ -4,12 +4,14 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.Conveyor;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
+import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
@@ -36,6 +38,9 @@ public class Robot extends TimedRobot {
       new DriveController(m_logger.subLogger("drive", 0.05));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
 
+  private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
+
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 
@@ -55,6 +60,8 @@ public class Robot extends TimedRobot {
     m_climb.update();
     m_conveyor.update();
     m_claw.update();
+    m_elevator.update();
+    m_arm.update();
   }
 
   private void resetSubsystems() {
@@ -65,7 +72,9 @@ public class Robot extends TimedRobot {
   private void logSubsystems() {
     m_driveController.log();
     m_claw.log();
+    m_elevator.log();
     m_logger.update();
+    m_arm.log();
     m_climb.log();
     m_conveyor.log();
   }
@@ -190,13 +199,38 @@ public class Robot extends TimedRobot {
     }
 
     if (m_coDriverStick.getAButton()) {
-      m_claw.setControl(ControlStatus.IntakeAndHold);
+      m_claw.setControl(Claw.ControlStatus.IntakeAndHold);
     } else if (m_coDriverStick.getBButton()) {
-      m_claw.setControl(ControlStatus.Stop);
+      m_claw.setControl(Claw.ControlStatus.Stop);
     } else if (m_coDriverStick.getXButton()) {
-      m_claw.setControl(ControlStatus.Score);
+      m_claw.setControl(Claw.ControlStatus.Score);
     } else if (m_coDriverStick.getYButton()) {
-      m_claw.setControl(ControlStatus.Retract);
+      m_claw.setControl(Claw.ControlStatus.Retract);
+    }
+    // if (m_coDriverStick.getPOVTop()) {
+    //   m_elevator.setTargetPostion(Elevator.Presets.LEVEL_4);
+    // } else if (m_coDriverStick.getPOVLeft()) {
+    //   m_elevator.setTargetPostion(Elevator.Presets.LEVEL_3);
+    // } else if (m_coDriverStick.getPOVRight()) {
+    //   m_elevator.setTargetPostion(Elevator.Presets.LEVEL_2);
+    // } else if (m_coDriverStick.getPOVBottom()) {
+    //   m_elevator.setTargetPostion(Elevator.Presets.LEVEL_1);
+    // } else if (m_coDriverStick.getLeftBumperButton()) {
+    //   m_elevator.setmotorManualOutput(m_coDriverStick.getLeftYAxis());
+    // } else {
+    //   m_elevator.setModeOff();
+    // }
+
+    if (m_coDriverStick.getLeftBumperButton()) {
+      m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
+    } else if (m_coDriverStick.getLeftTrigger()) {
+      m_arm.setArmTargetDeg(Arm.LOW_POSTION_DEG);
+    } else if (m_coDriverStick.getStartButton()) {
+      m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
+    } else if (m_coDriverStick.getRightBumperButton()) {
+      m_arm.setArmMotorManualOutput(m_coDriverStick.getRightYAxis() * -1.0);
+    } else {
+      m_arm.setStow();
     }
 
     updateSubsystems();
