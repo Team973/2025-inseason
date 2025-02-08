@@ -110,19 +110,35 @@ public class Claw implements Subsystem {
         && Math.abs(m_rightTargetMotion - m_motorRight.getPosition().getValueAsDouble()) < 0.1);
   }
 
-  public boolean sensorSeeCoral() {
+  private boolean getBackSensor() {
+    return m_backSensor.get();
+  }
+
+  private boolean getFrontSensor() {
+    return m_frontSensor.get();
+  }
+
+  private boolean getCoralSensor() {
     return m_coralSensor.get();
+  }
+
+  private boolean getAlgaeSensor() {
+    return m_algaeSensor.get();
+  }
+
+  public boolean getIsCoralInClaw() {
+    return getCoralSensor() && !getFrontSensor();
   }
 
   @Override
   public void update() {
     switch (m_mode) {
       case IntakeCoral:
-        if (!m_backSensor.get() && m_frontSensor.get()) {
+        if (!getBackSensor() && getFrontSensor()) {
           m_motorRight.setControl(ControlMode.VelocityVoltage, 0, VELOCITY_VOLTAGE_PID_SLOT);
           m_motorLeft.setControl(ControlMode.VelocityVoltage, 0, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
-        } else if (!m_frontSensor.get() && m_coralSensor.get()) {
+        } else if (!getFrontSensor() && getCoralSensor()) {
           m_motorRight.setControl(ControlMode.VelocityVoltage, -10, VELOCITY_VOLTAGE_PID_SLOT);
           m_motorLeft.setControl(ControlMode.VelocityVoltage, -10, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
@@ -133,7 +149,7 @@ public class Claw implements Subsystem {
         }
         break;
       case IntakeAlgae:
-        if (m_algaeSensor.get()) {
+        if (getAlgaeSensor()) {
           m_motorRight.setControl(ControlMode.VelocityVoltage, 0, VELOCITY_VOLTAGE_PID_SLOT);
           m_motorLeft.setControl(ControlMode.VelocityVoltage, 0, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
@@ -144,7 +160,7 @@ public class Claw implements Subsystem {
         }
         break;
       case HoldCoral:
-        if (!m_coralSensor.get() || m_frontSensor.get()) {
+        if (!getCoralSensor() || getFrontSensor()) {
           m_motorRight.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
           m_motorLeft.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.VelocityVoltage, 10);
@@ -164,7 +180,7 @@ public class Claw implements Subsystem {
         m_motorLeft.setControl(
             ControlMode.MotionMagicVoltage, m_leftTargetPostion, MOTION_MAGIC_PID_SLOT);
 
-        if (motorAtTarget() && m_coralSensor.get()) {
+        if (motorAtTarget() && getCoralSensor()) {
           m_motorRight.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
           m_motorLeft.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
         }
@@ -191,9 +207,14 @@ public class Claw implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log("sensorSeeCoral", sensorSeeCoral());
     m_motorRight.log();
     m_motorLeft.log();
+
+    m_logger.log("Back Sensor", getBackSensor());
+    m_logger.log("Front Sensor", getFrontSensor());
+    m_logger.log("Coral Sensor", getCoralSensor());
+    m_logger.log("Algae Sensor", getAlgaeSensor());
+
     m_logger.log("target postion left", m_leftTargetPostion);
     m_logger.log("target postion right", m_rightTargetMotion);
     m_logger.log("target rotations hit", motorAtTarget());
