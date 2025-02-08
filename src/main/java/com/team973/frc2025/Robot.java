@@ -34,11 +34,11 @@ public class Robot extends TimedRobot {
 
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
-
-  private final Superstructure m_superstructure =
-      new Superstructure(m_claw, m_climb, m_driveController);
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
+
+  private final Superstructure m_superstructure =
+      new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
@@ -172,11 +172,16 @@ public class Robot extends TimedRobot {
         && (m_driverStick.getLeftBumperButton() || m_driverStick.getRightBumperButton())) {
       m_superstructure.setState(Superstructure.State.Manual);
 
-      if (m_driverStick.getLeftTriggerPressed() || m_driverStick.getRightTriggerPressed()) {
+      if (m_driverStick.getLeftTriggerPressed()) {
         m_superstructure.setManualScore(true);
-      } else if (m_driverStick.getLeftTriggerReleased()
-          || m_driverStick.getRightTriggerReleased()) {
+      } else if (m_driverStick.getLeftTriggerReleased()) {
         m_superstructure.setManualScore(false);
+      }
+
+      if (m_driverStick.getRightTriggerPressed()) {
+        m_superstructure.setManualArmivator(true);
+      } else if (m_driverStick.getRightTriggerReleased()) {
+        m_superstructure.setManualArmivator(false);
       }
     } else if (m_coDriverStick.getYButtonReleased()) {
       m_superstructure.setState(Superstructure.State.IntakeCoral);

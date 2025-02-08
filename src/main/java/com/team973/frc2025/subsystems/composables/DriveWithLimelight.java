@@ -40,6 +40,8 @@ public class DriveWithLimelight extends DriveComposable {
 
   private TargetMode m_targetMode = TargetMode.Initial;
 
+  private boolean m_targetingComplete = false;
+
   public enum TargetReefSide {
     Left,
     Right
@@ -174,6 +176,7 @@ public class DriveWithLimelight extends DriveComposable {
 
       setTargetMode(TargetMode.Initial);
       m_target = getTargetReefPosition(side);
+      m_targetingComplete = false;
     }
 
     m_targetFinalPoseGate = targetFinalPoseGate;
@@ -230,6 +233,10 @@ public class DriveWithLimelight extends DriveComposable {
         TARGET_ANGLE_TOLERANCE_DEG);
   }
 
+  public boolean getTargetingComplete() {
+    return m_targetingComplete;
+  }
+
   public void init() {
     m_xController.reset(m_poseEstimator.getPoseMeters().getX());
     m_yController.reset(m_poseEstimator.getPoseMeters().getY());
@@ -241,7 +248,9 @@ public class DriveWithLimelight extends DriveComposable {
       return new ChassisSpeeds(0, 0, 0);
     }
 
-    if (reachedTargetInitialPose() && m_targetMode != TargetMode.ReInitial) {
+    if (reachedTargetInitialPose() && m_targetMode == TargetMode.ReInitial) {
+      m_targetingComplete = true;
+    } else if (reachedTargetInitialPose()) {
       setTargetMode(TargetMode.Final);
     } else if (reachedTargetFinalPose()) {
       setTargetMode(TargetMode.ReInitial);

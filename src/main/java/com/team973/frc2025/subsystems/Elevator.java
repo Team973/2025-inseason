@@ -15,7 +15,7 @@ public class Elevator implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_motorRight;
   private final GreyTalonFX m_motorLeft;
-  private ControlStatus m_mode = ControlStatus.Off;
+  private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_targetPostionHeightinches;
   private double m_targetpositionLeway = 0.1;
   double MOTOR_GEAR_RATIO = 10.0 / 56.0;
@@ -29,7 +29,7 @@ public class Elevator implements Subsystem {
 
   public void setmotorManualOutput(double joystick) {
     m_manualPower = joystick * 0.1;
-    m_mode = ControlStatus.Manual;
+    m_controlStatus = ControlStatus.Manual;
   }
 
   private double heightInchesToMotorRotations(double postionHeight) {
@@ -45,7 +45,7 @@ public class Elevator implements Subsystem {
     public static final double LEVEL_2 = 12.0;
     public static final double LEVEL_3 = 1.0;
     public static final double LEVEL_4 = 26.0;
-    public static final double OFF = 0;
+    public static final double STOW = 0;
   }
 
   public Elevator(Logger logger) {
@@ -94,8 +94,8 @@ public class Elevator implements Subsystem {
     return defaultElevatorMotorConfig;
   }
 
-  public void setModeOff() {
-    m_mode = ControlStatus.Off;
+  public void setControlStatus(ControlStatus status) {
+    m_controlStatus = status;
   }
 
   public boolean motorAtTarget() {
@@ -107,12 +107,27 @@ public class Elevator implements Subsystem {
 
   public void setTargetPostion(double targetPostionHeightinches) {
     m_targetPostionHeightinches = targetPostionHeightinches;
-    m_mode = ControlStatus.TargetPostion;
+    m_controlStatus = ControlStatus.TargetPostion;
+  }
+
+  public static double getTargetPositionFromLevel(int level) {
+    switch (level) {
+      case 1:
+        return Presets.LEVEL_1;
+      case 2:
+        return Presets.LEVEL_2;
+      case 3:
+        return Presets.LEVEL_3;
+      case 4:
+        return Presets.LEVEL_4;
+      default:
+        throw new IllegalArgumentException(String.valueOf(level));
+    }
   }
 
   @Override
   public void update() {
-    switch (m_mode) {
+    switch (m_controlStatus) {
       case Manual:
         m_motorRight.setControl(ControlMode.DutyCycleOut, m_manualPower, 0);
         break;
@@ -137,7 +152,7 @@ public class Elevator implements Subsystem {
     m_logger.log("targetPostionHeightInches", m_targetPostionHeightinches);
     m_motorLeft.log();
     m_motorRight.log();
-    m_logger.log("elevatorMode", m_mode.toString());
+    m_logger.log("elevatorMode", m_controlStatus.toString());
     m_logger.log(
         "motorErrorInches",
         motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));

@@ -12,13 +12,15 @@ import com.team973.lib.util.Subsystem;
 public class Arm implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_armMotor;
-  private ControlStatus m_mode = ControlStatus.Stow;
+  private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
 
-  public static final double HIGH_POSTION_DEG = 0;
-  public static final double MEDIUM_POSTION_DEG = -30;
-  public static final double LOW_POSTION_DEG = -60;
+  private static final double HIGH_POSTION_DEG = 0;
+  private static final double MEDIUM_POSTION_DEG = -30;
+  private static final double LOW_POSTION_DEG = -60;
+  public static final double STOW_POSITION_DEG = -60;
+
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.5;
@@ -26,7 +28,7 @@ public class Arm implements Subsystem {
   public static enum ControlStatus {
     Manual,
     TargetPostion,
-    Stow,
+    Off,
   }
 
   private double armDegToMotorRotations(double armPostionDeg) {
@@ -64,14 +66,14 @@ public class Arm implements Subsystem {
     m_armMotor.setPosition(armDegToMotorRotations(-90.0));
   }
 
-  public void setArmMotorManualOutput(double joystick) {
-    m_mode = ControlStatus.Manual;
+  public void setMotorManualOutput(double joystick) {
+    m_controlStatus = ControlStatus.Manual;
     m_manualArmPower = joystick * 0.1;
   }
 
-  public void setArmTargetDeg(double setPostionDeg) {
+  public void setTargetDeg(double setPostionDeg) {
     m_armTargetPostionDeg = setPostionDeg;
-    m_mode = ControlStatus.TargetPostion;
+    m_controlStatus = ControlStatus.TargetPostion;
   }
 
   public boolean motorAtTargetRotation() {
@@ -87,9 +89,24 @@ public class Arm implements Subsystem {
         * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
 
+  public static double getTargetDegFromLevel(int level) {
+    switch (level) {
+      case 1:
+        return LOW_POSTION_DEG;
+      case 2:
+        return MEDIUM_POSTION_DEG;
+      case 3:
+        return MEDIUM_POSTION_DEG;
+      case 4:
+        return HIGH_POSTION_DEG;
+      default:
+        throw new IllegalArgumentException(String.valueOf(level));
+    }
+  }
+
   @Override
   public void update() {
-    switch (m_mode) {
+    switch (m_controlStatus) {
       case Manual:
         m_armMotor.setControl(
             ControlMode.VoltageOut, (m_manualArmPower * 12.0) + getFeedForwardTargetAngle(), 0);
@@ -101,13 +118,13 @@ public class Arm implements Subsystem {
             getFeedForwardTargetAngle(),
             0);
         break;
-      case Stow:
+      case Off:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
     }
   }
 
-  public void setStow() {
-    m_mode = ControlStatus.Stow;
+  public void setControlStatus(ControlStatus status) {
+    m_controlStatus = status;
   }
 
   @Override
@@ -116,7 +133,7 @@ public class Arm implements Subsystem {
         "armDegPostion", motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble()));
     m_armMotor.log();
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
-    m_logger.log("armMode", m_mode.toString());
+    m_logger.log("armMode", m_controlStatus.toString());
     m_logger.log(
         "motorArmErrorDeg",
         motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
