@@ -25,10 +25,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
 
-  private final Joystick m_stick;
-
-  private final Joystick m_teststick;
-
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
 
@@ -73,8 +69,6 @@ public class Robot extends TimedRobot {
   private void updateJoysticks() {
     m_driverStick.update();
     m_coDriverStick.update();
-    m_stick.update();
-    m_teststick.update();
   }
 
   /**
@@ -84,8 +78,6 @@ public class Robot extends TimedRobot {
   public Robot() {
     resetSubsystems();
     m_driveController.startOdometrey();
-    m_stick = new Joystick(2, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
-    m_teststick = new Joystick(3, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
   }
 
   /**
