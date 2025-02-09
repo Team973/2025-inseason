@@ -41,7 +41,7 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    public static final double LEVEL_1 = 0.0;
+    public static final double LEVEL_1 = 2.0;
     public static final double LEVEL_2 = 12.0;
     public static final double LEVEL_3 = 1.0;
     public static final double LEVEL_4 = 26.0;
@@ -80,16 +80,16 @@ public class Elevator implements Subsystem {
     defaultElevatorMotorConfig.Slot1.kP = 1.0;
     defaultElevatorMotorConfig.Slot1.kI = 0.0;
     defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 16;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 20;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 160;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 64; // 32; // 16;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 500; // 40; // 20;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 500;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 10;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
     defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage = 4;
-    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = -4;
-    defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
+    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage = 12;
+    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = -12;
+    defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.00;
     defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     return defaultElevatorMotorConfig;
   }

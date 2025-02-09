@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Climb implements Subsystem {
 
-  private final DigitalInput m_bannerSensor = new DigitalInput(2);
+  private final DigitalInput m_bannerSensor = new DigitalInput(5);
 
   private boolean bannerSensorSeesCoral() {
     return m_bannerSensor.get();
