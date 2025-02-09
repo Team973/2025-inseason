@@ -10,8 +10,8 @@ public class Superstructure implements Subsystem {
   private final Arm m_arm;
   private final DriveController m_driveController;
 
-  private State m_state = State.Off;
-  private State m_lastState = State.Off;
+  private State m_state = State.IntakeCoral;
+  private State m_lastState = State.IntakeCoral;
 
   private int m_targetReefLevel = 1;
 

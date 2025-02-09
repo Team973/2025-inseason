@@ -137,10 +137,6 @@ public class Robot extends TimedRobot {
 
     if (m_coDriverStick.getYButtonPressed()) {
       m_manualScoringMode = !m_manualScoringMode;
-
-      if (!m_manualScoringMode) {
-        m_superstructure.setState(Superstructure.State.IntakeCoral);
-      }
     }
 
     m_driveController
@@ -165,6 +161,9 @@ public class Robot extends TimedRobot {
         } else if (m_driverStick.getRightTriggerReleased()) {
           m_superstructure.setManualArmivator(false);
         }
+      } else if (m_driverStick.getLeftBumperButtonReleased()
+          || m_driverStick.getRightBumperButtonReleased()) {
+        m_superstructure.setState(Superstructure.State.IntakeCoral);
       }
     } else {
       if (m_driverStick.getLeftBumperButton()) {
