@@ -16,7 +16,7 @@ public class Claw implements Subsystem {
 
   private final Logger m_logger;
 
-  private final GreyTalonFX m_motorRight;
+  private final GreyTalonFX m_clawMotor;
   private final GreyTalonFX m_conveyor;
 
   private final DigitalInput m_backSensor;
@@ -42,7 +42,7 @@ public class Claw implements Subsystem {
   public Claw(Logger logger) {
     m_logger = logger;
 
-    m_motorRight =
+    m_clawMotor =
         new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("shooterRight"));
     m_conveyor =
         new GreyTalonFX(
@@ -55,7 +55,7 @@ public class Claw implements Subsystem {
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    m_motorRight.setConfig(rightMotorConfig);
+    m_clawMotor.setConfig(rightMotorConfig);
 
     TalonFXConfiguration conveyorConfig = defaultClawMotorConfig();
 
@@ -92,7 +92,7 @@ public class Claw implements Subsystem {
   }
 
   public boolean motorAtTarget() {
-    return (Math.abs(m_rightTargetPotion - m_motorRight.getPosition().getValueAsDouble()) < 0.1);
+    return (Math.abs(m_rightTargetPotion - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
   }
 
   private boolean getBackSensor() {
@@ -120,7 +120,7 @@ public class Claw implements Subsystem {
   }
 
   private void velocityRPS(double motorDemandNum) {
-    m_motorRight.setControl(ControlMode.VelocityVoltage, motorDemandNum, VELOCITY_VOLTAGE_PID_SLOT);
+    m_clawMotor.setControl(ControlMode.VelocityVoltage, motorDemandNum, VELOCITY_VOLTAGE_PID_SLOT);
     m_conveyor.setControl(ControlMode.VelocityVoltage, motorDemandNum);
   }
 
@@ -152,13 +152,13 @@ public class Claw implements Subsystem {
         break;
       case ScoreCoral:
         if (m_lastMode != m_mode) {
-          m_rightTargetPotion = m_motorRight.getPosition().getValueAsDouble() + 4.5;
+          m_rightTargetPotion = m_clawMotor.getPosition().getValueAsDouble() + 4.5;
         }
-        m_motorRight.setControl(
+        m_clawMotor.setControl(
             ControlMode.MotionMagicVoltage, m_rightTargetPotion, MOTION_MAGIC_PID_SLOT);
 
         if (motorAtTarget() && getCoralSensor()) {
-          m_motorRight.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
         }
 
         m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
@@ -179,7 +179,7 @@ public class Claw implements Subsystem {
 
   @Override
   public void log() {
-    m_motorRight.log();
+    m_clawMotor.log();
 
     m_logger.log("Back Sensor", getBackSensor());
     m_logger.log("Front Sensor", getFrontSensor());
