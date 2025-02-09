@@ -5,12 +5,14 @@ import edu.wpi.first.wpilibj.util.Color;
 
 public class SolidSignaler implements ISignaler {
   private final Color m_color;
-  private int m_priority;
 
   private boolean m_isEnabled;
 
+  private int m_priortyNum;
+
   public SolidSignaler(Color color, int priority) {
     m_color = color;
+    m_priortyNum = priority;
   }
 
   @Override

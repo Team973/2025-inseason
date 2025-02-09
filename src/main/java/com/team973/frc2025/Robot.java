@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     if (m_coDriverStick.getRightBumperButtonPressed()) {
-      m_CaNdleManger.m_redBlinker.setEnabled(true);
+      m_CaNdleManger.m_priortyQue.get(1).setEnabled(true);
     }
     if (m_coDriverStick.getRightBumperButtonReleased()) {
       m_CaNdleManger.m_redBlinker.setEnabled(false);

@@ -10,6 +10,7 @@ public class BlinkingSignaler implements ISignaler {
   private final Logger m_logger;
 
   private double m_blinkPeriodMs;
+  public int m_priorty;
 
   private boolean m_isEnabled;
 
@@ -17,11 +18,13 @@ public class BlinkingSignaler implements ISignaler {
   private Color m_colorB;
   private Color m_currentColor;
 
-  public BlinkingSignaler(Logger logger, Color colorA, Color colorB, double blinkPeriodMs) {
+  public BlinkingSignaler(
+      Logger logger, Color colorA, Color colorB, double blinkPeriodMs, int priorityNum) {
     m_logger = logger;
     m_colorA = colorA;
     m_colorB = colorB;
     m_blinkPeriodMs = blinkPeriodMs;
+    m_priorty = priorityNum;
   }
 
   private double modTimeMilisecs() {
@@ -46,7 +49,7 @@ public class BlinkingSignaler implements ISignaler {
     }
   }
 
-  public void log() {
+  public void log(ISignaler signaler) {
 
     m_logger.log("current time us", RobotController.getFPGATime());
     SmartDashboard.putNumber("current time secs", RobotController.getFPGATime() / 1000.0 / 1000.0);
@@ -60,7 +63,6 @@ public class BlinkingSignaler implements ISignaler {
   public void syncSensors() {}
 
   public void update(CANdle candle) {
-    log();
     blinkingLights(candle);
   }
 

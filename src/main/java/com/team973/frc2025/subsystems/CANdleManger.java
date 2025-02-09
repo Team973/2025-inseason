@@ -14,13 +14,17 @@ public class CANdleManger implements Subsystem {
   public final CANdle m_candle = new CANdle(18, "rio");
   public final BlinkingSignaler m_redBlinker =
       new BlinkingSignaler(
-          new Logger("RedBlinking Signaler"), RobotInfo.Colors.RED, RobotInfo.Colors.GREEN, 500);
+          new Logger("RedBlinking Signaler"), RobotInfo.Colors.RED, RobotInfo.Colors.GREEN, 500, 3);
   public final BlinkingSignaler m_blueBlinker =
       new BlinkingSignaler(
-          new Logger("BlueBlinking Signaler"), RobotInfo.Colors.BLUE, RobotInfo.Colors.OFF, 1000);
-  public final SolidSignaler m_offBlinker = new SolidSignaler(RobotInfo.Colors.OFF, 10);
+          new Logger("BlueBlinking Signaler"),
+          RobotInfo.Colors.BLUE,
+          RobotInfo.Colors.OFF,
+          1000,
+          2);
+  public final SolidSignaler m_offBlinker = new SolidSignaler(RobotInfo.Colors.OFF, 1);
 
-  private final List<ISignaler> m_priorityList;
+  public List<ISignaler> m_priortyQue;
 
   public CANdleManger(Logger logger) {
     m_logger = logger;
@@ -33,10 +37,10 @@ public class CANdleManger implements Subsystem {
     configAll.vBatOutputMode = VBatOutputMode.Modulated;
     m_candle.configAllSettings(configAll, 100);
 
-    m_priorityList = new ArrayList<ISignaler>();
-    m_priorityList.add(m_redBlinker);
-    m_priorityList.add(m_blueBlinker);
-    m_priorityList.add(m_offBlinker);
+    m_priortyQue = new ArrayList<ISignaler>();
+    m_priortyQue.add(m_redBlinker);
+    m_priortyQue.add(m_blueBlinker);
+    m_priortyQue.add(m_offBlinker);
   }
 
   @Override
