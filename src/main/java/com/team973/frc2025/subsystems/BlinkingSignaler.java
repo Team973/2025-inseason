@@ -6,10 +6,12 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 
-public class BlinkingSignaler {
+public class BlinkingSignaler implements ISignaler {
   private final Logger m_logger;
 
   private double m_blinkPeriodMs;
+
+  private boolean m_isEnabled;
 
   private Color m_colorA;
   private Color m_colorB;
@@ -63,4 +65,14 @@ public class BlinkingSignaler {
   }
 
   public void reset() {}
+
+  @Override
+  public boolean isEnabled() {
+    return m_isEnabled;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    m_isEnabled = enabled;
+  }
 }
