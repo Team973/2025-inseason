@@ -30,6 +30,9 @@ public class Claw implements Subsystem {
   private double m_leftTargetPostion = 0;
   private double m_rightTargetPotion = 0;
 
+  private double m_leftTargetHoldPosition = 0;
+  private double m_targetHoldPosition = 0;
+
   public static enum ControlStatus {
     IntakeCoral,
     IntakeAlgae,
@@ -152,7 +155,13 @@ public class Claw implements Subsystem {
         //   m_clawMotor.setControl(ControlMode.VelocityVoltage, 15, VELOCITY_VOLTAGE_PID_SLOT);
         //   m_conveyor.setControl(ControlMode.VelocityVoltage, 7);
         // } else {
-        m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
+
+        if (m_lastMode != m_mode) {
+          m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - 6.0;
+        }
+
+        m_clawMotor.setControl(
+            ControlMode.PositionVoltage, m_targetHoldPosition, MOTION_MAGIC_PID_SLOT);
         m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         // }
         break;

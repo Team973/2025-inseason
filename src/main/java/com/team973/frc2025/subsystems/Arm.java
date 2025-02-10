@@ -16,8 +16,8 @@ public class Arm implements Subsystem {
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 68.0;
-  private static final double LEVEL_THREE_POSITION_DEG = 60;
+  private static final double LEVEL_FOUR_POSITION_DEG = 79.0; // 76
+  private static final double LEVEL_THREE_POSITION_DEG = 67.0;
   private static final double LEVEL_TWO_POSITION_DEG = -70.0;
   private static final double LEVEL_ONE_POSITION_DEG = -70.0;
   public static final double STOW_POSITION_DEG = -94.0;
@@ -103,6 +103,10 @@ public class Arm implements Subsystem {
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
+  }
+
+  public double getTargetPosition() {
+    return m_armTargetPostionDeg;
   }
 
   @Override

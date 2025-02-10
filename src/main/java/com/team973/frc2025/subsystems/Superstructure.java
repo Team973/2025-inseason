@@ -165,8 +165,11 @@ public class Superstructure implements Subsystem {
 
         if (m_manualScore) {
           m_claw.setControl(Claw.ControlStatus.ScoreCoral);
-        } else {
+        } else if (m_arm.motorAtTargetRotation()
+            && m_arm.getTargetPosition() != Arm.STOW_POSITION_DEG) {
           m_claw.setControl(Claw.ControlStatus.HoldCoral);
+        } else {
+          m_claw.setControl(Claw.ControlStatus.Off);
         }
 
         m_climb.setControlMode(Climb.ControlMode.OffState);
