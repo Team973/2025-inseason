@@ -16,15 +16,15 @@ public class Arm implements Subsystem {
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 63.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 68.0;
   private static final double LEVEL_THREE_POSITION_DEG = 60;
   private static final double LEVEL_TWO_POSITION_DEG = -70.0;
   private static final double LEVEL_ONE_POSITION_DEG = -70.0;
-  public static final double STOW_POSITION_DEG = -90;
+  public static final double STOW_POSITION_DEG = -94.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
-  private static final double FEED_FORWARD_MAX_VOLT = 0.5;
+  private static final double FEED_FORWARD_MAX_VOLT = 0.6; // 0.5;
 
   public static enum ControlStatus {
     Manual,
@@ -47,11 +47,11 @@ public class Arm implements Subsystem {
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.0;
     armMotorConfig.Slot0.kA = 0.0;
-    armMotorConfig.Slot0.kP = 8.0;
+    armMotorConfig.Slot0.kP = 50.0;
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
-    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 64.0;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 80.0;
+    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 72.0; // 64.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 90.0; // 80.0;
     armMotorConfig.MotionMagic.MotionMagicJerk = 160.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;

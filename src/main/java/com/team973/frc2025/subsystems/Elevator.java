@@ -44,7 +44,7 @@ public class Elevator implements Subsystem {
     public static final double LEVEL_1 = 2.0;
     public static final double LEVEL_2 = 12.0;
     public static final double LEVEL_3 = 1.0;
-    public static final double LEVEL_4 = 26.0;
+    public static final double LEVEL_4 = 27.0; // 29.0;
     public static final double STOW = 0;
   }
 
@@ -77,12 +77,14 @@ public class Elevator implements Subsystem {
     defaultElevatorMotorConfig.Slot1.kS = 0.0;
     defaultElevatorMotorConfig.Slot1.kV = 0.0;
     defaultElevatorMotorConfig.Slot1.kA = 0.0;
-    defaultElevatorMotorConfig.Slot1.kP = 1.0;
+    defaultElevatorMotorConfig.Slot1.kP = 125.0;
     defaultElevatorMotorConfig.Slot1.kI = 0.0;
     defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 64; // 32; // 16;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 500; // 40; // 20;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 500;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        50.0; // 32.0; // 64; // 32; // 16;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
+        300.0; // 40.0; // 500; // 40; // 20;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 2000.0;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
