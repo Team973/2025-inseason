@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
 
-  private boolean m_manualScoringMode = false;
+  private boolean m_manualScoringMode = true;
 
   private void syncSensors() {
     m_driveController.syncSensors();
@@ -135,9 +135,9 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     syncSensors();
 
-    if (m_coDriverStick.getYButtonPressed()) {
-      m_manualScoringMode = !m_manualScoringMode;
-    }
+    // if (m_coDriverStick.getYButtonPressed()) {
+    //   m_manualScoringMode = !m_manualScoringMode;
+    // }
 
     m_driveController
         .getDriveWithJoysticks()
