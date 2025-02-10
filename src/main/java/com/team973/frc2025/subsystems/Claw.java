@@ -9,6 +9,7 @@ import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Claw implements Subsystem {
   private static final int MOTION_MAGIC_PID_SLOT = 0;
@@ -32,6 +33,8 @@ public class Claw implements Subsystem {
 
   private double m_leftTargetHoldPosition = 0;
   private double m_targetHoldPosition = 0;
+
+  private double m_coralBackUpRot = 6.0;
 
   public static enum ControlStatus {
     IntakeCoral,
@@ -157,7 +160,7 @@ public class Claw implements Subsystem {
         // } else {
 
         if (m_lastMode != m_mode) {
-          m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - 6.0;
+          m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - m_coralBackUpRot;
         }
 
         m_clawMotor.setControl(
@@ -199,6 +202,10 @@ public class Claw implements Subsystem {
     m_mode = mode;
   }
 
+  public void incrementBackup(double increment) {
+    m_coralBackUpRot += increment;
+  }
+
   @Override
   public void log() {
     m_clawMotor.log();
@@ -212,6 +219,8 @@ public class Claw implements Subsystem {
     m_logger.log("target postion left", m_leftTargetPostion);
     m_logger.log("target postion right", m_rightTargetPotion);
     m_logger.log("target rotations hit", motorAtTarget());
+
+    SmartDashboard.putString("DB/String 9", "Coral Backup: " + m_coralBackUpRot);
   }
 
   @Override

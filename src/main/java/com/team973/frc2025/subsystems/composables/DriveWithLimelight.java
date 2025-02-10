@@ -184,7 +184,7 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void log() {
-    SmartDashboard.putString("DB/String 0", "Reef Face: " + m_targetReefFace);
+    // SmartDashboard.putString("DB/String 0", "Reef Face: " + m_targetReefFace);
     m_logger.log("Target Mode", m_targetMode.toString());
 
     m_logger.log("Target Initial Pose/x", m_targetInitialPose.getX());

@@ -10,6 +10,7 @@ import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements Subsystem {
   private final Logger m_logger;
@@ -20,6 +21,11 @@ public class Elevator implements Subsystem {
   private double m_targetpositionLeway = 0.1;
   double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
+
+  private double m_levelOneOffset = 0.0;
+  private double m_levelTwoOffset = 0.0;
+  private double m_levelThreeOffset = 0.0;
+  private double m_levelFourOffset = 0.0;
 
   public static enum ControlStatus {
     Manual,
@@ -112,16 +118,33 @@ public class Elevator implements Subsystem {
     m_controlStatus = ControlStatus.TargetPostion;
   }
 
-  public static double getTargetPositionFromLevel(int level) {
+  public void incrementOffset(double offset, int level) {
     switch (level) {
       case 1:
-        return Presets.LEVEL_1;
+        m_levelOneOffset += offset;
+        break;
       case 2:
-        return Presets.LEVEL_2;
+        m_levelTwoOffset += offset;
+        break;
       case 3:
-        return Presets.LEVEL_3;
+        m_levelThreeOffset += offset;
+        break;
       case 4:
-        return Presets.LEVEL_4;
+        m_levelFourOffset += offset;
+        break;
+    }
+  }
+
+  public double getTargetPositionFromLevel(int level) {
+    switch (level) {
+      case 1:
+        return Presets.LEVEL_1 + m_levelOneOffset;
+      case 2:
+        return Presets.LEVEL_2 + m_levelTwoOffset;
+      case 3:
+        return Presets.LEVEL_3 + m_levelThreeOffset;
+      case 4:
+        return Presets.LEVEL_4 + m_levelFourOffset;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
@@ -158,6 +181,15 @@ public class Elevator implements Subsystem {
     m_logger.log(
         "motorErrorInches",
         motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
+
+    SmartDashboard.putString(
+        "DB/String 1", "E1: " + String.valueOf(Presets.LEVEL_1 + m_levelOneOffset));
+    SmartDashboard.putString(
+        "DB/String 2", "E2: " + String.valueOf(Presets.LEVEL_2 + m_levelTwoOffset));
+    SmartDashboard.putString(
+        "DB/String 3", "E3: " + String.valueOf(Presets.LEVEL_3 + m_levelThreeOffset));
+    SmartDashboard.putString(
+        "DB/String 4", "E4: " + String.valueOf(Presets.LEVEL_4 + m_levelFourOffset));
   }
 
   @Override

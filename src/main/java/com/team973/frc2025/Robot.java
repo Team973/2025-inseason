@@ -15,7 +15,6 @@ import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -65,7 +64,7 @@ public class Robot extends TimedRobot {
     m_driveController.log();
     m_superstructure.log();
 
-    SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
+    // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
 
     m_logger.update();
   }
@@ -189,15 +188,36 @@ public class Robot extends TimedRobot {
       }
     }
 
+    if (m_coDriverStick.getAButton()) {
+      if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementArmOffset(1.0);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementArmOffset(-1.0);
+      }
+    } else if (m_coDriverStick.getBButton()) {
+      if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementElevatorOffset(0.5);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementElevatorOffset(-0.5);
+      }
+    } else if (m_coDriverStick.getYButton()) {
+      if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementCoralBackup(0.5);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementCoralBackup(-0.5);
+      }
+    }
+
     if (m_coDriverStick.getPOVTopPressed()) {
       m_superstructure.incrementTargetReefLevel(1);
     } else if (m_coDriverStick.getPOVBottomPressed()) {
       m_superstructure.incrementTargetReefLevel(-1);
-    } else if (m_coDriverStick.getPOVRightPressed()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
-    } else if (m_coDriverStick.getPOVLeftPressed()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
     }
+    // else if (m_coDriverStick.getPOVRightPressed()) {
+    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
+    // } else if (m_coDriverStick.getPOVLeftPressed()) {
+    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
+    // }
 
     updateSubsystems();
   }
@@ -219,8 +239,8 @@ public class Robot extends TimedRobot {
     } else if (m_coDriverStick.getBButtonPressed()) {
       m_autoManager.decrement();
     }
-    SmartDashboard.putString(
-        "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
+    // SmartDashboard.putString(
+    //     "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
   }
 
   /** This function is called once when test mode is enabled. */

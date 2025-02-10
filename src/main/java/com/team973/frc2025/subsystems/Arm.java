@@ -8,6 +8,7 @@ import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Arm implements Subsystem {
   private final Logger m_logger;
@@ -25,6 +26,11 @@ public class Arm implements Subsystem {
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.6; // 0.5;
+
+  private double m_levelOneOffset = 0.0;
+  private double m_levelTwoOffset = 0.0;
+  private double m_levelThreeOffset = 0.0;
+  private double m_levelFourOffset = 0.0;
 
   public static enum ControlStatus {
     Manual,
@@ -90,16 +96,16 @@ public class Arm implements Subsystem {
         * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
 
-  public static double getTargetDegFromLevel(int level) {
+  public double getTargetDegFromLevel(int level) {
     switch (level) {
       case 1:
-        return LEVEL_ONE_POSITION_DEG;
+        return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
       case 2:
-        return LEVEL_TWO_POSITION_DEG;
+        return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
       case 3:
-        return LEVEL_THREE_POSITION_DEG;
+        return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case 4:
-        return LEVEL_FOUR_POSITION_DEG;
+        return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
@@ -132,6 +138,23 @@ public class Arm implements Subsystem {
     m_controlStatus = status;
   }
 
+  public void incrementOffset(double increment, int level) {
+    switch (level) {
+      case 1:
+        m_levelOneOffset += increment;
+        break;
+      case 2:
+        m_levelTwoOffset += increment;
+        break;
+      case 3:
+        m_levelThreeOffset += increment;
+        break;
+      case 4:
+        m_levelFourOffset += increment;
+        break;
+    }
+  }
+
   @Override
   public void log() {
     m_logger.log(
@@ -144,6 +167,15 @@ public class Arm implements Subsystem {
         motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
+
+    SmartDashboard.putString(
+        "DB/String 5", "A1: " + String.valueOf(LEVEL_ONE_POSITION_DEG + m_levelOneOffset));
+    SmartDashboard.putString(
+        "DB/String 6", "A2: " + String.valueOf(LEVEL_TWO_POSITION_DEG + m_levelTwoOffset));
+    SmartDashboard.putString(
+        "DB/String 7", "A3: " + String.valueOf(LEVEL_THREE_POSITION_DEG + m_levelThreeOffset));
+    SmartDashboard.putString(
+        "DB/String 8", "A4: " + String.valueOf(LEVEL_FOUR_POSITION_DEG + m_levelFourOffset));
   }
 
   @Override

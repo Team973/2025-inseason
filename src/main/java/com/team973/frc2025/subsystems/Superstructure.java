@@ -68,7 +68,7 @@ public class Superstructure implements Subsystem {
   }
 
   public void log() {
-    SmartDashboard.putString("DB/String 1", "Reef Level: " + m_targetReefLevel);
+    SmartDashboard.putString("DB/String 0", "Reef Level: " + m_targetReefLevel);
 
     m_claw.log();
     m_climb.log();
@@ -84,7 +84,7 @@ public class Superstructure implements Subsystem {
   }
 
   private void armTargetReefLevel() {
-    m_arm.setTargetDeg(Arm.getTargetDegFromLevel(m_targetReefLevel));
+    m_arm.setTargetDeg(m_arm.getTargetDegFromLevel(m_targetReefLevel));
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }
 
@@ -94,13 +94,25 @@ public class Superstructure implements Subsystem {
   }
 
   private void elevatorTargetReefLevel() {
-    m_elevator.setTargetPostion(Elevator.getTargetPositionFromLevel(m_targetReefLevel));
+    m_elevator.setTargetPostion(m_elevator.getTargetPositionFromLevel(m_targetReefLevel));
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }
 
   private void elevatorStow() {
     m_elevator.setTargetPostion(Elevator.Presets.STOW);
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
+  }
+
+  public void incrementArmOffset(double increment) {
+    m_arm.incrementOffset(increment, m_targetReefLevel);
+  }
+
+  public void incrementElevatorOffset(double increment) {
+    m_elevator.incrementOffset(increment, m_targetReefLevel);
+  }
+
+  public void incrementCoralBackup(double increment) {
+    m_claw.incrementBackup(increment);
   }
 
   public void update() {
