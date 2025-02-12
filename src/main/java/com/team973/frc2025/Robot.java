@@ -146,26 +146,19 @@ public class Robot extends TimedRobot {
             m_driverStick.getRightXAxis() * 0.8);
 
     if (m_manualScoringMode) {
-      if (m_driverStick.getLeftBumperButton() || m_driverStick.getRightBumperButton()) {
-        m_superstructure.setState(Superstructure.State.Manual);
+      m_superstructure.setState(Superstructure.State.Manual);
 
-        if (m_driverStick.getLeftTriggerPressed()) {
-          m_superstructure.setManualScore(true);
-        } else if (m_driverStick.getLeftTriggerReleased()) {
-          m_superstructure.setManualScore(false);
-        }
+      if (m_driverStick.getRightBumperButtonPressed()) {
+        m_superstructure.setManualScore(true);
+      } else if (m_driverStick.getRightBumperButtonReleased()) {
+        m_superstructure.setManualScore(false);
+      }
 
-        if (m_driverStick.getRightTriggerPressed()) {
-          m_superstructure.setManualArmivator(true);
-        } else if (m_driverStick.getRightTriggerReleased()) {
-          m_superstructure.setManualArmivator(false);
-        }
-      } else if (m_driverStick.getLeftBumperButtonReleased()
-          || m_driverStick.getRightBumperButtonReleased()) {
-        m_superstructure.setState(Superstructure.State.IntakeCoral);
+      if (m_driverStick.getLeftBumperButtonPressed()) {
+        m_superstructure.toggleManualArmivator();
       }
     } else {
-      if (m_driverStick.getLeftBumperButton()) {
+      if (m_driverStick.getLeftTrigger()) {
         m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
         m_driveController
             .getDriveWithLimelight()
@@ -174,7 +167,7 @@ public class Robot extends TimedRobot {
                 () -> m_superstructure.readyToScore(),
                 () -> m_superstructure.finishedScoring());
         m_superstructure.setState(Superstructure.State.ScoreCoral);
-      } else if (m_driverStick.getRightBumperButton()) {
+      } else if (m_driverStick.getRightTrigger()) {
         m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
         m_driveController
             .getDriveWithLimelight()

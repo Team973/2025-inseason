@@ -45,8 +45,8 @@ public class Superstructure implements Subsystem {
     m_manualScore = score;
   }
 
-  public void setManualArmivator(boolean manual) {
-    m_manualArmivator = manual;
+  public void toggleManualArmivator() {
+    m_manualArmivator = !m_manualArmivator;
   }
 
   public void incrementTargetReefLevel(int increment) {
@@ -69,6 +69,12 @@ public class Superstructure implements Subsystem {
 
   public void log() {
     SmartDashboard.putString("DB/String 0", "Reef Level: " + m_targetReefLevel);
+    SmartDashboard.putString(
+        "DB/String 1",
+        "E: " + String.valueOf(m_elevator.getTargetPositionFromLevel(m_targetReefLevel)));
+    SmartDashboard.putString(
+        "DB/String 2", "A: " + String.valueOf(m_arm.getTargetDegFromLevel(m_targetReefLevel)));
+    SmartDashboard.putString("DB/String 3", "Scoring Pose: " + m_manualArmivator);
 
     m_claw.log();
     m_climb.log();
@@ -181,7 +187,11 @@ public class Superstructure implements Subsystem {
             && m_arm.getTargetPosition() != Arm.STOW_POSITION_DEG) {
           m_claw.setControl(Claw.ControlStatus.HoldCoral);
         } else {
-          m_claw.setControl(Claw.ControlStatus.Off);
+          if (m_claw.getIsCoralInClaw()) {
+            m_claw.setControl(Claw.ControlStatus.Off);
+          } else {
+            m_claw.setControl(Claw.ControlStatus.IntakeCoral);
+          }
         }
 
         m_climb.setControlMode(Climb.ControlMode.OffState);

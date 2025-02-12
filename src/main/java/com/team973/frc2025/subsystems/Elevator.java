@@ -10,7 +10,6 @@ import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator implements Subsystem {
   private final Logger m_logger;
@@ -181,15 +180,6 @@ public class Elevator implements Subsystem {
     m_logger.log(
         "motorErrorInches",
         motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
-
-    SmartDashboard.putString(
-        "DB/String 1", "E1: " + String.valueOf(Presets.LEVEL_1 + m_levelOneOffset));
-    SmartDashboard.putString(
-        "DB/String 2", "E2: " + String.valueOf(Presets.LEVEL_2 + m_levelTwoOffset));
-    SmartDashboard.putString(
-        "DB/String 3", "E3: " + String.valueOf(Presets.LEVEL_3 + m_levelThreeOffset));
-    SmartDashboard.putString(
-        "DB/String 4", "E4: " + String.valueOf(Presets.LEVEL_4 + m_levelFourOffset));
   }
 
   @Override

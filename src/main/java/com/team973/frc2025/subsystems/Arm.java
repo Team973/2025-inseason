@@ -8,7 +8,6 @@ import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Arm implements Subsystem {
   private final Logger m_logger;
@@ -167,15 +166,6 @@ public class Arm implements Subsystem {
         motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
-
-    SmartDashboard.putString(
-        "DB/String 5", "A1: " + String.valueOf(LEVEL_ONE_POSITION_DEG + m_levelOneOffset));
-    SmartDashboard.putString(
-        "DB/String 6", "A2: " + String.valueOf(LEVEL_TWO_POSITION_DEG + m_levelTwoOffset));
-    SmartDashboard.putString(
-        "DB/String 7", "A3: " + String.valueOf(LEVEL_THREE_POSITION_DEG + m_levelThreeOffset));
-    SmartDashboard.putString(
-        "DB/String 8", "A4: " + String.valueOf(LEVEL_FOUR_POSITION_DEG + m_levelFourOffset));
   }
 
   @Override

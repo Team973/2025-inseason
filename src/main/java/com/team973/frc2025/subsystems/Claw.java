@@ -220,7 +220,7 @@ public class Claw implements Subsystem {
     m_logger.log("target postion right", m_rightTargetPotion);
     m_logger.log("target rotations hit", motorAtTarget());
 
-    SmartDashboard.putString("DB/String 9", "Coral Backup: " + m_coralBackUpRot);
+    SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
   }
 
   @Override
