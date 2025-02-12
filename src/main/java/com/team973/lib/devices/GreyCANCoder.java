@@ -16,9 +16,9 @@ public class GreyCANCoder extends CANcoder {
   }
 
   public void log() {
-    m_logger.log("Position in Rotations", () -> this.getPosition().getValue().magnitude());
-    m_logger.log("Position in Degrees", () -> this.getPosition().getValue().magnitude() * 360.0);
-    m_logger.log("Supply Voltage", () -> this.getSupplyVoltage().getValue().magnitude());
-    m_logger.log("Velocity", () -> this.getVelocity().getValue().magnitude());
+    // m_logger.log("Position in Rotations", () -> this.getPosition().getValue().magnitude());
+    // m_logger.log("Position in Degrees", () -> this.getPosition().getValue().magnitude() * 360.0);
+    // m_logger.log("Supply Voltage", () -> this.getSupplyVoltage().getValue().magnitude());
+    // m_logger.log("Velocity", () -> this.getVelocity().getValue().magnitude());
   }
 }

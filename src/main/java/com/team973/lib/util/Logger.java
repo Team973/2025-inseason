@@ -77,49 +77,49 @@ public class Logger {
 
   public void log(String key, double value) {
     if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
+      // DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, String value) {
     if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
+      // DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, int value) {
     if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
+      // DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, boolean value) {
     if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
+      // DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, double[] value) {
     if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
+      // DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, String[] value) {
     if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
+      // DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, int[] value) {
     if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
+      // DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, boolean[] value) {
     if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
+      // DogLog.log(m_prefix + "/" + key, value);
     }
   }
 

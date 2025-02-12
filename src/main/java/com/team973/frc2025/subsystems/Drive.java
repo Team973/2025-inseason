@@ -43,8 +43,8 @@ public class Drive implements Subsystem {
 
   private Rotation2d m_targetRobotAngle = new Rotation2d();
   private final OdometrySupplier m_odometrySupplier;
-  private final MegaTagSupplier m_backLLSupplier;
-  private final MegaTagSupplier m_frontLLSupplier;
+  public final MegaTagSupplier m_backLLSupplier;
+  public final MegaTagSupplier m_frontLLSupplier;
 
   public Drive(GreyPigeon pigeon, DriveController driveController, Logger logger) {
     m_pigeon = pigeon;
@@ -201,8 +201,6 @@ public class Drive implements Subsystem {
 
   @Override
   public void syncSensors() {
-    m_backLLSupplier.syncSensors();
-    m_frontLLSupplier.syncSensors();
     m_estimatedPose = m_poseEstimator.getPoseMeters();
     m_estimatedVelocity = m_poseEstimator.getVelocityMetersPerSeconds();
   }

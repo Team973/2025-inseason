@@ -4,13 +4,8 @@
 
 package com.team973.frc2025;
 
-import com.team973.frc2025.subsystems.Arm;
-import com.team973.frc2025.subsystems.Claw;
-import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
-import com.team973.frc2025.subsystems.Elevator;
-import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
@@ -27,42 +22,42 @@ public class Robot extends TimedRobot {
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
 
-  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
-  private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
-  private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
+  // private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
+  // private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
+  // private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
+  // private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
 
-  private final Superstructure m_superstructure =
-      new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
+  // private final Superstructure m_superstructure =
+  //     new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
 
   private final AutoManager m_autoManager =
-      new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
+      new AutoManager(m_logger.subLogger("auto"), m_driveController);
 
   private final Joystick m_driverStick =
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
 
-  private boolean m_manualScoringMode = true;
+  private boolean m_manualScoringMode = false;
 
   private void syncSensors() {
     m_driveController.syncSensors();
-    m_superstructure.syncSensors();
+    // m_superstructure.syncSensors();
   }
 
   private void updateSubsystems() {
     m_driveController.update();
-    m_superstructure.update();
+    // m_superstructure.update();
   }
 
   private void resetSubsystems() {
     m_driveController.reset();
-    m_superstructure.reset();
+    // m_superstructure.reset();
   }
 
   private void logSubsystems() {
     m_driveController.log();
-    m_superstructure.log();
+    // m_superstructure.log();
 
     // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
 
@@ -94,6 +89,9 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     logSubsystems();
     updateJoysticks();
+
+    m_driveController.getDrive().m_backLLSupplier.syncSensors();
+    m_driveController.getDrive().m_frontLLSupplier.syncSensors();
   }
 
   /**
@@ -141,76 +139,69 @@ public class Robot extends TimedRobot {
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(
-            m_driverStick.getLeftXAxis() * 0.95,
-            m_driverStick.getLeftYAxis() * 0.95,
-            m_driverStick.getRightXAxis() * 0.8);
+            m_coDriverStick.getLeftXAxis() * 0.95,
+            m_coDriverStick.getLeftYAxis() * 0.95,
+            m_coDriverStick.getRightXAxis() * 0.8);
 
     if (m_manualScoringMode) {
-      m_superstructure.setState(Superstructure.State.Manual);
+      // m_superstructure.setState(Superstructure.State.Manual);
 
-      if (m_driverStick.getRightBumperButtonPressed()) {
-        m_superstructure.setManualScore(true);
-      } else if (m_driverStick.getRightBumperButtonReleased()) {
-        m_superstructure.setManualScore(false);
-      }
+      // if (m_driverStick.getRightBumperButtonPressed()) {
+      //   m_superstructure.setManualScore(true);
+      // } else if (m_driverStick.getRightBumperButtonReleased()) {
+      //   m_superstructure.setManualScore(false);
+      // }
 
-      if (m_driverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.toggleManualArmivator();
-      }
+      // if (m_driverStick.getLeftBumperButtonPressed()) {
+      //   m_superstructure.toggleManualArmivator();
+      // }
     } else {
-      if (m_driverStick.getLeftTrigger()) {
+      if (m_coDriverStick.getLeftTrigger()) {
         m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
         m_driveController
             .getDriveWithLimelight()
-            .targetReefPosition(
-                DriveWithLimelight.TargetReefSide.Left,
-                () -> m_superstructure.readyToScore(),
-                () -> m_superstructure.finishedScoring());
-        m_superstructure.setState(Superstructure.State.ScoreCoral);
-      } else if (m_driverStick.getRightTrigger()) {
+            .targetReefPosition(DriveWithLimelight.TargetReefSide.Left, () -> true, () -> true);
+        // m_superstructure.setState(Superstructure.State.ScoreCoral);
+      } else if (m_coDriverStick.getRightTrigger()) {
         m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
         m_driveController
             .getDriveWithLimelight()
-            .targetReefPosition(
-                DriveWithLimelight.TargetReefSide.Right,
-                () -> m_superstructure.readyToScore(),
-                () -> m_superstructure.finishedScoring());
-        m_superstructure.setState(Superstructure.State.ScoreCoral);
+            .targetReefPosition(DriveWithLimelight.TargetReefSide.Right, () -> true, () -> true);
+        // m_superstructure.setState(Superstructure.State.ScoreCoral);
       } else {
         m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
       }
     }
 
-    if (m_coDriverStick.getAButton()) {
-      if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementArmOffset(1.0);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementArmOffset(-1.0);
-      }
-    } else if (m_coDriverStick.getBButton()) {
-      if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementElevatorOffset(0.5);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementElevatorOffset(-0.5);
-      }
-    } else if (m_coDriverStick.getYButton()) {
-      if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementCoralBackup(0.5);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementCoralBackup(-0.5);
-      }
-    }
+    // if (m_coDriverStick.getAButton()) {
+    //   if (m_coDriverStick.getPOVRightPressed()) {
+    //     m_superstructure.incrementArmOffset(1.0);
+    //   } else if (m_coDriverStick.getPOVLeftPressed()) {
+    //     m_superstructure.incrementArmOffset(-1.0);
+    //   }
+    // } else if (m_coDriverStick.getBButton()) {
+    //   if (m_coDriverStick.getPOVRightPressed()) {
+    //     m_superstructure.incrementElevatorOffset(0.5);
+    //   } else if (m_coDriverStick.getPOVLeftPressed()) {
+    //     m_superstructure.incrementElevatorOffset(-0.5);
+    //   }
+    // } else if (m_coDriverStick.getYButton()) {
+    //   if (m_coDriverStick.getPOVRightPressed()) {
+    //     m_superstructure.incrementCoralBackup(0.5);
+    //   } else if (m_coDriverStick.getPOVLeftPressed()) {
+    //     m_superstructure.incrementCoralBackup(-0.5);
+    //   }
+    // }
 
     if (m_coDriverStick.getPOVTopPressed()) {
-      m_superstructure.incrementTargetReefLevel(1);
+      // m_superstructure.incrementTargetReefLevel(1);
     } else if (m_coDriverStick.getPOVBottomPressed()) {
-      m_superstructure.incrementTargetReefLevel(-1);
+      // m_superstructure.incrementTargetReefLevel(-1);
+    } else if (m_coDriverStick.getPOVRightPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
+    } else if (m_coDriverStick.getPOVLeftPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
     }
-    // else if (m_coDriverStick.getPOVRightPressed()) {
-    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
-    // } else if (m_coDriverStick.getPOVLeftPressed()) {
-    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
-    // }
 
     updateSubsystems();
   }

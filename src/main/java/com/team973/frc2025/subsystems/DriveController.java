@@ -126,6 +126,10 @@ public class DriveController implements Subsystem {
     }
   }
 
+  public Drive getDrive() {
+    return m_drive;
+  }
+
   @Override
   public synchronized void syncSensors() {
     if (m_drive == null) {
