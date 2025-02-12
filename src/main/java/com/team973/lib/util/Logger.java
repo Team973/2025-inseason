@@ -1,7 +1,6 @@
 package com.team973.lib.util;
 
 import dev.doglog.DogLog;
-import dev.doglog.DogLogOptions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
