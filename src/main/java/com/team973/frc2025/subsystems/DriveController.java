@@ -128,6 +128,10 @@ public class DriveController implements Subsystem {
 
   @Override
   public synchronized void syncSensors() {
+    if (m_drive == null) {
+      // TODO: Need to re-think initialization here.
+      return;
+    }
     m_drive.syncSensors();
     m_driveWithTrajectory.updatePose(getPose());
     m_driveWithJoysticks.updateAngle(

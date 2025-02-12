@@ -89,6 +89,8 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 
   	testImplementation 'junit:junit:4.12'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 }
 
 test {
@@ -155,4 +157,4 @@ spotless {
 }
 
 project.compileJava.dependsOn spotlessApply
-project.compileJava.options.compilerArgs << "-Xlint:all"
+project.compileJava.options.compilerArgs << "-Xlint:all,-serial,-processing"
