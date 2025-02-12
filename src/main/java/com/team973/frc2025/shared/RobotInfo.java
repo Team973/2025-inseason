@@ -142,5 +142,8 @@ public final class RobotInfo {
     public static final Color GREEN = new Color(0, 255, 0);
     public static final Color BLUE = new Color(0, 0, 255);
     public static final Color OFF = new Color(0, 0, 0);
+    public static final Color OARNGE = new Color(255, 165, 0);
+    public static final Color PINK = new Color(255, 105, 180);
+    public static final Color PURPLE = new Color(128, 0, 128);
   }
 }

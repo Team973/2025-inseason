@@ -3,11 +3,6 @@ package com.team973.frc2025.subsystems;
 import com.ctre.phoenix.led.CANdle;
 import edu.wpi.first.wpilibj.util.Color;
 
-// m_solidOarge if below 12 V low priorty
-// m_blinkingGreen if we have peice in intake
-// m_solidGreen when claw sensor see coral
-// m_blinkingred if it crashes
-// m_solidBlue for when climb is completed
 public class SolidSignaler implements ISignaler {
   private final Color m_color;
 

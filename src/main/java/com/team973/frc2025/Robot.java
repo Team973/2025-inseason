@@ -26,6 +26,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
+
+// m_solidOarge if below 12 V low priorty
+// m_blinkingGreen if we have peice in intake
+// m_solidGreen when claw sensor see coral
+// m_blinkingred if it crashes
+// m_solidBlue for when climb is completed
+
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
 
@@ -46,20 +53,15 @@ public class Robot extends TimedRobot {
 
   private final CANdleManger m_CaNdleManger = new CANdleManger(new Logger("candle manger"));
   public final BlinkingSignaler m_redBlinker =
-      new BlinkingSignaler(
-          new Logger("RedBlinking Signaler"),
-          RobotInfo.Colors.RED,
-          RobotInfo.Colors.GREEN,
-          500,
-          100);
+      new BlinkingSignaler(RobotInfo.Colors.RED, RobotInfo.Colors.OFF, 500, 100);
   public final BlinkingSignaler m_blueBlinker =
-      new BlinkingSignaler(
-          new Logger("BlueBlinking Signaler"),
-          RobotInfo.Colors.BLUE,
-          RobotInfo.Colors.OFF,
-          1000,
-          0);
+      new BlinkingSignaler(RobotInfo.Colors.BLUE, RobotInfo.Colors.OFF, 1000, 0);
+  public final BlinkingSignaler m_greenBlinker =
+      new BlinkingSignaler(RobotInfo.Colors.GREEN, RobotInfo.Colors.OFF, 500, 33);
   public final SolidSignaler m_offBlinker = new SolidSignaler(RobotInfo.Colors.OFF, 90);
+  public final SolidSignaler m_solidOarnge = new SolidSignaler(RobotInfo.Colors.OARNGE, 50);
+  public final SolidSignaler m_solidGreen = new SolidSignaler(RobotInfo.Colors.GREEN, 50);
+
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 

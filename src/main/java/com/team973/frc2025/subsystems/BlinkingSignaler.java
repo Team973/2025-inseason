@@ -1,13 +1,11 @@
 package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
-import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class BlinkingSignaler implements ISignaler {
-  private final Logger m_logger;
 
   private double m_blinkPeriodMs;
   public int m_priorty;
@@ -18,9 +16,7 @@ public class BlinkingSignaler implements ISignaler {
   private Color m_colorB;
   private Color m_currentColor;
 
-  public BlinkingSignaler(
-      Logger logger, Color colorA, Color colorB, double blinkPeriodMs, int priorityNum) {
-    m_logger = logger;
+  public BlinkingSignaler(Color colorA, Color colorB, double blinkPeriodMs, int priorityNum) {
     m_colorA = colorA;
     m_colorB = colorB;
     m_blinkPeriodMs = blinkPeriodMs;
@@ -51,7 +47,6 @@ public class BlinkingSignaler implements ISignaler {
 
   public void log(ISignaler signaler) {
 
-    m_logger.log("current time us", RobotController.getFPGATime());
     SmartDashboard.putNumber("current time secs", RobotController.getFPGATime() / 1000.0 / 1000.0);
     SmartDashboard.putNumber("current time mili mod", modTimeMilisecs());
     SmartDashboard.putNumber("current time mili", RobotController.getFPGATime() / 1000.0);
