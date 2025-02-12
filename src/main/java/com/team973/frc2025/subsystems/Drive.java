@@ -1,6 +1,5 @@
 package com.team973.frc2025.subsystems;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.frc2025.subsystems.swerve.SwerveModule;
@@ -15,8 +14,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Drive implements Subsystem {
   private static final Translation2d[] MODULE_LOCATIONS = {
@@ -34,31 +31,25 @@ public class Drive implements Subsystem {
   private Pose2d m_estimatedPose = new Pose2d();
   private Translation2d m_estimatedVelocity = new Translation2d();
   private GreyPoseEstimator m_poseEstimator;
-  private DriveController m_driveController;
 
   private final GreyPigeon m_pigeon;
 
-  private Rotation2d m_targetRobotAngle = new Rotation2d();
-
-  private final List<StatusSignal<?>> m_allStatusSignals = new ArrayList<>();
-
-  public Drive(GreyPigeon pigeon, DriveController m_DriveController, Logger logger) {
+  public Drive(GreyPigeon pigeon, DriveController driveController, Logger logger) {
     m_pigeon = pigeon;
-    m_driveController = m_DriveController;
     m_logger = logger;
     m_odometryLogger = logger.subLogger("odometry-estimator");
 
     m_swerveModules =
         new SwerveModule[] {
-          new SwerveModule(0, DriveInfo.FRONT_LEFT_CONSTANTS, logger.subLogger("mod0")),
-          new SwerveModule(1, DriveInfo.FRONT_RIGHT_CONSTANTS, logger.subLogger("mod1")),
-          new SwerveModule(2, DriveInfo.BACK_LEFT_CONSTANTS, logger.subLogger("mod2")),
-          new SwerveModule(3, DriveInfo.BACK_RIGHT_CONSTANTS, logger.subLogger("mod3"))
+          new SwerveModule(0, DriveInfo.FRONT_LEFT_CONSTANTS, logger.subLogger("swerve/mod0")),
+          new SwerveModule(1, DriveInfo.FRONT_RIGHT_CONSTANTS, logger.subLogger("swerve/mod1")),
+          new SwerveModule(2, DriveInfo.BACK_LEFT_CONSTANTS, logger.subLogger("swerve/mod2")),
+          new SwerveModule(3, DriveInfo.BACK_RIGHT_CONSTANTS, logger.subLogger("swerve/mod3"))
         };
 
     m_currentChassisSpeeds = new ChassisSpeeds();
 
-    m_poseEstimator = new GreyPoseEstimator(m_pigeon, m_swerveModules, m_DriveController);
+    m_poseEstimator = new GreyPoseEstimator(m_pigeon, m_swerveModules, driveController);
   }
 
   public void startOdometrey() {
@@ -67,6 +58,10 @@ public class Drive implements Subsystem {
 
   public GreyPigeon getPigeon() {
     return m_pigeon;
+  }
+
+  public GreyPoseEstimator getPoseEstimator() {
+    return m_poseEstimator;
   }
 
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
@@ -110,6 +105,12 @@ public class Drive implements Subsystem {
 
   public Translation2d getVelocity() {
     return m_estimatedVelocity;
+  }
+
+  public static boolean comparePoses(
+      Pose2d poseA, Pose2d poseB, double distanceTolerance, double angleTolerance) {
+    return poseA.getTranslation().getDistance(poseB.getTranslation()) < distanceTolerance
+        && poseA.getRotation().minus(poseB.getRotation()).getDegrees() < angleTolerance;
   }
 
   public void resetOdometry(Pose2d pose) {

@@ -30,6 +30,13 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+                  // Enable VisualVM connection
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote=true")
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
+                  // jvmArgs.add("-Djava.rmi.server.hostname=10.9.73.2")
                 }
 
                 // Static files artifact
@@ -76,7 +83,12 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+  	testImplementation 'junit:junit:4.12'
 }
 
 test {
@@ -106,6 +118,7 @@ wpi.java.configureTestTasks(test)
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
+    options.compilerArgs.add '-Werror'
 }
 
 spotless {

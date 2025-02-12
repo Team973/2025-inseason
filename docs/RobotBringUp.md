@@ -5,8 +5,8 @@
 - ID swerve motors
 - Find the gear ratios (drive and turn)
 - Find the wheel diameter
-- Find the track width
-- Find the wheel base
+- Find the track width (side to side distance)
+- Find the wheel base (front to back distance)
 - Find the motor inversion
 
 ## 2. [Find Swerve Module Offsets](UpdatingModuleOffsets.md)

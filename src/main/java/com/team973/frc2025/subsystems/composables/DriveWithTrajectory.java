@@ -76,21 +76,25 @@ public class DriveWithTrajectory extends DriveComposable {
 
     m_logger.log("sample/X", logSample.x);
     m_logger.log("sample/y", logSample.y);
+    m_logger.log("sample/vx", logSample.vx);
+    m_logger.log("sample/vy", logSample.vy);
     m_logger.log("sample/Heading Deg", Rotation2d.fromRadians(logSample.heading).getDegrees());
     m_logger.log("sample/Omega", logSample.omega);
 
-    m_logger.log("X Position Error", m_controller.getXController().getPositionError());
-    m_logger.log("X Velocity Error", m_controller.getXController().getVelocityError());
-    m_logger.log("Y Position Error", m_controller.getYController().getPositionError());
-    m_logger.log("Y Velocity Error", m_controller.getYController().getVelocityError());
+    m_logger.log("X Position Error", m_controller.getXController().getError());
+    m_logger.log("X Velocity Error", m_controller.getXController().getErrorDerivative());
+    m_logger.log("Y Position Error", m_controller.getYController().getError());
+    m_logger.log("Y Velocity Error", m_controller.getYController().getErrorDerivative());
     m_logger.log("Theta Position Error", m_controller.getThetaController().getPositionError());
     m_logger.log("Theta Velocity Error", m_controller.getThetaController().getVelocityError());
   }
 
+  public void init() {
+    m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
+  }
+
   @Override
   public synchronized ChassisSpeeds getOutput() {
-    log();
-
     Optional<SwerveSample> sample = m_trajectory.sampleAt(getTimeSecFromStart(), false);
 
     if (m_currentPose == null || sample.isEmpty()) {
@@ -98,11 +102,6 @@ public class DriveWithTrajectory extends DriveComposable {
     }
 
     m_currentSample = sample.get();
-
-    if (getFirstRun()) {
-      m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
-      firstRunComplete();
-    }
 
     return new ChassisSpeeds(
         m_currentSample.vx

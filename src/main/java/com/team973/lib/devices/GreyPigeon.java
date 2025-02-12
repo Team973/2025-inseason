@@ -225,9 +225,9 @@ public class GreyPigeon {
   }
 
   public void log() {
-    m_logger.log("Pitch", getPitch().getDegrees());
-    m_logger.log("Roll", getRoll().getDegrees());
-    m_logger.log("Yaw", getYaw().getDegrees());
-    m_logger.log("Angular Velocity", getAngularVelocity().getDegrees());
+    m_logger.log("Pitch", () -> getPitch().getDegrees());
+    m_logger.log("Roll", () -> getRoll().getDegrees());
+    m_logger.log("Yaw", () -> getYaw().getDegrees());
+    m_logger.log("Angular Velocity", () -> getAngularVelocity().getDegrees());
   }
 }

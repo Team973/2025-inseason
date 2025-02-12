@@ -65,11 +65,12 @@ public class Joystick extends XboxController {
    * @return The value of raw button 5 if the controller is a sick stick. The value of the left
    *     bumper if it's an Xbox controller.
    */
-  public boolean getLeftBumper() {
+  @Override
+  public boolean getLeftBumperButton() {
     if (m_type == Type.SickStick) {
       return super.getRawButton(5);
     } else {
-      return super.getLeftBumper();
+      return super.getLeftBumperButton();
     }
   }
 
@@ -77,11 +78,12 @@ public class Joystick extends XboxController {
    * @return The value of raw button 5 pressed if the controller is a sick stick. The value of the
    *     left bumper pressed if it's an Xbox controller.
    */
-  public boolean getLeftBumperPressed() {
+  @Override
+  public boolean getLeftBumperButtonPressed() {
     if (m_type == Type.SickStick) {
       return super.getRawButtonPressed(5);
     } else {
-      return super.getLeftBumperPressed();
+      return super.getLeftBumperButtonPressed();
     }
   }
 
@@ -89,11 +91,12 @@ public class Joystick extends XboxController {
    * @return The value of raw button 5 released if the controller is a sick stick. The value of the
    *     left bumper released if it's an Xbox controller.
    */
-  public boolean getLeftBumperReleased() {
+  @Override
+  public boolean getLeftBumperButtonReleased() {
     if (m_type == Type.SickStick) {
       return super.getRawButtonReleased(5);
     } else {
-      return super.getLeftBumperReleased();
+      return super.getLeftBumperButtonReleased();
     }
   }
 
@@ -101,11 +104,12 @@ public class Joystick extends XboxController {
    * @return The value of raw button 6 if the controller is a sick stick. The value of the right
    *     bumper if it's an Xbox controller.
    */
-  public boolean getRightBumper() {
+  @Override
+  public boolean getRightBumperButton() {
     if (m_type == Type.SickStick) {
       return super.getRawButton(6);
     } else {
-      return super.getRightBumper();
+      return super.getRightBumperButton();
     }
   }
 
@@ -113,11 +117,12 @@ public class Joystick extends XboxController {
    * @return The value of raw button 6 pressed if the controller is a sick stick. The value of the
    *     right bumper pressed if it's an Xbox controller.
    */
-  public boolean getRightBumperPressed() {
+  @Override
+  public boolean getRightBumperButtonPressed() {
     if (m_type == Type.SickStick) {
       return super.getRawButtonPressed(6);
     } else {
-      return super.getRightBumperPressed();
+      return super.getRightBumperButtonPressed();
     }
   }
 
@@ -125,11 +130,12 @@ public class Joystick extends XboxController {
    * @return The value of raw button 6 released if the controller is a sick stick. The value of the
    *     left bumper released if it's an Xbox controller.
    */
-  public boolean getRightBumperReleased() {
+  @Override
+  public boolean getRightBumperButtonReleased() {
     if (m_type == Type.SickStick) {
       return super.getRawButtonReleased(6);
     } else {
-      return super.getRightBumperReleased();
+      return super.getRightBumperButtonReleased();
     }
   }
 
@@ -164,6 +170,14 @@ public class Joystick extends XboxController {
       return super.getRawAxis(2);
     } else {
       return super.getRawAxis(4);
+    }
+  }
+
+  public double getRightYAxis() {
+    if (m_type == Type.SickStick) {
+      return super.getRawAxis(3);
+    } else {
+      return super.getRawAxis(5);
     }
   }
 
@@ -230,13 +244,13 @@ public class Joystick extends XboxController {
     m_logger.log("Right Trigger", this.getRightTrigger());
     m_logger.log("Right Trigger Released", this.getRightTriggerReleased());
 
-    m_logger.log("Left Bumper", this.getLeftBumper());
-    m_logger.log("Left Bumper Pressed", this.getLeftBumperPressed());
-    m_logger.log("Left Bumper Released", this.getLeftBumperReleased());
+    m_logger.log("Left Bumper", this.getLeftBumperButton());
+    m_logger.log("Left Bumper Pressed", this.getLeftBumperButtonPressed());
+    m_logger.log("Left Bumper Released", this.getLeftBumperButtonReleased());
 
-    m_logger.log("Right Bumper", this.getRightBumper());
-    m_logger.log("Right Bumper Pressed", this.getRightBumperPressed());
-    m_logger.log("Right Bumper Released", this.getRightBumperReleased());
+    m_logger.log("Right Bumper", this.getRightBumperButton());
+    m_logger.log("Right Bumper Pressed", this.getRightBumperButtonPressed());
+    m_logger.log("Right Bumper Released", this.getRightBumperButtonReleased());
 
     m_logger.log("A Button", this.getAButton());
     m_logger.log("A Button Pressed", this.getAButtonPressed());

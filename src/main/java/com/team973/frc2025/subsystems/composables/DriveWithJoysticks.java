@@ -49,7 +49,6 @@ public class DriveWithJoysticks extends DriveComposable {
   }
 
   public void updateInput(double xAxis, double yAxis, double rotAxis) {
-
     m_xAxis = xAxis;
     m_yAxis = yAxis;
     m_rot = rotAxis;
@@ -59,6 +58,8 @@ public class DriveWithJoysticks extends DriveComposable {
     m_currentYaw = currentYaw;
     m_angularVelocity = angularVelocity;
   }
+
+  public void init() {}
 
   @Override
   public ChassisSpeeds getOutput() {
