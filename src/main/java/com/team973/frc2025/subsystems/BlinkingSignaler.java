@@ -74,6 +74,11 @@ public class BlinkingSignaler implements ISignaler {
   }
 
   @Override
+  public int getPriorty() {
+    return m_priorty;
+  }
+
+  @Override
   public void setEnabled(boolean enabled) {
     m_isEnabled = enabled;
   }

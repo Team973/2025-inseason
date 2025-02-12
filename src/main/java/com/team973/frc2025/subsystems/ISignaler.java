@@ -7,5 +7,7 @@ public interface ISignaler {
 
   public void setEnabled(boolean enabled);
 
+  public int getPriorty();
+
   public void update(CANdle candle);
 }

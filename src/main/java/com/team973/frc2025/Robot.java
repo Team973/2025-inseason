@@ -4,10 +4,13 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.subsystems.BlinkingSignaler;
 import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -25,7 +28,21 @@ public class Robot extends TimedRobot {
   private final Claw m_claw = new Claw(new Logger("Claw"));
 
   private final CANdleManger m_CaNdleManger = new CANdleManger(new Logger("candle manger"));
-
+  public final BlinkingSignaler m_redBlinker =
+      new BlinkingSignaler(
+          new Logger("RedBlinking Signaler"),
+          RobotInfo.Colors.RED,
+          RobotInfo.Colors.GREEN,
+          500,
+          100);
+  public final BlinkingSignaler m_blueBlinker =
+      new BlinkingSignaler(
+          new Logger("BlueBlinking Signaler"),
+          RobotInfo.Colors.BLUE,
+          RobotInfo.Colors.OFF,
+          1000,
+          0);
+  public final SolidSignaler m_offBlinker = new SolidSignaler(RobotInfo.Colors.OFF, 90);
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 
@@ -70,6 +87,10 @@ public class Robot extends TimedRobot {
   public Robot() {
     resetSubsystems();
     m_driveController.startOdometrey();
+    m_offBlinker.setEnabled(true);
+    m_CaNdleManger.addSignaler(m_blueBlinker);
+    m_CaNdleManger.addSignaler(m_redBlinker);
+    m_CaNdleManger.addSignaler(m_offBlinker);
   }
 
   /**
@@ -82,16 +103,16 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     if (m_coDriverStick.getRightBumperButtonPressed()) {
-      m_CaNdleManger.m_priortyQue.get(1).setEnabled(true);
+      m_redBlinker.setEnabled(true);
     }
     if (m_coDriverStick.getRightBumperButtonReleased()) {
-      m_CaNdleManger.m_redBlinker.setEnabled(false);
+      m_redBlinker.setEnabled(false);
     }
     if (m_coDriverStick.getLeftBumperButtonPressed()) {
-      m_CaNdleManger.m_blueBlinker.setEnabled(true);
+      m_blueBlinker.setEnabled(true);
     }
     if (m_coDriverStick.getLeftBumperButtonReleased()) {
-      m_CaNdleManger.m_blueBlinker.setEnabled(false);
+      m_blueBlinker.setEnabled(false);
     }
     logSubsystems();
   }
