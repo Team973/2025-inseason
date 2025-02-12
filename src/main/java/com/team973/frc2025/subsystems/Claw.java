@@ -31,10 +31,12 @@ public class Claw implements Subsystem {
   private double m_leftTargetPostion = 0;
   private double m_rightTargetPotion = 0;
 
-  private double m_leftTargetHoldPosition = 0;
   private double m_targetHoldPosition = 0;
 
-  private double m_coralBackUpRot = 6.0;
+  private double m_coralBackUpRot = 3.0;
+
+  private boolean m_needsBackup = true;
+  private boolean m_hasCoral = false;
 
   public static enum ControlStatus {
     IntakeCoral,
@@ -120,14 +122,16 @@ public class Claw implements Subsystem {
   }
 
   public boolean getIsCoralInClaw() {
-    return !getFrontSensor(); // getCoralSensor() && !getFrontSensor();
+    return !getFrontSensor() && m_hasCoral; // getCoralSensor() && !getFrontSensor();
   }
 
   public boolean getHasCoral() {
-    return getBackSensor() || getFrontSensor(); // || getCoralSensor();
+    return m_hasCoral;
   }
 
-  private boolean m_hasCoral = false;
+  public boolean getIsCoralInConveyor() {
+    return getBackSensor() || getFrontSensor(); // || getCoralSensor();
+  }
 
   @Override
   public void update() {
@@ -159,8 +163,9 @@ public class Claw implements Subsystem {
         //   m_conveyor.setControl(ControlMode.VelocityVoltage, 7);
         // } else {
 
-        if (m_lastMode != m_mode) {
+        if (m_lastMode != m_mode && m_needsBackup) {
           m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - m_coralBackUpRot;
+          m_needsBackup = false;
         }
 
         m_clawMotor.setControl(
@@ -175,8 +180,9 @@ public class Claw implements Subsystem {
         // m_clawMotor.setControl(
         //     ControlMode.MotionMagicVoltage, m_rightTargetPotion, MOTION_MAGIC_PID_SLOT);
 
-        if (!getHasCoral()) {
+        if (!getIsCoralInConveyor()) {
           m_hasCoral = false;
+          m_needsBackup = true;
         }
 
         // if (motorAtTarget() && getCoralSensor()) {
@@ -225,7 +231,7 @@ public class Claw implements Subsystem {
 
   @Override
   public void syncSensors() {
-    if (getHasCoral()) {
+    if (getIsCoralInConveyor()) {
       m_hasCoral = true;
     }
   }
