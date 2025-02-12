@@ -7,6 +7,25 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 
 /** Robot info, specs, dimensions. */
 public final class RobotInfo {
+
+  public static enum BotVersion {
+    AlphaBot,
+    W1W,
+  }
+
+  public static final BotVersion BOT_VERSION = BotVersion.AlphaBot;
+
+  public static double fromBotVersion(double alphaValue, double w1wvalue) {
+    switch (BOT_VERSION) {
+      case AlphaBot:
+        return alphaValue;
+      case W1W:
+        return w1wvalue;
+      default:
+        throw new IllegalArgumentException("Unhandled bot version: " + BOT_VERSION);
+    }
+  }
+
   public static final String CANIVORE_CANBUS = "Canivore"; // "Canivore";
   public static final String ROBORIO_CANBUS = "";
 
@@ -18,22 +37,22 @@ public final class RobotInfo {
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 2;
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 3;
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 4;
-    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 264.902;
+    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = fromBotVersion(-311.133, 264.902);
 
     public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 8;
     public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 9;
     public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 10;
-    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 153.721;
+    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = fromBotVersion(-328.096, 153.721);
 
     public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 5;
     public static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
     public static final int BACK_LEFT_MODULE_STEER_ENCODER = 7;
-    public static final double BACK_LEFT_MODULE_STEER_OFFSET = 50.713;
+    public static final double BACK_LEFT_MODULE_STEER_OFFSET = fromBotVersion(-171.299, 50.713);
 
     public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 11;
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 12;
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 13;
-    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 100.107;
+    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = fromBotVersion(156.533, 100.107);
 
     public static final double DRIVE_GEAR_RATIO =
         (10.0 / 54.0) * (40.0 / 16.0) * (15.0 / 45.0); // x3:10, 6.48:1
@@ -47,13 +66,13 @@ public final class RobotInfo {
      * The left-to-right distance between the drivetrain wheels Should be measured from center to
      * center.
      */
-    public static final double TRACKWIDTH_METERS = 0.5334;
+    public static final double TRACKWIDTH_METERS = fromBotVersion(0.635, 0.5334);
 
     /**
      * The front-to-back distance between the drivetrain wheels. Should be measured from center to
      * center.
      */
-    public static final double WHEELBASE_METERS = 0.5334;
+    public static final double WHEELBASE_METERS = fromBotVersion(0.635, 0.5334);
 
     public static final double OPEN_LOOP_RAMP = 0.0;
     public static final double CLOSED_LOOP_RAMP = 0.0;

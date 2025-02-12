@@ -39,12 +39,18 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
   }
 
   public Pose2d getPoseMeters() {
+    if (m_poseEstimator == null) {
+      return new Pose2d(0, 0, Rotation2d.fromDegrees(0));
+    }
     return m_poseEstimator.getEstimatedPosition();
   }
 
   // TODO: This isn't going to be accurate the way we do it now. We should instead
   // just get the velocity from the odometry implementation and drop the rest.
   public Translation2d getVelocityMetersPerSeconds() {
+    if (m_lastPoseMeters == null) {
+      return new Translation2d(0, 0);
+    }
     return m_lastPoseMeters
         .minus(getPoseMeters())
         .getTranslation()
