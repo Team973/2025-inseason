@@ -36,7 +36,6 @@ public class Claw implements Subsystem {
   private double m_coralBackUpRot = 3.0;
 
   private boolean m_needsBackup = true;
-  private boolean m_hasCoral = false;
 
   public static enum ControlStatus {
     IntakeCoral,
@@ -122,16 +121,16 @@ public class Claw implements Subsystem {
   }
 
   public boolean getIsCoralInClaw() {
-    return !getFrontSensor() && m_hasCoral; // getCoralSensor() && !getFrontSensor();
+    return !getFrontSensor() && getCoralSensor();
   }
 
-  public boolean getHasCoral() {
-    return m_hasCoral;
+  public boolean getSeesCoral() {
+    return getFrontSensor() || getBackSensor() || getCoralSensor();
   }
 
-  public boolean getIsCoralInConveyor() {
-    return getBackSensor() || getFrontSensor(); // || getCoralSensor();
-  }
+  // public boolean getIsCoralInConveyor() {
+  //   return getBackSensor() || getFrontSensor(); // || getCoralSensor();
+  // }
 
   @Override
   public void update() {
@@ -140,7 +139,9 @@ public class Claw implements Subsystem {
         if (!getBackSensor() && getFrontSensor()) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-        } else if (!getFrontSensor() && m_hasCoral) {
+
+          m_needsBackup = true;
+        } else if (!getFrontSensor() && getCoralSensor()) {
           m_clawMotor.setControl(ControlMode.VelocityVoltage, -20, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
         } else {
@@ -180,11 +181,6 @@ public class Claw implements Subsystem {
         // m_clawMotor.setControl(
         //     ControlMode.MotionMagicVoltage, m_rightTargetPotion, MOTION_MAGIC_PID_SLOT);
 
-        if (!getIsCoralInConveyor()) {
-          m_hasCoral = false;
-          m_needsBackup = true;
-        }
-
         // if (motorAtTarget() && getCoralSensor()) {
         //   m_clawMotor.setControl(ControlMode.VelocityVoltage, 60, VELOCITY_VOLTAGE_PID_SLOT);
         // }
@@ -220,7 +216,6 @@ public class Claw implements Subsystem {
     m_logger.log("Front Sensor", getFrontSensor());
     m_logger.log("Coral Sensor", getCoralSensor());
     m_logger.log("Algae Sensor", getAlgaeSensor());
-    m_logger.log("Has Coral", m_hasCoral);
 
     m_logger.log("target postion left", m_leftTargetPostion);
     m_logger.log("target postion right", m_rightTargetPotion);
@@ -230,11 +225,7 @@ public class Claw implements Subsystem {
   }
 
   @Override
-  public void syncSensors() {
-    if (getIsCoralInConveyor()) {
-      m_hasCoral = true;
-    }
-  }
+  public void syncSensors() {}
 
   @Override
   public void reset() {}

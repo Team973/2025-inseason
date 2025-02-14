@@ -3,6 +3,7 @@ package com.team973.frc2025.subsystems;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
@@ -18,7 +19,7 @@ public class Climb implements Subsystem {
 
   private final Logger m_logger;
 
-  public final GreyTalonFX m_climb;
+  private final GreyTalonFX m_climb;
 
   private double m_manualPower = 0;
 
@@ -26,7 +27,7 @@ public class Climb implements Subsystem {
 
   public Climb(Logger logger) {
     m_logger = logger;
-    m_climb = new GreyTalonFX(35, "Canivore", m_logger.subLogger("climb motor"));
+    m_climb = new GreyTalonFX(23, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("climb motor"));
     m_climb.setConfig(defaultMotorConfig());
   }
 
@@ -48,12 +49,17 @@ public class Climb implements Subsystem {
     defaultMotorConfig.Slot1.kP = 6.4;
     defaultMotorConfig.Slot1.kI = 0.0;
     defaultMotorConfig.Slot1.kD = 0.04;
+
     defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
     defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
     defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
-    defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+
+    defaultMotorConfig.Voltage.PeakForwardVoltage = 2.0;
+    defaultMotorConfig.Voltage.PeakReverseVoltage = -2.0;
+
+    defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     defaultMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     return defaultMotorConfig;
   }

@@ -181,6 +181,8 @@ public class Robot extends TimedRobot {
       }
     }
 
+    double climbStick = m_coDriverStick.getLeftYAxis();
+
     if (m_coDriverStick.getAButton()) {
       if (m_coDriverStick.getPOVRightPressed()) {
         m_superstructure.incrementArmOffset(1.0);
@@ -199,6 +201,9 @@ public class Robot extends TimedRobot {
       } else if (m_coDriverStick.getPOVLeftPressed()) {
         m_superstructure.incrementCoralBackup(-0.5);
       }
+    } else if (Math.abs(climbStick) > 0.1) {
+      m_superstructure.setClimbPower(climbStick * 0.1);
+      m_superstructure.setState(Superstructure.State.Climb);
     }
 
     if (m_coDriverStick.getPOVTopPressed()) {

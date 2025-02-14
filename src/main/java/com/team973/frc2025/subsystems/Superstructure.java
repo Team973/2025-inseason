@@ -60,7 +60,7 @@ public class Superstructure implements Subsystem {
   }
 
   public boolean finishedScoring() {
-    return !m_claw.getHasCoral();
+    return !m_claw.getSeesCoral();
   }
 
   public boolean readyToScore() {
@@ -121,6 +121,10 @@ public class Superstructure implements Subsystem {
     m_claw.incrementBackup(increment);
   }
 
+  public void setClimbPower(double power) {
+    m_climb.setManualPower(power);
+  }
+
   public void update() {
     switch (m_state) {
       case IntakeCoral:
@@ -165,7 +169,7 @@ public class Superstructure implements Subsystem {
         break;
       case Climb:
         m_claw.setControl(Claw.ControlStatus.Off);
-        m_climb.setControlMode(Climb.ControlMode.ClimbLow);
+        m_climb.setControlMode(Climb.ControlMode.JoystickMode);
         break;
       case Manual:
         if (m_lastState != m_state) {
