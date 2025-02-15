@@ -145,5 +145,7 @@ public final class RobotInfo {
     public static final Color OARNGE = new Color(255, 165, 0);
     public static final Color PINK = new Color(255, 105, 180);
     public static final Color PURPLE = new Color(128, 0, 128);
+    public static final Color CYAN = new Color(0, 255, 255);
+    public static final Color HOT_PINK = new Color(255, 105, 180);
   }
 }
