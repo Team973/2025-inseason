@@ -43,6 +43,13 @@ public class Joystick extends XboxController {
   }
 
   /**
+   * @return True if the left trigger was pressed this cycle but not last cycle.
+   */
+  public boolean getLeftTriggerPressed() {
+    return (this.getLeftTrigger() && !m_leftTriggerLast);
+  }
+
+  /**
    * @return The value of raw button 8 if the controller is a sick stick. Whether or not the right
    *     trigger axis is greater than 0.3 if it's an Xbox controller.
    */
@@ -59,6 +66,13 @@ public class Joystick extends XboxController {
    */
   public boolean getRightTriggerReleased() {
     return (!this.getRightTrigger() && m_rightTriggerLast);
+  }
+
+  /**
+   * @return True if the right trigger was pressed this cycle but not last cycle.
+   */
+  public boolean getRightTriggerPressed() {
+    return (this.getRightTrigger() && !m_rightTriggerLast);
   }
 
   /**
@@ -170,6 +184,14 @@ public class Joystick extends XboxController {
       return super.getRawAxis(2);
     } else {
       return super.getRawAxis(4);
+    }
+  }
+
+  public double getRightYAxis() {
+    if (m_type == Type.SickStick) {
+      return super.getRawAxis(3);
+    } else {
+      return super.getRawAxis(5);
     }
   }
 

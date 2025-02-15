@@ -29,6 +29,17 @@ public final class RobotInfo {
   public static final String CANIVORE_CANBUS = "Canivore"; // "Canivore";
   public static final String ROBORIO_CANBUS = "";
 
+  public static class ClawInfo {
+    public static final int RIGHT_MOTOR_ID = 36;
+    public static final int LEFT_MOTOR_ID = 35;
+    public static final int CONVEYOR_MOTOR_ID = 34;
+
+    public static final int BACK_SENSOR_ID = 2;
+    public static final int FRONT_SENSOR_ID = 3;
+    public static final int CORAL_SENSOR_ID = 4;
+    public static final int ALGAE_SENSOR_ID = 5;
+  }
+
   public static class DriveInfo {
     public static final int STATUS_SIGNAL_FREQUENCY = 200;
 
