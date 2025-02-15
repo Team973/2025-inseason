@@ -105,7 +105,30 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    if (m_driverStick.getLeftBumperButtonPressed()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .targetReefPosition(
+              DriveWithLimelight.TargetReefSide.Left, () -> !m_claw.sensorSeeCoral());
+    } else if (m_driverStick.getRightBumperButtonPressed()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right, () -> true);
+    } else if (m_driverStick.getLeftBumperButtonReleased()
+        || m_driverStick.getRightBumperButtonReleased()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+    }
+
+    if (m_coDriverStick.getPOVRightPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
+    } else if (m_coDriverStick.getPOVLeftPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
+    }
+
     logSubsystems();
+    updateJoysticks();
   }
 
   /**
@@ -209,23 +232,7 @@ public class Robot extends TimedRobot {
       m_arm.setStow();
     }
 
-    if (m_driverStick.getLeftBumperButtonPressed()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .setTargetPosition(DriveWithLimelight.TargetPositions.TEST_ONE);
-    } else if (m_driverStick.getRightBumperButtonPressed()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .setTargetPosition(DriveWithLimelight.TargetPositions.TEST_TWO);
-    } else if (m_driverStick.getRightBumperButtonReleased()
-        || m_driverStick.getLeftBumperButtonReleased()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-    }
-
     updateSubsystems();
-    updateJoysticks();
   }
 
   /** This function is called once when the robot is disabled. */
