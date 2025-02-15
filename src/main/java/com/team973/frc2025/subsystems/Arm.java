@@ -30,8 +30,6 @@ public class Arm implements Subsystem {
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.6; // 0.5;
 
-  private int m_cycleCount;
-
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
@@ -78,20 +76,16 @@ public class Arm implements Subsystem {
     m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
   }
 
-  private boolean hallsensor() {
+  private boolean hallSensor() {
     return !m_hallSesnsor.get();
   }
 
   private void maybeHomeArm() {
-    m_cycleCount = m_cycleCount + 1;
-    m_logger.log("cycleCount", m_cycleCount);
-    if (m_lastHallSensorMode == false && hallsensor() == true) {
-      m_logger.log("timeToZero", true);
+    if (m_lastHallSensorMode == false && hallSensor() == true) {
       m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
     } else {
-      m_logger.log("timeToZero", false);
     }
-    m_lastHallSensorMode = hallsensor();
+    m_lastHallSensorMode = hallSensor();
   }
 
   public void setMotorManualOutput(double joystick) {
@@ -188,7 +182,7 @@ public class Arm implements Subsystem {
         motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
-    m_logger.log("HallsensorArm", hallsensor());
+    m_logger.log("HallsensorArm", hallSensor());
   }
 
   @Override
