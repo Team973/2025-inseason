@@ -10,6 +10,7 @@ import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.AutoMode;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,8 +54,11 @@ public class AutoManager {
     return m_availableAutos.get(m_selectedMode);
   }
 
-  public Pose2d getStartingPose() {
-    return m_currentMode.getStartingPose();
+  // TODO: Should account for alliance here and not in disabledPeriodic.
+  // TODO: Need to account for both position and rotation (currently we only
+  // account for rotation).
+  public Pose2d getStartingPose(Alliance alliance) {
+    return m_currentMode.getStartingPose(alliance);
   }
 
   public void run() {

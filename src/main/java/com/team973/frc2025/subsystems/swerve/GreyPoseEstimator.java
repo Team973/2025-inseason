@@ -79,7 +79,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
       }
       m_lastPoseMeters = m_poseEstimator.getEstimatedPosition();
     }
-    m_driveController.syncSensors();
+    m_driveController.syncSensorsHighFreq();
     m_driveController.update();
   }
 

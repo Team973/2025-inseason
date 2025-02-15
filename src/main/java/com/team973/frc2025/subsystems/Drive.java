@@ -18,7 +18,6 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive implements Subsystem {
   private static final Translation2d[] MODULE_LOCATIONS = {
@@ -136,7 +135,7 @@ public class Drive implements Subsystem {
       index += 2;
     }
 
-    SmartDashboard.putNumberArray("swerve/setpoints", states);
+    // SmartDashboard.putNumberArray("swerve/setpoints", states);
   }
 
   public Pose2d getPose() {
@@ -203,6 +202,9 @@ public class Drive implements Subsystem {
   public void syncSensors() {
     m_backLLSupplier.syncSensors();
     m_frontLLSupplier.syncSensors();
+  }
+
+  public synchronized void syncSensorsHighFreq() {
     m_estimatedPose = m_poseEstimator.getPoseMeters();
     m_estimatedVelocity = m_poseEstimator.getVelocityMetersPerSeconds();
   }
@@ -223,8 +225,6 @@ public class Drive implements Subsystem {
         DriveInfo.SWERVE_KINEMATICS.toSwerveModuleStates(updated_chassis_speeds);
 
     setModuleStates(swerveModuleStates);
-
-    SmartDashboard.putNumber("Yaw", m_pigeon.getYaw().getDegrees());
   }
 
   public void reset() {

@@ -7,7 +7,7 @@ import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.lib.devices.GreyPigeon;
 import com.team973.lib.util.Logger;
-import com.team973.lib.util.SignalAggregator;
+import com.team973.lib.util.PerfLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -39,7 +39,8 @@ public class OdometrySupplier {
   private final SwerveDriveOdometry m_swerveOdometry;
   private final SwerveModule[] m_swerveModules;
   private final GreyPigeon m_pigeon;
-  private SignalAggregator m_loopTimeTracker = new SignalAggregator();
+  private PerfLogger m_loopPeriodTracker;
+  private PerfLogger m_loopDurationTracker;
   private final Thread m_thread;
   private Pose2d m_lastPoseMeters;
 
@@ -57,6 +58,8 @@ public class OdometrySupplier {
     m_swerveModules = swerveModules;
     m_logger = logger;
     m_perfLogger = logger.subLogger("perf", 0.25);
+    m_loopPeriodTracker = new PerfLogger(m_perfLogger.subLogger("period"));
+    m_loopDurationTracker = new PerfLogger(m_perfLogger.subLogger("duration"));
 
     List<StatusSignal<Angle>> angleSignals = m_pigeon.getAngleStatusSignals();
     List<StatusSignal<AngularVelocity>> angularVelocitySignals =
@@ -135,7 +138,7 @@ public class OdometrySupplier {
     // Ref
     // https://api.ctr-electronics.com/phoenix6/release/java/src-html/com/ctre/phoenix6/mechanisms/swerve/SwerveDrivetrain.html#line.184
     Threads.setCurrentThreadPriority(true, 1);
-    double runStartedAt = Timer.getFPGATimestamp();
+    double lastCycleTimestamp = Timer.getFPGATimestamp();
     while (true) {
       // Since we've set the update frequency, we will never actually wait
       // this long for new signal. We expect to get a signal in at most 1/freq
@@ -143,6 +146,7 @@ public class OdometrySupplier {
           BaseStatusSignal.waitForAll(
               2.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY, m_allStatusSignals);
 
+      double runStartedAt = Timer.getFPGATimestamp();
       doCycle();
 
       synchronized (this) {
@@ -153,8 +157,9 @@ public class OdometrySupplier {
         }
 
         double runFinishedAt = Timer.getFPGATimestamp();
-        m_loopTimeTracker.sample(runFinishedAt - runStartedAt);
-        runStartedAt = runFinishedAt;
+        m_loopPeriodTracker.observe(runFinishedAt - lastCycleTimestamp);
+        m_loopDurationTracker.observe(runFinishedAt - runStartedAt);
+        lastCycleTimestamp = runFinishedAt;
       }
     }
   }
@@ -170,10 +175,9 @@ public class OdometrySupplier {
   }
 
   public void log() {
-    m_logger.log("thread/update freq mean", () -> getUpdateFrequencyMean());
-    m_logger.log("thread/update freq stddev", () -> getUpdateFrequencyStdDev());
-    m_logger.log("thread/successful cycles", () -> getSuccessfulCycles());
-    m_logger.log("thread/failed cycles", () -> getFailedCycles());
+    m_perfLogger.update();
+    m_perfLogger.log("thread/successful cycles", () -> getSuccessfulCycles());
+    m_perfLogger.log("thread/failed cycles", () -> getFailedCycles());
   }
 
   public SwerveModulePosition[] getPositions() {
@@ -182,14 +186,6 @@ public class OdometrySupplier {
       positions[mod.moduleNumber] = mod.getPosition();
     }
     return positions;
-  }
-
-  public synchronized double getUpdateFrequencyMean() {
-    return m_loopTimeTracker.getMean();
-  }
-
-  public synchronized double getUpdateFrequencyStdDev() {
-    return m_loopTimeTracker.getStdDev();
   }
 
   public synchronized int getSuccessfulCycles() {

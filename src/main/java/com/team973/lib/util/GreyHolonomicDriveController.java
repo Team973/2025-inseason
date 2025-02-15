@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This holonomic drive controller can be used to follow trajectories using a holonomic drivetrain
@@ -100,9 +99,6 @@ public class GreyHolonomicDriveController {
     // Calculate feedforward velocities (field-relative).
     double xFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getCos();
     double yFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getSin();
-    SmartDashboard.putNumber("Traj vel mag", desiredLinearVelocityMetersPerSecond);
-    SmartDashboard.putNumber("Traj X FF pre-transform", xFF);
-    SmartDashboard.putNumber("Traj Y FF pre-transform", yFF);
     double thetaFF =
         m_thetaController.calculate(
             currentPose.getRotation().getRadians(), desiredHeading.getRadians());

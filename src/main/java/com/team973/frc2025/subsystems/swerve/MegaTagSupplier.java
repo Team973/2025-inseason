@@ -3,6 +3,7 @@ package com.team973.frc2025.subsystems.swerve;
 import com.team973.lib.devices.GreyPigeon;
 import com.team973.lib.devices.LimelightHelpers;
 import com.team973.lib.util.Logger;
+import com.team973.lib.util.PerfLogger;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,7 @@ public class MegaTagSupplier {
   private Alliance m_alliance;
   private final Logger m_logger;
   private final Logger m_perfLogger;
+  private PerfLogger m_syncSensorsLogger;
   // Until we get our seed heading and our alliance (which requires us)
   // to wait for a message from the driver station, we cannot with any
   // confidence provide pose data.
@@ -42,6 +45,7 @@ public class MegaTagSupplier {
     m_pigeon = pigeon;
     m_logger = logger;
     m_perfLogger = logger.subLogger("perf", 0.25);
+    m_syncSensorsLogger = new PerfLogger(m_perfLogger.subLogger("syncSensors"));
 
     LimelightHelpers.setCameraPose_RobotSpace(
         llName,
@@ -63,7 +67,7 @@ public class MegaTagSupplier {
     LimelightHelpers.SetRobotOrientation(
         m_llName,
         // Yaw (heading)
-        m_pigeon.getYaw().getDegrees(),
+        m_pigeon.getYaw().plus(Rotation2d.fromDegrees(0)).getDegrees(),
         m_pigeon.getAngularVelocity().getDegrees(),
         // Pitch (hopefully not)
         0.0,
@@ -74,11 +78,14 @@ public class MegaTagSupplier {
   }
 
   public void syncSensors() {
+    double startTime = Timer.getFPGATimestamp();
     setHeading();
     doCycle();
+    m_syncSensorsLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
   public void log() {
+    m_perfLogger.update();
     m_perfLogger.log("rejected needs init", () -> getRejectedNeedsInit());
     m_perfLogger.log("rejected too spinny", () -> getRejectedTooSpinny());
     m_perfLogger.log("rejected no tags", () -> getRejectedNoTags());
@@ -132,7 +139,10 @@ public class MegaTagSupplier {
 
     LimelightHelpers.PoseEstimate mt2;
     if (m_alliance == Alliance.Red) {
-      mt2 = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(m_llName);
+      // TODO: This doesn't match the limelight spec --- gotta figure out
+      // why this is wrong.  It at least appears to br working on the red
+      // alliance though.
+      mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(m_llName);
     } else {
       mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(m_llName);
     }

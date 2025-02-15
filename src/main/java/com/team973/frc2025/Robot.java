@@ -4,6 +4,7 @@
 
 package com.team973.frc2025;
 
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.Climb;
@@ -13,8 +14,13 @@ import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
+import com.team973.lib.util.PerfLogger;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Optional;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -24,13 +30,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
 
-  private final Joystick m_stick;
-
-  private final Joystick m_teststick;
-
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
 
-  private final Conveyor m_conveyor = new Conveyor(m_logger.subLogger("conveyor manager"));
+  private final Conveyor m_conveyor = new Conveyor(m_logger.subLogger("conveyor manager", 0.2));
 
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
@@ -44,37 +46,50 @@ public class Robot extends TimedRobot {
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
 
+  private PerfLogger m_syncSensorsLogger =
+      new PerfLogger(m_logger.subLogger("perf/syncSensors", 0.25));
+
   private void syncSensors() {
+    double startTime = Timer.getFPGATimestamp();
     m_driveController.syncSensors();
-    m_climb.syncSensors();
-    m_conveyor.syncSensors();
+
+    if (RobotInfo.BOT_VERSION == RobotInfo.BotVersion.W1W) {
+      m_climb.syncSensors();
+      m_conveyor.syncSensors();
+    }
+
+    m_syncSensorsLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
   private void updateSubsystems() {
     m_driveController.update();
-    m_climb.update();
-    m_conveyor.update();
+    if (RobotInfo.BOT_VERSION == RobotInfo.BotVersion.W1W) {
+      m_climb.update();
+      m_conveyor.update();
+    }
     m_claw.update();
   }
 
   private void resetSubsystems() {
     m_driveController.reset();
-    m_climb.reset();
+    if (RobotInfo.BOT_VERSION == RobotInfo.BotVersion.W1W) {
+      m_climb.reset();
+    }
   }
 
   private void logSubsystems() {
     m_driveController.log();
     m_claw.log();
     m_logger.update();
-    m_climb.log();
-    m_conveyor.log();
+    if (RobotInfo.BOT_VERSION == RobotInfo.BotVersion.W1W) {
+      m_conveyor.log();
+      m_climb.log();
+    }
   }
 
   private void updateJoysticks() {
     m_driverStick.update();
     m_coDriverStick.update();
-    m_stick.update();
-    m_teststick.update();
   }
 
   /**
@@ -84,9 +99,10 @@ public class Robot extends TimedRobot {
   public Robot() {
     resetSubsystems();
     m_driveController.startOdometrey();
-    m_stick = new Joystick(2, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
-    m_teststick = new Joystick(3, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
   }
+
+  private PerfLogger m_robotPeriodicLogger =
+      new PerfLogger(m_logger.subLogger("perf/robotPeriodic"));
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -97,6 +113,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    double startTime = Timer.getFPGATimestamp();
+
+    maybeInitAlliance();
+
     if (m_driverStick.getLeftBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
@@ -120,7 +140,30 @@ public class Robot extends TimedRobot {
     }
 
     logSubsystems();
+
     updateJoysticks();
+
+    m_robotPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
+  }
+
+  private void setPoseFromAuto() {
+    m_driveController.resetOdometry(m_autoManager.getSelectedMode().getStartingPose(m_alliance));
+  }
+
+  private boolean m_allianceInitialized = false;
+  private Alliance m_alliance;
+
+  private void maybeInitAlliance() {
+    if (m_allianceInitialized) {
+      return;
+    }
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    if (!alliance.isPresent()) {
+      return;
+    }
+    m_allianceInitialized = true;
+    m_alliance = alliance.get();
+    setPoseFromAuto();
   }
 
   /**
@@ -136,7 +179,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoManager.init();
-    m_driveController.resetOdometry(m_autoManager.getStartingPose());
+    m_driveController.resetOdometry(m_autoManager.getStartingPose(m_alliance));
   }
 
   /** This function is called periodically during autonomous. */
@@ -161,32 +204,20 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     syncSensors();
 
-    m_driveController
-        .getDriveWithJoysticks()
-        .updateInput(
-            m_driverStick.getLeftXAxis() * 0.95,
-            m_driverStick.getLeftYAxis() * 0.95,
-            m_driverStick.getRightXAxis() * 0.8);
-
-    if (m_stick.getAButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.ClimbHigh);
-    } else if (m_stick.getBButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.ClimbLow);
-    } else if (m_stick.getXButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.OffState);
-    } else if (m_stick.getYButton()) {
-      m_climb.setControlMode(Climb.ControlMode.JoystickMode);
-      m_climb.setManualPower(m_stick.getLeftYAxis());
-    } else if (m_stick.getYButtonReleased()) {
-      m_climb.setControlMode(Climb.ControlMode.OffState);
-    }
-
-    if (m_teststick.getAButtonPressed()) {
-      m_conveyor.setControlMode(Conveyor.ControlMode.ConveyorForward);
-    } else if (m_teststick.getBButtonPressed()) {
-      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorBackward));
-    } else if (m_teststick.getXButtonPressed()) {
-      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorOff));
+    if (RobotInfo.BOT_VERSION == RobotInfo.BotVersion.W1W) {
+      m_driveController
+          .getDriveWithJoysticks()
+          .updateInput(
+              m_driverStick.getLeftXAxis() * 0.5,
+              m_driverStick.getLeftYAxis() * 0.5,
+              m_driverStick.getRightXAxis() * 0.4);
+    } else {
+      m_driveController
+          .getDriveWithJoysticks()
+          .updateInput(
+              m_driverStick.getLeftYAxis() * 0.2,
+              -m_driverStick.getLeftXAxis() * 0.2,
+              m_driverStick.getRightXAxis() * 0.2);
     }
 
     if (m_coDriverStick.getAButton()) {
@@ -206,9 +237,13 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {}
 
+  private PerfLogger m_disabledPeriodicLogger =
+      new PerfLogger(m_logger.subLogger("perf/disabledPeriodic", 0.25));
+
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
+    double startTime = Timer.getFPGATimestamp();
     syncSensors();
 
     // TODO: we're doing this badly to make it work
@@ -216,13 +251,15 @@ public class Robot extends TimedRobot {
 
     if (m_coDriverStick.getAButtonPressed()) {
       m_autoManager.increment();
-      m_driveController.resetOdometry(m_autoManager.getSelectedMode().getStartingPose());
+      setPoseFromAuto();
     } else if (m_coDriverStick.getBButtonPressed()) {
       m_autoManager.decrement();
-      m_driveController.resetOdometry(m_autoManager.getSelectedMode().getStartingPose());
+      setPoseFromAuto();
     }
     SmartDashboard.putString(
         "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
+
+    m_disabledPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
   /** This function is called once when test mode is enabled. */
