@@ -83,9 +83,8 @@ public class Arm implements Subsystem {
   private void maybeHomeArm() {
     if (m_lastHallSensorMode == false && hallSensor() == true) {
       m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
-    } else {
+      m_lastHallSensorMode = hallSensor();
     }
-    m_lastHallSensorMode = hallSensor();
   }
 
   public void setMotorManualOutput(double joystick) {

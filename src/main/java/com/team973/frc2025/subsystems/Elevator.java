@@ -29,6 +29,8 @@ public class Elevator implements Subsystem {
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
+  private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
+
   public static enum ControlStatus {
     Manual,
     TargetPostion,
@@ -111,7 +113,7 @@ public class Elevator implements Subsystem {
 
   private void maybeHomeElevator() {
     if (m_lastHallSensorMode == false && hallsensor() == true) {
-      m_motorRight.setPosition(heightInchesToMotorRotations(0.25));
+      m_motorRight.setPosition(heightInchesToMotorRotations(ELEVATOR_HOMING_POSTION_HEIGHT));
     }
     m_lastHallSensorMode = hallsensor();
   }
@@ -180,7 +182,6 @@ public class Elevator implements Subsystem {
         m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
         break;
     }
-    m_lastHallSensorMode = m_hallSensor.get();
   }
 
   @Override
