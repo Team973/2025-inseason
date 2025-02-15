@@ -21,6 +21,7 @@ public class Elevator implements Subsystem {
   private double m_targetpositionLeway = 0.1;
   double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
+  private boolean m_lastHallSensorMode;
   private final DigitalInput m_hallSensor = new DigitalInput(0);
 
   public static enum ControlStatus {
@@ -120,7 +121,9 @@ public class Elevator implements Subsystem {
 
   @Override
   public void update() {
-    elvatorZering();
+    if (m_lastHallSensorMode = !m_hallSensor.get()) {
+      elvatorZering();
+    }
     switch (m_mode) {
       case Manual:
         m_motorRight.setControl(ControlMode.DutyCycleOut, m_manualPower, 0);
@@ -135,10 +138,12 @@ public class Elevator implements Subsystem {
         m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
         break;
     }
+    m_lastHallSensorMode = m_hallSensor.get();
   }
 
   @Override
   public void log() {
+
     m_logger.log(
         "currentPostionHeightInches",
         motorRotationsToHeightInches(m_motorRight.getPosition().getValueAsDouble()));
