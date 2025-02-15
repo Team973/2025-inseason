@@ -8,6 +8,7 @@ import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Arm implements Subsystem {
   private final Logger m_logger;
@@ -15,6 +16,8 @@ public class Arm implements Subsystem {
   private ControlStatus m_mode = ControlStatus.Stow;
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
+  private boolean m_lastHallSensorMode;
+  private final DigitalInput m_hallSesnsor = new DigitalInput(4);
 
   public static final double HIGH_POSTION_DEG = 0;
   public static final double MEDIUM_POSTION_DEG = -30;
@@ -64,6 +67,12 @@ public class Arm implements Subsystem {
     m_armMotor.setPosition(armDegToMotorRotations(-90.0));
   }
 
+  private void armZeroing() {
+    if (m_hallSesnsor.get() == true) {
+      m_armMotor.setPosition(0.0);
+    }
+  }
+
   public void setArmMotorManualOutput(double joystick) {
     m_mode = ControlStatus.Manual;
     m_manualArmPower = joystick * 0.1;
@@ -89,6 +98,9 @@ public class Arm implements Subsystem {
 
   @Override
   public void update() {
+    if (m_lastHallSensorMode = !m_hallSesnsor.get()) {
+      armZeroing();
+    }
     switch (m_mode) {
       case Manual:
         m_armMotor.setControl(
@@ -104,6 +116,7 @@ public class Arm implements Subsystem {
       case Stow:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
     }
+    m_lastHallSensorMode = m_hallSesnsor.get();
   }
 
   public void setStow() {

@@ -10,6 +10,7 @@ import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator implements Subsystem {
   private final Logger m_logger;
@@ -20,6 +21,7 @@ public class Elevator implements Subsystem {
   private double m_targetpositionLeway = 0.1;
   double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
+  private final DigitalInput m_hallSensor = new DigitalInput(0);
 
   public static enum ControlStatus {
     Manual,
@@ -94,6 +96,12 @@ public class Elevator implements Subsystem {
     return defaultElevatorMotorConfig;
   }
 
+  private void elvatorZering() {
+    if (m_hallSensor.get() == true) {
+      m_motorRight.setPosition(0.0);
+    }
+  }
+
   public void setModeOff() {
     m_mode = ControlStatus.Off;
   }
@@ -112,6 +120,7 @@ public class Elevator implements Subsystem {
 
   @Override
   public void update() {
+    elvatorZering();
     switch (m_mode) {
       case Manual:
         m_motorRight.setControl(ControlMode.DutyCycleOut, m_manualPower, 0);

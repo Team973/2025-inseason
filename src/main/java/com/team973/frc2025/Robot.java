@@ -6,7 +6,6 @@ package com.team973.frc2025;
 
 import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.Claw;
-import com.team973.frc2025.subsystems.Claw.ControlStatus;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.Conveyor;
 import com.team973.frc2025.subsystems.DriveController;
