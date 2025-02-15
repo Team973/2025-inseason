@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm"));
 
   private final Superstructure m_superstructure =
       new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);

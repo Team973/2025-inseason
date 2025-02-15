@@ -70,6 +70,7 @@ public class Elevator implements Subsystem {
     m_motorRight.setConfig(rightMotorConfig);
 
     m_motorLeft.setControl(new Follower(m_motorRight.getDeviceID(), true));
+    m_motorRight.setPosition(0.0);
   }
 
   private static TalonFXConfiguration defaultElevatorMotorConfig() {
@@ -104,10 +105,15 @@ public class Elevator implements Subsystem {
     return defaultElevatorMotorConfig;
   }
 
-  private void elvatorZering() {
-    if (m_hallSensor.get() == true) {
-      m_motorRight.setPosition(0.0);
+  private boolean hallsensor() {
+    return !m_hallSensor.get();
+  }
+
+  private void maybeHomeElevator() {
+    if (m_lastHallSensorMode == false && hallsensor() == true) {
+      m_motorRight.setPosition(heightInchesToMotorRotations(0.25));
     }
+    m_lastHallSensorMode = hallsensor();
   }
 
   public void setControlStatus(ControlStatus status) {
@@ -160,9 +166,6 @@ public class Elevator implements Subsystem {
 
   @Override
   public void update() {
-    if (m_lastHallSensorMode = !m_hallSensor.get()) {
-      elvatorZering();
-    }
     switch (m_controlStatus) {
       case Manual:
         m_motorRight.setControl(ControlMode.DutyCycleOut, m_manualPower, 0);
@@ -182,7 +185,6 @@ public class Elevator implements Subsystem {
 
   @Override
   public void log() {
-
     m_logger.log(
         "currentPostionHeightInches",
         motorRotationsToHeightInches(m_motorRight.getPosition().getValueAsDouble()));
@@ -194,10 +196,13 @@ public class Elevator implements Subsystem {
     m_logger.log(
         "motorErrorInches",
         motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
+    m_logger.log("hallSesnsorReturnElevator", hallsensor());
   }
 
   @Override
-  public void syncSensors() {}
+  public void syncSensors() {
+    maybeHomeElevator();
+  }
 
   @Override
   public void reset() {}

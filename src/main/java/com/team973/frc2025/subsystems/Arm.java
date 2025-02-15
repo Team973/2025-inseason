@@ -17,17 +17,20 @@ public class Arm implements Subsystem {
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
   private boolean m_lastHallSensorMode;
-  private final DigitalInput m_hallSesnsor = new DigitalInput(4);
+  private final DigitalInput m_hallSesnsor = new DigitalInput(1);
 
   private static final double LEVEL_FOUR_POSITION_DEG = 79.0; // 76
   private static final double LEVEL_THREE_POSITION_DEG = 67.0;
   private static final double LEVEL_TWO_POSITION_DEG = -70.0;
   private static final double LEVEL_ONE_POSITION_DEG = -70.0;
-  public static final double STOW_POSITION_DEG = -94.0;
+  public static final double STOW_POSITION_DEG = -90.0;
+  private static final double ARM_HOMING_POSTION_DEG = -90.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.6; // 0.5;
+
+  private int m_cycleCount;
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
@@ -72,13 +75,23 @@ public class Arm implements Subsystem {
     armMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     armMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_armMotor.setConfig(armMotorConfig);
-    m_armMotor.setPosition(armDegToMotorRotations(-90.0));
+    m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
   }
 
-  private void armZeroing() {
-    if (m_hallSesnsor.get() == true) {
-      m_armMotor.setPosition(0.0);
+  private boolean hallsensor() {
+    return !m_hallSesnsor.get();
+  }
+
+  private void maybeHomeArm() {
+    m_cycleCount = m_cycleCount + 1;
+    m_logger.log("cycleCount", m_cycleCount);
+    if (m_lastHallSensorMode == false && hallsensor() == true) {
+      m_logger.log("timeToZero", true);
+      m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
+    } else {
+      m_logger.log("timeToZero", false);
     }
+    m_lastHallSensorMode = hallsensor();
   }
 
   public void setMotorManualOutput(double joystick) {
@@ -125,9 +138,6 @@ public class Arm implements Subsystem {
 
   @Override
   public void update() {
-    if (m_lastHallSensorMode = !m_hallSesnsor.get()) {
-      armZeroing();
-    }
     switch (m_controlStatus) {
       case Manual:
         m_armMotor.setControl(
@@ -143,7 +153,6 @@ public class Arm implements Subsystem {
       case Off:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
     }
-    m_lastHallSensorMode = m_hallSesnsor.get();
   }
 
   public void setControlStatus(ControlStatus status) {
@@ -179,10 +188,13 @@ public class Arm implements Subsystem {
         motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
+    m_logger.log("HallsensorArm", hallsensor());
   }
 
   @Override
-  public void syncSensors() {}
+  public void syncSensors() {
+    maybeHomeArm();
+  }
 
   @Override
   public void reset() {}
