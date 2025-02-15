@@ -3,33 +3,74 @@ package com.team973.frc2025.subsystems;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team973.frc2025.shared.RobotInfo.ClawInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Claw implements Subsystem {
+  private static final int MOTION_MAGIC_PID_SLOT = 0;
+  private static final int VELOCITY_VOLTAGE_PID_SLOT = 1;
+
   private final Logger m_logger;
-  private final GreyTalonFX m_motorRight;
-  private final GreyTalonFX m_motorLeft;
-  private final DigitalInput m_sensor = new DigitalInput(0);
-  private ControlStatus m_mode = ControlStatus.Stop;
-  private ControlStatus m_lastMode = ControlStatus.Stop;
+
+  private final GreyTalonFX m_clawMotor;
+  private final GreyTalonFX m_conveyor;
+
+  private final DigitalInput m_backSensor;
+  private final DigitalInput m_frontSensor;
+  private final DigitalInput m_coralSensor;
+  private final DigitalInput m_algaeSensor;
+
+  private ControlStatus m_mode = ControlStatus.Off;
+  private ControlStatus m_lastMode = ControlStatus.Off;
+
   private double m_leftTargetPostion = 0;
   private double m_rightTargetPotion = 0;
 
+  private double m_targetHoldPosition = 0;
+
+  private double m_coralBackUpRot = 3.0;
+
+  private boolean m_needsBackup = true;
+
+  public static enum ControlStatus {
+    IntakeCoral,
+    IntakeAlgae,
+    HoldCoral,
+    ScoreCoral,
+    ScoreAlgae,
+    Off,
+  }
+
   public Claw(Logger logger) {
     m_logger = logger;
-    m_motorRight = new GreyTalonFX(36, "Canivore", m_logger.subLogger("shooterRight"));
-    m_motorLeft = new GreyTalonFX(35, "Canivore", m_logger.subLogger("shooterLeft"));
+
+    m_clawMotor =
+        new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("shooterRight"));
+    m_conveyor =
+        new GreyTalonFX(
+            ClawInfo.CONVEYOR_MOTOR_ID, "Canivore", m_logger.subLogger("conveyor motor"));
+
+    m_backSensor = new DigitalInput(ClawInfo.BACK_SENSOR_ID);
+    m_frontSensor = new DigitalInput(ClawInfo.FRONT_SENSOR_ID);
+    m_coralSensor = new DigitalInput(ClawInfo.CORAL_SENSOR_ID);
+    m_algaeSensor = new DigitalInput(ClawInfo.ALGAE_SENSOR_ID);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
-    rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    m_motorRight.setConfig(rightMotorConfig);
-    TalonFXConfiguration leftMotorConfig = defaultClawMotorConfig();
-    leftMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    m_motorLeft.setConfig(leftMotorConfig);
+    rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    m_clawMotor.setConfig(rightMotorConfig);
+
+    TalonFXConfiguration conveyorConfig = defaultClawMotorConfig();
+
+    conveyorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+    conveyorConfig.Slot0.kP = 1.0;
+
+    m_conveyor.setConfig(conveyorConfig);
   }
 
   public static TalonFXConfiguration defaultClawMotorConfig() {
@@ -60,53 +101,100 @@ public class Claw implements Subsystem {
   }
 
   public boolean motorAtTarget() {
-    return (Math.abs(m_leftTargetPostion - m_motorLeft.getPosition().getValueAsDouble()) < 0.1
-        && Math.abs(m_rightTargetPotion - m_motorRight.getPosition().getValueAsDouble()) < 0.1);
+    return (Math.abs(m_rightTargetPotion - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
   }
 
-  public boolean sensorSeeCoral() {
-    return m_sensor.get();
+  private boolean getBackSensor() {
+    return m_backSensor.get();
   }
 
-  public static enum ControlStatus {
-    IntakeAndHold,
-    Shoot,
-    Stop,
-    Retract,
-    Score,
+  private boolean getFrontSensor() {
+    return m_frontSensor.get();
   }
 
-  private void velocityRPS(double motorDemandNum) {
-    m_motorRight.setControl(ControlMode.VelocityVoltage, motorDemandNum, 1);
-    m_motorLeft.setControl(ControlMode.VelocityVoltage, motorDemandNum, 1);
+  private boolean getCoralSensor() {
+    return m_coralSensor.get();
   }
+
+  private boolean getAlgaeSensor() {
+    return m_algaeSensor.get();
+  }
+
+  public boolean getIsCoralInClaw() {
+    return !getFrontSensor() && getCoralSensor();
+  }
+
+  public boolean getSeesCoral() {
+    return getFrontSensor() || getBackSensor() || getCoralSensor();
+  }
+
+  // public boolean getIsCoralInConveyor() {
+  //   return getBackSensor() || getFrontSensor(); // || getCoralSensor();
+  // }
 
   @Override
   public void update() {
     switch (m_mode) {
-      case IntakeAndHold:
-        if (sensorSeeCoral()) {
-          velocityRPS(0);
-        } else if (!sensorSeeCoral()) {
-          velocityRPS(10);
+      case IntakeCoral:
+        if (!getBackSensor() && getFrontSensor()) {
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+
+          m_needsBackup = true;
+        } else if (!getFrontSensor() && getCoralSensor()) {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -20, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
+        } else {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 20, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 10);
         }
         break;
-      case Shoot:
-        velocityRPS(2);
-        break;
-      case Stop:
-        velocityRPS(0);
-        break;
-      case Score:
-        if (m_lastMode != m_mode) {
-          m_rightTargetPotion = m_motorRight.getPosition().getValueAsDouble() + 4.5;
-          m_leftTargetPostion = m_motorLeft.getPosition().getValueAsDouble() + 4.5;
+      case IntakeAlgae:
+        if (getAlgaeSensor()) {
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        } else {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -35, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, -20);
         }
-        m_motorRight.setControl(ControlMode.MotionMagicVoltage, m_rightTargetPotion, 0);
-        m_motorLeft.setControl(ControlMode.MotionMagicVoltage, m_leftTargetPostion, 0);
         break;
-      case Retract:
-        velocityRPS(-5);
+      case HoldCoral:
+        // if (getFrontSensor()) { // if (!getCoralSensor() || getFrontSensor()) {
+        //   m_clawMotor.setControl(ControlMode.VelocityVoltage, 15, VELOCITY_VOLTAGE_PID_SLOT);
+        //   m_conveyor.setControl(ControlMode.VelocityVoltage, 7);
+        // } else {
+
+        if (m_lastMode != m_mode && m_needsBackup) {
+          m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - m_coralBackUpRot;
+          m_needsBackup = false;
+        }
+
+        m_clawMotor.setControl(
+            ControlMode.PositionVoltage, m_targetHoldPosition, MOTION_MAGIC_PID_SLOT);
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        // }
+        break;
+      case ScoreCoral:
+        // if (m_lastMode != m_mode) {
+        //   m_rightTargetPotion = m_clawMotor.getPosition().getValueAsDouble() + 40;
+        // }
+        // m_clawMotor.setControl(
+        //     ControlMode.MotionMagicVoltage, m_rightTargetPotion, MOTION_MAGIC_PID_SLOT);
+
+        // if (motorAtTarget() && getCoralSensor()) {
+        //   m_clawMotor.setControl(ControlMode.VelocityVoltage, 60, VELOCITY_VOLTAGE_PID_SLOT);
+        // }
+
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 35, VELOCITY_VOLTAGE_PID_SLOT);
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        break;
+      case ScoreAlgae:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, -35, VELOCITY_VOLTAGE_PID_SLOT);
+        m_conveyor.setControl(ControlMode.VelocityVoltage, -20);
+        break;
+      case Off:
+        m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         break;
     }
     m_lastMode = m_mode;
@@ -116,14 +204,24 @@ public class Claw implements Subsystem {
     m_mode = mode;
   }
 
+  public void incrementBackup(double increment) {
+    m_coralBackUpRot += increment;
+  }
+
   @Override
   public void log() {
-    m_logger.log("sensorSeeCoral", sensorSeeCoral());
-    m_motorRight.log();
-    m_motorLeft.log();
+    m_clawMotor.log();
+
+    m_logger.log("Back Sensor", getBackSensor());
+    m_logger.log("Front Sensor", getFrontSensor());
+    m_logger.log("Coral Sensor", getCoralSensor());
+    m_logger.log("Algae Sensor", getAlgaeSensor());
+
     m_logger.log("target postion left", m_leftTargetPostion);
     m_logger.log("target postion right", m_rightTargetPotion);
     m_logger.log("target rotations hit", motorAtTarget());
+
+    SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
   }
 
   @Override
