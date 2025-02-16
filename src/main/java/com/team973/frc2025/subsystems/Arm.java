@@ -17,7 +17,7 @@ public class Arm implements Subsystem {
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
   private boolean m_lastHallSensorMode;
-  private final DigitalInput m_hallSesnsor = new DigitalInput(1);
+  private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
   private static final double LEVEL_FOUR_POSITION_DEG = 79.0; // 76
   private static final double LEVEL_THREE_POSITION_DEG = 67.0;

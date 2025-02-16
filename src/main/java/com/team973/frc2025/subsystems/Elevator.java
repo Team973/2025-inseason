@@ -22,7 +22,7 @@ public class Elevator implements Subsystem {
   double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
   private boolean m_lastHallSensorMode;
-  private final DigitalInput m_hallSensor = new DigitalInput(0);
+  private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
