@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
 
   private final CANdleManger m_CaNdleManger = new CANdleManger(new Logger("candle manger"));
-  private final BlinkingSignaler m_oarngeBlinker =
+  private final BlinkingSignaler m_lowBatterySignaler =
       new BlinkingSignaler(RobotInfo.Colors.OARNGE, RobotInfo.Colors.OFF, 300, 1);
   private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 100);
   private final AutoManager m_autoManager =
@@ -103,7 +103,7 @@ public class Robot extends TimedRobot {
     resetSubsystems();
     m_driveController.startOdometrey();
     m_ledOff.setEnabled(true);
-    m_CaNdleManger.addSignaler(m_oarngeBlinker);
+    m_CaNdleManger.addSignaler(m_lowBatterySignaler);
     m_stick = new Joystick(2, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
     m_teststick = new Joystick(3, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
   }
@@ -140,10 +140,10 @@ public class Robot extends TimedRobot {
       m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
     }
     if (RobotController.getBatteryVoltage() < 12.0) {
-      m_oarngeBlinker.setEnabled(true);
+      m_lowBatterySignaler.setEnabled(true);
     }
     if (RobotController.getBatteryVoltage() > 12.1) {
-      m_oarngeBlinker.setEnabled(false);
+      m_lowBatterySignaler.setEnabled(false);
     }
 
     logSubsystems();
