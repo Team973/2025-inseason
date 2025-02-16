@@ -18,7 +18,7 @@ public class TaxiAuto extends AutoMode {
         new DriveTrajectoryCommand(
             drive,
             "C-4",
-            new CommandOnEvent("shoot", new ClawCommand(claw, Claw.ControlStatus.Shoot))));
+            new CommandOnEvent("shoot", new ClawCommand(claw, Claw.ControlStatus.ScoreCoral))));
   }
 
   public String getName() {
