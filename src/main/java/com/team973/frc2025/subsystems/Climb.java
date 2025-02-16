@@ -66,7 +66,7 @@ public class Climb implements Subsystem {
 
   public enum ControlMode {
     ClimbLow,
-    ClimbHigh,
+    ClimbStow,
     OffState,
     JoystickMode,
   }
@@ -99,10 +99,10 @@ public class Climb implements Subsystem {
         m_climb.setControl(GreyTalonFX.ControlMode.DutyCycleOut, 0, 0);
         break;
       case ClimbLow:
-        m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, -10, 0);
+        m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 82.6, 0);
         break;
-      case ClimbHigh:
-        m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 10, 1);
+      case ClimbStow:
+        m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 0, 1);
         break;
       case JoystickMode:
         m_climb.setControl(GreyTalonFX.ControlMode.DutyCycleOut, m_manualPower);
