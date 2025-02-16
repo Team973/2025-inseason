@@ -13,7 +13,9 @@ import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
+import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -43,6 +45,23 @@ public class Robot extends TimedRobot {
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
+
+  private final JoystickField m_reefSelector =
+      new JoystickField(
+          () -> m_coDriverStick.getRightXAxis(), () -> m_coDriverStick.getRightYAxis());
+
+  private final JoystickField.Range m_backFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_backRightFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(60), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_frontRightFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_frontFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_frontLeftFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(240), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_backLeftFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(300), Rotation2d.fromDegrees(30), 0.8);
 
   private boolean m_manualScoringMode = true;
 
@@ -138,8 +157,8 @@ public class Robot extends TimedRobot {
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(
-            m_driverStick.getLeftXAxis() * 0.95,
-            m_driverStick.getLeftYAxis() * 0.95,
+            m_driverStick.getLeftXAxis() * 0.95 * 0.5,
+            m_driverStick.getLeftYAxis() * 0.95 * 0.5,
             m_driverStick.getRightXAxis() * 0.8);
 
     if (m_manualScoringMode) {
@@ -152,7 +171,11 @@ public class Robot extends TimedRobot {
       }
 
       if (m_driverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.toggleManualArmivator();
+        m_superstructure.setManualArmivator(true);
+      }
+
+      if (m_driverStick.getLeftTriggerPressed()) {
+        m_superstructure.setManualArmivator(false);
       }
     } else {
       if (m_driverStick.getLeftTrigger()) {
@@ -180,39 +203,30 @@ public class Robot extends TimedRobot {
 
     double climbStick = m_coDriverStick.getLeftYAxis();
 
-    if (m_coDriverStick.getAButton()) {
-      if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementArmOffset(1.0);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementArmOffset(-1.0);
-      }
-    } else if (m_coDriverStick.getBButton()) {
-      if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementElevatorOffset(0.5);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementElevatorOffset(-0.5);
-      }
-    } else if (m_coDriverStick.getYButton()) {
-      if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementCoralBackup(0.5);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementCoralBackup(-0.5);
-      }
-    } else if (Math.abs(climbStick) > 0.1) {
+    if (m_coDriverStick.getPOVTopPressed()) {
+      m_superstructure.incrementElevatorOffset(0.5);
+    } else if (m_coDriverStick.getPOVBottomPressed()) {
+      m_superstructure.incrementElevatorOffset(-0.5);
+    } else if (m_coDriverStick.getPOVRightPressed()) {
+      m_superstructure.incrementArmOffset(1.0);
+    } else if (m_coDriverStick.getPOVLeftPressed()) {
+      m_superstructure.incrementArmOffset(-1.0);
+    }
+
+    if (m_coDriverStick.getAButtonPressed()) {
+      m_superstructure.setTargetReefLevel(1);
+    } else if (m_coDriverStick.getBButtonPressed()) {
+      m_superstructure.setTargetReefLevel(2);
+    } else if (m_coDriverStick.getXButtonPressed()) {
+      m_superstructure.setTargetReefLevel(3);
+    } else if (m_coDriverStick.getYButtonPressed()) {
+      m_superstructure.setTargetReefLevel(4);
+    }
+
+    if (Math.abs(climbStick) > 0.1) {
       m_superstructure.setClimbPower(climbStick * 0.1);
       m_superstructure.setState(Superstructure.State.Climb);
     }
-
-    if (m_coDriverStick.getPOVTopPressed()) {
-      m_superstructure.incrementTargetReefLevel(1);
-    } else if (m_coDriverStick.getPOVBottomPressed()) {
-      m_superstructure.incrementTargetReefLevel(-1);
-    }
-    // else if (m_coDriverStick.getPOVRightPressed()) {
-    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
-    // } else if (m_coDriverStick.getPOVLeftPressed()) {
-    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
-    // }
 
     updateSubsystems();
   }
@@ -228,6 +242,20 @@ public class Robot extends TimedRobot {
 
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
+
+    if (m_frontFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(1);
+    } else if (m_frontRightFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(2);
+    } else if (m_backRightFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(3);
+    } else if (m_backFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(4);
+    } else if (m_backLeftFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(5);
+    } else if (m_frontLeftFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(6);
+    }
 
     if (m_coDriverStick.getAButtonPressed()) {
       m_autoManager.increment();
