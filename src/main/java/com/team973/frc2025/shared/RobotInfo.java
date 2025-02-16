@@ -70,7 +70,7 @@ public final class RobotInfo {
     public static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */
-    public static final double ANGLE_KP = 8.0;
+    public static final double ANGLE_KP = 7.5;
     public static final double ANGLE_KI = 0.0;
     public static final double ANGLE_KD = 0.0;
     public static final double ANGLE_KF = 0.0;
@@ -80,7 +80,7 @@ public final class RobotInfo {
     public static final double DRIVE_KP = 0.35;
     public static final double DRIVE_KI = 0.0;
     public static final double DRIVE_KD = 0.0;
-    public static final double DRIVE_KF = 0.148 * 0.82;
+    public static final double DRIVE_KF = 0.11581;
 
     /* Motor Inverts */
     public static final boolean DRIVE_MOTOR_INVERT = true;
@@ -92,10 +92,14 @@ public final class RobotInfo {
     // public static final double FALCON_TRAP_FREE_SPEED = 6380.0;
     public static final double KRAKEN_TRAP_FREE_SPEED = 6000.0;
     public static final double MAX_ACCELERATION_METERS_PER_SECOND = 3.0; // 4.3;
-    public static final double MAX_VELOCITY_METERS_PER_SECOND =
-        (KRAKEN_TRAP_FREE_SPEED / 60.0 * DRIVE_GEAR_RATIO * WHEEL_DIAMETER_METERS * Math.PI);
+    public static final double LINEAR_METERS_PER_WHEEL_ROTATIONS = WHEEL_DIAMETER_METERS * Math.PI;
 
-    public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = 13.3; // 11.5;
+    /** Measured Max Speed: 4.724 MPS */
+    public static final double MAX_VELOCITY_METERS_PER_SECOND =
+        (KRAKEN_TRAP_FREE_SPEED / 60.0 * DRIVE_GEAR_RATIO * LINEAR_METERS_PER_WHEEL_ROTATIONS);
+
+    /** Measured Max Angular Speed: 12.65 RadPS */
+    public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = 13.3;
 
     public static final SwerveModuleConfig FRONT_LEFT_CONSTANTS =
         new SwerveModuleConfig(

@@ -15,6 +15,7 @@ import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -134,10 +135,6 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     syncSensors();
 
-    // if (m_coDriverStick.getYButtonPressed()) {
-    //   m_manualScoringMode = !m_manualScoringMode;
-    // }
-
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(
@@ -237,8 +234,8 @@ public class Robot extends TimedRobot {
     } else if (m_coDriverStick.getBButtonPressed()) {
       m_autoManager.decrement();
     }
-    // SmartDashboard.putString(
-    //     "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
+    SmartDashboard.putString(
+        "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
   }
 
   /** This function is called once when test mode is enabled. */
