@@ -33,8 +33,8 @@ public class DriveWithTrajectory extends DriveComposable {
   public DriveWithTrajectory(Logger logger, Drive drive) {
     m_controller =
         new GreyHolonomicDriveController(
-            new PIDController(5.0, 0.0, 0.0), // 32
-            new PIDController(5.0, 0.0, 0.0), // 32
+            new PIDController(5.0, 0.0, 0.0),
+            new PIDController(5.0, 0.0, 0.0),
             new ProfiledPIDController(
                 2.0,
                 0.0,

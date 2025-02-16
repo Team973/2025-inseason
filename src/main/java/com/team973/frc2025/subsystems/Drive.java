@@ -145,6 +145,10 @@ public class Drive implements Subsystem {
     m_odometryLogger.log("X Pos", m_poseEstimator.getPoseMeters().getX());
     m_odometryLogger.log("Y Pos", m_poseEstimator.getPoseMeters().getY());
     m_odometryLogger.log("Heading Deg", m_poseEstimator.getPoseMeters().getRotation().getDegrees());
+    m_odometryLogger.log(
+        "X Meters Per Second", m_poseEstimator.getVelocityMetersPerSeconds().getX());
+    m_odometryLogger.log(
+        "Y Meters Per Second", m_poseEstimator.getVelocityMetersPerSeconds().getY());
 
     double states[] = new double[8];
     int index = 0;

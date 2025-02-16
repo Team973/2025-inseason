@@ -92,7 +92,7 @@ public class GreyPoseEstimator {
     return m_lastPoseMeters
         .minus(getPoseMeters())
         .getTranslation()
-        .times(1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY);
+        .times(RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY);
   }
 
   public synchronized void resetPosition(Pose2d pose) {
@@ -149,7 +149,7 @@ public class GreyPoseEstimator {
         ImmutableList.of(
                 getPoseMeters().getTranslation().getX(),
                 getPoseMeters().getTranslation().getY(),
-                getPoseMeters().getRotation().getDegrees())
+                getPoseMeters().getRotation().getRadians())
             .toArray(Double[]::new));
   }
 
