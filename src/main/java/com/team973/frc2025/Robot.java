@@ -8,8 +8,10 @@ import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -126,7 +128,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
-    // m_driveController.resetOdometry(new Pose2d(15.8905, 4.1259, Rotation2d.fromDegrees(180)));
   }
 
   /** This function is called periodically during operator control. */
@@ -154,72 +155,72 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
-    // if (m_manualScoringMode) {
-    //   m_superstructure.setState(Superstructure.State.Manual);
+    if (m_manualScoringMode) {
+      m_superstructure.setState(Superstructure.State.Manual);
 
-    //   if (m_driverStick.getRightBumperButtonPressed()) {
-    //     m_superstructure.setManualScore(true);
-    //   } else if (m_driverStick.getRightBumperButtonReleased()) {
-    //     m_superstructure.setManualScore(false);
-    //   }
+      if (m_driverStick.getRightBumperButtonPressed()) {
+        m_superstructure.setManualScore(true);
+      } else if (m_driverStick.getRightBumperButtonReleased()) {
+        m_superstructure.setManualScore(false);
+      }
 
-    //   if (m_driverStick.getLeftBumperButtonPressed()) {
-    //     m_superstructure.toggleManualArmivator();
-    //   }
-    // } else {
-    //   if (m_driverStick.getLeftTrigger()) {
-    //     m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-    //     m_driveController
-    //         .getDriveWithLimelight()
-    //         .targetReefPosition(
-    //             DriveWithLimelight.TargetReefSide.Left,
-    //             () -> m_superstructure.readyToScore(),
-    //             () -> m_superstructure.finishedScoring());
-    //     m_superstructure.setState(Superstructure.State.ScoreCoral);
-    //   } else if (m_driverStick.getRightTrigger()) {
-    //     m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-    //     m_driveController
-    //         .getDriveWithLimelight()
-    //         .targetReefPosition(
-    //             DriveWithLimelight.TargetReefSide.Right,
-    //             () -> m_superstructure.readyToScore(),
-    //             () -> m_superstructure.finishedScoring());
-    //     m_superstructure.setState(Superstructure.State.ScoreCoral);
-    //   } else {
-    //     m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-    //   }
-    // }
+      if (m_driverStick.getLeftBumperButtonPressed()) {
+        m_superstructure.toggleManualArmivator();
+      }
+    } else {
+      if (m_driverStick.getLeftTrigger()) {
+        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+        m_driveController
+            .getDriveWithLimelight()
+            .targetReefPosition(
+                DriveWithLimelight.TargetReefSide.Left,
+                () -> m_superstructure.readyToScore(),
+                () -> m_superstructure.finishedScoring());
+        m_superstructure.setState(Superstructure.State.ScoreCoral);
+      } else if (m_driverStick.getRightTrigger()) {
+        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+        m_driveController
+            .getDriveWithLimelight()
+            .targetReefPosition(
+                DriveWithLimelight.TargetReefSide.Right,
+                () -> m_superstructure.readyToScore(),
+                () -> m_superstructure.finishedScoring());
+        m_superstructure.setState(Superstructure.State.ScoreCoral);
+      } else {
+        m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+      }
+    }
 
-    // double climbStick = m_coDriverStick.getLeftYAxis();
+    double climbStick = m_coDriverStick.getLeftYAxis();
 
-    // if (m_coDriverStick.getAButton()) {
-    //   if (m_coDriverStick.getPOVRightPressed()) {
-    //     m_superstructure.incrementArmOffset(1.0);
-    //   } else if (m_coDriverStick.getPOVLeftPressed()) {
-    //     m_superstructure.incrementArmOffset(-1.0);
-    //   }
-    // } else if (m_coDriverStick.getBButton()) {
-    //   if (m_coDriverStick.getPOVRightPressed()) {
-    //     m_superstructure.incrementElevatorOffset(0.5);
-    //   } else if (m_coDriverStick.getPOVLeftPressed()) {
-    //     m_superstructure.incrementElevatorOffset(-0.5);
-    //   }
-    // } else if (m_coDriverStick.getYButton()) {
-    //   if (m_coDriverStick.getPOVRightPressed()) {
-    //     m_superstructure.incrementCoralBackup(0.5);
-    //   } else if (m_coDriverStick.getPOVLeftPressed()) {
-    //     m_superstructure.incrementCoralBackup(-0.5);
-    //   }
-    // } else if (Math.abs(climbStick) > 0.1) {
-    //   m_superstructure.setClimbPower(climbStick * 0.1);
-    //   m_superstructure.setState(Superstructure.State.Climb);
-    // }
+    if (m_coDriverStick.getAButton()) {
+      if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementArmOffset(1.0);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementArmOffset(-1.0);
+      }
+    } else if (m_coDriverStick.getBButton()) {
+      if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementElevatorOffset(0.5);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementElevatorOffset(-0.5);
+      }
+    } else if (m_coDriverStick.getYButton()) {
+      if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementCoralBackup(0.5);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementCoralBackup(-0.5);
+      }
+    } else if (Math.abs(climbStick) > 0.1) {
+      m_superstructure.setClimbPower(climbStick * 0.1);
+      m_superstructure.setState(Superstructure.State.Climb);
+    }
 
-    // if (m_coDriverStick.getPOVTopPressed()) {
-    //   m_superstructure.incrementTargetReefLevel(1);
-    // } else if (m_coDriverStick.getPOVBottomPressed()) {
-    //   m_superstructure.incrementTargetReefLevel(-1);
-    // }
+    if (m_coDriverStick.getPOVTopPressed()) {
+      m_superstructure.incrementTargetReefLevel(1);
+    } else if (m_coDriverStick.getPOVBottomPressed()) {
+      m_superstructure.incrementTargetReefLevel(-1);
+    }
     // else if (m_coDriverStick.getPOVRightPressed()) {
     //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
     // } else if (m_coDriverStick.getPOVLeftPressed()) {
