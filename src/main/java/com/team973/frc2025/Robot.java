@@ -135,19 +135,6 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     syncSensors();
 
-    // if (m_driverStick.getRightTrigger()) {
-    //   m_driveController
-    //       .getDriveWithLimelight()
-    //       .targetReefPosition(DriveWithLimelight.TargetReefSide.Left, () -> false, () -> false);
-    //   m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-    // } else {
-    //   m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-    // }
-
-    // if (m_coDriverStick.getYButtonPressed()) {
-    //   m_manualScoringMode = !m_manualScoringMode;
-    // }
-
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(
