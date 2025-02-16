@@ -10,16 +10,26 @@ import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_motorRight;
   private final GreyTalonFX m_motorLeft;
-  private ControlStatus m_mode = ControlStatus.Off;
+  private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_targetPostionHeightinches;
   private double m_targetpositionLeway = 0.1;
   double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
+  private boolean m_lastHallSensorMode;
+  private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
+
+  private double m_levelOneOffset = 0.0;
+  private double m_levelTwoOffset = 0.0;
+  private double m_levelThreeOffset = 0.0;
+  private double m_levelFourOffset = 0.0;
+
+  private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
 
   public static enum ControlStatus {
     Manual,
@@ -29,7 +39,7 @@ public class Elevator implements Subsystem {
 
   public void setmotorManualOutput(double joystick) {
     m_manualPower = joystick * 0.1;
-    m_mode = ControlStatus.Manual;
+    m_controlStatus = ControlStatus.Manual;
   }
 
   private double heightInchesToMotorRotations(double postionHeight) {
@@ -41,11 +51,11 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    public static final double LEVEL_1 = 0.0;
+    public static final double LEVEL_1 = 2.0;
     public static final double LEVEL_2 = 12.0;
-    public static final double LEVEL_3 = 1.0;
-    public static final double LEVEL_4 = 26.0;
-    public static final double OFF = 0;
+    public static final double LEVEL_3 = 3.5;
+    public static final double LEVEL_4 = 25.5;
+    public static final double STOW = 0;
   }
 
   public Elevator(Logger logger) {
@@ -62,6 +72,7 @@ public class Elevator implements Subsystem {
     m_motorRight.setConfig(rightMotorConfig);
 
     m_motorLeft.setControl(new Follower(m_motorRight.getDeviceID(), true));
+    m_motorRight.setPosition(0.0);
   }
 
   private static TalonFXConfiguration defaultElevatorMotorConfig() {
@@ -77,25 +88,38 @@ public class Elevator implements Subsystem {
     defaultElevatorMotorConfig.Slot1.kS = 0.0;
     defaultElevatorMotorConfig.Slot1.kV = 0.0;
     defaultElevatorMotorConfig.Slot1.kA = 0.0;
-    defaultElevatorMotorConfig.Slot1.kP = 1.0;
+    defaultElevatorMotorConfig.Slot1.kP = 125.0;
     defaultElevatorMotorConfig.Slot1.kI = 0.0;
     defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 16;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 20;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 160;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        50.0; // 32.0; // 64; // 32; // 16;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
+        300.0; // 40.0; // 500; // 40; // 20;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 2000.0;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 10;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
     defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage = 4;
-    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = -4;
-    defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
+    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage = 12;
+    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = -12;
+    defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.00;
     defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     return defaultElevatorMotorConfig;
   }
 
-  public void setModeOff() {
-    m_mode = ControlStatus.Off;
+  private boolean hallsensor() {
+    return !m_hallSensor.get();
+  }
+
+  private void maybeHomeElevator() {
+    if (m_lastHallSensorMode == false && hallsensor() == true) {
+      m_motorRight.setPosition(heightInchesToMotorRotations(ELEVATOR_HOMING_POSTION_HEIGHT));
+    }
+    m_lastHallSensorMode = hallsensor();
+  }
+
+  public void setControlStatus(ControlStatus status) {
+    m_controlStatus = status;
   }
 
   public boolean motorAtTarget() {
@@ -107,12 +131,44 @@ public class Elevator implements Subsystem {
 
   public void setTargetPostion(double targetPostionHeightinches) {
     m_targetPostionHeightinches = targetPostionHeightinches;
-    m_mode = ControlStatus.TargetPostion;
+    m_controlStatus = ControlStatus.TargetPostion;
+  }
+
+  public void incrementOffset(double offset, int level) {
+    switch (level) {
+      case 1:
+        m_levelOneOffset += offset;
+        break;
+      case 2:
+        m_levelTwoOffset += offset;
+        break;
+      case 3:
+        m_levelThreeOffset += offset;
+        break;
+      case 4:
+        m_levelFourOffset += offset;
+        break;
+    }
+  }
+
+  public double getTargetPositionFromLevel(int level) {
+    switch (level) {
+      case 1:
+        return Presets.LEVEL_1 + m_levelOneOffset;
+      case 2:
+        return Presets.LEVEL_2 + m_levelTwoOffset;
+      case 3:
+        return Presets.LEVEL_3 + m_levelThreeOffset;
+      case 4:
+        return Presets.LEVEL_4 + m_levelFourOffset;
+      default:
+        throw new IllegalArgumentException(String.valueOf(level));
+    }
   }
 
   @Override
   public void update() {
-    switch (m_mode) {
+    switch (m_controlStatus) {
       case Manual:
         m_motorRight.setControl(ControlMode.DutyCycleOut, m_manualPower, 0);
         break;
@@ -137,14 +193,17 @@ public class Elevator implements Subsystem {
     m_logger.log("targetPostionHeightInches", m_targetPostionHeightinches);
     m_motorLeft.log();
     m_motorRight.log();
-    m_logger.log("elevatorMode", m_mode.toString());
+    m_logger.log("elevatorMode", m_controlStatus.toString());
     m_logger.log(
         "motorErrorInches",
         motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
+    m_logger.log("hallSesnsorReturnElevator", hallsensor());
   }
 
   @Override
-  public void syncSensors() {}
+  public void syncSensors() {
+    maybeHomeElevator();
+  }
 
   @Override
   public void reset() {}

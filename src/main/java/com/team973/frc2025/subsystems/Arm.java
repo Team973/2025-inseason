@@ -8,25 +8,37 @@ import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Arm implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_armMotor;
-  private ControlStatus m_mode = ControlStatus.Stow;
+  private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
+  private boolean m_lastHallSensorMode;
+  private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
-  public static final double HIGH_POSTION_DEG = 0;
-  public static final double MEDIUM_POSTION_DEG = -30;
-  public static final double LOW_POSTION_DEG = -60;
+  private static final double LEVEL_FOUR_POSITION_DEG = 79.0; // 76
+  private static final double LEVEL_THREE_POSITION_DEG = 67.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -70.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -70.0;
+  public static final double STOW_POSITION_DEG = -90.0;
+  private static final double ARM_HOMING_POSTION_DEG = -90.0;
+
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
-  private static final double FEED_FORWARD_MAX_VOLT = 0.5;
+  private static final double FEED_FORWARD_MAX_VOLT = 0.6; // 0.5;
+
+  private double m_levelOneOffset = 0.0;
+  private double m_levelTwoOffset = 0.0;
+  private double m_levelThreeOffset = 0.0;
+  private double m_levelFourOffset = 0.0;
 
   public static enum ControlStatus {
     Manual,
     TargetPostion,
-    Stow,
+    Off,
   }
 
   private double armDegToMotorRotations(double armPostionDeg) {
@@ -44,11 +56,11 @@ public class Arm implements Subsystem {
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.0;
     armMotorConfig.Slot0.kA = 0.0;
-    armMotorConfig.Slot0.kP = 8.0;
+    armMotorConfig.Slot0.kP = 50.0;
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
-    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 64.0;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 80.0;
+    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 72.0; // 64.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 90.0; // 80.0;
     armMotorConfig.MotionMagic.MotionMagicJerk = 160.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -61,17 +73,28 @@ public class Arm implements Subsystem {
     armMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     armMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_armMotor.setConfig(armMotorConfig);
-    m_armMotor.setPosition(armDegToMotorRotations(-90.0));
+    m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
   }
 
-  public void setArmMotorManualOutput(double joystick) {
-    m_mode = ControlStatus.Manual;
+  private boolean hallSensor() {
+    return !m_hallSesnsor.get();
+  }
+
+  private void maybeHomeArm() {
+    if (m_lastHallSensorMode == false && hallSensor() == true) {
+      m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
+      m_lastHallSensorMode = hallSensor();
+    }
+  }
+
+  public void setMotorManualOutput(double joystick) {
+    m_controlStatus = ControlStatus.Manual;
     m_manualArmPower = joystick * 0.1;
   }
 
-  public void setArmTargetDeg(double setPostionDeg) {
+  public void setTargetDeg(double setPostionDeg) {
     m_armTargetPostionDeg = setPostionDeg;
-    m_mode = ControlStatus.TargetPostion;
+    m_controlStatus = ControlStatus.TargetPostion;
   }
 
   public boolean motorAtTargetRotation() {
@@ -87,9 +110,28 @@ public class Arm implements Subsystem {
         * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
 
+  public double getTargetDegFromLevel(int level) {
+    switch (level) {
+      case 1:
+        return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
+      case 2:
+        return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
+      case 3:
+        return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
+      case 4:
+        return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+      default:
+        throw new IllegalArgumentException(String.valueOf(level));
+    }
+  }
+
+  public double getTargetPosition() {
+    return m_armTargetPostionDeg;
+  }
+
   @Override
   public void update() {
-    switch (m_mode) {
+    switch (m_controlStatus) {
       case Manual:
         m_armMotor.setControl(
             ControlMode.VoltageOut, (m_manualArmPower * 12.0) + getFeedForwardTargetAngle(), 0);
@@ -101,13 +143,30 @@ public class Arm implements Subsystem {
             getFeedForwardTargetAngle(),
             0);
         break;
-      case Stow:
+      case Off:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
     }
   }
 
-  public void setStow() {
-    m_mode = ControlStatus.Stow;
+  public void setControlStatus(ControlStatus status) {
+    m_controlStatus = status;
+  }
+
+  public void incrementOffset(double increment, int level) {
+    switch (level) {
+      case 1:
+        m_levelOneOffset += increment;
+        break;
+      case 2:
+        m_levelTwoOffset += increment;
+        break;
+      case 3:
+        m_levelThreeOffset += increment;
+        break;
+      case 4:
+        m_levelFourOffset += increment;
+        break;
+    }
   }
 
   @Override
@@ -116,16 +175,19 @@ public class Arm implements Subsystem {
         "armDegPostion", motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble()));
     m_armMotor.log();
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
-    m_logger.log("armMode", m_mode.toString());
+    m_logger.log("armMode", m_controlStatus.toString());
     m_logger.log(
         "motorArmErrorDeg",
         motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
+    m_logger.log("HallsensorArm", hallSensor());
   }
 
   @Override
-  public void syncSensors() {}
+  public void syncSensors() {
+    maybeHomeArm();
+  }
 
   @Override
   public void reset() {}
