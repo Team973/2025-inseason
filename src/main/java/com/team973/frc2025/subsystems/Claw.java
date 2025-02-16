@@ -31,7 +31,7 @@ public class Claw implements Subsystem {
   private ControlStatus m_mode = ControlStatus.Off;
   private ControlStatus m_lastMode = ControlStatus.Off;
 
-  public final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2); 
+  public final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2);
 
   private double m_leftTargetPostion = 0;
   private double m_rightTargetPotion = 0;
@@ -58,8 +58,8 @@ public class Claw implements Subsystem {
         new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("shooterRight"));
     m_conveyor =
         new GreyTalonFX(
-            ClawInfo.CONVEYOR_MOTOR_ID, "Canivore", m_logger.subLogger("conveyor motor")); 
-    
+            ClawInfo.CONVEYOR_MOTOR_ID, "Canivore", m_logger.subLogger("conveyor motor"));
+
     m_backSensor = new DigitalInput(ClawInfo.BACK_SENSOR_ID);
     m_frontSensor = new DigitalInput(ClawInfo.FRONT_SENSOR_ID);
     m_coralSensor = new DigitalInput(ClawInfo.CORAL_SENSOR_ID);

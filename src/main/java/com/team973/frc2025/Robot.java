@@ -6,14 +6,11 @@ import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
-import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
-import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -92,6 +89,7 @@ public class Robot extends TimedRobot {
     m_driverStick.update();
     m_coDriverStick.update();
   }
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -119,7 +117,8 @@ public class Robot extends TimedRobot {
     logSubsystems();
     updateJoysticks();
   }
- public void teleopPeriodic() {
+
+  public void teleopPeriodic() {
 
     double climbStick = m_coDriverStick.getLeftYAxis();
 
@@ -161,9 +160,11 @@ public class Robot extends TimedRobot {
     // }
     updateSubsystems();
   }
+
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {}
+
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
@@ -178,9 +179,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString(
         "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
   }
+
   /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {}
+
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
