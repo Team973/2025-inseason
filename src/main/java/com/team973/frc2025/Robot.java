@@ -9,11 +9,11 @@ import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
-import com.team973.frc2025.subsystems.Conveyor;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
+import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
@@ -29,18 +29,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
 
-  private final Joystick m_stick;
-
-  private final Joystick m_teststick;
-
-  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
-
-  private final Conveyor m_conveyor = new Conveyor(m_logger.subLogger("conveyor manager"));
-
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
-  private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
 
+  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
+  private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
 
@@ -50,6 +43,9 @@ public class Robot extends TimedRobot {
   private final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2);
 
   private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 100);
+  private final Superstructure m_superstructure =
+      new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
+
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 
@@ -58,23 +54,26 @@ public class Robot extends TimedRobot {
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
 
+  private boolean m_manualScoringMode = true;
+
   private void syncSensors() {
     m_driveController.syncSensors();
     m_claw.syncSensors();
     m_candleManger.syncSensors();
     m_climb.syncSensors();
-    m_conveyor.syncSensors();
+   
+    m_superstructure.syncSensors();
   }
 
   private void updateSubsystems() {
     m_driveController.update();
     m_climb.update();
-    m_conveyor.update();
     m_claw.update();
     m_candleManger.update();
     m_elevator.update();
     m_arm.update();
     m_candleManger.update();
+    m_superstructure.update();
   }
 
   private void resetSubsystems() {
@@ -84,17 +83,17 @@ public class Robot extends TimedRobot {
   }
 
   private void logSubsystems() {
-    // m_driveController.log();
-    // m_claw.log();
-    // m_candleManger.log();
+    m_driveController.log();
+    m_claw.log();
+    m_candleManger.log();
     m_climb.reset();
+    m_superstructure.reset();
+    m_logger.update();
   }
 
   private void updateJoysticks() {
     m_driverStick.update();
     m_coDriverStick.update();
-    m_stick.update();
-    m_teststick.update();
   }
 
   /**
@@ -108,8 +107,7 @@ public class Robot extends TimedRobot {
     m_candleManger.addSignaler(m_lowBatterySignaler);
     m_candleManger.addSignaler(m_ledOff);
     m_candleManger.addSignaler(m_coralInclawBlinker);
-    m_stick = new Joystick(2, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
-    m_teststick = new Joystick(3, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
+    m_candleManger.addSignaler(m_claw.m_coralInclawBlinker);
   }
 
   /**
@@ -121,40 +119,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
-    if (m_driverStick.getLeftBumperButtonPressed()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .targetReefPosition(
-              DriveWithLimelight.TargetReefSide.Left, () -> !m_claw.sensorSeeCoral());
-    } else if (m_driverStick.getRightBumperButtonPressed()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .targetReefPosition(DriveWithLimelight.TargetReefSide.Right, () -> true);
-    } else if (m_driverStick.getLeftBumperButtonReleased()
-        || m_driverStick.getRightBumperButtonReleased()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-    }
-
-    if (m_coDriverStick.getPOVRightPressed()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
-    } else if (m_coDriverStick.getPOVLeftPressed()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
-    }
-    if (RobotController.getBatteryVoltage() < 12.0) {
-      m_lowBatterySignaler.setEnabled(true);
-    }
-    if (RobotController.getBatteryVoltage() > 12.1) {
-      m_lowBatterySignaler.setEnabled(false);
-    }
-    if (m_claw.sensorSeeCoral() == true) {
-      m_coralInclawBlinker.setEnabled(true);
-    }
-    if (m_claw.sensorSeeCoral() == false) {
-      m_coralInclawBlinker.setEnabled(false);
-    }
 
     logSubsystems();
     updateJoysticks();
@@ -205,61 +169,54 @@ public class Robot extends TimedRobot {
             m_driverStick.getLeftYAxis() * 0.95,
             m_driverStick.getRightXAxis() * 0.8);
 
-    if (m_stick.getAButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.ClimbHigh);
-    } else if (m_stick.getBButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.ClimbLow);
-    } else if (m_stick.getXButtonPressed()) {
-      m_climb.setControlMode(Climb.ControlMode.OffState);
-    } else if (m_stick.getYButton()) {
-      m_climb.setControlMode(Climb.ControlMode.JoystickMode);
-      m_climb.setManualPower(m_stick.getLeftYAxis());
-    } else if (m_stick.getYButtonReleased()) {
-      m_climb.setControlMode(Climb.ControlMode.OffState);
-    }
+    if (m_manualScoringMode) {
+      m_superstructure.setState(Superstructure.State.Manual);
 
-    if (m_teststick.getAButtonPressed()) {
-      m_conveyor.setControlMode(Conveyor.ControlMode.ConveyorForward);
-    } else if (m_teststick.getBButtonPressed()) {
-      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorBackward));
-    } else if (m_teststick.getXButtonPressed()) {
-      m_conveyor.setControlMode((Conveyor.ControlMode.ConveyorOff));
-    }
+      if (m_driverStick.getRightBumperButtonPressed()) {
+        m_superstructure.setManualScore(true);
+      } else if (m_driverStick.getRightBumperButtonReleased()) {
+        m_superstructure.setManualScore(false);
+      }
 
-    if (m_coDriverStick.getAButton()) {
-      m_claw.setControl(Claw.ControlStatus.IntakeAndHold);
-    } else if (m_coDriverStick.getBButton()) {
-      m_claw.setControl(Claw.ControlStatus.Stop);
-    } else if (m_coDriverStick.getXButton()) {
-      m_claw.setControl(Claw.ControlStatus.Score);
-    } else if (m_coDriverStick.getYButton()) {
-      m_claw.setControl(Claw.ControlStatus.Retract);
-    }
-    if (m_coDriverStick.getPOVTop()) {
-      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_4);
-    } else if (m_coDriverStick.getPOVLeft()) {
-      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_3);
-    } else if (m_coDriverStick.getPOVRight()) {
-      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_2);
-    } else if (m_coDriverStick.getPOVBottom()) {
-      m_elevator.setTargetPostion(Elevator.Presets.LEVEL_1);
-    } else if (m_coDriverStick.getLeftBumperButton()) {
-      m_elevator.setmotorManualOutput(m_coDriverStick.getLeftYAxis());
+      if (m_driverStick.getLeftBumperButtonPressed()) {
+        m_superstructure.toggleManualArmivator();
+      }
     } else {
-      m_elevator.setModeOff();
+      if (m_driverStick.getLeftTrigger()) {
+        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+        m_driveController
+            .getDriveWithLimelight()
+            .targetReefPosition(
+                DriveWithLimelight.TargetReefSide.Left,
+                () -> m_superstructure.readyToScore(),
+                () -> m_superstructure.finishedScoring());
+        m_superstructure.setState(Superstructure.State.ScoreCoral);
+      } else if (m_driverStick.getRightTrigger()) {
+        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+        m_driveController
+            .getDriveWithLimelight()
+            .targetReefPosition(
+                DriveWithLimelight.TargetReefSide.Right,
+                () -> m_superstructure.readyToScore(),
+                () -> m_superstructure.finishedScoring());
+        m_superstructure.setState(Superstructure.State.ScoreCoral);
+      } else {
+        m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+      }
     }
 
-    if (m_coDriverStick.getLeftBumperButton()) {
-      m_arm.setArmTargetDeg(Arm.HIGH_POSTION_DEG);
-    } else if (m_coDriverStick.getLeftTrigger()) {
-      m_arm.setArmTargetDeg(Arm.LOW_POSTION_DEG);
-    } else if (m_coDriverStick.getStartButton()) {
-      m_arm.setArmTargetDeg(Arm.MEDIUM_POSTION_DEG);
-    } else if (m_coDriverStick.getRightBumperButton()) {
-      m_arm.setArmMotorManualOutput(m_coDriverStick.getRightYAxis() * -1.0);
-    } else {
-      m_arm.setStow();
+    double climbStick = m_coDriverStick.getLeftYAxis();
+
+    if (m_coDriverStick.getPOVTopPressed()) {
+      m_superstructure.incrementTargetReefLevel(1);
+    } else if (m_coDriverStick.getPOVBottomPressed()) {
+      m_superstructure.incrementTargetReefLevel(-1);
     }
+    // else if (m_coDriverStick.getPOVRightPressed()) {
+    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
+    // } else if (m_coDriverStick.getPOVLeftPressed()) {
+    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
+    // }
 
     updateSubsystems();
   }
@@ -282,7 +239,7 @@ public class Robot extends TimedRobot {
       m_autoManager.decrement();
     }
     SmartDashboard.putString(
-        "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
+        "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
   }
 
   /** This function is called once when test mode is enabled. */
