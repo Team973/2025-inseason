@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
 
-  private final CANdleManger m_CaNdleManger = new CANdleManger(new Logger("candle manger"));
+  private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
 
   private final SolidSignaler m_lowBatterySignaler = new SolidSignaler(RobotInfo.Colors.ORANGE, 1);
   private final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2);
@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
   private void syncSensors() {
     m_driveController.syncSensors();
     m_claw.syncSensors();
-    m_CaNdleManger.syncSensors();
+    m_candleManger.syncSensors();
     m_climb.syncSensors();
     m_conveyor.syncSensors();
   }
@@ -71,21 +71,22 @@ public class Robot extends TimedRobot {
     m_climb.update();
     m_conveyor.update();
     m_claw.update();
-    m_CaNdleManger.update();
+    m_candleManger.update();
     m_elevator.update();
     m_arm.update();
+    m_candleManger.update();
   }
 
   private void resetSubsystems() {
     m_driveController.reset();
     m_claw.reset();
-    m_CaNdleManger.reset();
+    m_candleManger.reset();
   }
 
   private void logSubsystems() {
     // m_driveController.log();
     // m_claw.log();
-    // m_CaNdleManger.log();
+    // m_candleManger.log();
     m_climb.reset();
   }
 
@@ -104,9 +105,9 @@ public class Robot extends TimedRobot {
     resetSubsystems();
     m_driveController.startOdometrey();
     m_ledOff.setEnabled(true);
-    m_CaNdleManger.addSignaler(m_lowBatterySignaler);
-    m_CaNdleManger.addSignaler(m_ledOff);
-    m_CaNdleManger.addSignaler(m_coralInclawBlinker);
+    m_candleManger.addSignaler(m_lowBatterySignaler);
+    m_candleManger.addSignaler(m_ledOff);
+    m_candleManger.addSignaler(m_coralInclawBlinker);
     m_stick = new Joystick(2, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
     m_teststick = new Joystick(3, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
   }
@@ -271,7 +272,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     syncSensors();
-    m_CaNdleManger.update();
 
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
