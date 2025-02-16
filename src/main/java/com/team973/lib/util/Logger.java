@@ -1,6 +1,5 @@
 package com.team973.lib.util;
 
-import dev.doglog.DogLog;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -75,69 +74,69 @@ public class Logger {
   }
 
   public void log(String key, double value) {
-    if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
-    }
+    // if (m_logAllowed) {
+    //   DogLog.log(m_prefix + "/" + key, value);
+    // }
   }
 
   public void log(String key, String value) {
-    if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
-    }
+    // if (m_logAllowed) {
+    //   DogLog.log(m_prefix + "/" + key, value);
+    // }
   }
 
   public void log(String key, int value) {
-    if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
-    }
+    // if (m_logAllowed) {
+    //   DogLog.log(m_prefix + "/" + key, value);
+    // }
   }
 
   public void log(String key, boolean value) {
-    if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
-    }
+    // if (m_logAllowed) {
+    //   DogLog.log(m_prefix + "/" + key, value);
+    // }
   }
 
   public void log(String key, double[] value) {
-    if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
-    }
+    // if (m_logAllowed) {
+    //   DogLog.log(m_prefix + "/" + key, value);
+    // }
   }
 
   public void log(String key, String[] value) {
-    if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
-    }
+    // if (m_logAllowed) {
+    //   DogLog.log(m_prefix + "/" + key, value);
+    // }
   }
 
   public void log(String key, int[] value) {
-    if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
-    }
+    // if (m_logAllowed) {
+    //   DogLog.log(m_prefix + "/" + key, value);
+    // }
   }
 
   public void log(String key, boolean[] value) {
-    if (m_logAllowed) {
-      DogLog.log(m_prefix + "/" + key, value);
-    }
+    // if (m_logAllowed) {
+    //   DogLog.log(m_prefix + "/" + key, value);
+    // }
   }
 
   public void log(String key, DoubleSupplier valueSupplier) {
-    if (m_logAllowed) {
-      log(key, valueSupplier.getAsDouble());
-    }
+    // if (m_logAllowed) {
+    //   log(key, valueSupplier.getAsDouble());
+    // }
   }
 
   public void log(String key, IntSupplier valueSupplier) {
-    if (m_logAllowed) {
-      log(key, valueSupplier.getAsInt());
-    }
+    // if (m_logAllowed) {
+    //   log(key, valueSupplier.getAsInt());
+    // }
   }
 
   public void log(String key, BooleanSupplier valueSupplier) {
-    if (m_logAllowed) {
-      log(key, valueSupplier.getAsBoolean());
-    }
+    // if (m_logAllowed) {
+    //   log(key, valueSupplier.getAsBoolean());
+    // }
   }
 
   /**

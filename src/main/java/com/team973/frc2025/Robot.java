@@ -18,6 +18,7 @@ import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -26,13 +27,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-
-// m_solidOarge if below 12 V low priorty
-// m_blinkingGreen if we have peice in intake
-// m_solidGreen when claw sensor see coral
-// m_blinkingred if it crashes
-// m_solidBlue for when climb is completed
-
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
 
@@ -52,16 +46,9 @@ public class Robot extends TimedRobot {
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
 
   private final CANdleManger m_CaNdleManger = new CANdleManger(new Logger("candle manger"));
-  public final BlinkingSignaler m_redBlinker =
-      new BlinkingSignaler(RobotInfo.Colors.RED, RobotInfo.Colors.OFF, 500, 100);
-  public final BlinkingSignaler m_blueBlinker =
-      new BlinkingSignaler(RobotInfo.Colors.BLUE, RobotInfo.Colors.OFF, 1000, 0);
-  public final BlinkingSignaler m_greenBlinker =
-      new BlinkingSignaler(RobotInfo.Colors.GREEN, RobotInfo.Colors.OFF, 500, 33);
-  public final SolidSignaler m_offBlinker = new SolidSignaler(RobotInfo.Colors.OFF, 90);
-  public final SolidSignaler m_solidOarnge = new SolidSignaler(RobotInfo.Colors.OARNGE, 50);
-  public final SolidSignaler m_solidGreen = new SolidSignaler(RobotInfo.Colors.GREEN, 50);
-
+  private final BlinkingSignaler m_oarngeBlinker =
+      new BlinkingSignaler(RobotInfo.Colors.OARNGE, RobotInfo.Colors.OFF, 300, 1);
+  private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 100);
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
 
@@ -115,10 +102,8 @@ public class Robot extends TimedRobot {
   public Robot() {
     resetSubsystems();
     m_driveController.startOdometrey();
-    m_offBlinker.setEnabled(true);
-    m_CaNdleManger.addSignaler(m_blueBlinker);
-    m_CaNdleManger.addSignaler(m_redBlinker);
-    m_CaNdleManger.addSignaler(m_offBlinker);
+    m_ledOff.setEnabled(true);
+    m_CaNdleManger.addSignaler(m_oarngeBlinker);
     m_stick = new Joystick(2, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
     m_teststick = new Joystick(3, Joystick.Type.XboxController, m_logger.subLogger("sticks"));
   }
@@ -132,18 +117,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    if (m_coDriverStick.getRightBumperButtonPressed()) {
-      m_redBlinker.setEnabled(true);
-    }
-    if (m_coDriverStick.getRightBumperButtonReleased()) {
-      m_redBlinker.setEnabled(false);
-    }
-    if (m_coDriverStick.getLeftBumperButtonPressed()) {
-      m_blueBlinker.setEnabled(true);
-    }
-    if (m_coDriverStick.getLeftBumperButtonReleased()) {
-      m_blueBlinker.setEnabled(false);
-    }
+
     if (m_driverStick.getLeftBumperButtonPressed()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
@@ -164,6 +138,12 @@ public class Robot extends TimedRobot {
       m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
     } else if (m_coDriverStick.getPOVLeftPressed()) {
       m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
+    }
+    if (RobotController.getBatteryVoltage() < 12.0) {
+      m_oarngeBlinker.setEnabled(true);
+    }
+    if (RobotController.getBatteryVoltage() > 12.1) {
+      m_oarngeBlinker.setEnabled(false);
     }
 
     logSubsystems();
