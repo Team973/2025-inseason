@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package com.team973.frc2025;
 
 import com.team973.frc2025.shared.RobotInfo;
@@ -28,10 +24,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
-
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
-
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
@@ -48,12 +42,10 @@ public class Robot extends TimedRobot {
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
-
   private final Joystick m_driverStick =
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
-
   private boolean m_manualScoringMode = true;
 
   private void syncSensors() {
@@ -61,7 +53,7 @@ public class Robot extends TimedRobot {
     m_claw.syncSensors();
     m_candleManger.syncSensors();
     m_climb.syncSensors();
-   
+
     m_superstructure.syncSensors();
   }
 
@@ -78,12 +70,17 @@ public class Robot extends TimedRobot {
 
   private void resetSubsystems() {
     m_driveController.reset();
+    m_superstructure.reset();
     m_claw.reset();
     m_candleManger.reset();
   }
 
   private void logSubsystems() {
     m_driveController.log();
+    m_superstructure.log();
+
+    // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
+
     m_claw.log();
     m_candleManger.log();
     m_climb.reset();
@@ -95,7 +92,6 @@ public class Robot extends TimedRobot {
     m_driverStick.update();
     m_coDriverStick.update();
   }
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -123,89 +119,35 @@ public class Robot extends TimedRobot {
     logSubsystems();
     updateJoysticks();
   }
-
-  /**
-   * This autonomous (along with the chooser code above) shows how to select between different
-   * autonomous modes using the dashboard. The sendable chooser code works with the Java
-   * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the chooser code and
-   * uncomment the getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to the switch structure
-   * below with additional strings. If using the SendableChooser make sure to add them to the
-   * chooser code above as well.
-   */
-  @Override
-  public void autonomousInit() {
-    m_autoManager.init();
-    m_driveController.resetOdometry(m_autoManager.getStartingPose());
-  }
-
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {
-    syncSensors();
-    // TODO: we're doing this badly to make it work
-    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
-    // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
-    m_autoManager.run();
-    updateSubsystems();
-  }
-
-  /** This function is called once when teleop is enabled. */
-  @Override
-  public void teleopInit() {
-    m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
-  }
-
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {
-    syncSensors();
-
-    m_driveController
-        .getDriveWithJoysticks()
-        .updateInput(
-            m_driverStick.getLeftXAxis() * 0.95,
-            m_driverStick.getLeftYAxis() * 0.95,
-            m_driverStick.getRightXAxis() * 0.8);
-
-    if (m_manualScoringMode) {
-      m_superstructure.setState(Superstructure.State.Manual);
-
-      if (m_driverStick.getRightBumperButtonPressed()) {
-        m_superstructure.setManualScore(true);
-      } else if (m_driverStick.getRightBumperButtonReleased()) {
-        m_superstructure.setManualScore(false);
-      }
-
-      if (m_driverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.toggleManualArmivator();
-      }
-    } else {
-      if (m_driverStick.getLeftTrigger()) {
-        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-        m_driveController
-            .getDriveWithLimelight()
-            .targetReefPosition(
-                DriveWithLimelight.TargetReefSide.Left,
-                () -> m_superstructure.readyToScore(),
-                () -> m_superstructure.finishedScoring());
-        m_superstructure.setState(Superstructure.State.ScoreCoral);
-      } else if (m_driverStick.getRightTrigger()) {
-        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-        m_driveController
-            .getDriveWithLimelight()
-            .targetReefPosition(
-                DriveWithLimelight.TargetReefSide.Right,
-                () -> m_superstructure.readyToScore(),
-                () -> m_superstructure.finishedScoring());
-        m_superstructure.setState(Superstructure.State.ScoreCoral);
-      } else {
-        m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-      }
-    }
+ public void teleopPeriodic() {
 
     double climbStick = m_coDriverStick.getLeftYAxis();
+
+    if (m_coDriverStick.getAButton()) {
+      if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementArmOffset(1.0);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementArmOffset(-1.0);
+      }
+    } else if (m_coDriverStick.getBButton()) {
+      if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementElevatorOffset(0.5);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementElevatorOffset(-0.5);
+      }
+    } else if (m_coDriverStick.getYButton()) {
+      if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementCoralBackup(0.5);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementCoralBackup(-0.5);
+      }
+    } else if ((climbStick) > 0.8) {
+      m_superstructure.setState(Superstructure.State.ClimbLow);
+    } else if ((climbStick) < -0.8) {
+      m_superstructure.setState(Superstructure.State.ClimbStow);
+    } else {
+      m_superstructure.setClimbPower(0);
+    }
 
     if (m_coDriverStick.getPOVTopPressed()) {
       m_superstructure.incrementTargetReefLevel(1);
@@ -217,22 +159,17 @@ public class Robot extends TimedRobot {
     // } else if (m_coDriverStick.getPOVLeftPressed()) {
     //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
     // }
-
     updateSubsystems();
   }
-
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {}
-
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
     syncSensors();
-
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
-
     if (m_coDriverStick.getAButtonPressed()) {
       m_autoManager.increment();
     } else if (m_coDriverStick.getBButtonPressed()) {
@@ -241,20 +178,10 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString(
         "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
   }
-
   /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {}
-
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
-
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {}
-
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {}
 }
