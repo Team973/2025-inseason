@@ -9,6 +9,14 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 public final class RobotInfo {
   public static final String CANIVORE_CANBUS = "Canivore"; // "Canivore";
   public static final String ROBORIO_CANBUS = "";
+  
+  public static class ArmInfo {
+    public static final int HALL_SENSOR_ID = 1;
+  }
+
+  public static class ElevatorInfo {
+    public static final int HALL_SENSOR_ID = 0;
+  }
 
   public static class ClawInfo {
     public static final int RIGHT_MOTOR_ID = 36;
