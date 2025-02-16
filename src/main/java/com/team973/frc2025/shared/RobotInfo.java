@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.util.Color;
 public final class RobotInfo {
   public static final String CANIVORE_CANBUS = "Canivore"; // "Canivore";
   public static final String ROBORIO_CANBUS = "";
-  
+
   public static class ArmInfo {
     public static final int HALL_SENSOR_ID = 1;
   }
@@ -165,7 +165,7 @@ public final class RobotInfo {
     public static final Color GREEN = new Color(0, 255, 0);
     public static final Color BLUE = new Color(0, 0, 255);
     public static final Color OFF = new Color(0, 0, 0);
-    public static final Color OARNGE = new Color(255, 165, 0);
+    public static final Color ORANGE = new Color(255, 165, 0);
     public static final Color PINK = new Color(255, 105, 180);
     public static final Color PURPLE = new Color(128, 0, 128);
     public static final Color CYAN = new Color(0, 255, 255);
