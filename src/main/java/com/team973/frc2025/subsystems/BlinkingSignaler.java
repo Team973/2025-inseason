@@ -77,4 +77,7 @@ public class BlinkingSignaler implements ISignaler {
   public void setEnabled(boolean enabled) {
     m_isEnabled = enabled;
   }
+
+  @Override
+  public void timeOn() {}
 }

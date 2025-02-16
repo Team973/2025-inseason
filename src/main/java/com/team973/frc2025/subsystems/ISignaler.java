@@ -10,4 +10,6 @@ public interface ISignaler {
   public int getPriorty();
 
   public void update(CANdle candle);
+
+  public void timeOn();
 }

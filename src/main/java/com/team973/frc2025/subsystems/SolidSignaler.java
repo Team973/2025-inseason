@@ -10,7 +10,9 @@ public class SolidSignaler implements ISignaler {
 
   private int m_priortyNum;
 
-  public SolidSignaler(Color color, int priority) {
+  private double m_timeOnMili;
+
+  public SolidSignaler(Color color, double timeMili, int priority) {
     m_color = color;
     m_priortyNum = priority;
   }
@@ -35,4 +37,7 @@ public class SolidSignaler implements ISignaler {
   public void setEnabled(boolean enabled) {
     m_isEnabled = enabled;
   }
+
+  @Override
+  public void timeOn() {}
 }

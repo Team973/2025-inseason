@@ -29,10 +29,12 @@ public class Robot extends TimedRobot {
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
 
-  private final SolidSignaler m_lowBatterySignaler = new SolidSignaler(RobotInfo.Colors.ORANGE, 1);
-  private final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2);
+  private final SolidSignaler m_lowBatterySignaler =
+      new SolidSignaler(RobotInfo.Colors.ORANGE, 0, 1);
+  private final SolidSignaler m_coralInclawBlinker =
+      new SolidSignaler(RobotInfo.Colors.GREEN, 2000, 2);
 
-  private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 100);
+  private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 0, 100);
   private final Superstructure m_superstructure =
       new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
 

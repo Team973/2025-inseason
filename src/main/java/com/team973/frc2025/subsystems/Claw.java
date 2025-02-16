@@ -16,8 +16,6 @@ public class Claw implements Subsystem {
   private static final int MOTION_MAGIC_PID_SLOT = 0;
   private static final int VELOCITY_VOLTAGE_PID_SLOT = 1;
 
-  private final SolidSignaler m_lowBatterySignaler = new SolidSignaler(RobotInfo.Colors.ORANGE, 1);
-
   private final Logger m_logger;
 
   private final GreyTalonFX m_clawMotor;
@@ -31,7 +29,7 @@ public class Claw implements Subsystem {
   private ControlStatus m_mode = ControlStatus.Off;
   private ControlStatus m_lastMode = ControlStatus.Off;
 
-  public final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2);
+  public final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 0, 2);
 
   private double m_leftTargetPostion = 0;
   private double m_rightTargetPotion = 0;
