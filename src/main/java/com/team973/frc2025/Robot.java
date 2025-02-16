@@ -198,9 +198,12 @@ public class Robot extends TimedRobot {
       } else if (m_coDriverStick.getPOVLeftPressed()) {
         m_superstructure.incrementCoralBackup(-0.5);
       }
-    } else if (Math.abs(climbStick) > 0.1) {
-      m_superstructure.setClimbPower(climbStick * 0.1);
-      m_superstructure.setState(Superstructure.State.Climb);
+    } else if ((climbStick) > 0.8) {
+      m_superstructure.setState(Superstructure.State.ClimbLow);
+    } else if ((climbStick) < -0.8) {
+      m_superstructure.setState(Superstructure.State.ClimbStow);
+    } else {
+      m_superstructure.setClimbPower(0);
     }
 
     if (m_coDriverStick.getPOVTopPressed()) {

@@ -23,7 +23,9 @@ public class Superstructure implements Subsystem {
     IntakeAlgae,
     ScoreCoral,
     ScoreAlgae,
-    Climb,
+    ClimbManual,
+    ClimbStow,
+    ClimbLow,
     Manual,
     Off
   }
@@ -167,9 +169,15 @@ public class Superstructure implements Subsystem {
         m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
         m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
-      case Climb:
+      case ClimbManual:
         m_claw.setControl(Claw.ControlStatus.Off);
         m_climb.setControlMode(Climb.ControlMode.JoystickMode);
+        break;
+      case ClimbStow:
+        m_climb.setControlMode(Climb.ControlMode.ClimbStow);
+        break;
+      case ClimbLow:
+        m_climb.setControlMode(Climb.ControlMode.ClimbLow);
         break;
       case Manual:
         if (m_lastState != m_state) {
