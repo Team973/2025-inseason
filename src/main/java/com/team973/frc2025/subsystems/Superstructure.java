@@ -47,17 +47,17 @@ public class Superstructure implements Subsystem {
     m_manualScore = score;
   }
 
-  public void toggleManualArmivator() {
-    m_manualArmivator = !m_manualArmivator;
+  public void setManualArmivator(boolean manual) {
+    m_manualArmivator = manual;
   }
 
-  public void incrementTargetReefLevel(int increment) {
-    m_targetReefLevel += increment;
+  public void setTargetReefLevel(int level) {
+    m_targetReefLevel = level;
 
     if (m_targetReefLevel > 4) {
-      m_targetReefLevel = 1;
-    } else if (m_targetReefLevel < 1) {
       m_targetReefLevel = 4;
+    } else if (m_targetReefLevel < 1) {
+      m_targetReefLevel = 1;
     }
   }
 

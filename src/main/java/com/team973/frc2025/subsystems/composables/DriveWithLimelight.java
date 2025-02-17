@@ -33,6 +33,9 @@ public class DriveWithLimelight extends DriveComposable {
   private Pose2d m_targetInitialPose = new Pose2d();
   private Pose2d m_targetFinalPose = new Pose2d();
 
+  private Pose2d m_targetInitialPoseLog = new Pose2d();
+  private Pose2d m_targetFinalPoseLog = new Pose2d();
+
   private int m_targetReefFace = 1;
 
   private BooleanSupplier m_targetFinalPoseGate = () -> true;
@@ -127,14 +130,17 @@ public class DriveWithLimelight extends DriveComposable {
     m_logger = logger;
   }
 
-  public void incrementTargetReefFace(int increment) {
-    m_targetReefFace += increment;
+  public void setTargetReefFace(int face) {
+    m_targetReefFace = face;
 
     if (m_targetReefFace > 6) {
-      m_targetReefFace = 1;
-    } else if (m_targetReefFace < 1) {
       m_targetReefFace = 6;
+    } else if (m_targetReefFace < 1) {
+      m_targetReefFace = 1;
     }
+
+    m_targetInitialPoseLog = getTargetReefPosition(TargetReefSide.Right).getInitialTargetPose();
+    m_targetFinalPoseLog = getTargetReefPosition(TargetReefSide.Right).getFinalTargetPose();
   }
 
   public TargetPositionRelativeToAprilTag getTargetReefPosition(TargetReefSide side) {
@@ -174,6 +180,9 @@ public class DriveWithLimelight extends DriveComposable {
       m_targetInitialPose = getTargetReefPosition(side).getInitialTargetPose();
       m_targetFinalPose = getTargetReefPosition(side).getFinalTargetPose();
 
+      m_targetInitialPoseLog = getTargetReefPosition(side).getInitialTargetPose();
+      m_targetFinalPoseLog = getTargetReefPosition(side).getFinalTargetPose();
+
       setTargetMode(TargetMode.Initial);
       m_target = getTargetReefPosition(side);
       m_targetingComplete = false;
@@ -184,7 +193,7 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void log() {
-    // SmartDashboard.putString("DB/String 0", "Reef Face: " + m_targetReefFace);
+    SmartDashboard.putString("DB/String 6", "Reef Face: " + m_targetReefFace);
     m_logger.log("Target Mode", m_targetMode.toString());
 
     m_logger.log("Target Initial Pose/x", m_targetInitialPose.getX());
@@ -208,12 +217,29 @@ public class DriveWithLimelight extends DriveComposable {
           m_targetInitialPose.getY(),
           m_targetInitialPose.getRotation().getRadians()
         });
+
+    SmartDashboard.putNumberArray(
+        "Target Initial Pose Log",
+        new double[] {
+          m_targetInitialPoseLog.getX(),
+          m_targetInitialPoseLog.getY(),
+          m_targetInitialPoseLog.getRotation().getRadians()
+        });
+
     SmartDashboard.putNumberArray(
         "Target Final Pose",
         new double[] {
           m_targetFinalPose.getX(),
           m_targetFinalPose.getY(),
           m_targetFinalPose.getRotation().getRadians()
+        });
+
+    SmartDashboard.putNumberArray(
+        "Target Final Pose Log",
+        new double[] {
+          m_targetFinalPoseLog.getX(),
+          m_targetFinalPoseLog.getY(),
+          m_targetFinalPoseLog.getRotation().getRadians()
         });
   }
 
