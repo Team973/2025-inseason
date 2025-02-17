@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm"));
 
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
 
@@ -69,7 +69,6 @@ public class Robot extends TimedRobot {
     // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
     m_candleManger.log();
     m_superstructure.reset();
-    m_logger.update();
   }
 
   private void updateJoysticks() {
