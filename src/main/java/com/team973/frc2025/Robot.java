@@ -1,5 +1,9 @@
 package com.team973.frc2025;
 
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.CANdleManger;
