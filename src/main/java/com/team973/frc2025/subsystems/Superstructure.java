@@ -199,7 +199,7 @@ public class Superstructure implements Subsystem {
             && m_arm.getTargetPosition() != Arm.STOW_POSITION_DEG) {
           m_claw.setControl(Claw.ControlStatus.HoldCoral);
         } else {
-          if (m_claw.getIsCoralInClaw()) {
+          if (m_elevator.getHeightInches() > 0.5) {
             m_claw.setControl(Claw.ControlStatus.Off);
           } else {
             m_claw.setControl(Claw.ControlStatus.IntakeCoral);
