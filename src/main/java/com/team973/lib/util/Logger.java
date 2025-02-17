@@ -2,7 +2,6 @@ package com.team973.lib.util;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
-
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;

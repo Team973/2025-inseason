@@ -49,9 +49,11 @@ public class Claw implements Subsystem {
     Off,
   }
 
-  public Claw(Logger logger) {
+  public Claw(Logger logger , CANdleManger candle) {
     m_logger = logger;
 
+
+    candle.addSignaler(m_coralInclawBlinker);
     m_clawMotor =
         new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("shooterRight"));
     m_conveyor =
@@ -236,7 +238,9 @@ public class Claw implements Subsystem {
   }
 
   @Override
-  public void syncSensors() {}
+  public void syncSensors() {
+    coralScoredLED();
+  }
 
   @Override
   public void reset() {}
