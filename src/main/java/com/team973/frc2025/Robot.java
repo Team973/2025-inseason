@@ -264,9 +264,9 @@ public class Robot extends TimedRobot {
 
     if (m_coDriverStick.getAButtonPressed()) {
       m_superstructure.setTargetReefLevel(1);
-    } else if (m_coDriverStick.getBButtonPressed()) {
-      m_superstructure.setTargetReefLevel(2);
     } else if (m_coDriverStick.getXButtonPressed()) {
+      m_superstructure.setTargetReefLevel(2);
+    } else if (m_coDriverStick.getBButtonPressed()) {
       m_superstructure.setTargetReefLevel(3);
     } else if (m_coDriverStick.getYButtonPressed()) {
       m_superstructure.setTargetReefLevel(4);
