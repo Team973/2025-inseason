@@ -47,20 +47,12 @@ public class Robot extends TimedRobot {
 
   private void syncSensors() {
     m_driveController.syncSensors();
-    m_claw.syncSensors();
     m_candleManger.syncSensors();
-    m_climb.syncSensors();
-
     m_superstructure.syncSensors();
   }
 
   private void updateSubsystems() {
     m_driveController.update();
-    m_climb.update();
-    m_claw.update();
-    m_candleManger.update();
-    m_elevator.update();
-    m_arm.update();
     m_candleManger.update();
     m_superstructure.update();
   }
@@ -68,19 +60,14 @@ public class Robot extends TimedRobot {
   private void resetSubsystems() {
     m_driveController.reset();
     m_superstructure.reset();
-    m_claw.reset();
     m_candleManger.reset();
   }
 
   private void logSubsystems() {
     m_driveController.log();
     m_superstructure.log();
-
     // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
-
-    m_claw.log();
     m_candleManger.log();
-    m_climb.reset();
     m_superstructure.reset();
     m_logger.update();
   }
@@ -119,6 +106,15 @@ public class Robot extends TimedRobot {
   }
 
   public void teleopPeriodic() {
+
+    syncSensors();
+
+    m_driveController
+        .getDriveWithJoysticks()
+        .updateInput(
+            m_driverStick.getLeftXAxis() * 0.95,
+            m_driverStick.getLeftYAxis() * 0.95,
+            m_driverStick.getRightXAxis() * 0.8);
 
     double climbStick = m_coDriverStick.getLeftYAxis();
 
