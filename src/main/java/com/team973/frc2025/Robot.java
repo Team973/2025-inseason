@@ -6,9 +6,11 @@ import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -104,6 +106,41 @@ public class Robot extends TimedRobot {
     updateJoysticks();
   }
 
+  /**
+   * This autonomous (along with the chooser code above) shows how to select between different
+   * autonomous modes using the dashboard. The sendable chooser code works with the Java
+   * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the chooser code and
+   * uncomment the getString line to get the auto name from the text box below the Gyro
+   *
+   * <p>You can add additional auto modes by adding additional comparisons to the switch structure
+   * below with additional strings. If using the SendableChooser make sure to add them to the
+   * chooser code above as well.
+   */
+  @Override
+  public void autonomousInit() {
+    m_autoManager.init();
+    m_driveController.resetOdometry(m_autoManager.getStartingPose());
+  }
+
+  /** This function is called periodically during autonomous. */
+  @Override
+  public void autonomousPeriodic() {
+    syncSensors();
+    // TODO: we're doing this badly to make it work
+    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
+    // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
+    m_autoManager.run();
+    updateSubsystems();
+  }
+
+  /** This function is called once when teleop is enabled. */
+  @Override
+  public void teleopInit() {
+    m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
+  }
+
+  /** This function is called periodically during operator control. */
+  @Override
   public void teleopPeriodic() {
 
     syncSensors();
@@ -153,6 +190,43 @@ public class Robot extends TimedRobot {
     // } else if (m_coDriverStick.getPOVLeftPressed()) {
     //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
     // }
+
+    if (m_manualScoringMode) {
+      m_superstructure.setState(Superstructure.State.Manual);
+
+      if (m_driverStick.getRightBumperButtonPressed()) {
+        m_superstructure.setManualScore(true);
+      } else if (m_driverStick.getRightBumperButtonReleased()) {
+        m_superstructure.setManualScore(false);
+      }
+
+      if (m_driverStick.getLeftBumperButtonPressed()) {
+        m_superstructure.toggleManualArmivator();
+      }
+    } else {
+      if (m_driverStick.getLeftTrigger()) {
+        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+        m_driveController
+            .getDriveWithLimelight()
+            .targetReefPosition(
+                DriveWithLimelight.TargetReefSide.Left,
+                () -> m_superstructure.readyToScore(),
+                () -> m_superstructure.finishedScoring());
+        m_superstructure.setState(Superstructure.State.ScoreCoral);
+      } else if (m_driverStick.getRightTrigger()) {
+        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+        m_driveController
+            .getDriveWithLimelight()
+            .targetReefPosition(
+                DriveWithLimelight.TargetReefSide.Right,
+                () -> m_superstructure.readyToScore(),
+                () -> m_superstructure.finishedScoring());
+        m_superstructure.setState(Superstructure.State.ScoreCoral);
+      } else {
+        m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+      }
+    }
+
     updateSubsystems();
   }
 
@@ -182,4 +256,12 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+  /** This function is called once when the robot is first started up. */
+  @Override
+  public void simulationInit() {}
+
+  /** This function is called periodically whilst in simulation. */
+  @Override
+  public void simulationPeriodic() {}
 }
