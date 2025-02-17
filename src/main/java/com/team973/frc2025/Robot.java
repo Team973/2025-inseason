@@ -92,7 +92,6 @@ public class Robot extends TimedRobot {
     m_ledOff.setEnabled(true);
     m_candleManger.addSignaler(m_lowBatterySignaler);
     m_candleManger.addSignaler(m_ledOff);
-    m_candleManger.addSignaler(m_coralInclawBlinker);
     m_candleManger.addSignaler(m_claw.m_coralInclawBlinker);
   }
 

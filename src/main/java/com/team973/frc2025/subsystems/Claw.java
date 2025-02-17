@@ -16,8 +16,6 @@ public class Claw implements Subsystem {
   private static final int MOTION_MAGIC_PID_SLOT = 0;
   private static final int VELOCITY_VOLTAGE_PID_SLOT = 1;
 
-  private final SolidSignaler m_lowBatterySignaler = new SolidSignaler(RobotInfo.Colors.ORANGE, 1);
-
   private final Logger m_logger;
 
   private final GreyTalonFX m_clawMotor;
