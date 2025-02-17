@@ -71,7 +71,12 @@ public class Robot extends TimedRobot {
   private final JoystickField.Range m_backLeftFace =
       m_reefSelector.range(Rotation2d.fromDegrees(300), Rotation2d.fromDegrees(30), 0.8);
 
-  private boolean m_manualScoringMode = true;
+  private final JoystickField m_sideSelector =
+      new JoystickField(() -> m_driverStick.getLeftXAxis(), () -> m_driverStick.getLeftYAxis());
+  private final JoystickField.Range m_leftReefSide =
+      m_sideSelector.range(Rotation2d.fromDegrees(240 - 90), Rotation2d.fromDegrees(60), 0.5);
+  private final JoystickField.Range m_rightReefSide =
+      m_sideSelector.range(Rotation2d.fromDegrees(120 - 90), Rotation2d.fromDegrees(60), 0.5);
 
   private void syncSensors() {
     double startTime = Timer.getFPGATimestamp();
@@ -95,8 +100,6 @@ public class Robot extends TimedRobot {
   private void logSubsystems() {
     m_driveController.log();
     m_superstructure.log();
-
-    // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
   }
 
   private void updateJoysticks() {
@@ -191,6 +194,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     syncSensors();
 
+    maybeUpdateScoringSelection();
+
     double allianceScalar = 1.0;
     if (m_alliance == Alliance.Red) {
       // Our gyroscope is blue-centric meaning that facing away from the alliance wall
@@ -208,7 +213,8 @@ public class Robot extends TimedRobot {
             allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
             m_driverStick.getRightXAxis() * 0.8);
 
-    if (m_manualScoringMode) {
+    if (!m_driverStick.getRightTrigger()) {
+      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
       m_superstructure.setState(Superstructure.State.Manual);
 
       if (m_driverStick.getRightBumperButtonPressed()) {
@@ -225,29 +231,13 @@ public class Robot extends TimedRobot {
         m_superstructure.setManualArmivator(false);
       }
     } else {
-      if (m_driverStick.getLeftTrigger()) {
-        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-        m_driveController
-            .getDriveWithLimelight()
-            .targetReefPosition(
-                DriveWithLimelight.TargetReefSide.Left,
-                // () -> m_superstructure.readyToScore(),
-                () -> false,
-                () -> m_superstructure.finishedScoring());
-        //  m_superstructure.setState(Superstructure.State.ScoreCoral);
-      } else if (m_driverStick.getRightTrigger()) {
-        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-        m_driveController
-            .getDriveWithLimelight()
-            .targetReefPosition(
-                DriveWithLimelight.TargetReefSide.Right,
-                () -> false,
-                // () -> m_superstructure.readyToScore(),
-                () -> m_superstructure.finishedScoring());
-        // m_superstructure.setState(Superstructure.State.ScoreCoral);
-      } else {
-        m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-      }
+      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_driveController
+          .getDriveWithLimelight()
+          .targetReefPosition(
+              () -> false,
+              // () -> m_superstructure.readyToScore(),
+              () -> m_superstructure.finishedScoring());
     }
 
     double climbStick = m_coDriverStick.getLeftYAxis();
@@ -302,16 +292,7 @@ public class Robot extends TimedRobot {
   private PerfLogger m_disabledPeriodicLogger =
       new PerfLogger(m_logger.subLogger("perf/disabledPeriodic", 0.25));
 
-  /** This function is called periodically when disabled. */
-  @Override
-  public void disabledPeriodic() {
-    double startTime = Timer.getFPGATimestamp();
-    maybeInitAlliance();
-    syncSensors();
-
-    // TODO: we're doing this badly to make it work
-    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
-
+  private void maybeUpdateScoringSelection() {
     if (m_frontFace.isActive()) {
       m_driveController.getDriveWithLimelight().setTargetReefFace(1);
     } else if (m_frontRightFace.isActive()) {
@@ -325,6 +306,31 @@ public class Robot extends TimedRobot {
     } else if (m_frontLeftFace.isActive()) {
       m_driveController.getDriveWithLimelight().setTargetReefFace(6);
     }
+
+    if (m_driverStick.getRightTrigger()) {
+      if (m_leftReefSide.isActive()) {
+        m_driveController
+            .getDriveWithLimelight()
+            .setTargetSide(DriveWithLimelight.TargetReefSide.Left);
+      } else if (m_rightReefSide.isActive()) {
+        m_driveController
+            .getDriveWithLimelight()
+            .setTargetSide(DriveWithLimelight.TargetReefSide.Right);
+      }
+    }
+  }
+
+  /** This function is called periodically when disabled. */
+  @Override
+  public void disabledPeriodic() {
+    double startTime = Timer.getFPGATimestamp();
+    maybeInitAlliance();
+    syncSensors();
+
+    // TODO: we're doing this badly to make it work
+    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
+
+    maybeUpdateScoringSelection();
 
     if (m_coDriverStick.getAButtonPressed()) {
       m_autoManager.increment();

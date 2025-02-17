@@ -38,6 +38,7 @@ public class DriveWithLimelight extends DriveComposable {
   private Pose2d m_targetFinalPoseLog = new Pose2d();
 
   private int m_targetReefFace = 1;
+  private TargetReefSide m_targetReefSide = TargetReefSide.Left;
 
   private BooleanSupplier m_targetFinalPoseGate = () -> true;
   private BooleanSupplier m_reTargetInitialPoseGate = () -> false;
@@ -58,8 +59,11 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public static class TargetPositions {
-    private static final Translation2d LEFT_REEF_INITIAL_TARGET = new Translation2d(0.1, 0.6);
-    private static final Translation2d RIGHT_REEF_INITIAL_TARGET = new Translation2d(-0.1, 0.6);
+    private static final double REEF_WIDTH_METERS = 0.33;
+    private static final Translation2d LEFT_REEF_INITIAL_TARGET =
+        new Translation2d(REEF_WIDTH_METERS / 2.0, 0.8);
+    private static final Translation2d RIGHT_REEF_INITIAL_TARGET =
+        new Translation2d(-REEF_WIDTH_METERS / 2.0, 0.8);
     private static final double REEF_FINAL_DIST = 0.1;
 
     private static final Translation2d HP_INITIAL_TARGET = new Translation2d(0.0, 0.5);
@@ -135,6 +139,13 @@ public class DriveWithLimelight extends DriveComposable {
     m_logger = logger;
   }
 
+  public void setTargetSide(TargetReefSide side) {
+    m_targetReefSide = side;
+
+    m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
+    m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
+  }
+
   public void setTargetReefFace(int face) {
     m_targetReefFace = face;
 
@@ -144,24 +155,36 @@ public class DriveWithLimelight extends DriveComposable {
       m_targetReefFace = 1;
     }
 
-    m_targetInitialPoseLog = getTargetReefPosition(TargetReefSide.Right).getInitialTargetPose();
-    m_targetFinalPoseLog = getTargetReefPosition(TargetReefSide.Right).getFinalTargetPose();
+    m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
+    m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
   }
 
-  public TargetPositionRelativeToAprilTag getTargetReefPosition(TargetReefSide side) {
+  public TargetPositionRelativeToAprilTag getTargetReefPosition() {
     switch (m_targetReefFace) {
       case 1:
-        return side == TargetReefSide.Left ? TargetPositions.ONE_L : TargetPositions.ONE_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.ONE_L
+            : TargetPositions.ONE_R;
       case 2:
-        return side == TargetReefSide.Left ? TargetPositions.TWO_L : TargetPositions.TWO_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.TWO_L
+            : TargetPositions.TWO_R;
       case 3:
-        return side == TargetReefSide.Left ? TargetPositions.THREE_L : TargetPositions.THREE_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.THREE_L
+            : TargetPositions.THREE_R;
       case 4:
-        return side == TargetReefSide.Left ? TargetPositions.FOUR_L : TargetPositions.FOUR_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.FOUR_L
+            : TargetPositions.FOUR_R;
       case 5:
-        return side == TargetReefSide.Left ? TargetPositions.FIVE_L : TargetPositions.FIVE_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.FIVE_L
+            : TargetPositions.FIVE_R;
       case 6:
-        return side == TargetReefSide.Left ? TargetPositions.SIX_L : TargetPositions.SIX_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.SIX_L
+            : TargetPositions.SIX_R;
       default:
         throw new IllegalArgumentException("Invalid reef face: " + m_targetReefFace);
     }
@@ -178,18 +201,16 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void targetReefPosition(
-      TargetReefSide side,
-      BooleanSupplier targetFinalPoseGate,
-      BooleanSupplier reTargetInitialPoseGate) {
-    if (getTargetReefPosition(side) != m_target) {
-      m_targetInitialPose = getTargetReefPosition(side).getInitialTargetPose();
-      m_targetFinalPose = getTargetReefPosition(side).getFinalTargetPose();
+      BooleanSupplier targetFinalPoseGate, BooleanSupplier reTargetInitialPoseGate) {
+    if (getTargetReefPosition() != m_target) {
+      m_targetInitialPose = getTargetReefPosition().getInitialTargetPose();
+      m_targetFinalPose = getTargetReefPosition().getFinalTargetPose();
 
-      m_targetInitialPoseLog = getTargetReefPosition(side).getInitialTargetPose();
-      m_targetFinalPoseLog = getTargetReefPosition(side).getFinalTargetPose();
+      m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
+      m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
 
       setTargetMode(TargetMode.Initial);
-      m_target = getTargetReefPosition(side);
+      m_target = getTargetReefPosition();
       m_targetingComplete = false;
     }
 
@@ -199,8 +220,10 @@ public class DriveWithLimelight extends DriveComposable {
 
   public void log() {
     SmartDashboard.putString("DB/String 6", "Reef Face: " + m_targetReefFace);
+    SmartDashboard.putString("DB/String 7", "Reef Side: " + m_targetReefSide);
 
     m_logger.log("Target Mode", m_targetMode.toString());
+    m_logger.log("Target Side", m_targetReefSide.toString());
 
     m_logger.log(
         "Target Initial Pose",
