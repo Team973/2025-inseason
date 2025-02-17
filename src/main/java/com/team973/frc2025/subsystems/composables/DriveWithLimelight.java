@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems.composables;
 
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Drive;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.lib.util.AprilTag;
@@ -37,6 +38,7 @@ public class DriveWithLimelight extends DriveComposable {
   private Pose2d m_targetFinalPoseLog = new Pose2d();
 
   private int m_targetReefFace = 1;
+  private TargetReefSide m_targetReefSide = TargetReefSide.Left;
 
   private BooleanSupplier m_targetFinalPoseGate = () -> true;
   private BooleanSupplier m_reTargetInitialPoseGate = () -> false;
@@ -57,8 +59,11 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public static class TargetPositions {
-    private static final Translation2d LEFT_REEF_INITIAL_TARGET = new Translation2d(0.1, 0.6);
-    private static final Translation2d RIGHT_REEF_INITIAL_TARGET = new Translation2d(-0.1, 0.6);
+    private static final double REEF_WIDTH_METERS = 0.33;
+    private static final Translation2d LEFT_REEF_INITIAL_TARGET =
+        new Translation2d(REEF_WIDTH_METERS / 2.0, 0.8);
+    private static final Translation2d RIGHT_REEF_INITIAL_TARGET =
+        new Translation2d(-REEF_WIDTH_METERS / 2.0, 0.8);
     private static final double REEF_FINAL_DIST = 0.1;
 
     private static final Translation2d HP_INITIAL_TARGET = new Translation2d(0.0, 0.5);
@@ -117,17 +122,28 @@ public class DriveWithLimelight extends DriveComposable {
   public DriveWithLimelight(GreyPoseEstimator poseEstimator, Logger logger) {
     m_poseEstimator = poseEstimator;
 
+    double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
     m_xController =
-        new ProfiledPIDController(12.0, 0, 0, new TrapezoidProfile.Constraints(0.2, 0.1));
+        new ProfiledPIDController(
+            5.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.25), controlPeriodSeconds);
     m_yController =
-        new ProfiledPIDController(12.0, 0, 0, new TrapezoidProfile.Constraints(0.2, 0.1));
+        new ProfiledPIDController(
+            5.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.25), controlPeriodSeconds);
     m_thetaController =
-        new ProfiledPIDController(8.0, 0, 0, new TrapezoidProfile.Constraints(0.5, 0.5));
+        new ProfiledPIDController(
+            8.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.6), controlPeriodSeconds);
 
     m_thetaController.enableContinuousInput(
         Units.degreesToRadians(0.0), Units.degreesToRadians(360.0));
 
     m_logger = logger;
+  }
+
+  public void setTargetSide(TargetReefSide side) {
+    m_targetReefSide = side;
+
+    m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
+    m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
   }
 
   public void setTargetReefFace(int face) {
@@ -139,24 +155,36 @@ public class DriveWithLimelight extends DriveComposable {
       m_targetReefFace = 1;
     }
 
-    m_targetInitialPoseLog = getTargetReefPosition(TargetReefSide.Right).getInitialTargetPose();
-    m_targetFinalPoseLog = getTargetReefPosition(TargetReefSide.Right).getFinalTargetPose();
+    m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
+    m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
   }
 
-  public TargetPositionRelativeToAprilTag getTargetReefPosition(TargetReefSide side) {
+  public TargetPositionRelativeToAprilTag getTargetReefPosition() {
     switch (m_targetReefFace) {
       case 1:
-        return side == TargetReefSide.Left ? TargetPositions.ONE_L : TargetPositions.ONE_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.ONE_L
+            : TargetPositions.ONE_R;
       case 2:
-        return side == TargetReefSide.Left ? TargetPositions.TWO_L : TargetPositions.TWO_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.TWO_L
+            : TargetPositions.TWO_R;
       case 3:
-        return side == TargetReefSide.Left ? TargetPositions.THREE_L : TargetPositions.THREE_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.THREE_L
+            : TargetPositions.THREE_R;
       case 4:
-        return side == TargetReefSide.Left ? TargetPositions.FOUR_L : TargetPositions.FOUR_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.FOUR_L
+            : TargetPositions.FOUR_R;
       case 5:
-        return side == TargetReefSide.Left ? TargetPositions.FIVE_L : TargetPositions.FIVE_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.FIVE_L
+            : TargetPositions.FIVE_R;
       case 6:
-        return side == TargetReefSide.Left ? TargetPositions.SIX_L : TargetPositions.SIX_R;
+        return m_targetReefSide == TargetReefSide.Left
+            ? TargetPositions.SIX_L
+            : TargetPositions.SIX_R;
       default:
         throw new IllegalArgumentException("Invalid reef face: " + m_targetReefFace);
     }
@@ -173,18 +201,16 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void targetReefPosition(
-      TargetReefSide side,
-      BooleanSupplier targetFinalPoseGate,
-      BooleanSupplier reTargetInitialPoseGate) {
-    if (getTargetReefPosition(side) != m_target) {
-      m_targetInitialPose = getTargetReefPosition(side).getInitialTargetPose();
-      m_targetFinalPose = getTargetReefPosition(side).getFinalTargetPose();
+      BooleanSupplier targetFinalPoseGate, BooleanSupplier reTargetInitialPoseGate) {
+    if (getTargetReefPosition() != m_target) {
+      m_targetInitialPose = getTargetReefPosition().getInitialTargetPose();
+      m_targetFinalPose = getTargetReefPosition().getFinalTargetPose();
 
-      m_targetInitialPoseLog = getTargetReefPosition(side).getInitialTargetPose();
-      m_targetFinalPoseLog = getTargetReefPosition(side).getFinalTargetPose();
+      m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
+      m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
 
       setTargetMode(TargetMode.Initial);
-      m_target = getTargetReefPosition(side);
+      m_target = getTargetReefPosition();
       m_targetingComplete = false;
     }
 
@@ -194,23 +220,12 @@ public class DriveWithLimelight extends DriveComposable {
 
   public void log() {
     SmartDashboard.putString("DB/String 6", "Reef Face: " + m_targetReefFace);
+    SmartDashboard.putString("DB/String 7", "Reef Side: " + m_targetReefSide);
+
     m_logger.log("Target Mode", m_targetMode.toString());
+    m_logger.log("Target Side", m_targetReefSide.toString());
 
-    m_logger.log("Target Initial Pose/x", m_targetInitialPose.getX());
-    m_logger.log("Target Initial Pose/y", m_targetInitialPose.getY());
-    m_logger.log("Target Initial Pose/degrees", m_targetInitialPose.getRotation().getDegrees());
-
-    m_logger.log("Target Final Pose/x", m_targetFinalPose.getX());
-    m_logger.log("Target Final Pose/y", m_targetFinalPose.getY());
-    m_logger.log("Target Final Pose/degrees", m_targetFinalPose.getRotation().getDegrees());
-
-    m_logger.log("X Controller Target Position", m_xController.getSetpoint().position);
-    m_logger.log("Y Controller Target Position", m_yController.getSetpoint().position);
     m_logger.log(
-        "Theta Controller Target Position Deg",
-        Math.toDegrees(m_thetaController.getSetpoint().position));
-
-    SmartDashboard.putNumberArray(
         "Target Initial Pose",
         new double[] {
           m_targetInitialPose.getX(),
@@ -218,7 +233,7 @@ public class DriveWithLimelight extends DriveComposable {
           m_targetInitialPose.getRotation().getRadians()
         });
 
-    SmartDashboard.putNumberArray(
+    m_logger.log(
         "Target Initial Pose Log",
         new double[] {
           m_targetInitialPoseLog.getX(),
@@ -226,7 +241,7 @@ public class DriveWithLimelight extends DriveComposable {
           m_targetInitialPoseLog.getRotation().getRadians()
         });
 
-    SmartDashboard.putNumberArray(
+    m_logger.log(
         "Target Final Pose",
         new double[] {
           m_targetFinalPose.getX(),
@@ -234,7 +249,19 @@ public class DriveWithLimelight extends DriveComposable {
           m_targetFinalPose.getRotation().getRadians()
         });
 
-    SmartDashboard.putNumberArray(
+    m_logger.log(
+        "Controller Target Position",
+        new double[] {
+          m_xController.getSetpoint().position,
+          m_yController.getSetpoint().position,
+          m_thetaController.getSetpoint().position
+        });
+    m_logger.log("x-state/velocity", m_xController.getSetpoint().velocity);
+    m_logger.log("x-state/position", m_xController.getSetpoint().position);
+    m_logger.log("y-state/velocity", m_yController.getSetpoint().velocity);
+    m_logger.log("y-state/position", m_yController.getSetpoint().position);
+
+    m_logger.log(
         "Target Final Pose Log",
         new double[] {
           m_targetFinalPoseLog.getX(),
@@ -287,21 +314,27 @@ public class DriveWithLimelight extends DriveComposable {
       case Initial:
         return new ChassisSpeeds(
             m_xController.calculate(
-                m_poseEstimator.getPoseMeters().getX(), m_targetInitialPose.getX()),
+                    m_poseEstimator.getPoseMeters().getX(), m_targetInitialPose.getX())
+                + m_xController.getSetpoint().velocity,
             m_yController.calculate(
-                m_poseEstimator.getPoseMeters().getY(), m_targetInitialPose.getY()),
+                    m_poseEstimator.getPoseMeters().getY(), m_targetInitialPose.getY())
+                + m_yController.getSetpoint().velocity,
             m_thetaController.calculate(
-                m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-                m_targetInitialPose.getRotation().getRadians()));
+                    m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+                    m_targetInitialPose.getRotation().getRadians())
+                + m_thetaController.getSetpoint().velocity);
       case Final:
         return new ChassisSpeeds(
             m_xController.calculate(
-                m_poseEstimator.getPoseMeters().getX(), m_targetFinalPose.getX()),
+                    m_poseEstimator.getPoseMeters().getX(), m_targetFinalPose.getX())
+                + m_xController.getSetpoint().velocity,
             m_yController.calculate(
-                m_poseEstimator.getPoseMeters().getY(), m_targetFinalPose.getY()),
+                    m_poseEstimator.getPoseMeters().getY(), m_targetFinalPose.getY())
+                + m_yController.getSetpoint().velocity,
             m_thetaController.calculate(
-                m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-                m_targetFinalPose.getRotation().getRadians()));
+                    m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+                    m_targetFinalPose.getRotation().getRadians())
+                + m_thetaController.getSetpoint().velocity);
       default:
         throw new IllegalArgumentException(m_targetMode.toString());
     }

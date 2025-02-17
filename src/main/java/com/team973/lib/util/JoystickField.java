@@ -21,13 +21,15 @@ public class JoystickField {
     }
 
     public boolean isActive() {
-      return ((getAngleDeg()
-                      >= wrapAngle(m_centerAngle.minus(m_maxAngleOffsetFromCenter).getDegrees())
-                  && getAngleDeg() < wrapAngle(m_centerAngle.getDegrees()))
-              || (getAngleDeg()
-                      < wrapAngle(m_centerAngle.plus(m_maxAngleOffsetFromCenter).getDegrees())
-                  && getAngleDeg() >= wrapAngle(m_centerAngle.getDegrees())))
-          && getDistFromCenter() >= m_minDistFromCenter;
+      if (getDistFromCenter() < m_minDistFromCenter) {
+        return false;
+      }
+
+      if (Math.abs(Rotation2d.fromDegrees(getAngleDeg()).minus(m_centerAngle).getDegrees())
+          < m_maxAngleOffsetFromCenter.getDegrees()) {
+        return true;
+      }
+      return false;
     }
   }
 

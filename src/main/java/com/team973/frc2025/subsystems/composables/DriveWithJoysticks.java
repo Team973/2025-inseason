@@ -8,7 +8,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveWithJoysticks extends DriveComposable {
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(10);
@@ -92,18 +91,10 @@ public class DriveWithJoysticks extends DriveComposable {
         diff += 360;
       }
 
-      SmartDashboard.putNumber("Angle Diff", diff);
-
       rot =
           m_rotationController.calculate(
               m_currentYaw.getDegrees(), m_currentYaw.getDegrees() + diff);
     }
-
-    SmartDashboard.putNumber("Robot Rotation", rot);
-    SmartDashboard.putNumber("Target Robot Angle", m_targetRobotAngle.getDegrees());
-    SmartDashboard.putNumber(
-        "drive/driveWithJoysticks/Current Robot Angle", m_currentYaw.getDegrees());
-    SmartDashboard.putString("Rotation Control", String.valueOf(m_rotationControl));
 
     return new ChassisSpeeds(xSpeed, ySpeed, rot);
   }

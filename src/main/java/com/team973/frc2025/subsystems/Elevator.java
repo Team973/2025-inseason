@@ -70,6 +70,7 @@ public class Elevator implements Subsystem {
     TalonFXConfiguration rightMotorConfig = defaultElevatorMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     m_motorRight.setConfig(rightMotorConfig);
+    m_motorRight.setPosition(0);
 
     m_motorLeft.setControl(new Follower(m_motorRight.getDeviceID(), true));
     m_motorRight.setPosition(0.0);

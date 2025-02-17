@@ -3,6 +3,7 @@ package com.team973.frc2025;
 import com.team973.frc2025.auto.modes.ClawTestAuto;
 import com.team973.frc2025.auto.modes.DriveTestAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
+import com.team973.frc2025.auto.modes.NoAutoAllianceWallCenter;
 import com.team973.frc2025.auto.modes.TaxiAuto;
 import com.team973.frc2025.auto.modes.TestAuto;
 import com.team973.frc2025.subsystems.Claw;
@@ -10,6 +11,7 @@ import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.AutoMode;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class AutoManager {
   private final AutoMode m_clawTestAuto;
   private final AutoMode m_testAuto;
   private final AutoMode m_driveTestAuto;
+  private NoAutoAllianceWallCenter m_noAutoAllianceWallCenter;
 
   public AutoManager(Logger logger, DriveController drive, Claw claw) {
     m_noAuto = new NoAuto(logger);
@@ -30,9 +33,16 @@ public class AutoManager {
     m_clawTestAuto = new ClawTestAuto(logger.subLogger("claw"), claw);
     m_testAuto = new TestAuto(logger.subLogger("test"), drive, claw);
     m_driveTestAuto = new DriveTestAuto(logger.subLogger("driveTest"), drive);
+    m_noAutoAllianceWallCenter = new NoAutoAllianceWallCenter(logger);
 
     m_availableAutos =
-        Arrays.asList(m_noAuto, m_taxiAuto, m_clawTestAuto, m_testAuto, m_driveTestAuto);
+        Arrays.asList(
+            m_noAuto,
+            m_taxiAuto,
+            m_clawTestAuto,
+            m_testAuto,
+            m_driveTestAuto,
+            m_noAutoAllianceWallCenter);
   }
 
   public void increment() {
@@ -53,8 +63,11 @@ public class AutoManager {
     return m_availableAutos.get(m_selectedMode);
   }
 
-  public Pose2d getStartingPose() {
-    return m_currentMode.getStartingPose();
+  // TODO: Should account for alliance here and not in disabledPeriodic.
+  // TODO: Need to account for both position and rotation (currently we only
+  // account for rotation).
+  public Pose2d getStartingPose(Alliance alliance) {
+    return m_currentMode.getStartingPose(alliance);
   }
 
   public void run() {
