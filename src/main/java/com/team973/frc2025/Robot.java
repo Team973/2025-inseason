@@ -229,6 +229,10 @@ public class Robot extends TimedRobot {
       m_superstructure.setClimbPower(0);
     }
 
+    if (m_coDriverStick.getStartButtonPressed()) {
+      m_driveController.resetAngle(Rotation2d.fromDegrees(0));
+    }
+
     updateSubsystems();
   }
 

@@ -101,6 +101,11 @@ public class DriveController implements Subsystem {
     m_driveWithJoysticks.reset(pose2d.getRotation());
   }
 
+  public synchronized void resetAngle(Rotation2d angle) {
+    m_drive.resetOdometry(new Pose2d(getPose().getTranslation(), angle));
+    m_driveWithJoysticks.reset(angle);
+  }
+
   @Override
   public void log() {
     m_drive.log();
