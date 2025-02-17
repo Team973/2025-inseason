@@ -52,7 +52,7 @@ public class Robot extends TimedRobot {
 
   private PerfLogger m_syncSensorsLogger =
       new PerfLogger(m_logger.subLogger("perf/syncSensors", 0.25));
-  private boolean m_manualScoringMode = true;
+  private boolean m_manualScoringMode = false;
 
   private void syncSensors() {
     double startTime = Timer.getFPGATimestamp();
@@ -177,9 +177,9 @@ public class Robot extends TimedRobot {
     if (RobotInfo.BOT_VERSION == RobotInfo.BotVersion.W1W) {
       m_driveController
           .getDriveWithJoysticks()
-          .updateInput(
-              m_driverStick.getLeftXAxis() * 0.5,
-              m_driverStick.getLeftYAxis() * 0.5,
+          .updateInput( // HACK: Not to be negated.
+              -m_driverStick.getLeftXAxis() * 0.5,
+              -m_driverStick.getLeftYAxis() * 0.5,
               m_driverStick.getRightXAxis() * 0.4);
     } else {
       m_driveController
@@ -209,18 +209,20 @@ public class Robot extends TimedRobot {
             .getDriveWithLimelight()
             .targetReefPosition(
                 DriveWithLimelight.TargetReefSide.Left,
-                () -> m_superstructure.readyToScore(),
+                // () -> m_superstructure.readyToScore(),
+                () -> false,
                 () -> m_superstructure.finishedScoring());
-        m_superstructure.setState(Superstructure.State.ScoreCoral);
+        //  m_superstructure.setState(Superstructure.State.ScoreCoral);
       } else if (m_driverStick.getRightTrigger()) {
         m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
         m_driveController
             .getDriveWithLimelight()
             .targetReefPosition(
                 DriveWithLimelight.TargetReefSide.Right,
-                () -> m_superstructure.readyToScore(),
+                () -> false,
+                // () -> m_superstructure.readyToScore(),
                 () -> m_superstructure.finishedScoring());
-        m_superstructure.setState(Superstructure.State.ScoreCoral);
+        // m_superstructure.setState(Superstructure.State.ScoreCoral);
       } else {
         m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
       }
@@ -255,12 +257,11 @@ public class Robot extends TimedRobot {
       m_superstructure.incrementTargetReefLevel(1);
     } else if (m_coDriverStick.getPOVBottomPressed()) {
       m_superstructure.incrementTargetReefLevel(-1);
+    } else if (m_coDriverStick.getPOVRightPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
+    } else if (m_coDriverStick.getPOVLeftPressed()) {
+      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
     }
-    // else if (m_coDriverStick.getPOVRightPressed()) {
-    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
-    // } else if (m_coDriverStick.getPOVLeftPressed()) {
-    //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
-    // }
 
     updateSubsystems();
   }
@@ -290,7 +291,7 @@ public class Robot extends TimedRobot {
       setPoseFromAuto();
     }
     SmartDashboard.putString(
-        "DB/String 2", String.valueOf(m_autoManager.getSelectedMode().getName()));
+        "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
 
     m_disabledPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
   }

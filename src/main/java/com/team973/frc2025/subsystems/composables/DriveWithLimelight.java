@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems.composables;
 
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Drive;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.lib.util.AprilTag;
@@ -13,7 +14,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.BooleanSupplier;
 
 public class DriveWithLimelight extends DriveComposable {
@@ -114,12 +114,16 @@ public class DriveWithLimelight extends DriveComposable {
   public DriveWithLimelight(GreyPoseEstimator poseEstimator, Logger logger) {
     m_poseEstimator = poseEstimator;
 
+    double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
     m_xController =
-        new ProfiledPIDController(12.0, 0, 0, new TrapezoidProfile.Constraints(0.2, 0.1));
+        new ProfiledPIDController(
+            5.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.25), controlPeriodSeconds);
     m_yController =
-        new ProfiledPIDController(12.0, 0, 0, new TrapezoidProfile.Constraints(0.2, 0.1));
+        new ProfiledPIDController(
+            5.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.25), controlPeriodSeconds);
     m_thetaController =
-        new ProfiledPIDController(8.0, 0, 0, new TrapezoidProfile.Constraints(0.5, 0.5));
+        new ProfiledPIDController(
+            8.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.6), controlPeriodSeconds);
 
     m_thetaController.enableContinuousInput(
         Units.degreesToRadians(0.0), Units.degreesToRadians(360.0));
@@ -135,6 +139,9 @@ public class DriveWithLimelight extends DriveComposable {
     } else if (m_targetReefFace < 1) {
       m_targetReefFace = 6;
     }
+
+    m_targetInitialPose = getTargetReefPosition(TargetReefSide.Left).getInitialTargetPose();
+    m_targetFinalPose = getTargetReefPosition(TargetReefSide.Left).getFinalTargetPose();
   }
 
   public TargetPositionRelativeToAprilTag getTargetReefPosition(TargetReefSide side) {
@@ -187,34 +194,32 @@ public class DriveWithLimelight extends DriveComposable {
     // SmartDashboard.putString("DB/String 0", "Reef Face: " + m_targetReefFace);
     m_logger.log("Target Mode", m_targetMode.toString());
 
-    m_logger.log("Target Initial Pose/x", m_targetInitialPose.getX());
-    m_logger.log("Target Initial Pose/y", m_targetInitialPose.getY());
-    m_logger.log("Target Initial Pose/degrees", m_targetInitialPose.getRotation().getDegrees());
-
-    m_logger.log("Target Final Pose/x", m_targetFinalPose.getX());
-    m_logger.log("Target Final Pose/y", m_targetFinalPose.getY());
-    m_logger.log("Target Final Pose/degrees", m_targetFinalPose.getRotation().getDegrees());
-
-    m_logger.log("X Controller Target Position", m_xController.getSetpoint().position);
-    m_logger.log("Y Controller Target Position", m_yController.getSetpoint().position);
     m_logger.log(
-        "Theta Controller Target Position Deg",
-        Math.toDegrees(m_thetaController.getSetpoint().position));
-
-    SmartDashboard.putNumberArray(
         "Target Initial Pose",
         new double[] {
-          m_targetInitialPose.getX(),
-          m_targetInitialPose.getY(),
+          m_targetInitialPose.getTranslation().getX(),
+          m_targetInitialPose.getTranslation().getY(),
           m_targetInitialPose.getRotation().getRadians()
         });
-    SmartDashboard.putNumberArray(
+    m_logger.log(
         "Target Final Pose",
         new double[] {
-          m_targetFinalPose.getX(),
-          m_targetFinalPose.getY(),
+          m_targetFinalPose.getTranslation().getX(),
+          m_targetFinalPose.getTranslation().getY(),
           m_targetFinalPose.getRotation().getRadians()
         });
+
+    m_logger.log(
+        "Controller Target Position",
+        new double[] {
+          m_xController.getSetpoint().position,
+          m_yController.getSetpoint().position,
+          m_thetaController.getSetpoint().position
+        });
+    m_logger.log("x-state/velocity", m_xController.getSetpoint().velocity);
+    m_logger.log("x-state/position", m_xController.getSetpoint().position);
+    m_logger.log("y-state/velocity", m_yController.getSetpoint().velocity);
+    m_logger.log("y-state/position", m_yController.getSetpoint().position);
   }
 
   public boolean reachedTargetInitialPose() {
@@ -261,21 +266,27 @@ public class DriveWithLimelight extends DriveComposable {
       case Initial:
         return new ChassisSpeeds(
             m_xController.calculate(
-                m_poseEstimator.getPoseMeters().getX(), m_targetInitialPose.getX()),
+                    m_poseEstimator.getPoseMeters().getX(), m_targetInitialPose.getX())
+                + m_xController.getSetpoint().velocity,
             m_yController.calculate(
-                m_poseEstimator.getPoseMeters().getY(), m_targetInitialPose.getY()),
+                    m_poseEstimator.getPoseMeters().getY(), m_targetInitialPose.getY())
+                + m_yController.getSetpoint().velocity,
             m_thetaController.calculate(
-                m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-                m_targetInitialPose.getRotation().getRadians()));
+                    m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+                    m_targetInitialPose.getRotation().getRadians())
+                + m_thetaController.getSetpoint().velocity);
       case Final:
         return new ChassisSpeeds(
             m_xController.calculate(
-                m_poseEstimator.getPoseMeters().getX(), m_targetFinalPose.getX()),
+                    m_poseEstimator.getPoseMeters().getX(), m_targetFinalPose.getX())
+                + m_xController.getSetpoint().velocity,
             m_yController.calculate(
-                m_poseEstimator.getPoseMeters().getY(), m_targetFinalPose.getY()),
+                    m_poseEstimator.getPoseMeters().getY(), m_targetFinalPose.getY())
+                + m_yController.getSetpoint().velocity,
             m_thetaController.calculate(
-                m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-                m_targetFinalPose.getRotation().getRadians()));
+                    m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+                    m_targetFinalPose.getRotation().getRadians())
+                + m_thetaController.getSetpoint().velocity);
       default:
         throw new IllegalArgumentException(m_targetMode.toString());
     }

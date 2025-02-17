@@ -33,17 +33,20 @@ public class Drive implements Subsystem {
   private ChassisSpeeds m_currentChassisSpeeds;
   private Pose2d m_estimatedPose = new Pose2d();
   private Translation2d m_estimatedVelocity = new Translation2d();
-  private GreyPoseEstimator m_poseEstimator;
 
+  private GreyPoseEstimator m_poseEstimator;
   private GreyPoseEstimator m_fusedEstimator;
+  private GreyPoseEstimator m_leftOnlyEstimator;
+  private GreyPoseEstimator m_rightOnlyEstimator;
+
   private DriveController m_driveController;
 
   private final GreyPigeon m_pigeon;
 
   private Rotation2d m_targetRobotAngle = new Rotation2d();
   private final OdometrySupplier m_odometrySupplier;
-  private final MegaTagSupplier m_backLLSupplier;
-  private final MegaTagSupplier m_frontLLSupplier;
+  private final MegaTagSupplier m_leftLLSupplier;
+  private final MegaTagSupplier m_rightLLSupplier;
 
   public Drive(GreyPigeon pigeon, DriveController driveController, Logger logger) {
     m_pigeon = pigeon;
@@ -65,30 +68,50 @@ public class Drive implements Subsystem {
         new GreyPoseEstimator(
             m_pigeon, m_driveController, m_odometrySupplier, logger.subLogger("estimators/main"));
 
-    m_backLLSupplier =
+    m_leftLLSupplier =
         new MegaTagSupplier(
-            "limelight-back",
+            "limelight-left",
             m_pigeon,
             // TODO: Waiting on these measurements
             new Pose3d(
-                new Translation3d(-0.3683, 0.0, 1.1811),
+                new Translation3d(0.108, -0.275, 0.908),
                 new Rotation3d(
-                    0.0,
-                    Rotation2d.fromDegrees(30.5).getRadians(),
-                    Rotation2d.fromDegrees(180).getRadians())),
-            logger.subLogger("providers/ll-back"));
-    m_frontLLSupplier =
+                    Rotation2d.fromDegrees(-90.0).getRadians(),
+                    Rotation2d.fromDegrees(-30.0).getRadians(),
+                    Rotation2d.fromDegrees(-30.0).getRadians())),
+            logger.subLogger("providers/ll-left"));
+    m_rightLLSupplier =
         new MegaTagSupplier(
-            "limelight-front",
+            "limelight-right",
             m_pigeon,
-            new Pose3d(new Translation3d(0.324, 0.0, 0.178), new Rotation3d(0.0, 0.0, 0.0)),
-            logger.subLogger("providers/ll-front"));
+            new Pose3d(
+                new Translation3d(0.108, 0.275, 0.908),
+                new Rotation3d(
+                    Rotation2d.fromDegrees(90.0).getRadians(),
+                    Rotation2d.fromDegrees(-30.0).getRadians(),
+                    Rotation2d.fromDegrees(30.0).getRadians())),
+            logger.subLogger("providers/ll-right"));
 
     m_fusedEstimator =
         new GreyPoseEstimator(
             m_pigeon, m_driveController, m_odometrySupplier, logger.subLogger("estimators/fused"));
-    m_backLLSupplier.addReceiver(m_fusedEstimator);
-    m_frontLLSupplier.addReceiver(m_fusedEstimator);
+    m_leftLLSupplier.addReceiver(m_fusedEstimator);
+    m_rightLLSupplier.addReceiver(m_fusedEstimator);
+
+    m_leftOnlyEstimator =
+        new GreyPoseEstimator(
+            m_pigeon,
+            m_driveController,
+            m_odometrySupplier,
+            logger.subLogger("estimators/leftOnly"));
+    m_leftLLSupplier.addReceiver(m_leftOnlyEstimator);
+    m_rightOnlyEstimator =
+        new GreyPoseEstimator(
+            m_pigeon,
+            driveController,
+            m_odometrySupplier,
+            logger.subLogger("estimators/rightOnly"));
+    m_rightLLSupplier.addReceiver(m_rightOnlyEstimator);
   }
 
   public void startOdometrey() {
@@ -100,7 +123,7 @@ public class Drive implements Subsystem {
   }
 
   public GreyPoseEstimator getPoseEstimator() {
-    return m_poseEstimator;
+    return m_fusedEstimator;
   }
 
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
@@ -156,6 +179,8 @@ public class Drive implements Subsystem {
     m_pigeon.setYawOffset(m_pigeon.getRawYaw().minus(pose.getRotation()));
     m_poseEstimator.resetPosition(pose);
     m_fusedEstimator.resetPosition(pose);
+    m_leftOnlyEstimator.resetPosition(pose);
+    m_rightOnlyEstimator.resetPosition(pose);
     syncSensors();
   }
 
@@ -193,19 +218,23 @@ public class Drive implements Subsystem {
     m_pigeon.log();
     m_poseEstimator.log();
     m_fusedEstimator.log();
-    m_backLLSupplier.log();
-    m_frontLLSupplier.log();
+    m_rightOnlyEstimator.log();
+    m_leftOnlyEstimator.log();
+    m_leftLLSupplier.log();
+    m_rightLLSupplier.log();
     m_odometrySupplier.log();
   }
 
   @Override
   public void syncSensors() {
-    m_backLLSupplier.syncSensors();
-    m_frontLLSupplier.syncSensors();
+    m_leftLLSupplier.syncSensors();
+    m_rightLLSupplier.syncSensors();
   }
 
   public synchronized void syncSensorsHighFreq() {
-    m_estimatedPose = m_poseEstimator.getPoseMeters();
+    // Use the fused estimator for our position but the odometry-only estimator
+    // for our velocity.
+    m_estimatedPose = m_fusedEstimator.getPoseMeters();
     m_estimatedVelocity = m_poseEstimator.getVelocityMetersPerSeconds();
   }
 

@@ -58,6 +58,9 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
   }
 
   public synchronized void resetPosition(Pose2d pose) {
+    if (m_poseEstimator == null) {
+      return;
+    }
     m_poseEstimator.resetPosition(m_pigeon.getYaw(), m_odometrySupplier.getPositions(), pose);
     log();
   }

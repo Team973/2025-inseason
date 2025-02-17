@@ -590,14 +590,12 @@ public class GreyTalonFX extends TalonFX {
   }
 
   public void log() {
-    /*
     m_logger.log("Velocity", () -> this.getVelocity().getValueAsDouble());
     m_logger.log("Acceleration", () -> this.getAcceleration().getValueAsDouble());
     m_logger.log("Stator Current", () -> this.getStatorCurrent().getValueAsDouble());
     m_logger.log("Supply Current", () -> this.getSupplyCurrent().getValueAsDouble());
     m_logger.log("Voltage", () -> this.getMotorVoltage().getValueAsDouble());
     m_logger.log("Position Rot", () -> this.getPosition().getValueAsDouble());
-    */
   }
 
   public void debugSmartDashboard() {

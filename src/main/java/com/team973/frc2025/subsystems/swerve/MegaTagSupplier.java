@@ -163,7 +163,7 @@ public class MegaTagSupplier {
     // 0.2 based on a handful of criteria. Higher numbers mean less trustworthy samples.
     // Ref
     // github.com/Team254/FRC-2024-Public/src/main/java/com/team254/frc2024/subsystems/vision/VisionSubsystem.java
-    Matrix<N3, N1> confidenceStdDev = VecBuilder.fill(0.5, 0.5, 9999999);
+    Matrix<N3, N1> confidenceStdDev = VecBuilder.fill(0.3, 0.3, 9999999);
     for (MegaTagReceiver receiver : m_receivers) {
       receiver.observeVisionData(m_llName, mt2.pose, mt2.timestampSeconds, confidenceStdDev);
     }
