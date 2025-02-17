@@ -35,8 +35,6 @@ public class Robot extends TimedRobot {
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm"));
 
-  
-
   private final SolidSignaler m_lowBatterySignaler = new SolidSignaler(RobotInfo.Colors.ORANGE, 1);
   private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 100);
   private final Superstructure m_superstructure =
@@ -142,7 +140,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-   syncSensors();
+    syncSensors();
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(

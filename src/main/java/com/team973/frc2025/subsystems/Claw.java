@@ -49,9 +49,8 @@ public class Claw implements Subsystem {
     Off,
   }
 
-  public Claw(Logger logger , CANdleManger candle) {
+  public Claw(Logger logger, CANdleManger candle) {
     m_logger = logger;
-
 
     candle.addSignaler(m_coralInclawBlinker);
     m_clawMotor =
@@ -138,7 +137,7 @@ public class Claw implements Subsystem {
   // }
 
   public void coralScoredLED() {
-    if (getCoralSensor() ) {
+    if (getCoralSensor()) {
       m_coralInclawBlinker.setEnabled(true);
     } else {
       m_coralInclawBlinker.setEnabled(false);
