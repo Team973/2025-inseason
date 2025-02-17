@@ -138,7 +138,7 @@ public class Claw implements Subsystem {
   // }
 
   public void coralScoredLED() {
-    if (getCoralSensor() == true) {
+    if (getCoralSensor() ) {
       m_coralInclawBlinker.setEnabled(true);
     } else {
       m_coralInclawBlinker.setEnabled(false);

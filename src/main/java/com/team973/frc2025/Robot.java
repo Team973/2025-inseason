@@ -73,7 +73,6 @@ public class Robot extends TimedRobot {
     m_superstructure.log();
     // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
     m_candleManger.log();
-    m_superstructure.reset();
   }
 
   private void updateJoysticks() {
@@ -143,7 +142,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-
+   syncSensors();
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(
@@ -224,8 +223,6 @@ public class Robot extends TimedRobot {
     // } else if (m_coDriverStick.getPOVLeftPressed()) {
     //   m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
     // }
-
-    syncSensors();
     updateSubsystems();
   }
 
