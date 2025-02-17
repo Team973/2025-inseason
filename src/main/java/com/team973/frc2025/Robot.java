@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm"));
 
   private final Superstructure m_superstructure =
       new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
@@ -85,8 +85,6 @@ public class Robot extends TimedRobot {
     m_superstructure.log();
 
     // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
-
-    m_logger.update();
   }
 
   private void updateJoysticks() {
@@ -223,9 +221,12 @@ public class Robot extends TimedRobot {
       m_superstructure.setTargetReefLevel(4);
     }
 
-    if (Math.abs(climbStick) > 0.1) {
-      m_superstructure.setClimbPower(climbStick * 0.1);
-      m_superstructure.setState(Superstructure.State.Climb);
+    if ((climbStick) > 0.8) {
+      m_superstructure.setState(Superstructure.State.ClimbLow);
+    } else if ((climbStick) < -0.8) {
+      m_superstructure.setState(Superstructure.State.ClimbStow);
+    } else {
+      m_superstructure.setClimbPower(0);
     }
 
     updateSubsystems();

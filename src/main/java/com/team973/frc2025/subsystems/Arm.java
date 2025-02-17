@@ -8,6 +8,7 @@ import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Arm implements Subsystem {
   private final Logger m_logger;
@@ -15,12 +16,15 @@ public class Arm implements Subsystem {
   private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
+  private boolean m_lastHallSensorMode;
+  private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
   private static final double LEVEL_FOUR_POSITION_DEG = 79.0; // 76
   private static final double LEVEL_THREE_POSITION_DEG = 67.0;
   private static final double LEVEL_TWO_POSITION_DEG = -70.0;
   private static final double LEVEL_ONE_POSITION_DEG = -70.0;
-  public static final double STOW_POSITION_DEG = -94.0;
+  public static final double STOW_POSITION_DEG = -90.0;
+  private static final double ARM_HOMING_POSTION_DEG = -90.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
@@ -69,7 +73,18 @@ public class Arm implements Subsystem {
     armMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     armMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_armMotor.setConfig(armMotorConfig);
-    m_armMotor.setPosition(armDegToMotorRotations(-90.0));
+    m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
+  }
+
+  private boolean hallSensor() {
+    return !m_hallSesnsor.get();
+  }
+
+  private void maybeHomeArm() {
+    if (m_lastHallSensorMode == false && hallSensor() == true) {
+      m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
+      m_lastHallSensorMode = hallSensor();
+    }
   }
 
   public void setMotorManualOutput(double joystick) {
@@ -166,10 +181,13 @@ public class Arm implements Subsystem {
         motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
+    m_logger.log("HallsensorArm", hallSensor());
   }
 
   @Override
-  public void syncSensors() {}
+  public void syncSensors() {
+    maybeHomeArm();
+  }
 
   @Override
   public void reset() {}

@@ -10,6 +10,7 @@ import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator implements Subsystem {
   private final Logger m_logger;
@@ -20,11 +21,15 @@ public class Elevator implements Subsystem {
   private double m_targetpositionLeway = 0.1;
   double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
+  private boolean m_lastHallSensorMode;
+  private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
+
+  private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
 
   public static enum ControlStatus {
     Manual,
@@ -67,6 +72,7 @@ public class Elevator implements Subsystem {
     m_motorRight.setConfig(rightMotorConfig);
 
     m_motorLeft.setControl(new Follower(m_motorRight.getDeviceID(), true));
+    m_motorRight.setPosition(0.0);
   }
 
   private static TalonFXConfiguration defaultElevatorMotorConfig() {
@@ -99,6 +105,17 @@ public class Elevator implements Subsystem {
     defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.00;
     defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     return defaultElevatorMotorConfig;
+  }
+
+  private boolean hallsensor() {
+    return !m_hallSensor.get();
+  }
+
+  private void maybeHomeElevator() {
+    if (m_lastHallSensorMode == false && hallsensor() == true) {
+      m_motorRight.setPosition(heightInchesToMotorRotations(ELEVATOR_HOMING_POSTION_HEIGHT));
+    }
+    m_lastHallSensorMode = hallsensor();
   }
 
   public void setControlStatus(ControlStatus status) {
@@ -180,10 +197,13 @@ public class Elevator implements Subsystem {
     m_logger.log(
         "motorErrorInches",
         motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
+    m_logger.log("hallSesnsorReturnElevator", hallsensor());
   }
 
   @Override
-  public void syncSensors() {}
+  public void syncSensors() {
+    maybeHomeElevator();
+  }
 
   @Override
   public void reset() {}
