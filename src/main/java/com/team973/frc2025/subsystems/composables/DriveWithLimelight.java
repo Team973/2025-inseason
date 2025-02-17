@@ -205,8 +205,8 @@ public class DriveWithLimelight extends DriveComposable {
     m_logger.log(
         "Target Initial Pose",
         new double[] {
-          m_targetInitialPose.getTranslation().getX(),
-          m_targetInitialPose.getTranslation().getY(),
+          m_targetInitialPose.getX(),
+          m_targetInitialPose.getY(),
           m_targetInitialPose.getRotation().getRadians()
         });
 
@@ -221,8 +221,8 @@ public class DriveWithLimelight extends DriveComposable {
     m_logger.log(
         "Target Final Pose",
         new double[] {
-          m_targetFinalPose.getTranslation().getX(),
-          m_targetFinalPose.getTranslation().getY(),
+          m_targetFinalPose.getX(),
+          m_targetFinalPose.getY(),
           m_targetFinalPose.getRotation().getRadians()
         });
 

@@ -72,7 +72,7 @@ public class Drive implements Subsystem {
         new MegaTagSupplier(
             "limelight-left",
             m_pigeon,
-            // TODO: Waiting on these measurements
+            // These measurements were derived from CAD.
             new Pose3d(
                 new Translation3d(0.108, -0.275, 0.908),
                 new Rotation3d(

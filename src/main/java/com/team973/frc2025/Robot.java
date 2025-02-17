@@ -114,7 +114,7 @@ public class Robot extends TimedRobot {
   }
 
   private PerfLogger m_robotPeriodicLogger =
-      new PerfLogger(m_logger.subLogger("perf/robotPeriodic"));
+      new PerfLogger(m_logger.subLogger("perf/robotPeriodic", 0.25));
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics

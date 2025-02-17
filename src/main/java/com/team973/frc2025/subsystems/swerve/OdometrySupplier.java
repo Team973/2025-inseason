@@ -58,8 +58,8 @@ public class OdometrySupplier {
     m_swerveModules = swerveModules;
     m_logger = logger;
     m_perfLogger = logger.subLogger("perf", 0.25);
-    m_loopPeriodTracker = new PerfLogger(m_perfLogger.subLogger("period"));
-    m_loopDurationTracker = new PerfLogger(m_perfLogger.subLogger("duration"));
+    m_loopPeriodTracker = new PerfLogger(m_perfLogger.subLogger("period", 0.25));
+    m_loopDurationTracker = new PerfLogger(m_perfLogger.subLogger("duration", 0.25));
 
     List<StatusSignal<Angle>> angleSignals = m_pigeon.getAngleStatusSignals();
     List<StatusSignal<AngularVelocity>> angularVelocitySignals =

@@ -45,7 +45,7 @@ public class MegaTagSupplier {
     m_pigeon = pigeon;
     m_logger = logger;
     m_perfLogger = logger.subLogger("perf", 0.25);
-    m_syncSensorsLogger = new PerfLogger(m_perfLogger.subLogger("syncSensors"));
+    m_syncSensorsLogger = new PerfLogger(m_perfLogger.subLogger("syncSensors", 0.25));
 
     LimelightHelpers.setCameraPose_RobotSpace(
         llName,
