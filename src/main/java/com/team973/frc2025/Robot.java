@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
       new DriveController(m_logger.subLogger("drive", 0.05));
 
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
-  private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
+  private final Claw m_claw = new Claw(m_logger.subLogger("claw"));
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm"));
 
@@ -204,8 +204,8 @@ public class Robot extends TimedRobot {
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(
-            allianceScalar * m_driverStick.getLeftXAxis() * 0.95 * 0.5,
-            allianceScalar * m_driverStick.getLeftYAxis() * 0.95 * 0.5,
+            allianceScalar * m_driverStick.getLeftXAxis() * 0.6,
+            allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
             m_driverStick.getRightXAxis() * 0.8);
 
     if (m_manualScoringMode) {

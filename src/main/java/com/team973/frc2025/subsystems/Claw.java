@@ -28,9 +28,6 @@ public class Claw implements Subsystem {
   private ControlStatus m_mode = ControlStatus.Off;
   private ControlStatus m_lastMode = ControlStatus.Off;
 
-  private double m_leftTargetPostion = 0;
-  private double m_rightTargetPotion = 0;
-
   private double m_targetHoldPosition = 0;
 
   private double m_coralBackUpRot = 3.0;
@@ -101,7 +98,7 @@ public class Claw implements Subsystem {
   }
 
   public boolean motorAtTarget() {
-    return (Math.abs(m_rightTargetPotion - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
+    return (Math.abs(m_targetHoldPosition - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
   }
 
   private boolean getBackSensor() {
@@ -217,8 +214,7 @@ public class Claw implements Subsystem {
     m_logger.log("Coral Sensor", getCoralSensor());
     m_logger.log("Algae Sensor", getAlgaeSensor());
 
-    m_logger.log("target postion left", m_leftTargetPostion);
-    m_logger.log("target postion right", m_rightTargetPotion);
+    m_logger.log("target hold postion", m_targetHoldPosition);
     m_logger.log("target rotations hit", motorAtTarget());
 
     SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
