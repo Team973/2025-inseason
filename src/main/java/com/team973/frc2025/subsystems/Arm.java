@@ -23,7 +23,7 @@ public class Arm implements Subsystem {
   private static final double LEVEL_THREE_POSITION_DEG = 75.0; // 67.0;
   private static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;
   private static final double LEVEL_ONE_POSITION_DEG = -59.0; // -70.0;
-  public static final double STOW_POSITION_DEG = -90.0;
+  public static final double STOW_POSITION_DEG = -92.0;
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);

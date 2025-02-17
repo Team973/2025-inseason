@@ -47,10 +47,10 @@ public class Claw implements Subsystem {
     m_logger = logger;
 
     m_clawMotor =
-        new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("clawMotor"));
+        new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("clawMotor", 0.2));
     m_conveyor =
         new GreyTalonFX(
-            ClawInfo.CONVEYOR_MOTOR_ID, "Canivore", m_logger.subLogger("conveyorMotor"));
+            ClawInfo.CONVEYOR_MOTOR_ID, "Canivore", m_logger.subLogger("conveyorMotor", 0.2));
 
     m_conveyorBackSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
     m_conveyorFrontSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
