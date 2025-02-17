@@ -11,7 +11,6 @@ public class PerfLogger {
   public void observe(double durationSec) {
     m_loopTimeTracker.sample(durationSec);
 
-    m_logger.update();
     m_logger.log("mean duration sec", m_loopTimeTracker.getMean());
     m_logger.log("stddev", m_loopTimeTracker.getStdDev());
     m_logger.log("count", m_loopTimeTracker.samples());

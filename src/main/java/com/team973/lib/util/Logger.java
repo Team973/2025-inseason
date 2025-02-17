@@ -2,8 +2,7 @@ package com.team973.lib.util;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
@@ -11,12 +10,7 @@ import java.util.function.IntSupplier;
 public class Logger {
   private final String m_prefix;
   private final double m_secondsPerLog;
-
-  private double m_nextAllowedLogTime = Conversions.Time.getSecTime();
-
-  private boolean m_logAllowed = true;
-
-  private List<Runnable> m_subLoggerUpdates = new ArrayList<>();
+  private HashMap<String, Double> m_keyLastLoggedAt = new HashMap<String, Double>();
 
   /**
    * Creates an instance of the logger.
@@ -48,6 +42,22 @@ public class Logger {
     return m_prefix;
   }
 
+  private boolean isLogAllowed(String key) {
+    if (m_secondsPerLog == 0) {
+      return true;
+    }
+    if (m_keyLastLoggedAt.containsKey(key) == false) {
+      m_keyLastLoggedAt.put(key, Conversions.Time.getSecTime());
+      return true;
+    }
+    double lastLoggedAt = m_keyLastLoggedAt.get(key);
+    if (lastLoggedAt + m_secondsPerLog < Conversions.Time.getSecTime()) {
+      m_keyLastLoggedAt.put(key, Conversions.Time.getSecTime());
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Creates a new logger instance. The seconds per log parameter is the same as the parent logger.
    *
@@ -70,90 +80,72 @@ public class Logger {
    */
   public Logger subLogger(String prefix, double secondsPerLog) {
     Logger subLogger = new Logger(m_prefix + "/" + prefix, secondsPerLog);
-    m_subLoggerUpdates.add(subLogger::update);
-
     return subLogger;
   }
 
   public void log(String key, double value) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, String value) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, int value) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, boolean value) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, double[] value) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, String[] value) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, int[] value) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, boolean[] value) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
     }
   }
 
   public void log(String key, DoubleSupplier valueSupplier) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       log(key, valueSupplier.getAsDouble());
     }
   }
 
   public void log(String key, IntSupplier valueSupplier) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       log(key, valueSupplier.getAsInt());
     }
   }
 
   public void log(String key, BooleanSupplier valueSupplier) {
-    if (m_logAllowed) {
+    if (isLogAllowed(key)) {
       log(key, valueSupplier.getAsBoolean());
     }
-  }
-
-  /**
-   * Updates the logger. If the time since the last log is greater than the seconds per log, then
-   * logging is allowed for the current cycle.
-   */
-  public void update() {
-    m_subLoggerUpdates.forEach((update) -> update.run());
-
-    if (Conversions.Time.getSecTime() > m_nextAllowedLogTime) {
-      m_nextAllowedLogTime += m_secondsPerLog;
-      m_logAllowed = true;
-      return;
-    }
-
-    m_logAllowed = false;
   }
 }

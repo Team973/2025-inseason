@@ -203,6 +203,8 @@ public class Drive implements Subsystem {
   }
 
   public void log() {
+    m_logger.log("X Meters Per Second", m_poseEstimator.getVelocityMetersPerSeconds().getX());
+    m_logger.log("Y Meters Per Second", m_poseEstimator.getVelocityMetersPerSeconds().getY());
 
     double states[] = new double[8];
     int index = 0;

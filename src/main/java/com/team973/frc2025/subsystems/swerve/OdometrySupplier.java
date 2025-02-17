@@ -175,7 +175,6 @@ public class OdometrySupplier {
   }
 
   public void log() {
-    m_perfLogger.update();
     m_perfLogger.log("thread/successful cycles", () -> getSuccessfulCycles());
     m_perfLogger.log("thread/failed cycles", () -> getFailedCycles());
   }

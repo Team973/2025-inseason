@@ -54,7 +54,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
     return m_lastPoseMeters
         .minus(getPoseMeters())
         .getTranslation()
-        .times(1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY);
+        .times(RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY);
   }
 
   public synchronized void resetPosition(Pose2d pose) {

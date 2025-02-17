@@ -85,7 +85,6 @@ public class MegaTagSupplier {
   }
 
   public void log() {
-    m_perfLogger.update();
     m_perfLogger.log("rejected needs init", () -> getRejectedNeedsInit());
     m_perfLogger.log("rejected too spinny", () -> getRejectedTooSpinny());
     m_perfLogger.log("rejected no tags", () -> getRejectedNoTags());

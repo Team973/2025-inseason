@@ -4,7 +4,6 @@
 
 package com.team973.frc2025;
 
-import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
@@ -14,8 +13,10 @@ import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
+import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.PerfLogger;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -37,7 +38,7 @@ public class Robot extends TimedRobot {
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2));
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2));
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm"));
 
   private final Superstructure m_superstructure =
       new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
@@ -52,7 +53,25 @@ public class Robot extends TimedRobot {
 
   private PerfLogger m_syncSensorsLogger =
       new PerfLogger(m_logger.subLogger("perf/syncSensors", 0.25));
-  private boolean m_manualScoringMode = false;
+
+  private final JoystickField m_reefSelector =
+      new JoystickField(
+          () -> m_coDriverStick.getRightXAxis(), () -> m_coDriverStick.getRightYAxis());
+
+  private final JoystickField.Range m_backFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_backRightFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(60), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_frontRightFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_frontFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_frontLeftFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(240), Rotation2d.fromDegrees(30), 0.8);
+  private final JoystickField.Range m_backLeftFace =
+      m_reefSelector.range(Rotation2d.fromDegrees(300), Rotation2d.fromDegrees(30), 0.8);
+
+  private boolean m_manualScoringMode = true;
 
   private void syncSensors() {
     double startTime = Timer.getFPGATimestamp();
@@ -78,8 +97,6 @@ public class Robot extends TimedRobot {
     m_superstructure.log();
 
     // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
-
-    m_logger.update();
   }
 
   private void updateJoysticks() {
@@ -174,21 +191,22 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     syncSensors();
 
-    if (RobotInfo.BOT_VERSION == RobotInfo.BotVersion.W1W) {
-      m_driveController
-          .getDriveWithJoysticks()
-          .updateInput( // HACK: Not to be negated.
-              -m_driverStick.getLeftXAxis() * 0.5,
-              -m_driverStick.getLeftYAxis() * 0.5,
-              m_driverStick.getRightXAxis() * 0.4);
-    } else {
-      m_driveController
-          .getDriveWithJoysticks()
-          .updateInput(
-              m_driverStick.getLeftYAxis() * 0.2,
-              -m_driverStick.getLeftXAxis() * 0.2,
-              m_driverStick.getRightXAxis() * 0.2);
+    double allianceScalar = 1.0;
+    if (m_alliance == Alliance.Red) {
+      // Our gyroscope is blue-centric meaning that facing away from the alliance wall
+      // is a 0 degree heading. But the driver station is facing 180 when we are on the
+      // red alliance. So when we are the red alliance we need to flip the joystick inputs.
+      // Ideally we would convert this to polar coordinates, rotate by 180, and then convert
+      // back to cartesian. But the algebra here is equivalent to just negating the X and Y
+      // so that's what we iwll do for now.
+      allianceScalar = -1.0;
     }
+    m_driveController
+        .getDriveWithJoysticks()
+        .updateInput(
+            allianceScalar * m_driverStick.getLeftXAxis() * 0.95 * 0.5,
+            allianceScalar * m_driverStick.getLeftYAxis() * 0.95 * 0.5,
+            m_driverStick.getRightXAxis() * 0.8);
 
     if (m_manualScoringMode) {
       m_superstructure.setState(Superstructure.State.Manual);
@@ -200,7 +218,11 @@ public class Robot extends TimedRobot {
       }
 
       if (m_driverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.toggleManualArmivator();
+        m_superstructure.setManualArmivator(true);
+      }
+
+      if (m_driverStick.getLeftTriggerPressed()) {
+        m_superstructure.setManualArmivator(false);
       }
     } else {
       if (m_driverStick.getLeftTrigger()) {
@@ -230,37 +252,44 @@ public class Robot extends TimedRobot {
 
     double climbStick = m_coDriverStick.getLeftYAxis();
 
-    if (m_coDriverStick.getAButton()) {
-      if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementArmOffset(1.0);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementArmOffset(-1.0);
-      }
-    } else if (m_coDriverStick.getBButton()) {
-      if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementElevatorOffset(0.5);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementElevatorOffset(-0.5);
-      }
-    } else if (m_coDriverStick.getYButton()) {
-      if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementCoralBackup(0.5);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementCoralBackup(-0.5);
-      }
-    } else if (Math.abs(climbStick) > 0.1) {
-      m_superstructure.setClimbPower(climbStick * 0.1);
-      m_superstructure.setState(Superstructure.State.Climb);
+    if (m_coDriverStick.getPOVTopPressed()) {
+      m_superstructure.incrementElevatorOffset(0.5);
+    } else if (m_coDriverStick.getPOVBottomPressed()) {
+      m_superstructure.incrementElevatorOffset(-0.5);
+    } else if (m_coDriverStick.getPOVRightPressed()) {
+      m_superstructure.incrementArmOffset(1.0);
+    } else if (m_coDriverStick.getPOVLeftPressed()) {
+      m_superstructure.incrementArmOffset(-1.0);
     }
 
-    if (m_coDriverStick.getPOVTopPressed()) {
-      m_superstructure.incrementTargetReefLevel(1);
-    } else if (m_coDriverStick.getPOVBottomPressed()) {
-      m_superstructure.incrementTargetReefLevel(-1);
-    } else if (m_coDriverStick.getPOVRightPressed()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(1);
-    } else if (m_coDriverStick.getPOVLeftPressed()) {
-      m_driveController.getDriveWithLimelight().incrementTargetReefFace(-1);
+    if (m_coDriverStick.getAButtonPressed()) {
+      m_superstructure.setTargetReefLevel(1);
+    } else if (m_coDriverStick.getBButtonPressed()) {
+      m_superstructure.setTargetReefLevel(2);
+    } else if (m_coDriverStick.getXButtonPressed()) {
+      m_superstructure.setTargetReefLevel(3);
+    } else if (m_coDriverStick.getYButtonPressed()) {
+      m_superstructure.setTargetReefLevel(4);
+    }
+
+    if ((climbStick) > 0.8) {
+      m_superstructure.setState(Superstructure.State.ClimbLow);
+    } else if ((climbStick) < -0.8) {
+      m_superstructure.setState(Superstructure.State.ClimbStow);
+    } else {
+      m_superstructure.setClimbPower(0);
+    }
+
+    if (m_coDriverStick.getStartButtonPressed()) {
+      // The drivers will always just point the robot _away_ from them. They give
+      // inputs in alliance-wall centric coordinates. The robot itself though is
+      // tracking angle in blue-centric coordinates. So when on the red alliance,
+      // their zero position is actually 180 in blue-centric coordinates.
+      if (m_alliance == Alliance.Blue) {
+        m_driveController.resetAngle(Rotation2d.fromDegrees(0));
+      } else {
+        m_driveController.resetAngle(Rotation2d.fromDegrees(180));
+      }
     }
 
     updateSubsystems();
@@ -282,6 +311,20 @@ public class Robot extends TimedRobot {
 
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
+
+    if (m_frontFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(1);
+    } else if (m_frontRightFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(2);
+    } else if (m_backRightFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(3);
+    } else if (m_backFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(4);
+    } else if (m_backLeftFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(5);
+    } else if (m_frontLeftFace.isActive()) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(6);
+    }
 
     if (m_coDriverStick.getAButtonPressed()) {
       m_autoManager.increment();

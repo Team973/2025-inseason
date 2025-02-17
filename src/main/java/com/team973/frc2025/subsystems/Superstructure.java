@@ -23,7 +23,9 @@ public class Superstructure implements Subsystem {
     IntakeAlgae,
     ScoreCoral,
     ScoreAlgae,
-    Climb,
+    ClimbManual,
+    ClimbStow,
+    ClimbLow,
     Manual,
     Off
   }
@@ -45,17 +47,17 @@ public class Superstructure implements Subsystem {
     m_manualScore = score;
   }
 
-  public void toggleManualArmivator() {
-    m_manualArmivator = !m_manualArmivator;
+  public void setManualArmivator(boolean manual) {
+    m_manualArmivator = manual;
   }
 
-  public void incrementTargetReefLevel(int increment) {
-    m_targetReefLevel += increment;
+  public void setTargetReefLevel(int level) {
+    m_targetReefLevel = level;
 
     if (m_targetReefLevel > 4) {
-      m_targetReefLevel = 1;
-    } else if (m_targetReefLevel < 1) {
       m_targetReefLevel = 4;
+    } else if (m_targetReefLevel < 1) {
+      m_targetReefLevel = 1;
     }
   }
 
@@ -167,9 +169,15 @@ public class Superstructure implements Subsystem {
         m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
         m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
-      case Climb:
+      case ClimbManual:
         m_claw.setControl(Claw.ControlStatus.Off);
         m_climb.setControlMode(Climb.ControlMode.JoystickMode);
+        break;
+      case ClimbStow:
+        m_climb.setControlMode(Climb.ControlMode.ClimbStow);
+        break;
+      case ClimbLow:
+        m_climb.setControlMode(Climb.ControlMode.ClimbLow);
         break;
       case Manual:
         if (m_lastState != m_state) {
