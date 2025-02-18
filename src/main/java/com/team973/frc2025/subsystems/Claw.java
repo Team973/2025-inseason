@@ -33,6 +33,7 @@ public class Claw implements Subsystem {
   private double m_coralBackUpRot = 3.0;
 
   private boolean m_needsBackup = true;
+  private boolean m_targetLevelNeedsBackup = false;
 
   public static enum ControlStatus {
     IntakeCoral,
@@ -126,9 +127,9 @@ public class Claw implements Subsystem {
     return getConveyorFrontSensor() || getConveyorBackSensor() || getClawCoralSensor();
   }
 
-  // public boolean getIsCoralInConveyor() {
-  //   return getBackSensor() || getFrontSensor(); // || getCoralSensor();
-  // }
+  public void setTargetLevelNeedsBackup(boolean targetLevelNeedsBackup) {
+    m_targetLevelNeedsBackup = targetLevelNeedsBackup;
+  }
 
   @Override
   public void update() {
@@ -136,8 +137,8 @@ public class Claw implements Subsystem {
       case IntakeCoral:
         if (!getConveyorFrontSensor() && getClawCoralSensor()) {
           // Too far forward --- back up!
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, -15, VELOCITY_VOLTAGE_PID_SLOT);
-          m_conveyor.setControl(ControlMode.VelocityVoltage, -15);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
           m_needsBackup = true;
         } else if (!getConveyorBackSensor() && getConveyorFrontSensor() && getClawCoralSensor()) {
           // Perfect spot!
@@ -146,8 +147,8 @@ public class Claw implements Subsystem {
           m_needsBackup = true;
         } else if (getConveyorBackSensor() && getConveyorFrontSensor() && getClawCoralSensor()) {
           // Slightly too far back
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 20, VELOCITY_VOLTAGE_PID_SLOT);
-          m_conveyor.setControl(ControlMode.VelocityVoltage, 20);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 10);
         } else {
           // Way too far back
           m_clawMotor.setControl(ControlMode.VelocityVoltage, 35, VELOCITY_VOLTAGE_PID_SLOT);
@@ -170,7 +171,11 @@ public class Claw implements Subsystem {
         // } else {
 
         if (m_lastMode != m_mode && m_needsBackup) {
-          m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - m_coralBackUpRot;
+          if (m_targetLevelNeedsBackup) {
+            m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - m_coralBackUpRot;
+          } else {
+            m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble();
+          }
           m_needsBackup = false;
         }
 
