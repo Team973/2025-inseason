@@ -56,9 +56,9 @@ public class Elevator implements Subsystem {
   public static class Presets {
     public static final double LEVEL_1 = 2.0;
     public static final double LEVEL_2 = 12.0;
-    public static final double LEVEL_3 = 3.5;
-    public static final double LEVEL_4 = 25.5;
-    public static final double STOW = 0;
+    public static final double LEVEL_3 = 2.5; // 3.5;
+    public static final double LEVEL_4 = 27.5;
+    public static final double STOW = 0.5; // Should be 0 when we don't have old bumpers
   }
 
   public Elevator(Logger logger) {
@@ -73,6 +73,7 @@ public class Elevator implements Subsystem {
     TalonFXConfiguration rightMotorConfig = defaultElevatorMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     m_motorRight.setConfig(rightMotorConfig);
+    m_motorRight.setPosition(0);
 
     m_motorLeft.setControl(new Follower(m_motorRight.getDeviceID(), true));
     m_motorRight.setPosition(0.0);
@@ -188,11 +189,13 @@ public class Elevator implements Subsystem {
     }
   }
 
+  public double getHeightInches() {
+    return motorRotationsToHeightInches(m_motorRight.getPosition().getValueAsDouble());
+  }
+
   @Override
   public void log() {
-    m_logger.log(
-        "currentPostionHeightInches",
-        motorRotationsToHeightInches(m_motorRight.getPosition().getValueAsDouble()));
+    m_logger.log("currentPostionHeightInches", getHeightInches());
     m_logger.log("targetPostionReached", motorAtTarget());
     m_logger.log("targetPostionHeightInches", m_targetPostionHeightinches);
     m_motorLeft.log();

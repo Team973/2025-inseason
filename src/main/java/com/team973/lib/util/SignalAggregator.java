@@ -22,4 +22,8 @@ public class SignalAggregator {
   public double getStdDev() {
     return Math.sqrt(m_m2 / m_count);
   }
+
+  public double samples() {
+    return m_count;
+  }
 }

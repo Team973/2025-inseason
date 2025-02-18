@@ -101,6 +101,11 @@ public class DriveController implements Subsystem {
     m_driveWithJoysticks.reset(pose2d.getRotation());
   }
 
+  public synchronized void resetAngle(Rotation2d angle) {
+    m_drive.resetOdometry(new Pose2d(getPose().getTranslation(), angle));
+    m_driveWithJoysticks.reset(angle);
+  }
+
   @Override
   public void log() {
     m_drive.log();
@@ -126,9 +131,19 @@ public class DriveController implements Subsystem {
     }
   }
 
-  @Override
-  public synchronized void syncSensors() {
+  public void syncSensors() {
+    if (m_drive == null) {
+      return;
+    }
     m_drive.syncSensors();
+  }
+
+  public synchronized void syncSensorsHighFreq() {
+    if (m_drive == null) {
+      // TODO: Need to re-think initialization here.
+      return;
+    }
+    m_drive.syncSensorsHighFreq();
     m_driveWithTrajectory.updatePose(getPose());
     m_driveWithJoysticks.updateAngle(
         m_drive.getPigeon().getNormalizedYaw(), m_drive.getPigeon().getAngularVelocity());
