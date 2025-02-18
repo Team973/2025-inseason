@@ -16,11 +16,18 @@ public class BlinkingSignaler implements ISignaler {
   private Color m_colorB;
   private Color m_currentColor;
 
-  public BlinkingSignaler(Color colorA, Color colorB, double blinkPeriodMs, int priorityNum) {
+  private double m_timeOnMili;
+
+  private double m_timeRequestedMili;
+
+  public BlinkingSignaler(
+      Color colorA, Color colorB, double blinkPeriodMs, double timeMili, int priorityNum) {
     m_colorA = colorA;
     m_colorB = colorB;
     m_blinkPeriodMs = blinkPeriodMs;
     m_priorty = priorityNum;
+    m_timeRequestedMili = timeMili;
+    m_timeOnMili = timeMili + RobotController.getFPGATime() / 1000.0;
   }
 
   private double modTimeMilisecs() {
@@ -55,13 +62,17 @@ public class BlinkingSignaler implements ISignaler {
     SmartDashboard.putString("colorB", m_colorB.toString());
   }
 
-  public void syncSensors() {}
-
   public void update(CANdle candle) {
     blinkingLights(candle);
   }
 
-  public void reset() {}
+  private boolean checkTimerUse() {
+    if (m_timeRequestedMili == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @Override
   public boolean isEnabled() {
@@ -79,5 +90,11 @@ public class BlinkingSignaler implements ISignaler {
   }
 
   @Override
-  public void timeOn() {}
+  public void timeOn() {
+    if (!checkTimerUse()) {
+      if (m_timeOnMili == RobotController.getFPGATime() / 1000.0) {
+        setEnabled(false);
+      }
+    }
+  }
 }

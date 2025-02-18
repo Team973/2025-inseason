@@ -24,6 +24,9 @@ public class Elevator implements Subsystem {
   private boolean m_lastHallSensorMode;
   private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
 
+  private final BlinkingSignaler m_elevatorHomedBlinker =
+      new BlinkingSignaler(RobotInfo.Colors.PURPLE, RobotInfo.Colors.OFF, 400, 3500, 86);
+
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
@@ -114,6 +117,7 @@ public class Elevator implements Subsystem {
   private void maybeHomeElevator() {
     if (m_lastHallSensorMode == false && hallsensor() == true) {
       m_motorRight.setPosition(heightInchesToMotorRotations(ELEVATOR_HOMING_POSTION_HEIGHT));
+      m_elevatorHomedBlinker.setEnabled(true);
     }
     m_lastHallSensorMode = hallsensor();
   }

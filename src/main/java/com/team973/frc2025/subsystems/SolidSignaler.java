@@ -1,6 +1,7 @@
 package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class SolidSignaler implements ISignaler {
@@ -12,9 +13,21 @@ public class SolidSignaler implements ISignaler {
 
   private double m_timeOnMili;
 
+  private double m_timeRequestedMili;
+
   public SolidSignaler(Color color, double timeMili, int priority) {
     m_color = color;
     m_priortyNum = priority;
+    m_timeRequestedMili = timeMili;
+    m_timeOnMili = timeMili + RobotController.getFPGATime() / 1000.0;
+  }
+
+  private boolean checkTimerUse() {
+    if (m_timeRequestedMili == 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -39,5 +52,11 @@ public class SolidSignaler implements ISignaler {
   }
 
   @Override
-  public void timeOn() {}
+  public void timeOn() {
+    if (!checkTimerUse()) {
+      if (m_timeOnMili == RobotController.getFPGATime() / 1000.0) {
+        setEnabled(false);
+      }
+    }
+  }
 }

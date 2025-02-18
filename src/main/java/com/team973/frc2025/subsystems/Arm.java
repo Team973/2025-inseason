@@ -19,6 +19,9 @@ public class Arm implements Subsystem {
   private boolean m_lastHallSensorMode;
   private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
+  private final BlinkingSignaler m_armHomedSigaler =
+      new BlinkingSignaler(RobotInfo.Colors.CYAN, RobotInfo.Colors.OFF, 400, 3500, 90);
+
   private static final double LEVEL_FOUR_POSITION_DEG = 79.0; // 76
   private static final double LEVEL_THREE_POSITION_DEG = 67.0;
   private static final double LEVEL_TWO_POSITION_DEG = -70.0;
@@ -83,8 +86,9 @@ public class Arm implements Subsystem {
   private void maybeHomeArm() {
     if (m_lastHallSensorMode == false && hallSensor() == true) {
       m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
-      m_lastHallSensorMode = hallSensor();
+      m_armHomedSigaler.setEnabled(true);
     }
+    m_lastHallSensorMode = hallSensor();
   }
 
   public void setMotorManualOutput(double joystick) {
