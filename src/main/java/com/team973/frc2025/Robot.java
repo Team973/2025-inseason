@@ -10,6 +10,7 @@ import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
@@ -39,8 +40,6 @@ public class Robot extends TimedRobot {
 
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(RobotInfo.Colors.ORANGE, 0, 1);
-  private final SolidSignaler m_coralInclawBlinker =
-      new SolidSignaler(RobotInfo.Colors.GREEN, 2000, 2);
 
   private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 0, 100);
   private final Superstructure m_superstructure =
@@ -124,11 +123,10 @@ public class Robot extends TimedRobot {
   public Robot() {
     resetSubsystems();
     m_driveController.startOdometrey();
-    m_ledOff.setEnabled(true);
+    m_ledOff.enable();
     m_candleManger.addSignaler(m_lowBatterySignaler);
     m_candleManger.addSignaler(m_ledOff);
-    m_candleManger.addSignaler(m_coralInclawBlinker);
-    m_candleManger.addSignaler(m_claw.m_coralInclawBlinker);
+    m_candleManger.addSignaler(m_claw.m_coralInClawSignaler);
   }
 
   private PerfLogger m_robotPeriodicLogger =
@@ -322,15 +320,15 @@ public class Robot extends TimedRobot {
     }
 
     if (m_driverStick.getRightTrigger()) {
-      // if (m_leftReefSide.isActive()) {
-      //   m_driveController
-      //       .getDriveWithLimelight()
-      //       .setTargetSide(DriveWithLimelight.TargetReefSide.Left);
-      // } else if (m_rightReefSide.isActive()) {
-      //   m_driveController
-      //       .getDriveWithLimelight()
-      //       .setTargetSide(DriveWithLimelight.TargetReefSide.Right);
-      // }
+      if (m_leftReefSide.isActive()) {
+        m_driveController
+            .getDriveWithLimelight()
+            .setTargetSide(DriveWithLimelight.TargetReefSide.Left);
+      } else if (m_rightReefSide.isActive()) {
+        m_driveController
+            .getDriveWithLimelight()
+            .setTargetSide(DriveWithLimelight.TargetReefSide.Right);
+      }
     }
   }
 

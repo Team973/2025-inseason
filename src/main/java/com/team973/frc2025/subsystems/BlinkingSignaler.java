@@ -1,7 +1,7 @@
 package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
-import edu.wpi.first.wpilibj.RobotController;
+import com.team973.lib.util.Conversions;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -14,28 +14,21 @@ public class BlinkingSignaler implements ISignaler {
 
   private Color m_colorA;
   private Color m_colorB;
-  private Color m_currentColor;
-
-  private double m_timeOnMili;
 
   private double m_timeRequestedMili;
+  private double m_enabledStartTime;
 
   public BlinkingSignaler(
-      Color colorA, Color colorB, double blinkPeriodMs, double timeMili, int priorityNum) {
+      Color colorA, Color colorB, double blinkPeriodMs, double timeOnMili, int priorityNum) {
     m_colorA = colorA;
     m_colorB = colorB;
     m_blinkPeriodMs = blinkPeriodMs;
     m_priorty = priorityNum;
-    m_timeRequestedMili = timeMili;
-    m_timeOnMili = timeMili + RobotController.getFPGATime() / 1000.0;
+    m_timeRequestedMili = timeOnMili;
   }
 
   private double modTimeMilisecs() {
-    return RobotController.getFPGATime() / 1000.0 % m_blinkPeriodMs;
-  }
-
-  public Color getCurrentColor() {
-    return m_currentColor;
+    return Conversions.Time.getMsecTime() % m_blinkPeriodMs;
   }
 
   private void blinkingLights(CANdle candle) {
@@ -54,9 +47,9 @@ public class BlinkingSignaler implements ISignaler {
 
   public void log(ISignaler signaler) {
 
-    SmartDashboard.putNumber("current time secs", RobotController.getFPGATime() / 1000.0 / 1000.0);
+    SmartDashboard.putNumber("current time secs", Conversions.Time.getMsecTime() / 1000.0);
     SmartDashboard.putNumber("current time mili mod", modTimeMilisecs());
-    SmartDashboard.putNumber("current time mili", RobotController.getFPGATime() / 1000.0);
+    SmartDashboard.putNumber("current time mili", Conversions.Time.getMsecTime());
     SmartDashboard.putNumber("blink time MOD", m_blinkPeriodMs);
     SmartDashboard.putString("colorA", m_colorA.toString());
     SmartDashboard.putString("colorB", m_colorB.toString());
@@ -66,17 +59,17 @@ public class BlinkingSignaler implements ISignaler {
     blinkingLights(candle);
   }
 
-  private boolean checkTimerUse() {
-    if (m_timeRequestedMili == 0) {
-      return true;
-    } else {
-      return false;
-    }
+  private boolean isInfiniteTime() {
+    return m_timeRequestedMili == 0;
+  }
+
+  private boolean isEnabledTimer() {
+    return Conversions.Time.getMsecTime() > m_enabledStartTime + m_timeRequestedMili;
   }
 
   @Override
   public boolean isEnabled() {
-    return m_isEnabled;
+    return m_isEnabled && (isInfiniteTime() || isEnabledTimer());
   }
 
   @Override
@@ -85,16 +78,13 @@ public class BlinkingSignaler implements ISignaler {
   }
 
   @Override
-  public void setEnabled(boolean enabled) {
-    m_isEnabled = enabled;
+  public void enable() {
+    m_isEnabled = true;
+    m_enabledStartTime = Conversions.Time.getMsecTime();
   }
 
   @Override
-  public void timeOn() {
-    if (!checkTimerUse()) {
-      if (m_timeOnMili == RobotController.getFPGATime() / 1000.0) {
-        setEnabled(false);
-      }
-    }
+  public void disable() {
+    m_isEnabled = false;
   }
 }

@@ -86,7 +86,7 @@ public class Arm implements Subsystem {
   private void maybeHomeArm() {
     if (m_lastHallSensorMode == false && hallSensor() == true) {
       m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
-      m_armHomedSigaler.setEnabled(true);
+      m_armHomedSigaler.enable();
     }
     m_lastHallSensorMode = hallSensor();
   }

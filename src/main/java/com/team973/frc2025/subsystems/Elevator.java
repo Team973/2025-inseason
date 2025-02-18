@@ -116,9 +116,9 @@ public class Elevator implements Subsystem {
   }
 
   private void maybeHomeElevator() {
-    if (m_lastHallSensorMode == false && hallsensor() == true) {
+    if (!m_lastHallSensorMode && hallsensor()) {
       m_motorRight.setPosition(heightInchesToMotorRotations(ELEVATOR_HOMING_POSTION_HEIGHT));
-      m_elevatorHomedBlinker.setEnabled(true);
+      m_elevatorHomedBlinker.enable();
     }
     m_lastHallSensorMode = hallsensor();
   }

@@ -5,11 +5,11 @@ import com.ctre.phoenix.led.CANdle;
 public interface ISignaler {
   public boolean isEnabled();
 
-  public void setEnabled(boolean enabled);
+  public void enable();
+
+  public void disable();
 
   public int getPriorty();
 
   public void update(CANdle candle);
-
-  public void timeOn();
 }

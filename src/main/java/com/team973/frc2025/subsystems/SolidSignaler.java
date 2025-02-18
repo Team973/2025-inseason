@@ -1,7 +1,7 @@
 package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
-import edu.wpi.first.wpilibj.RobotController;
+import com.team973.lib.util.Conversions;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class SolidSignaler implements ISignaler {
@@ -11,23 +11,22 @@ public class SolidSignaler implements ISignaler {
 
   private int m_priortyNum;
 
-  private double m_timeOnMili;
-
   private double m_timeRequestedMili;
+
+  private double m_enabledStartTime;
 
   public SolidSignaler(Color color, double timeMili, int priority) {
     m_color = color;
     m_priortyNum = priority;
     m_timeRequestedMili = timeMili;
-    m_timeOnMili = timeMili + RobotController.getFPGATime() / 1000.0;
   }
 
-  private boolean checkTimerUse() {
-    if (m_timeRequestedMili == 0) {
-      return true;
-    } else {
-      return false;
-    }
+  private boolean isInfiniteTime() {
+    return m_timeRequestedMili == 0;
+  }
+
+  private boolean isEnabledTimer() {
+    return Conversions.Time.getMsecTime() > m_enabledStartTime + m_timeRequestedMili;
   }
 
   @Override
@@ -38,7 +37,7 @@ public class SolidSignaler implements ISignaler {
 
   @Override
   public boolean isEnabled() {
-    return m_isEnabled;
+    return m_isEnabled && (isInfiniteTime() || isEnabledTimer());
   }
 
   @Override
@@ -47,16 +46,12 @@ public class SolidSignaler implements ISignaler {
   }
 
   @Override
-  public void setEnabled(boolean enabled) {
-    m_isEnabled = enabled;
+  public void enable() {
+    m_isEnabled = true;
+    m_enabledStartTime = Conversions.Time.getMsecTime();
   }
 
-  @Override
-  public void timeOn() {
-    if (!checkTimerUse()) {
-      if (m_timeOnMili == RobotController.getFPGATime() / 1000.0) {
-        setEnabled(false);
-      }
-    }
+  public void disable() {
+    m_isEnabled = false;
   }
 }
