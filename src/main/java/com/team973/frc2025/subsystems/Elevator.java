@@ -53,9 +53,9 @@ public class Elevator implements Subsystem {
   public static class Presets {
     public static final double LEVEL_1 = 2.0;
     public static final double LEVEL_2 = 12.0;
-    public static final double LEVEL_3 = 2.5; // 3.5;
+    public static final double LEVEL_3 = 2.5;
     public static final double LEVEL_4 = 27.5;
-    public static final double STOW = 0.5; // Should be 0 when we don't have old bumpers
+    public static final double STOW = 0.0;
   }
 
   public Elevator(Logger logger) {
