@@ -1,6 +1,7 @@
 package com.team973.lib.util;
 
 import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -23,7 +24,7 @@ public class Logger {
     m_prefix = prefix;
     m_secondsPerLog = secondsPerLog;
 
-    // DogLog.setOptions(new DogLogOptions().withNtPublish(true));
+    DogLog.setOptions(new DogLogOptions().withNtPublish(true));
     // TODO: solve why this doesn't work
     // DogLog.setPdh(new PowerDistribution());
   }

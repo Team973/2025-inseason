@@ -1,5 +1,9 @@
 package com.team973.frc2025;
 
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.CANdleManger;
@@ -11,6 +15,7 @@ import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight.TargetReefFace;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
@@ -18,6 +23,7 @@ import com.team973.lib.util.PerfLogger;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -51,6 +57,7 @@ public class Robot extends TimedRobot {
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
+  private boolean m_manualScoringMode = true;
 
   private PerfLogger m_syncSensorsLogger =
       new PerfLogger(m_logger.subLogger("perf/syncSensors", 0.25));
@@ -82,7 +89,7 @@ public class Robot extends TimedRobot {
   private void syncSensors() {
     double startTime = Timer.getFPGATimestamp();
     m_driveController.syncSensors();
-
+    m_candleManger.syncSensors();
     m_superstructure.syncSensors();
 
     m_syncSensorsLogger.observe(Timer.getFPGATimestamp() - startTime);
@@ -90,11 +97,6 @@ public class Robot extends TimedRobot {
 
   private void updateSubsystems() {
     m_driveController.update();
-    m_climb.update();
-    m_claw.update();
-    m_candleManger.update();
-    m_elevator.update();
-    m_arm.update();
     m_candleManger.update();
     m_superstructure.update();
   }
@@ -102,13 +104,14 @@ public class Robot extends TimedRobot {
   private void resetSubsystems() {
     m_driveController.reset();
     m_superstructure.reset();
-    m_claw.reset();
     m_candleManger.reset();
   }
 
   private void logSubsystems() {
     m_driveController.log();
     m_superstructure.log();
+    // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
+    m_candleManger.log();
   }
 
   private void updateJoysticks() {
@@ -126,7 +129,6 @@ public class Robot extends TimedRobot {
     m_ledOff.enable();
     m_candleManger.addSignaler(m_lowBatterySignaler);
     m_candleManger.addSignaler(m_ledOff);
-    m_candleManger.addSignaler(m_claw.m_coralInClawSignaler);
   }
 
   private PerfLogger m_robotPeriodicLogger =
@@ -141,6 +143,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
+    if (RobotController.getBatteryVoltage() < 12.0) {
+      m_lowBatterySignaler.enable();
+    } else {
+      m_lowBatterySignaler.disable();
+    }
+
     double startTime = Timer.getFPGATimestamp();
     logSubsystems();
 
@@ -252,7 +261,6 @@ public class Robot extends TimedRobot {
               // () -> m_superstructure.readyToScore(),
               () -> m_superstructure.finishedScoring());
     }
-
     double climbStick = m_coDriverStick.getLeftYAxis();
 
     if (m_coDriverStick.getPOVTopPressed()) {
@@ -306,17 +314,17 @@ public class Robot extends TimedRobot {
 
   private void maybeUpdateScoringSelection() {
     if (m_frontFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(1);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.A);
     } else if (m_frontRightFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(2);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.B);
     } else if (m_backRightFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(3);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.C);
     } else if (m_backFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(4);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.D);
     } else if (m_backLeftFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(5);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.E);
     } else if (m_frontLeftFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(6);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.F);
     }
 
     if (m_driverStick.getRightTrigger()) {
@@ -338,6 +346,7 @@ public class Robot extends TimedRobot {
     double startTime = Timer.getFPGATimestamp();
     maybeInitAlliance();
     syncSensors();
+    m_candleManger.update();
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
 
