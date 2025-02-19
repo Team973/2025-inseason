@@ -12,6 +12,7 @@ import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight.TargetReefFace;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
@@ -294,17 +295,17 @@ public class Robot extends TimedRobot {
 
   private void maybeUpdateScoringSelection() {
     if (m_frontFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(1);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.A);
     } else if (m_frontRightFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(2);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.B);
     } else if (m_backRightFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(3);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.C);
     } else if (m_backFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(4);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.D);
     } else if (m_backLeftFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(5);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.E);
     } else if (m_frontLeftFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(6);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.F);
     }
 
     if (m_driverStick.getRightTrigger()) {
