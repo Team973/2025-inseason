@@ -37,7 +37,7 @@ public class DriveWithLimelight extends DriveComposable {
   private Pose2d m_targetInitialPoseLog = new Pose2d();
   private Pose2d m_targetFinalPoseLog = new Pose2d();
 
-  private int m_targetReefFace = 1;
+  private TargetReefFace m_targetReefFace = TargetReefFace.A;
   private TargetReefSide m_targetReefSide = TargetReefSide.Left;
 
   private BooleanSupplier m_targetFinalPoseGate = () -> true;
@@ -50,6 +50,15 @@ public class DriveWithLimelight extends DriveComposable {
   public enum TargetReefSide {
     Left,
     Right
+  }
+
+  public enum TargetReefFace {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F
   }
 
   private enum TargetMode {
@@ -81,40 +90,40 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag HPR =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(2), HP_INITIAL_TARGET, 0.0, Rotation2d.fromDegrees(180));
-    public static final TargetPositionRelativeToAprilTag ONE_L =
+    public static final TargetPositionRelativeToAprilTag A_L =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag ONE_R =
+    public static final TargetPositionRelativeToAprilTag A_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag TWO_L =
+    public static final TargetPositionRelativeToAprilTag B_L =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(8), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag TWO_R =
+    public static final TargetPositionRelativeToAprilTag B_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(8), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag THREE_L =
+    public static final TargetPositionRelativeToAprilTag C_L =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(9), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag THREE_R =
+    public static final TargetPositionRelativeToAprilTag C_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(9), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag FOUR_L =
+    public static final TargetPositionRelativeToAprilTag D_L =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(10), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag FOUR_R =
+    public static final TargetPositionRelativeToAprilTag D_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(10), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag FIVE_L =
+    public static final TargetPositionRelativeToAprilTag E_L =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(11), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag FIVE_R =
+    public static final TargetPositionRelativeToAprilTag E_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(11), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag SIX_L =
+    public static final TargetPositionRelativeToAprilTag F_L =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(6), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag SIX_R =
+    public static final TargetPositionRelativeToAprilTag F_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(6), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
   }
@@ -125,10 +134,10 @@ public class DriveWithLimelight extends DriveComposable {
     double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
     m_xController =
         new ProfiledPIDController(
-            5.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.25), controlPeriodSeconds);
+            4.0, 0, 0, new TrapezoidProfile.Constraints(0.8, 0.2), controlPeriodSeconds);
     m_yController =
         new ProfiledPIDController(
-            5.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.25), controlPeriodSeconds);
+            4.0, 0, 0, new TrapezoidProfile.Constraints(0.8, 0.2), controlPeriodSeconds);
     m_thetaController =
         new ProfiledPIDController(
             8.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.6), controlPeriodSeconds);
@@ -146,14 +155,8 @@ public class DriveWithLimelight extends DriveComposable {
     m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
   }
 
-  public void setTargetReefFace(int face) {
+  public void setTargetReefFace(TargetReefFace face) {
     m_targetReefFace = face;
-
-    if (m_targetReefFace > 6) {
-      m_targetReefFace = 6;
-    } else if (m_targetReefFace < 1) {
-      m_targetReefFace = 1;
-    }
 
     m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
     m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
@@ -161,30 +164,18 @@ public class DriveWithLimelight extends DriveComposable {
 
   public TargetPositionRelativeToAprilTag getTargetReefPosition() {
     switch (m_targetReefFace) {
-      case 1:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.ONE_L
-            : TargetPositions.ONE_R;
-      case 2:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.TWO_L
-            : TargetPositions.TWO_R;
-      case 3:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.THREE_L
-            : TargetPositions.THREE_R;
-      case 4:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.FOUR_L
-            : TargetPositions.FOUR_R;
-      case 5:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.FIVE_L
-            : TargetPositions.FIVE_R;
-      case 6:
-        return m_targetReefSide == TargetReefSide.Left
-            ? TargetPositions.SIX_L
-            : TargetPositions.SIX_R;
+      case A:
+        return m_targetReefSide == TargetReefSide.Left ? TargetPositions.A_L : TargetPositions.A_R;
+      case B:
+        return m_targetReefSide == TargetReefSide.Left ? TargetPositions.B_L : TargetPositions.B_R;
+      case C:
+        return m_targetReefSide == TargetReefSide.Left ? TargetPositions.C_L : TargetPositions.C_R;
+      case D:
+        return m_targetReefSide == TargetReefSide.Left ? TargetPositions.D_L : TargetPositions.D_R;
+      case E:
+        return m_targetReefSide == TargetReefSide.Left ? TargetPositions.E_L : TargetPositions.E_R;
+      case F:
+        return m_targetReefSide == TargetReefSide.Left ? TargetPositions.F_L : TargetPositions.F_R;
       default:
         throw new IllegalArgumentException("Invalid reef face: " + m_targetReefFace);
     }
