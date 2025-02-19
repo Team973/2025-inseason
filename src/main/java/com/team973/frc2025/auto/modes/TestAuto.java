@@ -5,6 +5,7 @@ import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefSide;
 import com.team973.lib.util.AutoMode;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,8 +15,8 @@ public class TestAuto extends AutoMode {
   public TestAuto(Logger logger, DriveController drive, Superstructure superstructure) {
     super(
         logger,
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.A, ReefLevel.L_1));
+        new Pose2d(13.8905 + 1.2192, 4.0259, Rotation2d.fromDegrees(0)),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.A, ReefLevel.L_1, ReefSide.Right));
   }
 
   public String getName() {
