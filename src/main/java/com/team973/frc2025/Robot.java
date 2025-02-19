@@ -11,6 +11,7 @@ import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.TargetReefFace;
 import com.team973.lib.util.Joystick;
@@ -254,13 +255,13 @@ public class Robot extends TimedRobot {
     }
 
     if (m_coDriverStick.getAButtonPressed()) {
-      m_superstructure.setTargetReefLevel(1);
+      m_superstructure.setTargetReefLevel(ReefLevel.L_1);
     } else if (m_coDriverStick.getXButtonPressed()) {
-      m_superstructure.setTargetReefLevel(2);
+      m_superstructure.setTargetReefLevel(ReefLevel.L_2);
     } else if (m_coDriverStick.getBButtonPressed()) {
-      m_superstructure.setTargetReefLevel(3);
+      m_superstructure.setTargetReefLevel(ReefLevel.L_3);
     } else if (m_coDriverStick.getYButtonPressed()) {
-      m_superstructure.setTargetReefLevel(4);
+      m_superstructure.setTargetReefLevel(ReefLevel.L_4);
     }
 
     if ((climbStick) > 0.8) {

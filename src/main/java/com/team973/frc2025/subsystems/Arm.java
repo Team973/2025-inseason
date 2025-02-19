@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
@@ -110,15 +111,15 @@ public class Arm implements Subsystem {
         * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
 
-  public double getTargetDegFromLevel(int level) {
+  public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
-      case 1:
+      case L_1:
         return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
-      case 2:
+      case L_2:
         return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
-      case 3:
+      case L_3:
         return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
-      case 4:
+      case L_4:
         return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
@@ -152,18 +153,18 @@ public class Arm implements Subsystem {
     m_controlStatus = status;
   }
 
-  public void incrementOffset(double increment, int level) {
+  public void incrementOffset(double increment, ReefLevel level) {
     switch (level) {
-      case 1:
+      case L_1:
         m_levelOneOffset += increment;
         break;
-      case 2:
+      case L_2:
         m_levelTwoOffset += increment;
         break;
-      case 3:
+      case L_3:
         m_levelThreeOffset += increment;
         break;
-      case 4:
+      case L_4:
         m_levelFourOffset += increment;
         break;
     }

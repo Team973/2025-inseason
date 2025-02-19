@@ -3,6 +3,7 @@ package com.team973.frc2025.auto.modes;
 import com.team973.frc2025.auto.commands.ScoreCoralCommand;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.TargetReefFace;
 import com.team973.lib.util.AutoMode;
 import com.team973.lib.util.Logger;
@@ -14,7 +15,7 @@ public class TestAuto extends AutoMode {
     super(
         logger,
         new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-        new ScoreCoralCommand(drive, superstructure, TargetReefFace.A, 1));
+        new ScoreCoralCommand(drive, superstructure, TargetReefFace.A, ReefLevel.L_1));
   }
 
   public String getName() {
