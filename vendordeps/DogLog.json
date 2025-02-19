@@ -1,24 +1,5 @@
 {
     "javaDependencies": [
-<<<<<<< HEAD
-    {
-      "groupId": "com.github.jonahsnider",
-      "artifactId": "doglog",
-      "version": "2025.2.1"
-    }
-  ],
-  "fileName": "DogLog.json",
-  "frcYear": "2025",
-  "jsonUrl": "https://doglog.dev/vendordep.json",
-  "name": "DogLog",
-  "jniDependencies": [],
-  "mavenUrls": [
-    "https://jitpack.io"
-  ],
-  "cppDependencies": [],
-  "version": "2025.2.1",
-  "uuid": "65592ce1-2251-4a31-8e4b-2df20dacebe4"
-=======
         {
             "groupId": "com.github.jonahsnider",
             "artifactId": "doglog",
@@ -36,5 +17,4 @@
     "cppDependencies": [],
     "version": "2025.3.0",
     "uuid": "65592ce1-2251-4a31-8e4b-2df20dacebe4"
->>>>>>> 3fb0ba2ef9e1264cc6e4cce773523acb1a02c0fd
 }
