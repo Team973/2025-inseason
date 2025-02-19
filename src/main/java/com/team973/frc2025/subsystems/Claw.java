@@ -21,10 +21,10 @@ public class Claw implements Subsystem {
   private final GreyTalonFX m_clawMotor;
   private final GreyTalonFX m_conveyor;
 
-  private final DigitalInput m_backSensor;
-  private final DigitalInput m_frontSensor;
-  private final DigitalInput m_coralSensor;
-  private final DigitalInput m_algaeSensor;
+  private final DigitalInput m_conveyorBackSensor;
+  private final DigitalInput m_conveyorFrontSensor;
+  private final DigitalInput m_clawCoralSensor;
+  private final DigitalInput m_clawAlgaeSensor;
 
   private ControlStatus m_mode = ControlStatus.Off;
   private ControlStatus m_lastMode = ControlStatus.Off;
@@ -39,6 +39,7 @@ public class Claw implements Subsystem {
   private double m_coralBackUpRot = 3.0;
 
   private boolean m_needsBackup = true;
+  private boolean m_targetLevelNeedsBackup = false;
 
   public static enum ControlStatus {
     IntakeCoral,
@@ -54,15 +55,15 @@ public class Claw implements Subsystem {
 
     candle.addSignaler(m_coralInclawBlinker);
     m_clawMotor =
-        new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("shooterRight"));
+        new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("clawMotor", 0.2));
     m_conveyor =
         new GreyTalonFX(
-            ClawInfo.CONVEYOR_MOTOR_ID, "Canivore", m_logger.subLogger("conveyor motor"));
+            ClawInfo.CONVEYOR_MOTOR_ID, "Canivore", m_logger.subLogger("conveyorMotor", 0.2));
 
-    m_backSensor = new DigitalInput(ClawInfo.BACK_SENSOR_ID);
-    m_frontSensor = new DigitalInput(ClawInfo.FRONT_SENSOR_ID);
-    m_coralSensor = new DigitalInput(ClawInfo.CORAL_SENSOR_ID);
-    m_algaeSensor = new DigitalInput(ClawInfo.ALGAE_SENSOR_ID);
+    m_conveyorBackSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
+    m_conveyorFrontSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
+    m_clawCoralSensor = new DigitalInput(ClawInfo.CLAW_CORAL_SENSOR_ID);
+    m_clawAlgaeSensor = new DigitalInput(ClawInfo.CLAW_ALGAE_SENSOR_ID);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -72,7 +73,8 @@ public class Claw implements Subsystem {
 
     conveyorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-    conveyorConfig.Slot0.kP = 1.0;
+    conveyorConfig.Slot0.kP = 0.3;
+    conveyorConfig.Slot0.kV = 0.1;
 
     m_conveyor.setConfig(conveyorConfig);
   }
@@ -105,39 +107,39 @@ public class Claw implements Subsystem {
   }
 
   public boolean motorAtTarget() {
-    return (Math.abs(m_rightTargetPotion - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
+    return (Math.abs(m_targetHoldPosition - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
   }
 
-  private boolean getBackSensor() {
-    return m_backSensor.get();
+  private boolean getConveyorBackSensor() {
+    return m_conveyorBackSensor.get();
   }
 
-  private boolean getFrontSensor() {
-    return m_frontSensor.get();
+  private boolean getConveyorFrontSensor() {
+    return m_conveyorFrontSensor.get();
   }
 
-  private boolean getCoralSensor() {
-    return m_coralSensor.get();
+  private boolean getClawCoralSensor() {
+    return m_clawCoralSensor.get();
   }
 
-  private boolean getAlgaeSensor() {
-    return m_algaeSensor.get();
+  private boolean getClawAlgaeSensor() {
+    return m_clawAlgaeSensor.get();
   }
 
   public boolean getIsCoralInClaw() {
-    return !getFrontSensor() && getCoralSensor();
+    return !getConveyorFrontSensor() && getClawCoralSensor();
   }
 
   public boolean getSeesCoral() {
-    return getFrontSensor() || getBackSensor() || getCoralSensor();
+    return getConveyorFrontSensor() || getConveyorBackSensor() || getClawCoralSensor();
   }
 
-  // public boolean getIsCoralInConveyor() {
-  //   return getBackSensor() || getFrontSensor(); // || getCoralSensor();
-  // }
+  public void setTargetLevelNeedsBackup(boolean targetLevelNeedsBackup) {
+    m_targetLevelNeedsBackup = targetLevelNeedsBackup;
+  }
 
   public void coralScoredLED() {
-    if (getCoralSensor()) {
+    if ((getIsCoralInClaw())) {
       m_coralInclawBlinker.setEnabled(true);
     } else {
       m_coralInclawBlinker.setEnabled(false);
@@ -148,21 +150,28 @@ public class Claw implements Subsystem {
   public void update() {
     switch (m_mode) {
       case IntakeCoral:
-        if (!getBackSensor() && getFrontSensor()) {
+        if (!getConveyorFrontSensor() && getClawCoralSensor()) {
+          // Too far forward --- back up!
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
+          m_needsBackup = true;
+        } else if (!getConveyorBackSensor() && getConveyorFrontSensor() && getClawCoralSensor()) {
+          // Perfect spot!
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-
           m_needsBackup = true;
-        } else if (!getFrontSensor() && getCoralSensor()) {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, -20, VELOCITY_VOLTAGE_PID_SLOT);
-          m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
-        } else {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 20, VELOCITY_VOLTAGE_PID_SLOT);
+        } else if (getConveyorBackSensor() && getConveyorFrontSensor() && getClawCoralSensor()) {
+          // Slightly too far back
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.VelocityVoltage, 10);
+        } else {
+          // Way too far back
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 35, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 35);
         }
         break;
       case IntakeAlgae:
-        if (getAlgaeSensor()) {
+        if (getClawAlgaeSensor()) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         } else {
@@ -177,7 +186,11 @@ public class Claw implements Subsystem {
         // } else {
 
         if (m_lastMode != m_mode && m_needsBackup) {
-          m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - m_coralBackUpRot;
+          if (m_targetLevelNeedsBackup) {
+            m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - m_coralBackUpRot;
+          } else {
+            m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble();
+          }
           m_needsBackup = false;
         }
 
@@ -197,7 +210,7 @@ public class Claw implements Subsystem {
         //   m_clawMotor.setControl(ControlMode.VelocityVoltage, 60, VELOCITY_VOLTAGE_PID_SLOT);
         // }
 
-        m_clawMotor.setControl(ControlMode.VelocityVoltage, 35, VELOCITY_VOLTAGE_PID_SLOT);
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 50, VELOCITY_VOLTAGE_PID_SLOT);
         m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         break;
       case ScoreAlgae:
@@ -223,15 +236,16 @@ public class Claw implements Subsystem {
   @Override
   public void log() {
     m_clawMotor.log();
+    m_conveyor.log();
 
-    m_logger.log("Back Sensor", getBackSensor());
-    m_logger.log("Front Sensor", getFrontSensor());
-    m_logger.log("Coral Sensor", getCoralSensor());
-    m_logger.log("Algae Sensor", getAlgaeSensor());
+    m_logger.log("Conveyor Back Sensor", getConveyorBackSensor());
+    m_logger.log("Conveyor Front Sensor", getConveyorFrontSensor());
+    m_logger.log("Claw Coral Sensor", getClawCoralSensor());
+    m_logger.log("Claw Algae Sensor", getClawAlgaeSensor());
 
-    m_logger.log("target postion left", m_leftTargetPostion);
-    m_logger.log("target postion right", m_rightTargetPotion);
+    m_logger.log("target hold postion", m_targetHoldPosition);
     m_logger.log("target rotations hit", motorAtTarget());
+    m_logger.log("mode", m_mode.toString());
 
     SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
   }

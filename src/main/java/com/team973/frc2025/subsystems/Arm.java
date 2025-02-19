@@ -19,11 +19,11 @@ public class Arm implements Subsystem {
   private boolean m_lastHallSensorMode;
   private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 79.0; // 76
-  private static final double LEVEL_THREE_POSITION_DEG = 67.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -70.0;
-  private static final double LEVEL_ONE_POSITION_DEG = -70.0;
-  public static final double STOW_POSITION_DEG = -90.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 76.0; // 79
+  private static final double LEVEL_THREE_POSITION_DEG = 75.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -59.0; // -70.0;
+  public static final double STOW_POSITION_DEG = -92.0;
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
