@@ -13,7 +13,7 @@ import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
-import com.team973.frc2025.subsystems.composables.DriveWithLimelight.TargetReefFace;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
@@ -296,28 +296,24 @@ public class Robot extends TimedRobot {
 
   private void maybeUpdateScoringSelection() {
     if (m_frontFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.A);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.A);
     } else if (m_frontRightFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.B);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.B);
     } else if (m_backRightFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.C);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.C);
     } else if (m_backFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.D);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.D);
     } else if (m_backLeftFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.E);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.E);
     } else if (m_frontLeftFace.isActive()) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(TargetReefFace.F);
+      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.F);
     }
 
     if (m_driverStick.getRightTrigger()) {
       if (m_leftReefSide.isActive()) {
-        m_driveController
-            .getDriveWithLimelight()
-            .setTargetSide(DriveWithLimelight.TargetReefSide.Left);
+        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
       } else if (m_rightReefSide.isActive()) {
-        m_driveController
-            .getDriveWithLimelight()
-            .setTargetSide(DriveWithLimelight.TargetReefSide.Right);
+        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Right);
       }
     }
   }
