@@ -17,6 +17,7 @@ import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.Logger;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -99,6 +100,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
+    if (RobotController.getBatteryVoltage() < 12.0) {
+      m_lowBatterySignaler.setEnabled(true);
+    } else {
+      m_lowBatterySignaler.setEnabled(false);
+    }
 
     logSubsystems();
     updateJoysticks();
@@ -232,6 +239,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     syncSensors();
+    m_candleManger.update();
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
     if (m_coDriverStick.getAButtonPressed()) {
