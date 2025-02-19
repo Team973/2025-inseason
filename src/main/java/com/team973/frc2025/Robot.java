@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
       new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
 
   private final AutoManager m_autoManager =
-      new AutoManager(m_logger.subLogger("auto"), m_driveController, m_claw);
+      new AutoManager(m_logger.subLogger("auto"), m_driveController, m_superstructure);
 
   private final Joystick m_driverStick =
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
