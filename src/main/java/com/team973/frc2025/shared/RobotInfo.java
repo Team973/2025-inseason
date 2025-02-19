@@ -4,6 +4,7 @@ import com.team973.lib.util.SwerveModuleConfig;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.util.Color;
 
 /** Robot info, specs, dimensions. */
 public final class RobotInfo {
@@ -176,5 +177,17 @@ public final class RobotInfo {
                 MAX_VELOCITY_METERS_PER_SECOND * 0.65, MAX_ACCELERATION_METERS_PER_SECOND * 0.65)
             .setKinematics(SWERVE_KINEMATICS)
             .setReversed(true);
+  }
+
+  public static class Colors {
+    public static final Color RED = new Color(255, 0, 0);
+    public static final Color GREEN = new Color(0, 255, 0);
+    public static final Color BLUE = new Color(0, 0, 255);
+    public static final Color OFF = new Color(0, 0, 0);
+    public static final Color ORANGE = new Color(255, 100, 25);
+    public static final Color PINK = new Color(255, 105, 180);
+    public static final Color PURPLE = new Color(128, 0, 128);
+    public static final Color CYAN = new Color(0, 255, 255);
+    public static final Color HOT_PINK = new Color(255, 105, 180);
   }
 }
