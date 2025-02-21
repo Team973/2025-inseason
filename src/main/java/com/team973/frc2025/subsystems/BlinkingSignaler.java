@@ -2,7 +2,6 @@ package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
 import com.team973.lib.util.Conversions;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class BlinkingSignaler implements ISignaler {
@@ -45,26 +44,18 @@ public class BlinkingSignaler implements ISignaler {
     }
   }
 
-  public void log(ISignaler signaler) {
-
-    SmartDashboard.putNumber("current time secs", Conversions.Time.getMsecTime() / 1000.0);
-    SmartDashboard.putNumber("current time mili mod", modTimeMilisecs());
-    SmartDashboard.putNumber("current time mili", Conversions.Time.getMsecTime());
-    SmartDashboard.putNumber("blink time MOD", m_blinkPeriodMs);
-    SmartDashboard.putString("colorA", m_colorA.toString());
-    SmartDashboard.putString("colorB", m_colorB.toString());
-  }
+  public void log(ISignaler signaler) {}
 
   public void update(CANdle candle) {
     blinkingLights(candle);
   }
 
-  private boolean isInfiniteTime() {
+  public boolean isInfiniteTime() {
     return m_timeRequestedMili == 0;
   }
 
-  private boolean isEnabledTimer() {
-    return Conversions.Time.getMsecTime() > m_enabledStartTime + m_timeRequestedMili;
+  public boolean isEnabledTimer() {
+    return Conversions.Time.getMsecTime() < m_enabledStartTime + m_timeRequestedMili;
   }
 
   @Override

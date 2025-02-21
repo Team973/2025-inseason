@@ -20,7 +20,7 @@ public class Arm implements Subsystem {
   private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
   private final BlinkingSignaler m_armHomedSigaler =
-      new BlinkingSignaler(RobotInfo.Colors.CYAN, RobotInfo.Colors.OFF, 400, 3500, 90);
+      new BlinkingSignaler(RobotInfo.Colors.CYAN, RobotInfo.Colors.OFF, 400, 2000, 90);
 
   private static final double LEVEL_FOUR_POSITION_DEG = 76.0; // 79
   private static final double LEVEL_THREE_POSITION_DEG = 75.0;
@@ -38,6 +38,8 @@ public class Arm implements Subsystem {
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
+  private CANdleManger m_candleManger;
+
   public static enum ControlStatus {
     Manual,
     TargetPostion,
@@ -52,10 +54,12 @@ public class Arm implements Subsystem {
     return motorPostion * ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
-  public Arm(Logger logger) {
+  public Arm(Logger logger, CANdleManger candle) {
     m_logger = logger;
     m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
+    m_candleManger = candle;
+    m_candleManger.addSignaler(m_armHomedSigaler);
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.0;
     armMotorConfig.Slot0.kA = 0.0;

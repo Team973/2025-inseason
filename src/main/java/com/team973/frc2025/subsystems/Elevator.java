@@ -25,7 +25,7 @@ public class Elevator implements Subsystem {
   private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
 
   private final BlinkingSignaler m_elevatorHomedBlinker =
-      new BlinkingSignaler(RobotInfo.Colors.PURPLE, RobotInfo.Colors.OFF, 400, 3500, 86);
+      new BlinkingSignaler(RobotInfo.Colors.PURPLE, RobotInfo.Colors.OFF, 400, 2000, 86);
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
@@ -33,6 +33,7 @@ public class Elevator implements Subsystem {
   private double m_levelFourOffset = 0.0;
 
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
+  private CANdleManger m_candleManger;
 
   public static enum ControlStatus {
     Manual,
@@ -61,8 +62,10 @@ public class Elevator implements Subsystem {
     public static final double STOW = 0.0;
   }
 
-  public Elevator(Logger logger) {
+  public Elevator(Logger logger, CANdleManger candle) {
     m_logger = logger;
+    m_candleManger = candle;
+    m_candleManger.addSignaler(m_elevatorHomedBlinker);
     m_motorRight = new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorRight"));
     m_motorLeft = new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft"));
 
