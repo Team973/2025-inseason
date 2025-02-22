@@ -20,8 +20,8 @@ public class WaitUntillCoralSeeStateCommand extends AutoCommand {
 
   @Override
   public boolean isCompleted() {
-    return (m_waitUntilSensorSeesCoral && m_claw.getIsCoralInClaw())
-        || (!m_waitUntilSensorSeesCoral && !m_claw.getIsCoralInClaw());
+    return (m_waitUntilSensorSeesCoral && m_claw.getSeesCoral())
+        || (!m_waitUntilSensorSeesCoral && !m_claw.getSeesCoral());
   }
 
   @Override

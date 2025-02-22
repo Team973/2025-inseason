@@ -20,14 +20,14 @@ public class Arm implements Subsystem {
   private boolean m_lastHallSensorMode;
   private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 76.0; // 79
-  private static final double LEVEL_THREE_POSITION_DEG = 75.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 64.0; // 79
+  private static final double LEVEL_THREE_POSITION_DEG = 64.0;
   private static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;
   private static final double LEVEL_ONE_POSITION_DEG = -59.0; // -70.0;
   public static final double STOW_POSITION_DEG = -92.0;
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
 
-  private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 64.0) * (24.0 / 80.0);
+  private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.6; // 0.5;
 
@@ -60,9 +60,9 @@ public class Arm implements Subsystem {
     armMotorConfig.Slot0.kP = 50.0;
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
-    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 72.0; // 64.0;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 90.0; // 80.0;
-    armMotorConfig.MotionMagic.MotionMagicJerk = 160.0;
+    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 110.0; // 64.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 80.0; // 80.0;
+    armMotorConfig.MotionMagic.MotionMagicJerk = 1000.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     armMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;

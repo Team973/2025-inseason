@@ -45,7 +45,6 @@ public final class RobotInfo {
 
     public static final int CONVEYOR_BACK_SENSOR_ID = 2;
     public static final int CONVEYOR_FRONT_SENSOR_ID = 3;
-    public static final int CLAW_CORAL_SENSOR_ID = 4;
     public static final int CLAW_ALGAE_SENSOR_ID = 5;
   }
 
