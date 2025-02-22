@@ -142,9 +142,9 @@ public class Superstructure implements Subsystem {
         m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
       case ScoreCoral:
-        if (finishedScoring() && m_driveController.getDriveWithLimelight().getTargetingComplete()) {
-          m_claw.setControl(Claw.ControlStatus.IntakeCoral);
+        m_claw.setControl(Claw.ControlStatus.IntakeCoral);
 
+        if (m_driveController.getDriveWithLimelight().reachedBackOffPose()) {
           armStow();
           elevatorStow();
         } else if (finishedScoring()) {
@@ -152,16 +152,17 @@ public class Superstructure implements Subsystem {
 
           armTargetReefLevel();
           elevatorTargetReefLevel();
-        } else if (m_driveController.getDriveWithLimelight().reachedTargetFinalPose()) {
+        } else if (m_driveController.getDriveWithLimelight().reachedScoringPose()) {
           m_claw.setControl(Claw.ControlStatus.ScoreCoral);
 
           armTargetReefLevel();
           elevatorTargetReefLevel();
-        } else {
-          m_claw.setControl(Claw.ControlStatus.HoldCoral);
-
+        } else if (m_driveController.getDriveWithLimelight().reachedTargetInitialPose()) {
           armTargetReefLevel();
           elevatorTargetReefLevel();
+        } else {
+          armStow();
+          elevatorStow();
         }
 
         m_climb.setControlMode(Climb.ControlMode.OffState);

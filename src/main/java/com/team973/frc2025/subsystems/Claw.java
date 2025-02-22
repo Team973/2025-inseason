@@ -13,9 +13,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Claw implements Subsystem {
-  private static final int MOTION_MAGIC_PID_SLOT = 0;
-  private static final int VELOCITY_VOLTAGE_PID_SLOT = 1;
-
   private final Logger m_logger;
 
   private final GreyTalonFX m_clawMotor;
@@ -26,7 +23,6 @@ public class Claw implements Subsystem {
   private final DigitalInput m_clawAlgaeSensor;
 
   private ControlStatus m_mode = ControlStatus.Off;
-  private ControlStatus m_lastMode = ControlStatus.Off;
 
   public final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2);
 
@@ -37,7 +33,6 @@ public class Claw implements Subsystem {
   public static enum ControlStatus {
     IntakeCoral,
     IntakeAlgae,
-    HoldCoral,
     ScoreCoral,
     ScoreAlgae,
     Off,
@@ -74,21 +69,11 @@ public class Claw implements Subsystem {
   public static TalonFXConfiguration defaultClawMotorConfig() {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
     defaultMotorConfig.Slot0.kS = 0.0;
-    defaultMotorConfig.Slot0.kV = 0.15;
-    defaultMotorConfig.Slot0.kA = 0.01;
-    defaultMotorConfig.Slot0.kP = 4.0;
+    defaultMotorConfig.Slot0.kV = 0.125 * 10.0 / 10.5;
+    defaultMotorConfig.Slot0.kA = 0.0;
+    defaultMotorConfig.Slot0.kP = 0.3;
     defaultMotorConfig.Slot0.kI = 0.0;
     defaultMotorConfig.Slot0.kD = 0.0;
-    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 8;
-    defaultMotorConfig.MotionMagic.MotionMagicAcceleration = 16;
-    defaultMotorConfig.MotionMagic.MotionMagicJerk = 160;
-    // slot 1 is for velocity
-    defaultMotorConfig.Slot1.kS = 0.0;
-    defaultMotorConfig.Slot1.kV = 0.125 * 10.0 / 10.5;
-    defaultMotorConfig.Slot1.kA = 0.0;
-    defaultMotorConfig.Slot1.kP = 0.3;
-    defaultMotorConfig.Slot1.kI = 0.0;
-    defaultMotorConfig.Slot1.kD = 0.0;
     defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
     defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
@@ -132,66 +117,40 @@ public class Claw implements Subsystem {
       case IntakeCoral:
         if (getConveyorFrontSensor()) {
           // Too far forward --- back up!
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10, VELOCITY_VOLTAGE_PID_SLOT);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10);
           m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
         } else if (getConveyorBackSensor() && !getConveyorFrontSensor()) {
           // Perfect spot!
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
           m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         } else {
           // Way too far back
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 20, VELOCITY_VOLTAGE_PID_SLOT);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 20);
           m_conveyor.setControl(ControlMode.VelocityVoltage, 20);
         }
         break;
       case IntakeAlgae:
         if (getClawAlgaeSensor()) {
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
           m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         } else {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, -35, VELOCITY_VOLTAGE_PID_SLOT);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -35);
           m_conveyor.setControl(ControlMode.VelocityVoltage, -20);
         }
         break;
-      case HoldCoral:
-        // if (getFrontSensor()) { // if (!getCoralSensor() || getFrontSensor()) {
-        //   m_clawMotor.setControl(ControlMode.VelocityVoltage, 15, VELOCITY_VOLTAGE_PID_SLOT);
-        //   m_conveyor.setControl(ControlMode.VelocityVoltage, 7);
-        // } else {
-
-        if (m_lastMode != m_mode) {
-          m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble();
-        }
-
-        m_clawMotor.setControl(
-            ControlMode.PositionVoltage, m_targetHoldPosition, MOTION_MAGIC_PID_SLOT);
-        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-        // }
-        break;
       case ScoreCoral:
-        // if (m_lastMode != m_mode) {
-        //   m_rightTargetPotion = m_clawMotor.getPosition().getValueAsDouble() + 40;
-        // }
-        // m_clawMotor.setControl(
-        //     ControlMode.MotionMagicVoltage, m_rightTargetPotion, MOTION_MAGIC_PID_SLOT);
-
-        // if (motorAtTarget() && getCoralSensor()) {
-        //   m_clawMotor.setControl(ControlMode.VelocityVoltage, 60, VELOCITY_VOLTAGE_PID_SLOT);
-        // }
-
-        m_clawMotor.setControl(ControlMode.VelocityVoltage, 50, VELOCITY_VOLTAGE_PID_SLOT);
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 50);
         m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         break;
       case ScoreAlgae:
-        m_clawMotor.setControl(ControlMode.VelocityVoltage, -35, VELOCITY_VOLTAGE_PID_SLOT);
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, -35);
         m_conveyor.setControl(ControlMode.VelocityVoltage, -20);
         break;
       case Off:
-        m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
+        m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
         m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         break;
     }
-    m_lastMode = m_mode;
   }
 
   public void setControl(ControlStatus mode) {

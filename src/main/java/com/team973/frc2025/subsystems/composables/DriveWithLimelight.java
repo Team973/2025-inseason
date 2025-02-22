@@ -31,21 +31,23 @@ public class DriveWithLimelight extends DriveComposable {
 
   private TargetPositionRelativeToAprilTag m_target = null;
 
-  private Pose2d m_targetInitialPose = new Pose2d();
-  private Pose2d m_targetFinalPose = new Pose2d();
+  private Pose2d m_approachPose = new Pose2d();
+  private Pose2d m_scoringPose = new Pose2d();
 
-  private Pose2d m_targetInitialPoseLog = new Pose2d();
-  private Pose2d m_targetFinalPoseLog = new Pose2d();
+  private Pose2d m_approachPoseLog = new Pose2d();
+  private Pose2d m_scoringPoseLog = new Pose2d();
 
   private ReefFace m_targetReefFace = ReefFace.A;
   private ReefSide m_targetReefSide = ReefSide.Left;
 
-  private BooleanSupplier m_targetFinalPoseGate = () -> true;
-  private BooleanSupplier m_reTargetInitialPoseGate = () -> false;
+  private BooleanSupplier m_targetScoringPoseGate = () -> true;
+  private BooleanSupplier m_targetBackOffPoseGate = () -> false;
 
-  private TargetMode m_targetMode = TargetMode.Initial;
+  private TargetMode m_targetMode = TargetMode.Approach;
 
-  private boolean m_targetingComplete = false;
+  private boolean m_reachedApproachPose = false;
+  private boolean m_reachedScoringPose = false;
+  private boolean m_reachedBackOffPose = false;
 
   public enum ReefSide {
     Left,
@@ -62,20 +64,20 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   private enum TargetMode {
-    Initial,
-    Final,
-    ReInitial
+    Approach,
+    Scoring,
+    BackOff
   }
 
   public static class TargetPositions {
     private static final double REEF_WIDTH_METERS = 0.33;
-    private static final Translation2d LEFT_REEF_INITIAL_TARGET =
+    private static final Translation2d LEFT_REEF_APPROACH_TARGET =
         new Translation2d(REEF_WIDTH_METERS / 2.0, 0.8);
-    private static final Translation2d RIGHT_REEF_INITIAL_TARGET =
+    private static final Translation2d RIGHT_REEF_APPROACH_TARGET =
         new Translation2d(-REEF_WIDTH_METERS / 2.0, 0.8);
-    private static final double REEF_FINAL_DIST = 0.45;
+    private static final double REEF_SCORING_DIST = 0.45;
 
-    private static final Translation2d HP_INITIAL_TARGET = new Translation2d(0.0, 0.5);
+    private static final Translation2d HP_APPROACH_TARGET = new Translation2d(0.0, 0.5);
 
     public static final TargetPositionRelativeToAprilTag TEST_ONE =
         new TargetPositionRelativeToAprilTag(
@@ -86,46 +88,46 @@ public class DriveWithLimelight extends DriveComposable {
 
     public static final TargetPositionRelativeToAprilTag HPL =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(1), HP_INITIAL_TARGET, 0.0, Rotation2d.fromDegrees(180));
+            AprilTag.fromRed(1), HP_APPROACH_TARGET, 0.0, Rotation2d.fromDegrees(180));
     public static final TargetPositionRelativeToAprilTag HPR =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(2), HP_INITIAL_TARGET, 0.0, Rotation2d.fromDegrees(180));
+            AprilTag.fromRed(2), HP_APPROACH_TARGET, 0.0, Rotation2d.fromDegrees(180));
     public static final TargetPositionRelativeToAprilTag A_L =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(7), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(7), LEFT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag A_R =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(7), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(7), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag B_L =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(8), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(8), LEFT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag B_R =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(8), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(8), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag C_L =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(9), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(9), LEFT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag C_R =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(9), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(9), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag D_L =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(10), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(10), LEFT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag D_R =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(10), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(10), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag E_L =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(11), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(11), LEFT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag E_R =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(11), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(11), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag F_L =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(6), LEFT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(6), LEFT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag F_R =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(6), RIGHT_REEF_INITIAL_TARGET, REEF_FINAL_DIST, new Rotation2d());
+            AprilTag.fromRed(6), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
   }
 
   public DriveWithLimelight(GreyPoseEstimator poseEstimator, Logger logger) {
@@ -151,15 +153,15 @@ public class DriveWithLimelight extends DriveComposable {
   public void setTargetSide(ReefSide side) {
     m_targetReefSide = side;
 
-    m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
-    m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
+    m_approachPoseLog = getTargetReefPosition().getApproachPose();
+    m_scoringPoseLog = getTargetReefPosition().getScoringPose();
   }
 
   public void setTargetReefFace(ReefFace face) {
     m_targetReefFace = face;
 
-    m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
-    m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
+    m_approachPoseLog = getTargetReefPosition().getApproachPose();
+    m_scoringPoseLog = getTargetReefPosition().getScoringPose();
   }
 
   public TargetPositionRelativeToAprilTag getTargetReefPosition() {
@@ -182,31 +184,34 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   private void setTargetMode(TargetMode targetMode) {
-    if (targetMode == TargetMode.Final && m_targetFinalPoseGate.getAsBoolean()) {
-      m_targetMode = TargetMode.Final;
-    } else if (targetMode == TargetMode.ReInitial && m_reTargetInitialPoseGate.getAsBoolean()) {
-      m_targetMode = TargetMode.ReInitial;
-    } else if (targetMode == TargetMode.Initial) {
-      m_targetMode = TargetMode.Initial;
+    if (targetMode == TargetMode.Scoring && m_targetScoringPoseGate.getAsBoolean()) {
+      m_targetMode = TargetMode.Scoring;
+    } else if (targetMode == TargetMode.BackOff && m_targetBackOffPoseGate.getAsBoolean()) {
+      m_targetMode = TargetMode.BackOff;
+    } else if (targetMode == TargetMode.Approach) {
+      m_targetMode = TargetMode.Approach;
     }
   }
 
   public void targetReefPosition(
-      BooleanSupplier targetFinalPoseGate, BooleanSupplier reTargetInitialPoseGate) {
+      BooleanSupplier targetScoringPoseGate, BooleanSupplier targetBackOffPoseGate) {
     if (getTargetReefPosition() != m_target) {
-      m_targetInitialPose = getTargetReefPosition().getInitialTargetPose();
-      m_targetFinalPose = getTargetReefPosition().getFinalTargetPose();
+      m_approachPose = getTargetReefPosition().getApproachPose();
+      m_scoringPose = getTargetReefPosition().getScoringPose();
 
-      m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
-      m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
+      m_approachPoseLog = getTargetReefPosition().getApproachPose();
+      m_scoringPoseLog = getTargetReefPosition().getScoringPose();
 
-      m_targetMode = TargetMode.Initial;
+      m_targetMode = TargetMode.Approach;
       m_target = getTargetReefPosition();
-      m_targetingComplete = false;
+
+      m_reachedApproachPose = false;
+      m_reachedScoringPose = false;
+      m_reachedBackOffPose = false;
     }
 
-    m_targetFinalPoseGate = targetFinalPoseGate;
-    m_reTargetInitialPoseGate = reTargetInitialPoseGate;
+    m_targetScoringPoseGate = targetScoringPoseGate;
+    m_targetBackOffPoseGate = targetBackOffPoseGate;
   }
 
   public void log() {
@@ -216,28 +221,27 @@ public class DriveWithLimelight extends DriveComposable {
     m_logger.log("Target Mode", m_targetMode.toString());
     m_logger.log("Target Side", m_targetReefSide.toString());
 
+    m_logger.log("Target Scoring Pose Gate", m_targetScoringPoseGate.getAsBoolean());
+    m_logger.log("Target BackOff Pose Gate", m_targetBackOffPoseGate.getAsBoolean());
+
     m_logger.log(
         "Target Initial Pose",
         new double[] {
-          m_targetInitialPose.getX(),
-          m_targetInitialPose.getY(),
-          m_targetInitialPose.getRotation().getRadians()
+          m_approachPose.getX(), m_approachPose.getY(), m_approachPose.getRotation().getRadians()
         });
 
     m_logger.log(
         "Target Initial Pose Log",
         new double[] {
-          m_targetInitialPoseLog.getX(),
-          m_targetInitialPoseLog.getY(),
-          m_targetInitialPoseLog.getRotation().getRadians()
+          m_approachPoseLog.getX(),
+          m_approachPoseLog.getY(),
+          m_approachPoseLog.getRotation().getRadians()
         });
 
     m_logger.log(
         "Target Final Pose",
         new double[] {
-          m_targetFinalPose.getX(),
-          m_targetFinalPose.getY(),
-          m_targetFinalPose.getRotation().getRadians()
+          m_scoringPose.getX(), m_scoringPose.getY(), m_scoringPose.getRotation().getRadians()
         });
 
     m_logger.log(
@@ -255,9 +259,9 @@ public class DriveWithLimelight extends DriveComposable {
     m_logger.log(
         "Target Final Pose Log",
         new double[] {
-          m_targetFinalPoseLog.getX(),
-          m_targetFinalPoseLog.getY(),
-          m_targetFinalPoseLog.getRotation().getRadians()
+          m_scoringPoseLog.getX(),
+          m_scoringPoseLog.getY(),
+          m_scoringPoseLog.getRotation().getRadians()
         });
     Pose2d currentTargetPose2d = getCurrentTargetPose2d();
     m_logger.log(
@@ -270,34 +274,26 @@ public class DriveWithLimelight extends DriveComposable {
 
   public Pose2d getCurrentTargetPose2d() {
     switch (m_targetMode) {
-      case ReInitial:
-      case Initial:
-        return m_targetInitialPose;
-      case Final:
-        return m_targetFinalPose;
+      case BackOff:
+      case Approach:
+        return m_approachPose;
+      case Scoring:
+        return m_scoringPose;
       default:
         throw new IllegalArgumentException(m_targetMode.toString());
     }
   }
 
   public boolean reachedTargetInitialPose() {
-    return Drive.comparePoses(
-        m_poseEstimator.getPoseMeters(),
-        m_targetInitialPose,
-        TARGET_DISTANCE_TOLERANCE_METERS,
-        TARGET_ANGLE_TOLERANCE_DEG);
+    return m_reachedApproachPose;
   }
 
-  public boolean reachedTargetFinalPose() {
-    return Drive.comparePoses(
-        m_poseEstimator.getPoseMeters(),
-        m_targetFinalPose,
-        TARGET_DISTANCE_TOLERANCE_METERS,
-        TARGET_ANGLE_TOLERANCE_DEG);
+  public boolean reachedScoringPose() {
+    return m_reachedScoringPose;
   }
 
-  public boolean getTargetingComplete() {
-    return m_targetingComplete;
+  public boolean reachedBackOffPose() {
+    return m_reachedBackOffPose;
   }
 
   public void init() {
@@ -311,39 +307,47 @@ public class DriveWithLimelight extends DriveComposable {
       return new ChassisSpeeds(0, 0, 0);
     }
 
-    if (reachedTargetInitialPose() && m_targetMode == TargetMode.ReInitial) {
-      m_targetingComplete = true;
-    } else if (reachedTargetInitialPose()) {
-      setTargetMode(TargetMode.Final);
-    } else if (reachedTargetFinalPose()) {
-      setTargetMode(TargetMode.ReInitial);
+    if (Drive.comparePoses(
+        m_poseEstimator.getPoseMeters(),
+        m_scoringPose,
+        TARGET_DISTANCE_TOLERANCE_METERS,
+        TARGET_ANGLE_TOLERANCE_DEG)) {
+      m_reachedScoringPose = true;
+      setTargetMode(TargetMode.BackOff);
+    } else if (Drive.comparePoses(
+        m_poseEstimator.getPoseMeters(),
+        m_approachPose,
+        TARGET_DISTANCE_TOLERANCE_METERS,
+        TARGET_ANGLE_TOLERANCE_DEG)) {
+      if (m_targetMode == TargetMode.BackOff) {
+        m_reachedBackOffPose = true;
+      } else {
+        m_reachedApproachPose = true;
+        setTargetMode(TargetMode.Scoring);
+      }
     }
 
     switch (m_targetMode) {
-      case ReInitial:
-      case Initial:
+      case BackOff:
+      case Approach:
         return new ChassisSpeeds(
-            m_xController.calculate(
-                    m_poseEstimator.getPoseMeters().getX(), m_targetInitialPose.getX())
+            m_xController.calculate(m_poseEstimator.getPoseMeters().getX(), m_approachPose.getX())
                 + m_xController.getSetpoint().velocity,
-            m_yController.calculate(
-                    m_poseEstimator.getPoseMeters().getY(), m_targetInitialPose.getY())
+            m_yController.calculate(m_poseEstimator.getPoseMeters().getY(), m_approachPose.getY())
                 + m_yController.getSetpoint().velocity,
             m_thetaController.calculate(
                     m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-                    m_targetInitialPose.getRotation().getRadians())
+                    m_approachPose.getRotation().getRadians())
                 + m_thetaController.getSetpoint().velocity);
-      case Final:
+      case Scoring:
         return new ChassisSpeeds(
-            m_xController.calculate(
-                    m_poseEstimator.getPoseMeters().getX(), m_targetFinalPose.getX())
+            m_xController.calculate(m_poseEstimator.getPoseMeters().getX(), m_scoringPose.getX())
                 + m_xController.getSetpoint().velocity,
-            m_yController.calculate(
-                    m_poseEstimator.getPoseMeters().getY(), m_targetFinalPose.getY())
+            m_yController.calculate(m_poseEstimator.getPoseMeters().getY(), m_scoringPose.getY())
                 + m_yController.getSetpoint().velocity,
             m_thetaController.calculate(
                     m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-                    m_targetFinalPose.getRotation().getRadians())
+                    m_scoringPose.getRotation().getRadians())
                 + m_thetaController.getSetpoint().velocity);
       default:
         throw new IllegalArgumentException(m_targetMode.toString());
