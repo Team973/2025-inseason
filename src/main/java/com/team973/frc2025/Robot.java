@@ -6,6 +6,7 @@ package com.team973.frc2025;
 
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Arm;
+import com.team973.frc2025.subsystems.Arm.ControlStatus;
 import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
@@ -16,6 +17,7 @@ import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.TargetReefFace;
+import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
@@ -43,9 +45,11 @@ public class Robot extends TimedRobot {
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"), m_candleManger);
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm"), m_candleManger);
-
   private final SolidSignaler m_lowBatterySignaler =
-      new SolidSignaler(RobotInfo.Colors.ORANGE, 0, 1);
+      new SolidSignaler(RobotInfo.Colors.ORANGE, 3000, 1);
+
+  private double m_lowBatteryTimerLED;
+  private double m_lowBatteryTimeOut = 1500;
 
   private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 0, 100);
   private final Superstructure m_superstructure =
@@ -85,6 +89,11 @@ public class Robot extends TimedRobot {
       m_sideSelector.range(Rotation2d.fromDegrees(240 - 90), Rotation2d.fromDegrees(60), 0.5);
   private final JoystickField.Range m_rightReefSide =
       m_sideSelector.range(Rotation2d.fromDegrees(120 - 90), Rotation2d.fromDegrees(60), 0.5);
+
+  public static enum ControlStatus {
+    HighBattery,
+    LowBattery,
+  }
 
   private void syncSensors() {
     double startTime = Timer.getFPGATimestamp();
@@ -144,7 +153,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-    if (RobotController.getBatteryVoltage() < 12.0) {
+    if (RobotController.getBatteryVoltage() > 12.1) {
+      m_lowBatteryTimerLED = Conversions.Time.getMsecTime();
+    } else if (m_lowBatteryTimerLED + m_lowBatteryTimeOut > Conversions.Time.getMsecTime()) {
       m_lowBatterySignaler.enable();
     } else {
       m_lowBatterySignaler.disable();

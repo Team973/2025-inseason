@@ -29,7 +29,7 @@ public class Claw implements Subsystem {
   private ControlStatus m_mode = ControlStatus.Off;
   private ControlStatus m_lastMode = ControlStatus.Off;
 
-  public final SolidSignaler m_coralInClawSignaler =
+  private final SolidSignaler m_clawHasPeiceSignaler =
       new SolidSignaler(RobotInfo.Colors.GREEN, 0, 2);
 
   private double m_leftTargetPostion = 0;
@@ -57,7 +57,7 @@ public class Claw implements Subsystem {
     m_logger = logger;
     m_caNdle = candle;
 
-    m_caNdle.addSignaler(m_coralInClawSignaler);
+    m_caNdle.addSignaler(m_clawHasPeiceSignaler);
     m_clawMotor =
         new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("clawMotor", 0.2));
     m_conveyor =
@@ -143,10 +143,10 @@ public class Claw implements Subsystem {
   }
 
   public void coralScoredLED() {
-    if (getIsCoralInClaw() == true) {
-      m_coralInClawSignaler.enable();
+    if (getIsCoralInClaw() || getClawAlgaeSensor()) {
+      m_clawHasPeiceSignaler.enable();
     } else {
-      m_coralInClawSignaler.disable();
+      m_clawHasPeiceSignaler.disable();
     }
   }
 
