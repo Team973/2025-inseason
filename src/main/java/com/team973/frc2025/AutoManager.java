@@ -29,7 +29,7 @@ public class AutoManager {
 
   public AutoManager(Logger logger, DriveController drive, Superstructure superstructure) {
     m_noAuto = new NoAuto(logger);
-    m_BabyBirdAuto = new BabyBird(logger.subLogger("BabyBird"), drive);
+    m_BabyBirdAuto = new BabyBird(logger.subLogger("BabyBird"), drive, superstructure);
     m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive);
     m_testAuto = new TestAuto(logger.subLogger("test"), drive, superstructure);
     m_driveTestAuto = new DriveTestAuto(logger.subLogger("driveTest"), drive);
