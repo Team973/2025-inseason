@@ -21,7 +21,7 @@ public class Arm implements Subsystem {
   private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
   private final BlinkingSignaler m_armHomedSigaler =
-      new BlinkingSignaler(RobotInfo.Colors.CYAN, RobotInfo.Colors.OFF, 400, 2000, 90);
+      new BlinkingSignaler(RobotInfo.Colors.CYAN, RobotInfo.Colors.OFF, 400, 250, 90);
   private static final double LEVEL_FOUR_POSITION_DEG = 64.0; // 79
   private static final double LEVEL_THREE_POSITION_DEG = 64.0;
   private static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;

@@ -50,7 +50,8 @@ public class Robot extends TimedRobot {
       new SolidSignaler(RobotInfo.Colors.ORANGE, 3000, 1);
 
   private double m_lowBatteryTimerLED;
-  private double m_lowBatteryTimeOut = 1500;
+  private double m_lowBatteryTimeOut = 500.0;
+  private double m_lowBatterMimiumVoltage = 12.3;
 
   private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 0, 100);
   private final Superstructure m_superstructure =
@@ -136,9 +137,8 @@ public class Robot extends TimedRobot {
   public Robot() {
     resetSubsystems();
     m_driveController.startOdometrey();
-    m_ledOff.enable();
-    m_candleManger.addSignaler(m_lowBatterySignaler);
     m_candleManger.addSignaler(m_ledOff);
+    m_candleManger.addSignaler(m_lowBatterySignaler);
   }
 
   private PerfLogger m_robotPeriodicLogger =
@@ -153,14 +153,17 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    m_ledOff.enable();
 
-    if (RobotController.getBatteryVoltage() > 12.1) {
+    if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
       m_lowBatteryTimerLED = Conversions.Time.getMsecTime();
-    } else if (m_lowBatteryTimerLED + m_lowBatteryTimeOut > Conversions.Time.getMsecTime()) {
-      m_lowBatterySignaler.enable();
-    } else {
       m_lowBatterySignaler.disable();
+    } else if (m_lowBatteryTimerLED + m_lowBatteryTimeOut < Conversions.Time.getMsecTime()) {
+      m_lowBatterySignaler.enable();
     }
+    m_logger.log("LowBatteryLEDtimer", m_lowBatteryTimerLED + m_lowBatteryTimeOut);
+    m_logger.log("currentTime", Conversions.Time.getMsecTime());
+    m_logger.log("isLowbatteryEnabeld", m_lowBatterySignaler.isEnabled());
 
     double startTime = Timer.getFPGATimestamp();
     logSubsystems();
