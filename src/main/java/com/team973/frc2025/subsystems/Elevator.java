@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Conversions;
@@ -135,32 +136,32 @@ public class Elevator implements Subsystem {
     m_controlStatus = ControlStatus.TargetPostion;
   }
 
-  public void incrementOffset(double offset, int level) {
+  public void incrementOffset(double offset, ReefLevel level) {
     switch (level) {
-      case 1:
+      case L_1:
         m_levelOneOffset += offset;
         break;
-      case 2:
+      case L_2:
         m_levelTwoOffset += offset;
         break;
-      case 3:
+      case L_3:
         m_levelThreeOffset += offset;
         break;
-      case 4:
+      case L_4:
         m_levelFourOffset += offset;
         break;
     }
   }
 
-  public double getTargetPositionFromLevel(int level) {
+  public double getTargetPositionFromLevel(ReefLevel level) {
     switch (level) {
-      case 1:
+      case L_1:
         return Presets.LEVEL_1 + m_levelOneOffset;
-      case 2:
+      case L_2:
         return Presets.LEVEL_2 + m_levelTwoOffset;
-      case 3:
+      case L_3:
         return Presets.LEVEL_3 + m_levelThreeOffset;
-      case 4:
+      case L_4:
         return Presets.LEVEL_4 + m_levelFourOffset;
       default:
         throw new IllegalArgumentException(String.valueOf(level));

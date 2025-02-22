@@ -13,7 +13,7 @@ public class Superstructure implements Subsystem {
   private State m_state = State.IntakeCoral;
   private State m_lastState = State.IntakeCoral;
 
-  private int m_targetReefLevel = 1;
+  private ReefLevel m_targetReefLevel = ReefLevel.L_1;
 
   private boolean m_manualScore = false;
   private boolean m_manualArmivator = false;
@@ -28,6 +28,13 @@ public class Superstructure implements Subsystem {
     ClimbLow,
     Manual,
     Off
+  }
+
+  public enum ReefLevel {
+    L_1,
+    L_2,
+    L_3,
+    L_4
   }
 
   public Superstructure(
@@ -51,14 +58,8 @@ public class Superstructure implements Subsystem {
     m_manualArmivator = manual;
   }
 
-  public void setTargetReefLevel(int level) {
+  public void setTargetReefLevel(ReefLevel level) {
     m_targetReefLevel = level;
-
-    if (m_targetReefLevel > 4) {
-      m_targetReefLevel = 4;
-    } else if (m_targetReefLevel < 1) {
-      m_targetReefLevel = 1;
-    }
   }
 
   public boolean finishedScoring() {
@@ -194,7 +195,8 @@ public class Superstructure implements Subsystem {
         }
 
         if (m_manualScore) {
-          m_claw.setTargetLevelNeedsBackup(m_targetReefLevel == 3 || m_targetReefLevel == 4);
+          m_claw.setTargetLevelNeedsBackup(
+              m_targetReefLevel == ReefLevel.L_3 || m_targetReefLevel == ReefLevel.L_4);
           m_claw.setControl(Claw.ControlStatus.ScoreCoral);
         } else if (m_arm.motorAtTargetRotation()
             && m_arm.getTargetPosition() != Arm.STOW_POSITION_DEG) {
