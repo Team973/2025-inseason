@@ -23,7 +23,6 @@ public class Claw implements Subsystem {
 
   private final DigitalInput m_conveyorBackSensor;
   private final DigitalInput m_conveyorFrontSensor;
-  private final DigitalInput m_clawCoralSensor;
   private final DigitalInput m_clawAlgaeSensor;
 
   private ControlStatus m_mode = ControlStatus.Off;
@@ -31,15 +30,9 @@ public class Claw implements Subsystem {
 
   public final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2);
 
-  private double m_leftTargetPostion = 0;
-  private double m_rightTargetPotion = 0;
-
   private double m_targetHoldPosition = 0;
 
   private double m_coralBackUpRot = 3.0;
-
-  private boolean m_needsBackup = true;
-  private boolean m_targetLevelNeedsBackup = false;
 
   public static enum ControlStatus {
     IntakeCoral,
@@ -62,7 +55,6 @@ public class Claw implements Subsystem {
 
     m_conveyorBackSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
     m_conveyorFrontSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
-    m_clawCoralSensor = new DigitalInput(ClawInfo.CLAW_CORAL_SENSOR_ID);
     m_clawAlgaeSensor = new DigitalInput(ClawInfo.CLAW_ALGAE_SENSOR_ID);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
@@ -118,28 +110,16 @@ public class Claw implements Subsystem {
     return m_conveyorFrontSensor.get();
   }
 
-  private boolean getClawCoralSensor() {
-    return m_clawCoralSensor.get();
-  }
-
   private boolean getClawAlgaeSensor() {
     return m_clawAlgaeSensor.get();
   }
 
-  public boolean getIsCoralInClaw() {
-    return !getConveyorFrontSensor() && getClawCoralSensor();
-  }
-
   public boolean getSeesCoral() {
-    return getConveyorFrontSensor() || getConveyorBackSensor() || getClawCoralSensor();
-  }
-
-  public void setTargetLevelNeedsBackup(boolean targetLevelNeedsBackup) {
-    m_targetLevelNeedsBackup = targetLevelNeedsBackup;
+    return getConveyorFrontSensor() || getConveyorBackSensor();
   }
 
   public void coralScoredLED() {
-    if ((getIsCoralInClaw())) {
+    if ((getSeesCoral())) {
       m_coralInclawBlinker.setEnabled(true);
     } else {
       m_coralInclawBlinker.setEnabled(false);
@@ -150,24 +130,18 @@ public class Claw implements Subsystem {
   public void update() {
     switch (m_mode) {
       case IntakeCoral:
-        if (!getConveyorFrontSensor() && getClawCoralSensor()) {
+        if (getConveyorFrontSensor()) {
           // Too far forward --- back up!
           m_clawMotor.setControl(ControlMode.VelocityVoltage, -10, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
-          m_needsBackup = true;
-        } else if (!getConveyorBackSensor() && getConveyorFrontSensor() && getClawCoralSensor()) {
+        } else if (getConveyorBackSensor() && !getConveyorFrontSensor()) {
           // Perfect spot!
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0, VELOCITY_VOLTAGE_PID_SLOT);
           m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-          m_needsBackup = true;
-        } else if (getConveyorBackSensor() && getConveyorFrontSensor() && getClawCoralSensor()) {
-          // Slightly too far back
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 10, VELOCITY_VOLTAGE_PID_SLOT);
-          m_conveyor.setControl(ControlMode.VelocityVoltage, 10);
         } else {
           // Way too far back
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 35, VELOCITY_VOLTAGE_PID_SLOT);
-          m_conveyor.setControl(ControlMode.VelocityVoltage, 35);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 20, VELOCITY_VOLTAGE_PID_SLOT);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 20);
         }
         break;
       case IntakeAlgae:
@@ -185,13 +159,8 @@ public class Claw implements Subsystem {
         //   m_conveyor.setControl(ControlMode.VelocityVoltage, 7);
         // } else {
 
-        if (m_lastMode != m_mode && m_needsBackup) {
-          if (m_targetLevelNeedsBackup) {
-            m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble() - m_coralBackUpRot;
-          } else {
-            m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble();
-          }
-          m_needsBackup = false;
+        if (m_lastMode != m_mode) {
+          m_targetHoldPosition = m_clawMotor.getPosition().getValueAsDouble();
         }
 
         m_clawMotor.setControl(
@@ -240,7 +209,6 @@ public class Claw implements Subsystem {
 
     m_logger.log("Conveyor Back Sensor", getConveyorBackSensor());
     m_logger.log("Conveyor Front Sensor", getConveyorFrontSensor());
-    m_logger.log("Claw Coral Sensor", getClawCoralSensor());
     m_logger.log("Claw Algae Sensor", getClawAlgaeSensor());
 
     m_logger.log("target hold postion", m_targetHoldPosition);
