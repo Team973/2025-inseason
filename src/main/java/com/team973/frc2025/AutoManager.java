@@ -1,5 +1,6 @@
 package com.team973.frc2025;
 
+import com.team973.frc2025.auto.modes.BabyBird;
 import com.team973.frc2025.auto.modes.ClawTestAuto;
 import com.team973.frc2025.auto.modes.DriveTestAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
@@ -22,6 +23,7 @@ public class AutoManager {
 
   private final AutoMode m_noAuto;
   private final AutoMode m_taxiAuto;
+  private final AutoMode m_BabyBirdAuto;
   private final AutoMode m_clawTestAuto;
   private final AutoMode m_testAuto;
   private final AutoMode m_driveTestAuto;
@@ -29,6 +31,7 @@ public class AutoManager {
 
   public AutoManager(Logger logger, DriveController drive, Claw claw) {
     m_noAuto = new NoAuto(logger);
+    m_BabyBirdAuto = new BabyBird(logger.subLogger("BabyBird"), drive);
     m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive, claw);
     m_clawTestAuto = new ClawTestAuto(logger.subLogger("claw"), claw);
     m_testAuto = new TestAuto(logger.subLogger("test"), drive, claw);
@@ -39,6 +42,7 @@ public class AutoManager {
         Arrays.asList(
             m_noAuto,
             m_taxiAuto,
+            m_BabyBirdAuto,
             m_clawTestAuto,
             m_testAuto,
             m_driveTestAuto,
