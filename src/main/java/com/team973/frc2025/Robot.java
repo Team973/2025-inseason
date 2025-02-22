@@ -57,7 +57,6 @@ public class Robot extends TimedRobot {
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
-  private boolean m_manualScoringMode = true;
 
   private PerfLogger m_syncSensorsLogger =
       new PerfLogger(m_logger.subLogger("perf/syncSensors", 0.25));
@@ -235,31 +234,30 @@ public class Robot extends TimedRobot {
             allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
             m_driverStick.getRightXAxis() * 0.8);
 
+    if (m_driverStick.getLeftBumperButtonPressed()) {
+      m_superstructure.setManualArmivator(true);
+    }
+
+    if (m_driverStick.getLeftTriggerPressed()) {
+      m_superstructure.setManualArmivator(false);
+    }
+
+    if (m_driverStick.getRightBumperButtonPressed()) {
+      m_superstructure.setManualScore(true);
+    } else if (m_driverStick.getRightBumperButtonReleased()) {
+      m_superstructure.setManualScore(false);
+    }
+
     if (!m_driverStick.getRightTrigger()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
       m_superstructure.setState(Superstructure.State.Manual);
 
-      if (m_driverStick.getRightBumperButtonPressed()) {
-        m_superstructure.setManualScore(true);
-      } else if (m_driverStick.getRightBumperButtonReleased()) {
-        m_superstructure.setManualScore(false);
-      }
-
-      if (m_driverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.setManualArmivator(true);
-      }
-
-      if (m_driverStick.getLeftTriggerPressed()) {
-        m_superstructure.setManualArmivator(false);
-      }
     } else {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
           .getDriveWithLimelight()
           .targetReefPosition(
-              () -> false,
-              // () -> m_superstructure.readyToScore(),
-              () -> m_superstructure.finishedScoring());
+              () -> m_superstructure.readyToScore(), () -> m_superstructure.finishedScoring());
     }
     double climbStick = m_coDriverStick.getLeftYAxis();
 

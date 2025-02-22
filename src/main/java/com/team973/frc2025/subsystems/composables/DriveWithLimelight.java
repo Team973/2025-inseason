@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.BooleanSupplier;
 
 public class DriveWithLimelight extends DriveComposable {
-  private static final double TARGET_DISTANCE_TOLERANCE_METERS = 0.03;
+  private static final double TARGET_DISTANCE_TOLERANCE_METERS = 0.05;
   private static final double TARGET_ANGLE_TOLERANCE_DEG = 5.0;
 
   private final GreyPoseEstimator m_poseEstimator;
@@ -73,7 +73,7 @@ public class DriveWithLimelight extends DriveComposable {
         new Translation2d(REEF_WIDTH_METERS / 2.0, 0.8);
     private static final Translation2d RIGHT_REEF_INITIAL_TARGET =
         new Translation2d(-REEF_WIDTH_METERS / 2.0, 0.8);
-    private static final double REEF_FINAL_DIST = 0.1;
+    private static final double REEF_FINAL_DIST = 0.45;
 
     private static final Translation2d HP_INITIAL_TARGET = new Translation2d(0.0, 0.5);
 
@@ -200,7 +200,7 @@ public class DriveWithLimelight extends DriveComposable {
       m_targetInitialPoseLog = getTargetReefPosition().getInitialTargetPose();
       m_targetFinalPoseLog = getTargetReefPosition().getFinalTargetPose();
 
-      setTargetMode(TargetMode.Initial);
+      m_targetMode = TargetMode.Initial;
       m_target = getTargetReefPosition();
       m_targetingComplete = false;
     }
@@ -259,6 +259,25 @@ public class DriveWithLimelight extends DriveComposable {
           m_targetFinalPoseLog.getY(),
           m_targetFinalPoseLog.getRotation().getRadians()
         });
+    Pose2d currentTargetPose2d = getCurrentTargetPose2d();
+    m_logger.log(
+        "dist to target",
+        m_poseEstimator
+            .getPoseMeters()
+            .getTranslation()
+            .getDistance(currentTargetPose2d.getTranslation()));
+  }
+
+  public Pose2d getCurrentTargetPose2d() {
+    switch (m_targetMode) {
+      case ReInitial:
+      case Initial:
+        return m_targetInitialPose;
+      case Final:
+        return m_targetFinalPose;
+      default:
+        throw new IllegalArgumentException(m_targetMode.toString());
+    }
   }
 
   public boolean reachedTargetInitialPose() {
