@@ -194,7 +194,6 @@ public class Superstructure implements Subsystem {
         }
 
         if (m_manualScore) {
-          m_claw.setTargetLevelNeedsBackup(m_targetReefLevel == 3 || m_targetReefLevel == 4);
           m_claw.setControl(Claw.ControlStatus.ScoreCoral);
         } else if (m_arm.motorAtTargetRotation()
             && m_arm.getTargetPosition() != Arm.STOW_POSITION_DEG) {
