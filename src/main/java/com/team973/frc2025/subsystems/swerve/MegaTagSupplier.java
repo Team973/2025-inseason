@@ -157,12 +157,22 @@ public class MegaTagSupplier {
       return;
     }
 
-    // TODO: We need to decide on what heuristics we're going to use for these. A good reference
-    // here would be to look at the 2024 poofs code where they generate a value between 2.0 and
-    // 0.2 based on a handful of criteria. Higher numbers mean less trustworthy samples.
+    // The following is a sequence of heuristics tuned by trial an error. The starting point
+    // was 254's 2024 code. We look at a handful of factors to decide what level of confidence
+    // to ascribe to the limelight reading. Higher numbers mean less confidence. The general
+    // range we have seen in other teams is between 0.2 and 2.0 trust.
     // Ref
     // github.com/Team254/FRC-2024-Public/src/main/java/com/team254/frc2024/subsystems/vision/VisionSubsystem.java
-    Matrix<N3, N1> confidenceStdDev = VecBuilder.fill(0.3, 0.3, 9999999);
+    double xyStdev = 2.0;
+
+    if (mt2.tagCount >= 2 && mt2.avgTagArea > 0.1) {
+      xyStdev = 0.5;
+    } else if (mt2.tagCount >= 2 || mt2.avgTagArea > 0.1) {
+      xyStdev = 0.75;
+    } else if (mt2.avgTagArea > 0.8) {
+      xyStdev = 0.8;
+    }
+    Matrix<N3, N1> confidenceStdDev = VecBuilder.fill(xyStdev, xyStdev, 9999999);
     for (MegaTagReceiver receiver : m_receivers) {
       receiver.observeVisionData(m_llName, mt2.pose, mt2.timestampSeconds, confidenceStdDev);
     }
