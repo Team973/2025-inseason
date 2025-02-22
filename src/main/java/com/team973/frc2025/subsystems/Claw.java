@@ -3,6 +3,7 @@ package com.team973.frc2025.subsystems;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.ClawInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
@@ -28,6 +29,11 @@ public class Claw implements Subsystem {
   private ControlStatus m_mode = ControlStatus.Off;
   private ControlStatus m_lastMode = ControlStatus.Off;
 
+  public final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2);
+
+  private double m_leftTargetPostion = 0;
+  private double m_rightTargetPotion = 0;
+
   private double m_targetHoldPosition = 0;
 
   private double m_coralBackUpRot = 3.0;
@@ -44,9 +50,10 @@ public class Claw implements Subsystem {
     Off,
   }
 
-  public Claw(Logger logger) {
+  public Claw(Logger logger, CANdleManger candle) {
     m_logger = logger;
 
+    candle.addSignaler(m_coralInclawBlinker);
     m_clawMotor =
         new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("clawMotor", 0.2));
     m_conveyor =
@@ -129,6 +136,14 @@ public class Claw implements Subsystem {
 
   public void setTargetLevelNeedsBackup(boolean targetLevelNeedsBackup) {
     m_targetLevelNeedsBackup = targetLevelNeedsBackup;
+  }
+
+  public void coralScoredLED() {
+    if ((getIsCoralInClaw())) {
+      m_coralInclawBlinker.setEnabled(true);
+    } else {
+      m_coralInclawBlinker.setEnabled(false);
+    }
   }
 
   @Override
@@ -236,7 +251,9 @@ public class Claw implements Subsystem {
   }
 
   @Override
-  public void syncSensors() {}
+  public void syncSensors() {
+    coralScoredLED();
+  }
 
   @Override
   public void reset() {}
