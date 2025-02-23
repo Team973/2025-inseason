@@ -43,11 +43,7 @@ public class DriveWithLimelight extends DriveComposable {
   private BooleanSupplier m_targetScoringPoseGate = () -> true;
   private BooleanSupplier m_targetBackOffPoseGate = () -> false;
 
-  private TargetMode m_targetMode = TargetMode.Approach;
-
-  private boolean m_reachedApproachPose = false;
-  private boolean m_reachedScoringPose = false;
-  private boolean m_reachedBackOffPose = false;
+  private TargetStage m_targetStage = TargetStage.MoveToApproach;
 
   public enum ReefSide {
     Left,
@@ -63,9 +59,12 @@ public class DriveWithLimelight extends DriveComposable {
     F
   }
 
-  private enum TargetMode {
+  public enum TargetStage {
+    MoveToApproach,
     Approach,
+    MoveToScoring,
     Scoring,
+    MoveToBackOff,
     BackOff
   }
 
@@ -183,14 +182,8 @@ public class DriveWithLimelight extends DriveComposable {
     }
   }
 
-  private void setTargetMode(TargetMode targetMode) {
-    if (targetMode == TargetMode.Scoring && m_targetScoringPoseGate.getAsBoolean()) {
-      m_targetMode = TargetMode.Scoring;
-    } else if (targetMode == TargetMode.BackOff && m_targetBackOffPoseGate.getAsBoolean()) {
-      m_targetMode = TargetMode.BackOff;
-    } else if (targetMode == TargetMode.Approach) {
-      m_targetMode = TargetMode.Approach;
-    }
+  public TargetStage getTargetStage() {
+    return m_targetStage;
   }
 
   public void targetReefPosition(
@@ -202,12 +195,9 @@ public class DriveWithLimelight extends DriveComposable {
       m_approachPoseLog = getTargetReefPosition().getApproachPose();
       m_scoringPoseLog = getTargetReefPosition().getScoringPose();
 
-      m_targetMode = TargetMode.Approach;
       m_target = getTargetReefPosition();
 
-      m_reachedApproachPose = false;
-      m_reachedScoringPose = false;
-      m_reachedBackOffPose = false;
+      m_targetStage = TargetStage.MoveToApproach;
     }
 
     m_targetScoringPoseGate = targetScoringPoseGate;
@@ -218,11 +208,30 @@ public class DriveWithLimelight extends DriveComposable {
     SmartDashboard.putString("DB/String 6", "Reef Face: " + m_targetReefFace);
     SmartDashboard.putString("DB/String 7", "Reef Side: " + m_targetReefSide);
 
-    m_logger.log("Target Mode", m_targetMode.toString());
     m_logger.log("Target Side", m_targetReefSide.toString());
+    m_logger.log("Target Stage", m_targetStage.toString());
 
     m_logger.log("Target Scoring Pose Gate", m_targetScoringPoseGate.getAsBoolean());
     m_logger.log("Target BackOff Pose Gate", m_targetBackOffPoseGate.getAsBoolean());
+
+    m_logger.log("Is At Approach", isAtApproach());
+    m_logger.log("Is At Scoring", isAtScoring());
+
+    m_logger.log(
+        "Approach Error/X", m_poseEstimator.getPoseMeters().getX() - m_approachPose.getX());
+    m_logger.log(
+        "Approach Error/Y", m_poseEstimator.getPoseMeters().getY() - m_approachPose.getY());
+    m_logger.log(
+        "Approach Error/Deg",
+        m_poseEstimator.getPoseMeters().getRotation().getDegrees()
+            - m_approachPose.getRotation().getDegrees());
+
+    m_logger.log("Scoring Error/X", m_poseEstimator.getPoseMeters().getX() - m_scoringPose.getX());
+    m_logger.log("Scoring Error/Y", m_poseEstimator.getPoseMeters().getY() - m_scoringPose.getY());
+    m_logger.log(
+        "Scoring Error/Deg",
+        m_poseEstimator.getPoseMeters().getRotation().getDegrees()
+            - m_scoringPose.getRotation().getDegrees());
 
     m_logger.log(
         "Target Initial Pose",
@@ -272,28 +281,35 @@ public class DriveWithLimelight extends DriveComposable {
             .getDistance(currentTargetPose2d.getTranslation()));
   }
 
+  private boolean isAtApproach() {
+    return Drive.comparePoses(
+        m_poseEstimator.getPoseMeters(),
+        m_approachPose,
+        TARGET_DISTANCE_TOLERANCE_METERS * 1.2,
+        TARGET_ANGLE_TOLERANCE_DEG * 1.2);
+  }
+
+  private boolean isAtScoring() {
+    return Drive.comparePoses(
+        m_poseEstimator.getPoseMeters(),
+        m_scoringPose,
+        TARGET_DISTANCE_TOLERANCE_METERS * 1.2,
+        TARGET_ANGLE_TOLERANCE_DEG * 1.2);
+  }
+
   public Pose2d getCurrentTargetPose2d() {
-    switch (m_targetMode) {
+    switch (m_targetStage) {
+      case MoveToBackOff:
       case BackOff:
+      case MoveToApproach:
       case Approach:
         return m_approachPose;
+      case MoveToScoring:
       case Scoring:
         return m_scoringPose;
       default:
-        throw new IllegalArgumentException(m_targetMode.toString());
+        throw new IllegalArgumentException(m_targetStage.toString());
     }
-  }
-
-  public boolean reachedTargetInitialPose() {
-    return m_reachedApproachPose;
-  }
-
-  public boolean reachedScoringPose() {
-    return m_reachedScoringPose;
-  }
-
-  public boolean reachedBackOffPose() {
-    return m_reachedBackOffPose;
   }
 
   public void init() {
@@ -307,24 +323,34 @@ public class DriveWithLimelight extends DriveComposable {
       return new ChassisSpeeds(0, 0, 0);
     }
 
-    if (Drive.comparePoses(
-        m_poseEstimator.getPoseMeters(),
-        m_scoringPose,
-        TARGET_DISTANCE_TOLERANCE_METERS,
-        TARGET_ANGLE_TOLERANCE_DEG)) {
-      m_reachedScoringPose = true;
-      setTargetMode(TargetMode.BackOff);
-    } else if (Drive.comparePoses(
-        m_poseEstimator.getPoseMeters(),
-        m_approachPose,
-        TARGET_DISTANCE_TOLERANCE_METERS,
-        TARGET_ANGLE_TOLERANCE_DEG)) {
-      if (m_targetMode == TargetMode.BackOff) {
-        m_reachedBackOffPose = true;
-      } else {
-        m_reachedApproachPose = true;
-        setTargetMode(TargetMode.Scoring);
-      }
+    switch (m_targetStage) {
+      case MoveToApproach:
+        if (isAtApproach()) {
+          m_targetStage = TargetStage.Approach;
+        }
+        break;
+      case Approach:
+        if (m_targetScoringPoseGate.getAsBoolean()) {
+          m_targetStage = TargetStage.MoveToScoring;
+        }
+        break;
+      case MoveToScoring:
+        if (isAtScoring()) {
+          m_targetStage = TargetStage.Scoring;
+        }
+        break;
+      case Scoring:
+        if (m_targetBackOffPoseGate.getAsBoolean()) {
+          m_targetStage = TargetStage.MoveToBackOff;
+        }
+        break;
+      case MoveToBackOff:
+        if (isAtApproach()) {
+          m_targetStage = TargetStage.BackOff;
+        }
+        break;
+      case BackOff:
+        break;
     }
 
     return new ChassisSpeeds(
