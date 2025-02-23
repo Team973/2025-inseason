@@ -327,30 +327,16 @@ public class DriveWithLimelight extends DriveComposable {
       }
     }
 
-    switch (m_targetMode) {
-      case BackOff:
-      case Approach:
-        return new ChassisSpeeds(
-            m_xController.calculate(m_poseEstimator.getPoseMeters().getX(), m_approachPose.getX())
-                + m_xController.getSetpoint().velocity,
-            m_yController.calculate(m_poseEstimator.getPoseMeters().getY(), m_approachPose.getY())
-                + m_yController.getSetpoint().velocity,
-            m_thetaController.calculate(
-                    m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-                    m_approachPose.getRotation().getRadians())
-                + m_thetaController.getSetpoint().velocity);
-      case Scoring:
-        return new ChassisSpeeds(
-            m_xController.calculate(m_poseEstimator.getPoseMeters().getX(), m_scoringPose.getX())
-                + m_xController.getSetpoint().velocity,
-            m_yController.calculate(m_poseEstimator.getPoseMeters().getY(), m_scoringPose.getY())
-                + m_yController.getSetpoint().velocity,
-            m_thetaController.calculate(
-                    m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-                    m_scoringPose.getRotation().getRadians())
-                + m_thetaController.getSetpoint().velocity);
-      default:
-        throw new IllegalArgumentException(m_targetMode.toString());
-    }
+    return new ChassisSpeeds(
+        m_xController.calculate(
+                m_poseEstimator.getPoseMeters().getX(), getCurrentTargetPose2d().getX())
+            + m_xController.getSetpoint().velocity,
+        m_yController.calculate(
+                m_poseEstimator.getPoseMeters().getY(), getCurrentTargetPose2d().getY())
+            + m_yController.getSetpoint().velocity,
+        m_thetaController.calculate(
+                m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+                getCurrentTargetPose2d().getRotation().getRadians())
+            + m_thetaController.getSetpoint().velocity);
   }
 }
