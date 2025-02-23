@@ -276,7 +276,7 @@ public class SwerveModule {
     m_angleMotor.log();
     m_angleEncoder.log();
     m_logger.log(
-        "Current Velcity MPS",
+        "Current Velocity MPS",
         m_driveMechanism.getOutputDistanceFromRotorRotation(
             (Rotation2d.fromRotations(m_driveMotor.getVelocity().getValueAsDouble()))));
     m_logger.log("Integrated", getState().angle.getDegrees());
