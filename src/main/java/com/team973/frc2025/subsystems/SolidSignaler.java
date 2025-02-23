@@ -1,6 +1,7 @@
 package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
+import com.team973.lib.util.Conversions;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class SolidSignaler implements ISignaler {
@@ -10,9 +11,22 @@ public class SolidSignaler implements ISignaler {
 
   private int m_priortyNum;
 
-  public SolidSignaler(Color color, int priority) {
+  private double m_timeRequestedMili;
+
+  private double m_enabledStartTime;
+
+  public SolidSignaler(Color color, double timeMili, int priority) {
     m_color = color;
     m_priortyNum = priority;
+    m_timeRequestedMili = timeMili;
+  }
+
+  private boolean isInfiniteTime() {
+    return m_timeRequestedMili == 0;
+  }
+
+  private boolean isEnabledTimer() {
+    return Conversions.Time.getMsecTime() < m_enabledStartTime + m_timeRequestedMili;
   }
 
   @Override
@@ -23,7 +37,7 @@ public class SolidSignaler implements ISignaler {
 
   @Override
   public boolean isEnabled() {
-    return m_isEnabled;
+    return m_isEnabled && (isInfiniteTime() || isEnabledTimer());
   }
 
   @Override
@@ -32,7 +46,12 @@ public class SolidSignaler implements ISignaler {
   }
 
   @Override
-  public void setEnabled(boolean enabled) {
-    m_isEnabled = enabled;
+  public void enable() {
+    m_isEnabled = true;
+    m_enabledStartTime = Conversions.Time.getMsecTime();
+  }
+
+  public void disable() {
+    m_isEnabled = false;
   }
 }

@@ -1,8 +1,7 @@
 package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.team973.lib.util.Conversions;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class BlinkingSignaler implements ISignaler {
@@ -14,21 +13,21 @@ public class BlinkingSignaler implements ISignaler {
 
   private Color m_colorA;
   private Color m_colorB;
-  private Color m_currentColor;
 
-  public BlinkingSignaler(Color colorA, Color colorB, double blinkPeriodMs, int priorityNum) {
+  private double m_timeRequestedMs;
+  private double m_enabledStartTime;
+
+  public BlinkingSignaler(
+      Color colorA, Color colorB, double blinkPeriodMs, double timeOnMili, int priorityNum) {
     m_colorA = colorA;
     m_colorB = colorB;
     m_blinkPeriodMs = blinkPeriodMs;
     m_priorty = priorityNum;
+    m_timeRequestedMs = timeOnMili;
   }
 
   private double modTimeMilisecs() {
-    return RobotController.getFPGATime() / 1000.0 % m_blinkPeriodMs;
-  }
-
-  public Color getCurrentColor() {
-    return m_currentColor;
+    return Conversions.Time.getMsecTime() % m_blinkPeriodMs;
   }
 
   private void blinkingLights(CANdle candle) {
@@ -45,27 +44,23 @@ public class BlinkingSignaler implements ISignaler {
     }
   }
 
-  public void log(ISignaler signaler) {
-
-    SmartDashboard.putNumber("current time secs", RobotController.getFPGATime() / 1000.0 / 1000.0);
-    SmartDashboard.putNumber("current time mili mod", modTimeMilisecs());
-    SmartDashboard.putNumber("current time mili", RobotController.getFPGATime() / 1000.0);
-    SmartDashboard.putNumber("blink time MOD", m_blinkPeriodMs);
-    SmartDashboard.putString("colorA", m_colorA.toString());
-    SmartDashboard.putString("colorB", m_colorB.toString());
-  }
-
-  public void syncSensors() {}
+  public void log(ISignaler signaler) {}
 
   public void update(CANdle candle) {
     blinkingLights(candle);
   }
 
-  public void reset() {}
+  public boolean isInfiniteTime() {
+    return m_timeRequestedMs == 0;
+  }
+
+  public boolean isEnabledTimer() {
+    return Conversions.Time.getMsecTime() < m_enabledStartTime + m_timeRequestedMs;
+  }
 
   @Override
   public boolean isEnabled() {
-    return m_isEnabled;
+    return m_isEnabled && (isInfiniteTime() || isEnabledTimer());
   }
 
   @Override
@@ -74,7 +69,13 @@ public class BlinkingSignaler implements ISignaler {
   }
 
   @Override
-  public void setEnabled(boolean enabled) {
-    m_isEnabled = enabled;
+  public void enable() {
+    m_isEnabled = true;
+    m_enabledStartTime = Conversions.Time.getMsecTime();
+  }
+
+  @Override
+  public void disable() {
+    m_isEnabled = false;
   }
 }
