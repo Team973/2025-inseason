@@ -14,7 +14,7 @@ public class BlinkingSignaler implements ISignaler {
   private Color m_colorA;
   private Color m_colorB;
 
-  private double m_timeRequestedMili;
+  private double m_timeRequestedMs;
   private double m_enabledStartTime;
 
   public BlinkingSignaler(
@@ -23,7 +23,7 @@ public class BlinkingSignaler implements ISignaler {
     m_colorB = colorB;
     m_blinkPeriodMs = blinkPeriodMs;
     m_priorty = priorityNum;
-    m_timeRequestedMili = timeOnMili;
+    m_timeRequestedMs = timeOnMili;
   }
 
   private double modTimeMilisecs() {
@@ -51,11 +51,11 @@ public class BlinkingSignaler implements ISignaler {
   }
 
   public boolean isInfiniteTime() {
-    return m_timeRequestedMili == 0;
+    return m_timeRequestedMs == 0;
   }
 
   public boolean isEnabledTimer() {
-    return Conversions.Time.getMsecTime() < m_enabledStartTime + m_timeRequestedMili;
+    return Conversions.Time.getMsecTime() < m_enabledStartTime + m_timeRequestedMs;
   }
 
   @Override

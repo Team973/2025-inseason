@@ -50,8 +50,8 @@ public class Robot extends TimedRobot {
       new SolidSignaler(
           RobotInfo.Colors.ORANGE, 3000, RobotInfo.SignalerInfo.LOW_BATTER_SIGNALER_PRIORTY);
 
-  private double m_batterLowSinceTime;
-  private final double m_lowBatteryTimeOut = 1000.0;
+  private double m_lastBatteryVoltageHighMSTimestamp;
+  private final double m_lowBatteryTimeOutMs = 1000.0;
   private final double m_lowBatterMimiumVoltage = 12.1;
 
   private final SolidSignaler m_ledOff =
@@ -158,9 +158,10 @@ public class Robot extends TimedRobot {
     m_ledOff.enable();
 
     if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
-      m_batterLowSinceTime = Conversions.Time.getMsecTime();
+      m_lastBatteryVoltageHighMSTimestamp = Conversions.Time.getMsecTime();
       m_lowBatterySignaler.disable();
-    } else if (m_batterLowSinceTime + m_lowBatteryTimeOut < Conversions.Time.getMsecTime()) {
+    } else if (m_lastBatteryVoltageHighMSTimestamp + m_lowBatteryTimeOutMs
+        < Conversions.Time.getMsecTime()) {
       m_lowBatterySignaler.enable();
     }
     double startTime = Timer.getFPGATimestamp();
