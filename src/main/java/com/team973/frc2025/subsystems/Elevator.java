@@ -26,8 +26,10 @@ public class Elevator implements Subsystem {
   private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
 
   private final SolidSignaler m_elevatorHomedBlinker =
-      new SolidSignaler(RobotInfo.Colors.PURPLE,
-       250, 86);
+      new SolidSignaler(
+          RobotInfo.Colors.PURPLE,
+          250,
+          RobotInfo.SignalerInfo.ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY);
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;

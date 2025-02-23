@@ -26,7 +26,7 @@ public class SolidSignaler implements ISignaler {
   }
 
   private boolean isEnabledTimer() {
-    return Conversions.Time.getMsecTime() > m_enabledStartTime + m_timeRequestedMili;
+    return Conversions.Time.getMsecTime() < m_enabledStartTime + m_timeRequestedMili;
   }
 
   @Override

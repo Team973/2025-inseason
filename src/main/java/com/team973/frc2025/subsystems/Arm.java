@@ -20,7 +20,9 @@ public class Arm implements Subsystem {
   private boolean m_lastHallSensorMode;
   private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
-  private final SolidSignaler m_armHomedSigaler = new SolidSignaler(RobotInfo.Colors.BLUE, 250, 90);
+  private final SolidSignaler m_armHomedSigaler =
+      new SolidSignaler(
+          RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
   private static final double LEVEL_FOUR_POSITION_DEG = 64.0; // 79
   private static final double LEVEL_THREE_POSITION_DEG = 64.0;
   private static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;
@@ -155,6 +157,10 @@ public class Arm implements Subsystem {
     }
   }
 
+  public double getArmPostionDeg() {
+    return motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble());
+  }
+
   public void setControlStatus(ControlStatus status) {
     m_controlStatus = status;
   }
@@ -178,8 +184,7 @@ public class Arm implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log(
-        "armDegPostion", motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble()));
+    m_logger.log("armDegPostion", getArmPostionDeg());
     m_armMotor.log();
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
     m_logger.log("armMode", m_controlStatus.toString());
