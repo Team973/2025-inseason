@@ -1,5 +1,7 @@
 package com.team973.lib.util;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 /** Abstract Class for auto commands. */
 public abstract class AutoCommand {
   protected double m_targetSec = Double.MAX_VALUE;
@@ -18,9 +20,9 @@ public abstract class AutoCommand {
   public abstract void init();
 
   /** Run the auto command. */
-  public abstract void run();
+  public abstract void run(Alliance alliance);
 
-  public abstract void log();
+  public abstract void log(Alliance alliance);
 
   /**
    * Check if the auto command is completed.

@@ -1,6 +1,7 @@
 package com.team973.frc2025.auto.commands.util;
 
 import com.team973.lib.util.AutoCommand;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class BlockingLambdaCommand extends AutoCommand {
   private final BlockingLambda m_lambda;
@@ -26,11 +27,11 @@ public class BlockingLambdaCommand extends AutoCommand {
   }
 
   @Override
-  public void run() {
+  public void run(Alliance alliance) {
     m_lastLambdaResult = m_lambda.get();
   }
 
-  public void log() {}
+  public void log(Alliance alliance) {}
 
   @Override
   public boolean isCompleted() {

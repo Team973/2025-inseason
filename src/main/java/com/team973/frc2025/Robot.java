@@ -4,6 +4,7 @@ package com.team973.frc2025;
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+import choreo.util.ChoreoAllianceFlipUtil;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.CANdleManger;
@@ -140,6 +141,7 @@ public class Robot extends TimedRobot {
     m_driveController.startOdometrey();
     m_candleManger.addSignaler(m_ledOff);
     m_candleManger.addSignaler(m_lowBatterySignaler);
+    ChoreoAllianceFlipUtil.setYear(2025);
   }
 
   private PerfLogger m_robotPeriodicLogger =
@@ -172,7 +174,7 @@ public class Robot extends TimedRobot {
   }
 
   private void setPoseFromAuto() {
-    m_driveController.resetOdometry(m_autoManager.getSelectedMode().getStartingPose(m_alliance));
+    m_driveController.resetOdometry(m_autoManager.getStartingPose(m_alliance));
   }
 
   private boolean m_allianceInitialized = false;
@@ -213,9 +215,8 @@ public class Robot extends TimedRobot {
     syncSensors();
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
-    // TODO: Figure out why autos don't work if updateSubsystems() comes before
-    // automanager.run().
-    m_autoManager.run();
+    // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
+    m_autoManager.run(m_alliance);
     updateSubsystems();
   }
 
