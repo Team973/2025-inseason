@@ -1,6 +1,7 @@
 package com.team973.frc2025.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
@@ -20,15 +21,19 @@ public class Claw implements Subsystem {
 
   private final DigitalInput m_conveyorBackSensor;
   private final DigitalInput m_conveyorFrontSensor;
-  private final DigitalInput m_clawAlgaeSensor;
+  private final CANrange m_clawAlgaeSensor;
 
   private ControlStatus m_mode = ControlStatus.Off;
 
-  public final SolidSignaler m_coralInclawBlinker = new SolidSignaler(RobotInfo.Colors.GREEN, 2);
+  private final SolidSignaler m_clawHasPeiceSignaler =
+      new SolidSignaler(
+          RobotInfo.Colors.GREEN, 0, RobotInfo.SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
 
   private double m_targetHoldPosition = 0;
 
   private double m_coralBackUpRot = 3.0;
+
+  private CANdleManger m_caNdle;
 
   public static enum ControlStatus {
     IntakeCoral,
@@ -40,17 +45,23 @@ public class Claw implements Subsystem {
 
   public Claw(Logger logger, CANdleManger candle) {
     m_logger = logger;
+    m_caNdle = candle;
 
-    candle.addSignaler(m_coralInclawBlinker);
+    m_caNdle.addSignaler(m_clawHasPeiceSignaler);
     m_clawMotor =
-        new GreyTalonFX(ClawInfo.RIGHT_MOTOR_ID, "Canivore", m_logger.subLogger("clawMotor", 0.2));
+        new GreyTalonFX(
+            ClawInfo.RIGHT_MOTOR_ID,
+            RobotInfo.CANIVORE_CANBUS,
+            m_logger.subLogger("clawMotor", 0.2));
     m_conveyor =
         new GreyTalonFX(
-            ClawInfo.CONVEYOR_MOTOR_ID, "Canivore", m_logger.subLogger("conveyorMotor", 0.2));
+            ClawInfo.CONVEYOR_MOTOR_ID,
+            RobotInfo.CANIVORE_CANBUS,
+            m_logger.subLogger("conveyorMotor", 0.2));
 
     m_conveyorBackSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
     m_conveyorFrontSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
-    m_clawAlgaeSensor = new DigitalInput(ClawInfo.CLAW_ALGAE_SENSOR_ID);
+    m_clawAlgaeSensor = new CANrange(ClawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -102,7 +113,7 @@ public class Claw implements Subsystem {
   }
 
   private boolean getClawAlgaeSensor() {
-    return m_clawAlgaeSensor.get();
+    return m_clawAlgaeSensor.getDistance().getValueAsDouble() < 0.1;
   }
 
   public boolean getSeesCoral() {
@@ -110,10 +121,11 @@ public class Claw implements Subsystem {
   }
 
   public void coralScoredLED() {
-    if ((getSeesCoral())) {
-      m_coralInclawBlinker.setEnabled(true);
+    // TODO: Add back the algee sensor once tunned
+    if (getSeesCoral()) {
+      m_clawHasPeiceSignaler.enable();
     } else {
-      m_coralInclawBlinker.setEnabled(false);
+      m_clawHasPeiceSignaler.disable();
     }
   }
 
@@ -179,6 +191,8 @@ public class Claw implements Subsystem {
     m_logger.log("target hold postion", m_targetHoldPosition);
     m_logger.log("target rotations hit", motorAtTarget());
     m_logger.log("mode", m_mode.toString());
+    m_logger.log("AlgeeCANdistance", m_clawAlgaeSensor.getDistance().getValueAsDouble());
+    m_logger.log("SensorSeesAlgee", getClawAlgaeSensor());
 
     SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
   }

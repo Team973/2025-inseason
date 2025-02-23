@@ -17,6 +17,7 @@ import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
+import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
@@ -42,11 +43,18 @@ public class Robot extends TimedRobot {
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
-  private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"));
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm"));
+  private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"), m_candleManger);
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm"), m_candleManger);
+  private final SolidSignaler m_lowBatterySignaler =
+      new SolidSignaler(
+          RobotInfo.Colors.ORANGE, 3000, RobotInfo.SignalerInfo.LOW_BATTER_SIGNALER_PRIORTY);
 
-  private final SolidSignaler m_lowBatterySignaler = new SolidSignaler(RobotInfo.Colors.ORANGE, 1);
-  private final SolidSignaler m_ledOff = new SolidSignaler(RobotInfo.Colors.OFF, 100);
+  private double m_lastBatteryVoltageHighMSTimestamp;
+  private final double m_lowBatteryTimeOutMs = 1000.0;
+  private final double m_lowBatterMimiumVoltage = 12.1;
+
+  private final SolidSignaler m_ledOff =
+      new SolidSignaler(RobotInfo.Colors.OFF, 0, RobotInfo.SignalerInfo.OFF_SIGNALER_PRIORTY);
   private final Superstructure m_superstructure =
       new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
 
@@ -84,6 +92,11 @@ public class Robot extends TimedRobot {
       m_sideSelector.range(Rotation2d.fromDegrees(240 - 90), Rotation2d.fromDegrees(60), 0.5);
   private final JoystickField.Range m_rightReefSide =
       m_sideSelector.range(Rotation2d.fromDegrees(120 - 90), Rotation2d.fromDegrees(60), 0.5);
+
+  public static enum ControlStatus {
+    HighBattery,
+    LowBattery,
+  }
 
   private void syncSensors() {
     double startTime = Timer.getFPGATimestamp();
@@ -125,9 +138,8 @@ public class Robot extends TimedRobot {
   public Robot() {
     resetSubsystems();
     m_driveController.startOdometrey();
-    m_ledOff.setEnabled(true);
-    m_candleManger.addSignaler(m_lowBatterySignaler);
     m_candleManger.addSignaler(m_ledOff);
+    m_candleManger.addSignaler(m_lowBatterySignaler);
   }
 
   private PerfLogger m_robotPeriodicLogger =
@@ -142,13 +154,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    m_ledOff.enable();
 
-    if (RobotController.getBatteryVoltage() < 12.0) {
-      m_lowBatterySignaler.setEnabled(true);
-    } else {
-      m_lowBatterySignaler.setEnabled(false);
+    if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
+      m_lastBatteryVoltageHighMSTimestamp = Conversions.Time.getMsecTime();
+      m_lowBatterySignaler.disable();
+    } else if (m_lastBatteryVoltageHighMSTimestamp + m_lowBatteryTimeOutMs
+        < Conversions.Time.getMsecTime()) {
+      m_lowBatterySignaler.enable();
     }
-
     double startTime = Timer.getFPGATimestamp();
     logSubsystems();
 
@@ -199,7 +213,8 @@ public class Robot extends TimedRobot {
     syncSensors();
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
-    // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
+    // TODO: Figure out why autos don't work if updateSubsystems() comes before
+    // automanager.run().
     m_autoManager.run();
     updateSubsystems();
   }
@@ -220,10 +235,14 @@ public class Robot extends TimedRobot {
     double allianceScalar = 1.0;
     if (m_alliance == Alliance.Red) {
       // Our gyroscope is blue-centric meaning that facing away from the alliance wall
-      // is a 0 degree heading. But the driver station is facing 180 when we are on the
-      // red alliance. So when we are the red alliance we need to flip the joystick inputs.
-      // Ideally we would convert this to polar coordinates, rotate by 180, and then convert
-      // back to cartesian. But the algebra here is equivalent to just negating the X and Y
+      // is a 0 degree heading. But the driver station is facing 180 when we are on
+      // the
+      // red alliance. So when we are the red alliance we need to flip the joystick
+      // inputs.
+      // Ideally we would convert this to polar coordinates, rotate by 180, and then
+      // convert
+      // back to cartesian. But the algebra here is equivalent to just negating the X
+      // and Y
       // so that's what we iwll do for now.
       allianceScalar = -1.0;
     }
@@ -366,12 +385,4 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
-
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {}
-
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {}
 }

@@ -25,12 +25,19 @@ public class Elevator implements Subsystem {
   private boolean m_lastHallSensorMode;
   private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
 
+  private final SolidSignaler m_elevatorHomedBlinker =
+      new SolidSignaler(
+          RobotInfo.Colors.PURPLE,
+          250,
+          RobotInfo.SignalerInfo.ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY);
+
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
+  private CANdleManger m_candleManger;
 
   public static enum ControlStatus {
     Manual,
@@ -59,8 +66,10 @@ public class Elevator implements Subsystem {
     public static final double STOW = 0.0;
   }
 
-  public Elevator(Logger logger) {
+  public Elevator(Logger logger, CANdleManger candle) {
     m_logger = logger;
+    m_candleManger = candle;
+    m_candleManger.addSignaler(m_elevatorHomedBlinker);
     m_motorRight = new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorRight"));
     m_motorLeft = new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft"));
 
@@ -114,8 +123,9 @@ public class Elevator implements Subsystem {
   }
 
   private void maybeHomeElevator() {
-    if (m_lastHallSensorMode == false && hallsensor() == true) {
+    if (!m_lastHallSensorMode && hallsensor()) {
       m_motorRight.setPosition(heightInchesToMotorRotations(ELEVATOR_HOMING_POSTION_HEIGHT));
+      m_elevatorHomedBlinker.enable();
     }
     m_lastHallSensorMode = hallsensor();
   }
