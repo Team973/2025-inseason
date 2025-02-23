@@ -26,6 +26,7 @@ import com.team973.lib.util.PerfLogger;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -156,22 +157,12 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     m_ledOff.enable();
 
-    if (m_arm.getArmPostionDeg() > m_lowBatterMimiumVoltage) {
+    if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
       m_batterLowSinceTime = Conversions.Time.getMsecTime();
       m_lowBatterySignaler.disable();
     } else if (m_batterLowSinceTime + m_lowBatteryTimeOut < Conversions.Time.getMsecTime()) {
       m_lowBatterySignaler.enable();
     }
-    m_logger.log("LowBatteryExpiryTime", m_batterLowSinceTime + m_lowBatteryTimeOut);
-    m_logger.log("currentTime", Conversions.Time.getMsecTime());
-    m_logger.log("isLowbatteryEnabeld", m_lowBatterySignaler.isEnabled());
-    m_logger.log(
-        "LowBatteryExpresion",
-        m_batterLowSinceTime + m_lowBatteryTimeOut < Conversions.Time.getMsecTime());
-    m_logger.log("batteryLowSinceTime", m_batterLowSinceTime);
-    m_logger.log("resetTimerLogic", m_arm.getArmPostionDeg() > m_lowBatterMimiumVoltage);
-    m_logger.log("lowBatterMimiumVoltage", m_lowBatterMimiumVoltage);
-
     double startTime = Timer.getFPGATimestamp();
     logSubsystems();
 

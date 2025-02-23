@@ -130,7 +130,8 @@ public class Claw implements Subsystem {
   }
 
   public void coralScoredLED() {
-    if (getSeesCoral() || getClawAlgaeSensor()) {
+    // TODO: Add back the algee sensor once tunned
+    if (getSeesCoral()) {
       m_clawHasPeiceSignaler.enable();
     } else {
       m_clawHasPeiceSignaler.disable();
