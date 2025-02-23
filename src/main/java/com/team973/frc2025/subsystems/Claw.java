@@ -68,18 +68,24 @@ public class Claw implements Subsystem {
 
   public static TalonFXConfiguration defaultClawMotorConfig() {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
+
+    // Slot 0 PID constants are for velocity voltage
     defaultMotorConfig.Slot0.kS = 0.0;
     defaultMotorConfig.Slot0.kV = 0.125 * 10.0 / 10.5;
     defaultMotorConfig.Slot0.kA = 0.0;
     defaultMotorConfig.Slot0.kP = 0.3;
     defaultMotorConfig.Slot0.kI = 0.0;
     defaultMotorConfig.Slot0.kD = 0.0;
+
     defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
     defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
     defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
     defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
+
     defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+
     return defaultMotorConfig;
   }
 
