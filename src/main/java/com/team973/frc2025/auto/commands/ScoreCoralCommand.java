@@ -7,6 +7,7 @@ import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefSide;
 import com.team973.lib.util.AutoCommand;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class ScoreCoralCommand extends AutoCommand {
   private final DriveController m_drive;
@@ -44,10 +45,10 @@ public class ScoreCoralCommand extends AutoCommand {
   }
 
   @Override
-  public void run() {}
+  public void run(Alliance alliance) {}
 
   @Override
-  public void log() {}
+  public void log(Alliance alliance) {}
 
   @Override
   public boolean isCompleted() {

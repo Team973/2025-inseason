@@ -3,6 +3,7 @@ package com.team973.frc2025.auto.commands.util;
 import com.google.common.collect.ImmutableList;
 import com.team973.lib.util.AutoCommand;
 import com.team973.lib.util.Logger;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SequentialCommand extends AutoCommand {
@@ -38,7 +39,7 @@ public class SequentialCommand extends AutoCommand {
     setTargetSec(m_timeoutSec);
   }
 
-  public void run() {
+  public void run(Alliance alliance) {
     if (isCompleted()) {
       return;
     }
@@ -51,7 +52,7 @@ public class SequentialCommand extends AutoCommand {
       m_cmdNeedsInit = false;
     }
 
-    currentCommand.run();
+    currentCommand.run(alliance);
 
     if (currentCommand.isCompleted()) {
       m_currentIndex++;
@@ -64,11 +65,11 @@ public class SequentialCommand extends AutoCommand {
     }
   }
 
-  public void log() {
+  public void log(Alliance alliance) {
     m_logger.log("Index", m_currentIndex);
 
     if (m_currentIndex < m_cmdList.size()) {
-      m_cmdList.get(m_currentIndex).log();
+      m_cmdList.get(m_currentIndex).log(alliance);
     }
   }
 

@@ -2,6 +2,7 @@ package com.team973.frc2025.auto.commands.util;
 
 import com.google.common.collect.ImmutableList;
 import com.team973.lib.util.AutoCommand;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.HashSet;
 
 public class ConcurrentCommand extends AutoCommand {
@@ -40,7 +41,7 @@ public class ConcurrentCommand extends AutoCommand {
     }
   }
 
-  public void run() {
+  public void run(Alliance alliance) {
     if (isCompleted()) {
       return;
     }
@@ -50,7 +51,7 @@ public class ConcurrentCommand extends AutoCommand {
         continue;
       }
 
-      command.run();
+      command.run(alliance);
 
       if (command.isCompleted()) {
         command.postComplete(false);
@@ -66,7 +67,7 @@ public class ConcurrentCommand extends AutoCommand {
     return m_finishedCmds.size() == m_cmdList.size();
   }
 
-  public void log() {}
+  public void log(Alliance alliance) {}
 
   public void postComplete(boolean interrupted) {
     if (interrupted) {
