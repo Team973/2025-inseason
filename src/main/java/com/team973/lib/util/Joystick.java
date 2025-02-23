@@ -158,7 +158,7 @@ public class Joystick extends XboxController {
    */
   public double getLeftXAxis() {
     if (m_type == Type.SickStick) {
-      return super.getRawAxis(1);
+      return super.getRawAxis(0);
     } else {
       return super.getRawAxis(0);
     }
@@ -169,7 +169,7 @@ public class Joystick extends XboxController {
    */
   public double getLeftYAxis() {
     if (m_type == Type.SickStick) {
-      return super.getRawAxis(0);
+      return -super.getRawAxis(1);
     } else {
       return -super.getRawAxis(1);
     }

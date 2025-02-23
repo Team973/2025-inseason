@@ -32,7 +32,7 @@ public class TargetPositionRelativeToAprilTag {
     return m_tag.getPoseFromAlliance(Alliance.Red);
   }
 
-  public Pose2d getInitialTargetPose() {
+  public Pose2d getApproachPose() {
     return new Pose2d(
         getAprilTagPose()
             .getTranslation()
@@ -54,7 +54,7 @@ public class TargetPositionRelativeToAprilTag {
             .plus(m_targetAngle));
   }
 
-  public Pose2d getFinalTargetPose() {
+  public Pose2d getScoringPose() {
     return new Pose2d(
         getAprilTagPose()
             .getTranslation()

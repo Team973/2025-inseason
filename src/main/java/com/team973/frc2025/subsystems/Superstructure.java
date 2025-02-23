@@ -142,26 +142,37 @@ public class Superstructure implements Subsystem {
         m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
       case ScoreCoral:
-        if (finishedScoring() && m_driveController.getDriveWithLimelight().getTargetingComplete()) {
-          m_claw.setControl(Claw.ControlStatus.IntakeCoral);
+        m_claw.setControl(Claw.ControlStatus.IntakeCoral);
 
-          armStow();
-          elevatorStow();
-        } else if (finishedScoring()) {
-          m_claw.setControl(Claw.ControlStatus.Off);
+        switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
+          case MoveToApproach:
+            armStow();
+            elevatorStow();
+            break;
+          case Approach:
+            armTargetReefLevel();
+            elevatorTargetReefLevel();
+            break;
+          case MoveToScoring:
+            armTargetReefLevel();
+            elevatorTargetReefLevel();
+            break;
+          case Scoring:
+            m_claw.setControl(Claw.ControlStatus.ScoreCoral);
 
-          armTargetReefLevel();
-          elevatorTargetReefLevel();
-        } else if (m_driveController.getDriveWithLimelight().reachedTargetFinalPose()) {
-          m_claw.setControl(Claw.ControlStatus.ScoreCoral);
+            armTargetReefLevel();
+            elevatorTargetReefLevel();
+            break;
+          case MoveToBackOff:
+            m_claw.setControl(Claw.ControlStatus.Off);
 
-          armTargetReefLevel();
-          elevatorTargetReefLevel();
-        } else {
-          m_claw.setControl(Claw.ControlStatus.HoldCoral);
-
-          armTargetReefLevel();
-          elevatorTargetReefLevel();
+            armTargetReefLevel();
+            elevatorTargetReefLevel();
+            break;
+          case BackOff:
+            armStow();
+            elevatorStow();
+            break;
         }
 
         m_climb.setControlMode(Climb.ControlMode.OffState);
