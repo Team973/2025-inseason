@@ -1,5 +1,6 @@
 package com.team973.frc2025;
 
+import choreo.util.ChoreoAllianceFlipUtil;
 import com.team973.frc2025.auto.modes.DriveTestAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
 import com.team973.frc2025.auto.modes.NoAutoAllianceWallCenter;
@@ -55,16 +56,17 @@ public class AutoManager {
     return m_availableAutos.get(m_selectedMode);
   }
 
-  // TODO: Should account for alliance here and not in disabledPeriodic.
-  // TODO: Need to account for both position and rotation (currently we only
-  // account for rotation).
   public Pose2d getStartingPose(Alliance alliance) {
-    return m_currentMode.getStartingPose(alliance);
+    if (alliance == Alliance.Red) {
+      return ChoreoAllianceFlipUtil.flip(m_currentMode.getStartingPose());
+    } else {
+      return m_currentMode.getStartingPose();
+    }
   }
 
-  public void run() {
-    m_currentMode.run();
-    m_currentMode.log();
+  public void run(Alliance alliance) {
+    m_currentMode.run(alliance);
+    m_currentMode.log(alliance);
   }
 
   public void init() {
