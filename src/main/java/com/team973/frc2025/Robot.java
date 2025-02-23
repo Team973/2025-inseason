@@ -89,9 +89,9 @@ public class Robot extends TimedRobot {
   private final JoystickField m_sideSelector =
       new JoystickField(() -> m_driverStick.getLeftXAxis(), () -> m_driverStick.getLeftYAxis());
   private final JoystickField.Range m_leftReefSide =
-      m_sideSelector.range(Rotation2d.fromDegrees(240 - 90), Rotation2d.fromDegrees(60), 0.5);
+      m_sideSelector.range(Rotation2d.fromDegrees(240), Rotation2d.fromDegrees(60), 0.5);
   private final JoystickField.Range m_rightReefSide =
-      m_sideSelector.range(Rotation2d.fromDegrees(120 - 90), Rotation2d.fromDegrees(60), 0.5);
+      m_sideSelector.range(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(60), 0.5);
 
   public static enum ControlStatus {
     HighBattery,
@@ -249,8 +249,8 @@ public class Robot extends TimedRobot {
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(
+            -allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
             allianceScalar * m_driverStick.getLeftXAxis() * 0.6,
-            allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
             m_driverStick.getRightXAxis() * 0.8);
 
     if (m_driverStick.getLeftBumperButtonPressed()) {
