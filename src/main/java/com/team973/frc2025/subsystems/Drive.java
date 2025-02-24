@@ -31,7 +31,7 @@ public class Drive implements Subsystem {
 
   private final SwerveModule[] m_swerveModules;
   private ChassisSpeeds m_currentChassisSpeeds;
-  private Pose2d m_odometryOnlyEstimator = new Pose2d();
+  private Pose2d m_estimatedPose = new Pose2d();
   private Translation2d m_estimatedVelocity = new Translation2d();
 
   private GreyPoseEstimator m_poseEstimator;
@@ -162,7 +162,7 @@ public class Drive implements Subsystem {
   }
 
   public Pose2d getPose() {
-    return m_odometryOnlyEstimator;
+    return m_estimatedPose;
   }
 
   public Translation2d getVelocity() {
@@ -236,7 +236,7 @@ public class Drive implements Subsystem {
   public synchronized void syncSensorsHighFreq() {
     // Use the fused estimator for our position but the odometry-only estimator
     // for our velocity.
-    m_odometryOnlyEstimator = m_poseEstimator.getPoseMeters();
+    m_estimatedPose = m_fusedEstimator.getPoseMeters();
     m_estimatedVelocity = m_poseEstimator.getVelocityMetersPerSeconds();
   }
 
