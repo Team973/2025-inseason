@@ -2,6 +2,7 @@ package com.team973.frc2025.auto.commands;
 
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.lib.util.AutoCommand;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class WaitUntilCoralScoredComand extends AutoCommand {
   private final Claw m_claw;
@@ -14,7 +15,7 @@ public class WaitUntilCoralScoredComand extends AutoCommand {
   public void init() {}
 
   @Override
-  public void run() {}
+  public void run(Alliance alliance) {}
 
   @Override
   public boolean isCompleted() {
@@ -24,5 +25,5 @@ public class WaitUntilCoralScoredComand extends AutoCommand {
   @Override
   public void postComplete(boolean interrupted) {}
 
-  public void log() {}
+  public void log(Alliance alliance) {}
 }

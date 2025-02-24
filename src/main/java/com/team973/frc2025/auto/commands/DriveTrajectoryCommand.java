@@ -7,6 +7,7 @@ import choreo.trajectory.Trajectory;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.AutoCommand;
 import com.team973.lib.util.CommandOnEvent;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class DriveTrajectoryCommand extends AutoCommand {
     return Double.compare(a.timestamp, b.timestamp);
   }
 
-  public void log() {}
+  public void log(Alliance alliance) {}
 
   public void init() {
     m_drive.setControllerOption(DriveController.ControllerOption.DriveWithTrajectory);
@@ -58,7 +59,7 @@ public class DriveTrajectoryCommand extends AutoCommand {
     }
   }
 
-  public void run() {
+  public void run(Alliance alliance) {
     if (m_commandList.size() > m_pendingEventIndex) {
       if (m_commandList.get(m_pendingEventIndex).timestamp
           <= m_drive.getDriveWithTrajectory().getTimeSecFromStart()) {
@@ -78,7 +79,7 @@ public class DriveTrajectoryCommand extends AutoCommand {
         m_currentCommand.postComplete(false);
         m_currentCommand = null;
       } else {
-        m_currentCommand.run();
+        m_currentCommand.run(alliance);
       }
     }
   }

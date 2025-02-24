@@ -14,6 +14,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Optional;
 
 public class DriveWithTrajectory extends DriveComposable {
@@ -96,12 +98,29 @@ public class DriveWithTrajectory extends DriveComposable {
   }
 
   public void init() {
+    maybeInitAlliance();
     m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
+  }
+
+  private boolean m_allianceInitialized = false;
+  private Alliance m_alliance;
+
+  private void maybeInitAlliance() {
+    if (m_allianceInitialized) {
+      return;
+    }
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    if (!alliance.isPresent()) {
+      return;
+    }
+    m_allianceInitialized = true;
+    m_alliance = alliance.get();
   }
 
   @Override
   public synchronized ChassisSpeeds getOutput() {
-    Optional<SwerveSample> sample = m_trajectory.sampleAt(getTimeSecFromStart(), false);
+    Optional<SwerveSample> sample =
+        m_trajectory.sampleAt(getTimeSecFromStart(), m_alliance == Alliance.Red);
 
     if (m_currentPose == null || sample.isEmpty()) {
       return new ChassisSpeeds();

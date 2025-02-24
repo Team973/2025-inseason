@@ -20,6 +20,9 @@ public class Arm implements Subsystem {
   private boolean m_lastHallSensorMode;
   private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
+  private final SolidSignaler m_armHomedSigaler =
+      new SolidSignaler(
+          RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
   private static final double LEVEL_FOUR_POSITION_DEG = 64.0; // 79
   private static final double LEVEL_THREE_POSITION_DEG = 64.0;
   private static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;
@@ -36,6 +39,8 @@ public class Arm implements Subsystem {
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
+  private CANdleManger m_candleManger;
+
   public static enum ControlStatus {
     Manual,
     TargetPostion,
@@ -50,10 +55,12 @@ public class Arm implements Subsystem {
     return motorPostion * ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
-  public Arm(Logger logger) {
+  public Arm(Logger logger, CANdleManger candle) {
     m_logger = logger;
     m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
+    m_candleManger = candle;
+    m_candleManger.addSignaler(m_armHomedSigaler);
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.0;
     armMotorConfig.Slot0.kA = 0.0;
@@ -84,8 +91,9 @@ public class Arm implements Subsystem {
   private void maybeHomeArm() {
     if (m_lastHallSensorMode == false && hallSensor() == true) {
       m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
-      m_lastHallSensorMode = hallSensor();
+      m_armHomedSigaler.enable();
     }
+    m_lastHallSensorMode = hallSensor();
   }
 
   public void setMotorManualOutput(double joystick) {
@@ -149,6 +157,10 @@ public class Arm implements Subsystem {
     }
   }
 
+  public double getArmPostionDeg() {
+    return motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble());
+  }
+
   public void setControlStatus(ControlStatus status) {
     m_controlStatus = status;
   }
@@ -172,8 +184,7 @@ public class Arm implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log(
-        "armDegPostion", motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble()));
+    m_logger.log("armDegPostion", getArmPostionDeg());
     m_armMotor.log();
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
     m_logger.log("armMode", m_controlStatus.toString());
