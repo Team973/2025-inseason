@@ -277,7 +277,7 @@ public class Robot extends TimedRobot {
       m_driveController
           .getDriveWithLimelight()
           .targetReefPosition(
-              () -> m_superstructure.readyToScore(), () -> m_superstructure.finishedScoring());
+              () -> m_superstructure.readyToScore(), () -> !m_superstructure.getSeesCoral());
     }
     double climbStick = m_coDriverStick.getLeftYAxis();
 
