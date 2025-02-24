@@ -81,6 +81,9 @@ public class DriveWithTrajectory extends DriveComposable {
         new double[] {
           logSample.x, logSample.y, logSample.heading,
         });
+    m_logger.log("sample/vx", logSample.vx);
+    m_logger.log("sample/vy", logSample.vy);
+    m_logger.log("sample/Omega", logSample.omega);
 
     m_logger.log("X Position Error", m_controller.getXController().getError());
     m_logger.log("X Velocity Error", m_controller.getXController().getErrorDerivative());
