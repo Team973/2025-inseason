@@ -178,7 +178,6 @@ public class Robot extends TimedRobot {
   private void setPoseFromAuto() {
     Pose2d startingPose = m_autoManager.getStartingPose(m_alliance);
     m_driveController.resetOdometry(startingPose);
-    m_logger.log("startingPose/heading-degrees", startingPose.getRotation().getDegrees());
   }
 
   private boolean m_allianceInitialized = false;
