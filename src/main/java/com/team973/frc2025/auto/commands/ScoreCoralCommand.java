@@ -6,6 +6,7 @@ import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefSide;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight.TargetStage;
 import com.team973.lib.util.AutoCommand;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -37,7 +38,7 @@ public class ScoreCoralCommand extends AutoCommand {
     m_drive.getDriveWithLimelight().setTargetReefFace(m_targetReefFace);
     m_drive.getDriveWithLimelight().setTargetSide(m_targetReefSide);
     m_superstructure.setTargetReefLevel(m_targetReefLevel);
-    m_superstructure.setState(Superstructure.State.ScoreCoral); // TODO: not tested
+    m_superstructure.setState(Superstructure.State.ScoreCoral);
     m_drive
         .getDriveWithLimelight()
         .targetReefPosition(
@@ -52,7 +53,7 @@ public class ScoreCoralCommand extends AutoCommand {
 
   @Override
   public boolean isCompleted() {
-    return m_drive.getDriveWithLimelight().getTargetingComplete();
+    return m_drive.getDriveWithLimelight().getTargetStage() == TargetStage.BackOff;
   }
 
   @Override

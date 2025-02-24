@@ -7,7 +7,6 @@ package com.team973.frc2025;
 import choreo.util.ChoreoAllianceFlipUtil;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Arm;
-import com.team973.frc2025.subsystems.Arm.ControlStatus;
 import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
@@ -92,9 +91,9 @@ public class Robot extends TimedRobot {
   private final JoystickField m_sideSelector =
       new JoystickField(() -> m_driverStick.getLeftXAxis(), () -> m_driverStick.getLeftYAxis());
   private final JoystickField.Range m_leftReefSide =
-      m_sideSelector.range(Rotation2d.fromDegrees(240 - 90), Rotation2d.fromDegrees(60), 0.5);
+      m_sideSelector.range(Rotation2d.fromDegrees(240), Rotation2d.fromDegrees(60), 0.5);
   private final JoystickField.Range m_rightReefSide =
-      m_sideSelector.range(Rotation2d.fromDegrees(120 - 90), Rotation2d.fromDegrees(60), 0.5);
+      m_sideSelector.range(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(60), 0.5);
 
   public static enum ControlStatus {
     HighBattery,
@@ -239,18 +238,22 @@ public class Robot extends TimedRobot {
     double allianceScalar = 1.0;
     if (m_alliance == Alliance.Red) {
       // Our gyroscope is blue-centric meaning that facing away from the alliance wall
-      // is a 0 degree heading. But the driver station is facing 180 when we are on the
-      // red alliance. So when we are the red alliance we need to flip the joystick inputs.
-      // Ideally we would convert this to polar coordinates, rotate by 180, and then convert
-      // back to cartesian. But the algebra here is equivalent to just negating the X and Y
+      // is a 0 degree heading. But the driver station is facing 180 when we are on
+      // the
+      // red alliance. So when we are the red alliance we need to flip the joystick
+      // inputs.
+      // Ideally we would convert this to polar coordinates, rotate by 180, and then
+      // convert
+      // back to cartesian. But the algebra here is equivalent to just negating the X
+      // and Y
       // so that's what we iwll do for now.
       allianceScalar = -1.0;
     }
     m_driveController
         .getDriveWithJoysticks()
         .updateInput(
+            -allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
             allianceScalar * m_driverStick.getLeftXAxis() * 0.6,
-            allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
             m_driverStick.getRightXAxis() * 0.8);
 
     if (m_driverStick.getLeftBumperButtonPressed()) {
