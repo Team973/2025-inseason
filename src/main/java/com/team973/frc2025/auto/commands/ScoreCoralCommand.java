@@ -41,7 +41,7 @@ public class ScoreCoralCommand extends AutoCommand {
     m_drive
         .getDriveWithLimelight()
         .targetReefPosition(
-            () -> m_superstructure.readyToScore(), () -> m_superstructure.finishedScoring());
+            () -> m_superstructure.readyToScore(), () -> !m_superstructure.getSeesCoral());
   }
 
   @Override

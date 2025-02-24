@@ -2,6 +2,7 @@ package com.team973.frc2025;
 
 import choreo.util.ChoreoAllianceFlipUtil;
 import com.team973.frc2025.auto.modes.DriveTestAuto;
+import com.team973.frc2025.auto.modes.LeftSideAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
 import com.team973.frc2025.auto.modes.NoAutoAllianceWallCenter;
 import com.team973.frc2025.auto.modes.TaxiAuto;
@@ -24,6 +25,7 @@ public class AutoManager {
   private final AutoMode m_taxiAuto;
   private final AutoMode m_testAuto;
   private final AutoMode m_driveTestAuto;
+  private final AutoMode m_leftSideAuto;
   private NoAutoAllianceWallCenter m_noAutoAllianceWallCenter;
 
   public AutoManager(Logger logger, DriveController drive, Superstructure superstructure) {
@@ -31,11 +33,19 @@ public class AutoManager {
     m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive);
     m_testAuto = new TestAuto(logger.subLogger("test"), drive, superstructure);
     m_driveTestAuto = new DriveTestAuto(logger.subLogger("driveTest"), drive);
+    m_leftSideAuto = new LeftSideAuto(logger.subLogger("LeftSideAuto"), superstructure, drive);
     m_noAutoAllianceWallCenter = new NoAutoAllianceWallCenter(logger);
 
     m_availableAutos =
         Arrays.asList(
-            m_noAuto, m_taxiAuto, m_testAuto, m_driveTestAuto, m_noAutoAllianceWallCenter);
+            m_noAuto,
+            m_taxiAuto,
+            m_testAuto,
+            m_driveTestAuto,
+            m_noAutoAllianceWallCenter,
+            m_leftSideAuto);
+
+    selectAuto(getSelectedMode());
   }
 
   public void increment() {
@@ -43,6 +53,7 @@ public class AutoManager {
     if (m_selectedMode >= m_availableAutos.size()) {
       m_selectedMode = 0;
     }
+    selectAuto(getSelectedMode());
   }
 
   public void decrement() {
@@ -50,6 +61,7 @@ public class AutoManager {
     if (m_selectedMode < 0) {
       m_selectedMode = m_availableAutos.size() - 1;
     }
+    selectAuto(getSelectedMode());
   }
 
   public AutoMode getSelectedMode() {

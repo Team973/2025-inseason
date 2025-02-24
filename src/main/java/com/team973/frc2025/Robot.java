@@ -7,7 +7,6 @@ package com.team973.frc2025;
 import choreo.util.ChoreoAllianceFlipUtil;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Arm;
-import com.team973.frc2025.subsystems.Arm.ControlStatus;
 import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
@@ -274,7 +273,7 @@ public class Robot extends TimedRobot {
       m_driveController
           .getDriveWithLimelight()
           .targetReefPosition(
-              () -> m_superstructure.readyToScore(), () -> m_superstructure.finishedScoring());
+              () -> m_superstructure.readyToScore(), () -> !m_superstructure.getSeesCoral());
     }
     double climbStick = m_coDriverStick.getLeftYAxis();
 

@@ -62,12 +62,12 @@ public class Superstructure implements Subsystem {
     m_targetReefLevel = level;
   }
 
-  public boolean finishedScoring() {
-    return !m_claw.getSeesCoral();
-  }
-
   public boolean readyToScore() {
     return m_arm.motorAtTargetRotation() && m_elevator.motorAtTarget();
+  }
+
+  public boolean getSeesCoral() {
+    return m_claw.getSeesCoral();
   }
 
   public void log() {
@@ -142,12 +142,12 @@ public class Superstructure implements Subsystem {
         m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
       case ScoreCoral:
-        if (finishedScoring() && m_driveController.getDriveWithLimelight().getTargetingComplete()) {
+        if (!getSeesCoral() && m_driveController.getDriveWithLimelight().getTargetingComplete()) {
           m_claw.setControl(Claw.ControlStatus.IntakeCoral);
 
           armStow();
           elevatorStow();
-        } else if (finishedScoring()) {
+        } else if (!getSeesCoral()) {
           m_claw.setControl(Claw.ControlStatus.Off);
 
           armTargetReefLevel();
