@@ -75,7 +75,7 @@ public class DriveWithTrajectory extends DriveComposable {
     } else {
       logSample = m_currentSample;
     }
-
+    m_logger.log("samplePose", new double[] {logSample.x, logSample.y, logSample.heading});
     m_logger.log("sample/X", logSample.x);
     m_logger.log("sample/y", logSample.y);
     m_logger.log("sample/vx", logSample.vx);
