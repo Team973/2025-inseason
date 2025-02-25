@@ -51,11 +51,11 @@ public class DriveTrajectoryCommand extends AutoCommand {
   public void log() {}
 
   public void init() {
-    m_drive.setControllerOption(DriveController.ControllerOption.DriveWithTrajectory);
-
     if (m_trajectory.isPresent()) {
       m_drive.getDriveWithTrajectory().setTrajectory(m_trajectory.get());
     }
+
+    m_drive.setControllerOption(DriveController.ControllerOption.DriveWithTrajectory);
   }
 
   public void run() {
