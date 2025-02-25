@@ -162,14 +162,12 @@ public class Claw implements Subsystem {
       case IntakeAlgae:
         if (getAlgaeDistance().isEmpty()) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
+        } else if (getAlgaeDistance().get() > 1.0) {
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
+        } else if (getAlgaeDistance().get() < 0.1) {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -5);
         } else {
-          if (getAlgaeDistance().get() > 1.0) {
-            m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-          } else if (getAlgaeDistance().get() < 0.1) {
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, -5);
-          } else {
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, -30);
-          }
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -30);
         }
 
         m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
