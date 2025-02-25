@@ -167,6 +167,10 @@ public class Superstructure implements Subsystem {
     m_climb.setManualPower(power);
   }
 
+  public void incrementClimbTarget(double increment) {
+    m_climb.incrementTarget(increment);
+  }
+
   public void clawIntake() {
     if (m_gamePieceMode == GamePiece.Coral) {
       m_claw.setControl(Claw.ControlStatus.IntakeCoral);
@@ -186,7 +190,7 @@ public class Superstructure implements Subsystem {
   public void update() {
     switch (m_state) {
       case Intake:
-        m_climb.setControlMode(Climb.ControlMode.OffState);
+        // m_climb.setControlMode(Climb.ControlMode.OffState);
 
         clawIntake();
         armStow();
@@ -230,17 +234,17 @@ public class Superstructure implements Subsystem {
           m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
         }
 
-        m_climb.setControlMode(Climb.ControlMode.OffState);
+        // m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
       case ClimbManual:
         m_claw.setControl(Claw.ControlStatus.Off);
-        m_climb.setControlMode(Climb.ControlMode.JoystickMode);
+        // m_climb.setControlMode(Climb.ControlMode.JoystickMode);
         break;
       case ClimbStow:
-        m_climb.setControlMode(Climb.ControlMode.ClimbStow);
+        // m_climb.setControlMode(Climb.ControlMode.ClimbStow);
         break;
       case ClimbLow:
-        m_climb.setControlMode(Climb.ControlMode.ClimbLow);
+        // m_climb.setControlMode(Climb.ControlMode.ClimbLow);
         break;
       case Manual:
         if (m_lastState != m_state) {
@@ -262,11 +266,11 @@ public class Superstructure implements Subsystem {
           clawIntake();
         }
 
-        m_climb.setControlMode(Climb.ControlMode.OffState);
+        // m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
       case Off:
         m_claw.setControl(Claw.ControlStatus.Off);
-        m_climb.setControlMode(Climb.ControlMode.OffState);
+        // m_climb.setControlMode(Climb.ControlMode.OffState);
 
         m_arm.setControlStatus(Arm.ControlStatus.Off);
         m_elevator.setControlStatus(Elevator.ControlStatus.Off);

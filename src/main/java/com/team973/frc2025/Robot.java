@@ -215,7 +215,8 @@ public class Robot extends TimedRobot {
     syncSensors();
     // TODO: we're doing this badly to make it work
     m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
-    // TODO: Figure out why autos don't work if updateSubsystems() comes before automanager.run().
+    // TODO: Figure out why autos don't work if updateSubsystems() comes before
+    // automanager.run().
     m_autoManager.run(m_alliance);
     updateSubsystems();
   }
@@ -305,12 +306,8 @@ public class Robot extends TimedRobot {
       m_superstructure.toggleGamePieceMode();
     }
 
-    if ((climbStick) > 0.8) {
-      m_superstructure.setState(Superstructure.State.ClimbLow);
-    } else if ((climbStick) < -0.8) {
-      m_superstructure.setState(Superstructure.State.ClimbStow);
-    } else {
-      m_superstructure.setClimbPower(0);
+    if (Math.abs(climbStick) > 0.5) {
+      m_superstructure.incrementClimbTarget(climbStick);
     }
 
     if (m_coDriverStick.getStartButtonPressed()) {
