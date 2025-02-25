@@ -26,6 +26,6 @@ public class RightSideAuto extends AutoMode {
   }
 
   public String getName() {
-    return "Left Side Auto";
+    return "right Side Auto";
   }
 }
