@@ -113,8 +113,10 @@ public class DriveWithTrajectory extends DriveComposable {
 
   @Override
   public synchronized ChassisSpeeds getOutput() {
-    Optional<SwerveSample> sample =
-        m_trajectory.sampleAt(getTimeSecFromStart(), m_alliance == Alliance.Red);
+    if (m_trajectory == null) {
+      return new ChassisSpeeds();
+    }
+    Optional<SwerveSample> sample = m_trajectory.sampleAt(getTimeSecFromStart(), false);
 
     if (m_currentPose == null || sample.isEmpty()) {
       return new ChassisSpeeds();

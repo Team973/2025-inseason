@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems.swerve;
 
+import com.team973.frc2025.shared.CrashTracker;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.swerve.MegaTagSupplier.MegaTagReceiver;
@@ -82,8 +83,12 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
       }
       m_lastPoseMeters = m_poseEstimator.getEstimatedPosition();
     }
-    m_driveController.syncSensorsHighFreq();
-    m_driveController.update();
+    try {
+      m_driveController.syncSensorsHighFreq();
+      m_driveController.update();
+    } catch (Exception e) {
+      CrashTracker.logException("Update odometry", e);
+    }
   }
 
   @Override
