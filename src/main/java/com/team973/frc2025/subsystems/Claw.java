@@ -13,6 +13,7 @@ import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Optional;
 
 public class Claw implements Subsystem {
   private final Logger m_logger;
@@ -120,6 +121,10 @@ public class Claw implements Subsystem {
     return getConveyorFrontSensor() || getConveyorBackSensor();
   }
 
+  private Optional<Double> getAlgaeDistance() {
+    return Optional.of(m_clawAlgaeSensor.getDistance().getValueAsDouble());
+  }
+
   public void coralScoredLED() {
     // TODO: Add back the algee sensor once tunned
     if (getSeesCoral()) {
@@ -148,12 +153,16 @@ public class Claw implements Subsystem {
         }
         break;
       case IntakeAlgae:
-        if (m_clawAlgaeSensor.getDistance().getValueAsDouble() > 1.0) {
+        if (getAlgaeDistance().isEmpty()) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-        } else if (m_clawAlgaeSensor.getDistance().getValueAsDouble() < 0.1) {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, -5);
         } else {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, -30);
+          if (getAlgaeDistance().get() > 1.0) {
+            m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
+          } else if (getAlgaeDistance().get() < 0.1) {
+            m_clawMotor.setControl(ControlMode.VelocityVoltage, -5);
+          } else {
+            m_clawMotor.setControl(ControlMode.VelocityVoltage, -30);
+          }
         }
 
         m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
