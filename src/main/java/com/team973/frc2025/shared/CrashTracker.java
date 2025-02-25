@@ -27,8 +27,10 @@ public class CrashTracker {
   }
 
   private static void logMarker(String mark, Throwable e) {
+    System.out.printf("Exception at mark %s\n", mark);
+    System.out.println(e);
+
     if (RobotBase.isSimulation()) {
-      System.out.println(e);
       return;
     }
 
