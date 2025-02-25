@@ -10,6 +10,7 @@ import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Climb implements Subsystem {
+  private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 2.5;
 
   private final DigitalInput m_bannerSensor = new DigitalInput(9);
 
@@ -22,13 +23,16 @@ public class Climb implements Subsystem {
   private final GreyTalonFX m_climb;
 
   private double m_manualPower = 0;
+  private double m_targetPosition;
 
-  private ControlMode m_controlMode = ControlMode.OffState;
+  private ControlMode m_controlMode = ControlMode.ClimbLow;
 
   public Climb(Logger logger) {
     m_logger = logger;
     m_climb = new GreyTalonFX(23, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("climb motor"));
     m_climb.setConfig(defaultMotorConfig());
+
+    m_targetPosition = m_climb.getPosition().getValueAsDouble();
   }
 
   private static TalonFXConfiguration defaultMotorConfig() {
@@ -79,6 +83,11 @@ public class Climb implements Subsystem {
     m_manualPower = power;
   }
 
+  public void incrementTarget(double increment) {
+    m_targetPosition =
+        m_climb.getPosition().getValueAsDouble() + (increment * JOYSTICK_TO_MOTOR_ROTATIONS);
+  }
+
   @Override
   public void log() {
     double climbPosition = m_climb.getPosition().getValueAsDouble();
@@ -87,6 +96,7 @@ public class Climb implements Subsystem {
     m_logger.log("CurrentMode", m_controlMode.toString());
     m_climb.log();
     m_logger.log("CurrentManualPower", m_manualPower);
+    m_logger.log("Target Position", m_targetPosition);
   }
 
   @Override
@@ -99,7 +109,8 @@ public class Climb implements Subsystem {
         m_climb.setControl(GreyTalonFX.ControlMode.DutyCycleOut, 0, 0);
         break;
       case ClimbLow:
-        m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 82.6, 0);
+        // m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 82.6, 0);
+        m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, m_targetPosition, 0);
         break;
       case ClimbStow:
         m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 0, 1);
