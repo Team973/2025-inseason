@@ -23,12 +23,18 @@ public class Arm implements Subsystem {
   private final SolidSignaler m_armHomedSigaler =
       new SolidSignaler(
           RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
+
+  private static final double ARM_HOMING_POSTION_DEG = -90.0;
+
   private static final double LEVEL_FOUR_POSITION_DEG = 64.0; // 79
   private static final double LEVEL_THREE_POSITION_DEG = 64.0;
   private static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;
   private static final double LEVEL_ONE_POSITION_DEG = -59.0; // -70.0;
-  public static final double STOW_POSITION_DEG = -92.0;
-  private static final double ARM_HOMING_POSTION_DEG = -90.0;
+  public static final double CORAL_STOW_POSITION_DEG = -92.0;
+
+  private static final double ALGAE_HIGH_POSITION_DEG = 0.0; // TODO
+  private static final double ALGAE_LOW_POSITION_DEG = 0.0; // TODO
+  public static final double ALGAE_STOW_POSITION_DEG = 0.0; // TODO
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
@@ -38,6 +44,9 @@ public class Arm implements Subsystem {
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
+
+  private double m_algaeHighOffset = 0.0;
+  private double m_algaeLowOffset = 0.0;
 
   private CANdleManger m_candleManger;
 
@@ -76,7 +85,8 @@ public class Arm implements Subsystem {
     armMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     armMotorConfig.Voltage.PeakForwardVoltage = 12.0;
     armMotorConfig.Voltage.PeakReverseVoltage = -12.0;
-    // clockwise postive when looking at it from the shaft, is on inside of the left point so that
+    // clockwise postive when looking at it from the shaft, is on inside of the left
+    // point so that
     // the shaft is pointing left, up is positve, gear ratio is odd
     armMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     armMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -129,6 +139,10 @@ public class Arm implements Subsystem {
         return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case L_4:
         return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+      case AlgaeHigh:
+        return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
+      case AlgaeLow:
+        return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
@@ -178,6 +192,12 @@ public class Arm implements Subsystem {
         break;
       case L_4:
         m_levelFourOffset += increment;
+        break;
+      case AlgaeHigh:
+        m_algaeHighOffset += increment;
+        break;
+      case AlgaeLow:
+        m_algaeLowOffset += increment;
         break;
     }
   }
