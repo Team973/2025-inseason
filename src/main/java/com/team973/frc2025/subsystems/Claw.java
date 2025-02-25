@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -75,6 +76,9 @@ public class Claw implements Subsystem {
     conveyorConfig.Slot0.kV = 0.1;
 
     m_conveyor.setConfig(conveyorConfig);
+
+    CANrangeConfiguration algaeSensorConfig = new CANrangeConfiguration();
+    m_clawAlgaeSensor.getConfigurator().apply(algaeSensorConfig);
   }
 
   public static TalonFXConfiguration defaultClawMotorConfig() {
@@ -184,6 +188,10 @@ public class Claw implements Subsystem {
 
     m_logger.log("Conveyor Back Sensor", getConveyorBackSensor());
     m_logger.log("Conveyor Front Sensor", getConveyorFrontSensor());
+
+    m_logger.log("Algae Sensor Strength", m_clawAlgaeSensor.getSignalStrength().getValueAsDouble());
+    m_logger.log(
+        "Algae Sensor Health", m_clawAlgaeSensor.getMeasurementHealth().getValueAsDouble());
 
     m_logger.log("target hold postion", m_targetHoldPosition);
     m_logger.log("target rotations hit", motorAtTarget());
