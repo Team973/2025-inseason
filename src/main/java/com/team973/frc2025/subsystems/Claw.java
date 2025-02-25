@@ -35,6 +35,8 @@ public class Claw implements Subsystem {
 
   private CANdleManger m_caNdle;
 
+  private boolean m_lastClawSensorReturn;
+
   public static enum ControlStatus {
     IntakeCoral,
     IntakeAlgae,
@@ -120,6 +122,14 @@ public class Claw implements Subsystem {
     return getConveyorFrontSensor() || getConveyorBackSensor();
   }
 
+  private boolean getInstanceClawSensors() {
+    if (getSeesCoral() && !m_lastClawSensorReturn) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public void coralScoredLED() {
     // TODO: Add back the algee sensor once tunned
     if (getSeesCoral()) {
@@ -200,6 +210,7 @@ public class Claw implements Subsystem {
   @Override
   public void syncSensors() {
     coralScoredLED();
+    m_lastClawSensorReturn = getSeesCoral();
   }
 
   @Override
