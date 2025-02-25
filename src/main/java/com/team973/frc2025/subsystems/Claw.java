@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 
 public class Claw implements Subsystem {
+  private static final double ALGAE_SENSOR_STRENGTH_THRESHOLD = 1000.0;
+
   private final Logger m_logger;
 
   private final GreyTalonFX m_clawMotor;
@@ -122,6 +124,11 @@ public class Claw implements Subsystem {
   }
 
   private Optional<Double> getAlgaeDistance() {
+    if (m_clawAlgaeSensor.getSignalStrength().getValueAsDouble()
+        < ALGAE_SENSOR_STRENGTH_THRESHOLD) {
+      return Optional.empty();
+    }
+
     return Optional.of(m_clawAlgaeSensor.getDistance().getValueAsDouble());
   }
 
