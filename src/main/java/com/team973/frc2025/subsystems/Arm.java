@@ -32,9 +32,9 @@ public class Arm implements Subsystem {
   private static final double LEVEL_ONE_POSITION_DEG = -59.0; // -70.0;
   public static final double CORAL_STOW_POSITION_DEG = -92.0;
 
-  private static final double ALGAE_HIGH_POSITION_DEG = 0.0; // TODO
-  private static final double ALGAE_LOW_POSITION_DEG = 0.0; // TODO
-  public static final double ALGAE_STOW_POSITION_DEG = 0.0; // TODO
+  private static final double ALGAE_HIGH_POSITION_DEG = 38.0;
+  private static final double ALGAE_LOW_POSITION_DEG = -61.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -80.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;

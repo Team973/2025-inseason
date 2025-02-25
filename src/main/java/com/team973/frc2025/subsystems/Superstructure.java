@@ -65,6 +65,14 @@ public class Superstructure implements Subsystem {
     m_manualArmivator = manual;
   }
 
+  public void setTargetReefLevel(ReefLevel coralLevel, ReefLevel algaeLevel) {
+    if (m_gamePieceMode == GamePiece.Coral) {
+      m_targetReefLevel = coralLevel;
+    } else {
+      m_targetReefLevel = algaeLevel;
+    }
+  }
+
   public void setTargetReefLevel(ReefLevel level) {
     m_targetReefLevel = level;
   }
@@ -85,6 +93,7 @@ public class Superstructure implements Subsystem {
     SmartDashboard.putString(
         "DB/String 2", "A: " + String.valueOf(m_arm.getTargetDegFromLevel(m_targetReefLevel)));
     SmartDashboard.putString("DB/String 3", "Scoring Pose: " + m_manualArmivator);
+    SmartDashboard.putString("DB/String 8", m_gamePieceMode.toString());
 
     m_claw.log();
     m_climb.log();
@@ -137,6 +146,14 @@ public class Superstructure implements Subsystem {
 
   public void setGamePieceMode(GamePiece gamePiece) {
     m_gamePieceMode = gamePiece;
+  }
+
+  public void toggleGamePieceMode() {
+    if (m_gamePieceMode == GamePiece.Coral) {
+      setGamePieceMode(GamePiece.Algae);
+    } else {
+      setGamePieceMode(GamePiece.Coral);
+    }
   }
 
   public void incrementCoralBackup(double increment) {
@@ -238,15 +255,8 @@ public class Superstructure implements Subsystem {
 
         if (m_manualScore) {
           clawScore();
-        } else if (m_arm.motorAtTargetRotation()
-            && m_arm.getTargetPosition() != Arm.CORAL_STOW_POSITION_DEG) {
-          clawIntake();
         } else {
-          if (m_elevator.getHeightInches() > 0.5) {
-            m_claw.setControl(Claw.ControlStatus.Off);
-          } else {
-            clawIntake();
-          }
+          clawIntake();
         }
 
         m_climb.setControlMode(Climb.ControlMode.OffState);
