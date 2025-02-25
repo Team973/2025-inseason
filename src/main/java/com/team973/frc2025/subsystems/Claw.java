@@ -14,191 +14,190 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Claw implements Subsystem {
-	private final Logger m_logger;
+  private final Logger m_logger;
 
-	private final GreyTalonFX m_clawMotor;
-	private final GreyTalonFX m_conveyor;
+  private final GreyTalonFX m_clawMotor;
+  private final GreyTalonFX m_conveyor;
 
-	private final DigitalInput m_conveyorBackSensor;
-	private final DigitalInput m_conveyorFrontSensor;
-	private final CANrange m_clawAlgaeSensor;
+  private final DigitalInput m_conveyorBackSensor;
+  private final DigitalInput m_conveyorFrontSensor;
+  private final CANrange m_clawAlgaeSensor;
 
-	private ControlStatus m_mode = ControlStatus.Off;
+  private ControlStatus m_mode = ControlStatus.Off;
 
-	private final SolidSignaler m_clawHasPeiceSignaler = new SolidSignaler(
-			RobotInfo.Colors.GREEN, 0, RobotInfo.SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
+  private final SolidSignaler m_clawHasPeiceSignaler =
+      new SolidSignaler(
+          RobotInfo.Colors.GREEN, 0, RobotInfo.SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
 
-	private double m_targetHoldPosition = 0;
+  private double m_targetHoldPosition = 0;
 
-	private double m_coralBackUpRot = 3.0;
+  private double m_coralBackUpRot = 3.0;
 
-	private CANdleManger m_caNdle;
+  private CANdleManger m_caNdle;
 
-	public static enum ControlStatus {
-		IntakeCoral,
-		IntakeAlgae,
-		ScoreCoral,
-		ScoreAlgae,
-		Off,
-	}
+  public static enum ControlStatus {
+    IntakeCoral,
+    IntakeAlgae,
+    ScoreCoral,
+    ScoreAlgae,
+    Off,
+  }
 
-	public Claw(Logger logger, CANdleManger candle) {
-		m_logger = logger;
-		m_caNdle = candle;
+  public Claw(Logger logger, CANdleManger candle) {
+    m_logger = logger;
+    m_caNdle = candle;
 
-		m_caNdle.addSignaler(m_clawHasPeiceSignaler);
-		m_clawMotor = new GreyTalonFX(
-				ClawInfo.RIGHT_MOTOR_ID,
-				RobotInfo.CANIVORE_CANBUS,
-				m_logger.subLogger("clawMotor", 0.2));
-		m_conveyor = new GreyTalonFX(
-				ClawInfo.CONVEYOR_MOTOR_ID,
-				RobotInfo.CANIVORE_CANBUS,
-				m_logger.subLogger("conveyorMotor", 0.2));
+    m_caNdle.addSignaler(m_clawHasPeiceSignaler);
+    m_clawMotor =
+        new GreyTalonFX(
+            ClawInfo.RIGHT_MOTOR_ID,
+            RobotInfo.CANIVORE_CANBUS,
+            m_logger.subLogger("clawMotor", 0.2));
+    m_conveyor =
+        new GreyTalonFX(
+            ClawInfo.CONVEYOR_MOTOR_ID,
+            RobotInfo.CANIVORE_CANBUS,
+            m_logger.subLogger("conveyorMotor", 0.2));
 
-		m_conveyorBackSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
-		m_conveyorFrontSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
-		m_clawAlgaeSensor = new CANrange(ClawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
+    m_conveyorBackSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
+    m_conveyorFrontSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
+    m_clawAlgaeSensor = new CANrange(ClawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
 
-		TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
-		rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-		m_clawMotor.setConfig(rightMotorConfig);
+    TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
+    rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    m_clawMotor.setConfig(rightMotorConfig);
 
-		TalonFXConfiguration conveyorConfig = defaultClawMotorConfig();
+    TalonFXConfiguration conveyorConfig = defaultClawMotorConfig();
 
-		conveyorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    conveyorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-		conveyorConfig.Slot0.kP = 0.3;
-		conveyorConfig.Slot0.kV = 0.1;
+    conveyorConfig.Slot0.kP = 0.3;
+    conveyorConfig.Slot0.kV = 0.1;
 
-		m_conveyor.setConfig(conveyorConfig);
-	}
+    m_conveyor.setConfig(conveyorConfig);
+  }
 
-	public static TalonFXConfiguration defaultClawMotorConfig() {
-		TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
+  public static TalonFXConfiguration defaultClawMotorConfig() {
+    TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
 
-		// Slot 0 PID constants are for velocity voltage
-		defaultMotorConfig.Slot0.kS = 0.0;
-		defaultMotorConfig.Slot0.kV = 0.125 * 10.0 / 10.5;
-		defaultMotorConfig.Slot0.kA = 0.0;
-		defaultMotorConfig.Slot0.kP = 0.3;
-		defaultMotorConfig.Slot0.kI = 0.0;
-		defaultMotorConfig.Slot0.kD = 0.0;
+    // Slot 0 PID constants are for velocity voltage
+    defaultMotorConfig.Slot0.kS = 0.0;
+    defaultMotorConfig.Slot0.kV = 0.125 * 10.0 / 10.5;
+    defaultMotorConfig.Slot0.kA = 0.0;
+    defaultMotorConfig.Slot0.kP = 0.3;
+    defaultMotorConfig.Slot0.kI = 0.0;
+    defaultMotorConfig.Slot0.kD = 0.0;
 
-		defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
-		defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-		defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
-		defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-		defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
+    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
-		defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-		return defaultMotorConfig;
-	}
+    return defaultMotorConfig;
+  }
 
-	public boolean motorAtTarget() {
-		return (Math.abs(m_targetHoldPosition - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
-	}
+  public boolean motorAtTarget() {
+    return (Math.abs(m_targetHoldPosition - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
+  }
 
-	private boolean getConveyorBackSensor() {
-		return m_conveyorBackSensor.get();
-	}
+  private boolean getConveyorBackSensor() {
+    return m_conveyorBackSensor.get();
+  }
 
-	private boolean getConveyorFrontSensor() {
-		return m_conveyorFrontSensor.get();
-	}
+  private boolean getConveyorFrontSensor() {
+    return m_conveyorFrontSensor.get();
+  }
 
-	private boolean getClawAlgaeSensor() {
-		return m_clawAlgaeSensor.getDistance().getValueAsDouble() < 0.1;
-	}
+  public boolean getSeesCoral() {
+    return getConveyorFrontSensor() || getConveyorBackSensor();
+  }
 
-	public boolean getSeesCoral() {
-		return getConveyorFrontSensor() || getConveyorBackSensor();
-	}
+  public void coralScoredLED() {
+    // TODO: Add back the algee sensor once tunned
+    if (getSeesCoral()) {
+      m_clawHasPeiceSignaler.enable();
+    } else {
+      m_clawHasPeiceSignaler.disable();
+    }
+  }
 
-	public void coralScoredLED() {
-		// TODO: Add back the algee sensor once tunned
-		if (getSeesCoral()) {
-			m_clawHasPeiceSignaler.enable();
-		} else {
-			m_clawHasPeiceSignaler.disable();
-		}
-	}
+  @Override
+  public void update() {
+    switch (m_mode) {
+      case IntakeCoral:
+        if (getConveyorFrontSensor()) {
+          // Too far forward --- back up!
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
+        } else if (getConveyorBackSensor() && !getConveyorFrontSensor()) {
+          // Perfect spot!
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
+          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        } else {
+          // Way too far back
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 20);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 20);
+        }
+        break;
+      case IntakeAlgae:
+        if (m_clawAlgaeSensor.getDistance().getValueAsDouble() > 1.0) {
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
+        } else if (m_clawAlgaeSensor.getDistance().getValueAsDouble() < 0.1) {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -5);
+        } else {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -30);
+        }
 
-	@Override
-	public void update() {
-		switch (m_mode) {
-			case IntakeCoral:
-				if (getConveyorFrontSensor()) {
-					// Too far forward --- back up!
-					m_clawMotor.setControl(ControlMode.VelocityVoltage, -10);
-					m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
-				} else if (getConveyorBackSensor() && !getConveyorFrontSensor()) {
-					// Perfect spot!
-					m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-					m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-				} else {
-					// Way too far back
-					m_clawMotor.setControl(ControlMode.VelocityVoltage, 20);
-					m_conveyor.setControl(ControlMode.VelocityVoltage, 20);
-				}
-				break;
-			case IntakeAlgae:
-				if (getClawAlgaeSensor()) {
-					m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-					m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-				} else {
-					m_clawMotor.setControl(ControlMode.VelocityVoltage, -35);
-					m_conveyor.setControl(ControlMode.VelocityVoltage, -20);
-				}
-				break;
-			case ScoreCoral:
-				m_clawMotor.setControl(ControlMode.VelocityVoltage, 50);
-				m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-				break;
-			case ScoreAlgae:
-				m_clawMotor.setControl(ControlMode.VelocityVoltage, -35);
-				m_conveyor.setControl(ControlMode.VelocityVoltage, -20);
-				break;
-			case Off:
-				m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-				m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-				break;
-		}
-	}
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        break;
+      case ScoreCoral:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 50);
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        break;
+      case ScoreAlgae:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, -35);
+        m_conveyor.setControl(ControlMode.VelocityVoltage, -20);
+        break;
+      case Off:
+        m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        break;
+    }
+  }
 
-	public void setControl(ControlStatus mode) {
-		m_mode = mode;
-	}
+  public void setControl(ControlStatus mode) {
+    m_mode = mode;
+  }
 
-	public void incrementBackup(double increment) {
-		m_coralBackUpRot += increment;
-	}
+  public void incrementBackup(double increment) {
+    m_coralBackUpRot += increment;
+  }
 
-	@Override
-	public void log() {
-		m_clawMotor.log();
-		m_conveyor.log();
+  @Override
+  public void log() {
+    m_clawMotor.log();
+    m_conveyor.log();
 
-		m_logger.log("Conveyor Back Sensor", getConveyorBackSensor());
-		m_logger.log("Conveyor Front Sensor", getConveyorFrontSensor());
-		m_logger.log("Claw Algae Sensor", getClawAlgaeSensor());
+    m_logger.log("Conveyor Back Sensor", getConveyorBackSensor());
+    m_logger.log("Conveyor Front Sensor", getConveyorFrontSensor());
 
-		m_logger.log("target hold postion", m_targetHoldPosition);
-		m_logger.log("target rotations hit", motorAtTarget());
-		m_logger.log("mode", m_mode.toString());
-		m_logger.log("AlgeeCANdistance", m_clawAlgaeSensor.getDistance().getValueAsDouble());
+    m_logger.log("target hold postion", m_targetHoldPosition);
+    m_logger.log("target rotations hit", motorAtTarget());
+    m_logger.log("mode", m_mode.toString());
+    m_logger.log("AlgeeCANdistance", m_clawAlgaeSensor.getDistance().getValueAsDouble());
 
-		SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
-	}
+    SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
+  }
 
-	@Override
-	public void syncSensors() {
-		coralScoredLED();
-	}
+  @Override
+  public void syncSensors() {
+    coralScoredLED();
+  }
 
-	@Override
-	public void reset() {
-	}
+  @Override
+  public void reset() {}
 }
