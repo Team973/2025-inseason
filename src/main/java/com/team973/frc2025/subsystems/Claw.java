@@ -17,6 +17,7 @@ import java.util.Optional;
 
 public class Claw implements Subsystem {
   private static final double ALGAE_SENSOR_STRENGTH_THRESHOLD = 1000.0;
+  private static final double ALGAE_SENSOR_DISTANCE_THRESHOLD = 0.06;
 
   private final Logger m_logger;
 
@@ -132,9 +133,13 @@ public class Claw implements Subsystem {
     return Optional.of(m_clawAlgaeSensor.getDistance().getValueAsDouble());
   }
 
-  public void coralScoredLED() {
-    // TODO: Add back the algee sensor once tunned
+  public void peiceScoredLED() {
+    Optional<Double> algeaDistance = getAlgaeDistance();
     if (getSeesCoral()) {
+      m_clawHasPeiceSignaler.enable();
+    } else if (algeaDistance.isEmpty()) {
+      m_clawHasPeiceSignaler.disable();
+    } else if (algeaDistance.get() < ALGAE_SENSOR_DISTANCE_THRESHOLD) {
       m_clawHasPeiceSignaler.enable();
     } else {
       m_clawHasPeiceSignaler.disable();
@@ -164,7 +169,7 @@ public class Claw implements Subsystem {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
         } else if (getAlgaeDistance().get() > 0.4) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-        } else if (getAlgaeDistance().get() < 0.06) {
+        } else if (getAlgaeDistance().get() < ALGAE_SENSOR_DISTANCE_THRESHOLD) {
           m_clawMotor.setControl(ControlMode.VelocityVoltage, 4);
         } else {
           m_clawMotor.setControl(ControlMode.VelocityVoltage, 30);
@@ -219,7 +224,7 @@ public class Claw implements Subsystem {
 
   @Override
   public void syncSensors() {
-    coralScoredLED();
+    peiceScoredLED();
   }
 
   @Override
