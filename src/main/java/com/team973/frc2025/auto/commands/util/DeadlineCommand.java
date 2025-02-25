@@ -2,6 +2,7 @@ package com.team973.frc2025.auto.commands.util;
 
 import com.google.common.collect.ImmutableList;
 import com.team973.lib.util.AutoCommand;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -43,7 +44,7 @@ public class DeadlineCommand extends AutoCommand {
     setTargetSec(m_timeoutSec);
   }
 
-  public void run() {
+  public void run(Alliance alliance) {
     if (isCompleted()) {
       return;
     }
@@ -55,7 +56,7 @@ public class DeadlineCommand extends AutoCommand {
         command.init();
       }
 
-      command.run();
+      command.run(alliance);
 
       if (command.isCompleted()) {
         command.postComplete(false);
@@ -68,7 +69,7 @@ public class DeadlineCommand extends AutoCommand {
     m_cmdsNeedInit = false;
   }
 
-  public void log() {}
+  public void log(Alliance alliance) {}
 
   public boolean isCompleted() {
     return m_deadline.isCompleted() || m_unfinishedCmds.size() == 0;

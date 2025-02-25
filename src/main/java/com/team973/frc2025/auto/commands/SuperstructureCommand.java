@@ -2,6 +2,7 @@ package com.team973.frc2025.auto.commands;
 
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.lib.util.AutoCommand;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class SuperstructureCommand extends AutoCommand {
   private final Superstructure m_superstructure;
@@ -18,10 +19,10 @@ public class SuperstructureCommand extends AutoCommand {
   }
 
   @Override
-  public void run() {}
+  public void run(Alliance alliance) {}
 
   @Override
-  public void log() {}
+  public void log(Alliance alliance) {}
 
   @Override
   public boolean isCompleted() {

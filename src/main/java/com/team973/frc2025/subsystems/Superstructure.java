@@ -77,12 +77,14 @@ public class Superstructure implements Subsystem {
     m_targetReefLevel = level;
   }
 
-  public boolean finishedScoring() {
-    return !m_claw.getSeesCoral();
+  public boolean readyToScore() {
+    return m_arm.motorAtTargetRotation()
+        && m_elevator.motorAtTarget()
+        && m_arm.getTargetPosition() != Arm.STOW_POSITION_DEG;
   }
 
-  public boolean readyToScore() {
-    return m_arm.motorAtTargetRotation() && m_elevator.motorAtTarget();
+  public boolean getSeesCoral() {
+    return m_claw.getSeesCoral();
   }
 
   public void log() {
