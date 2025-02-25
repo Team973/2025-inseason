@@ -5,8 +5,10 @@ package com.team973.frc2025;
 // the WPILib BSD license file in the root directory of this project.
 
 import choreo.util.ChoreoAllianceFlipUtil;
+import com.team973.frc2025.shared.CrashTracker;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Arm;
+import com.team973.frc2025.subsystems.BlinkingSignaler;
 import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
@@ -56,6 +58,13 @@ public class Robot extends TimedRobot {
 
   private final SolidSignaler m_ledOff =
       new SolidSignaler(RobotInfo.Colors.OFF, 0, RobotInfo.SignalerInfo.OFF_SIGNALER_PRIORTY);
+  private final BlinkingSignaler m_crashSignaler =
+      new BlinkingSignaler(
+          RobotInfo.Colors.RED,
+          RobotInfo.Colors.OFF,
+          200,
+          1000,
+          RobotInfo.SignalerInfo.CRASH_SIGNALER_PRIORITY);
   private final Superstructure m_superstructure =
       new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
 
@@ -141,6 +150,7 @@ public class Robot extends TimedRobot {
     m_driveController.startOdometrey();
     m_candleManger.addSignaler(m_ledOff);
     m_candleManger.addSignaler(m_lowBatterySignaler);
+    m_candleManger.addSignaler(m_crashSignaler);
     ChoreoAllianceFlipUtil.setYear(2025);
   }
 
@@ -164,6 +174,10 @@ public class Robot extends TimedRobot {
     } else if (m_lastBatteryVoltageHighMSTimestamp + m_lowBatteryTimeOutMs
         < Conversions.Time.getMsecTime()) {
       m_lowBatterySignaler.enable();
+    }
+    if (CrashTracker.getExceptionHappened()) {
+      m_crashSignaler.enable();
+      CrashTracker.resetExceptionHappened();
     }
     double startTime = Timer.getFPGATimestamp();
     logSubsystems();
