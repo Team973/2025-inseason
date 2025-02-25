@@ -80,7 +80,8 @@ public class Superstructure implements Subsystem {
   public boolean readyToScore() {
     return m_arm.motorAtTargetRotation()
         && m_elevator.motorAtTarget()
-        && m_arm.getTargetPosition() != Arm.STOW_POSITION_DEG;
+        && m_arm.getTargetPosition() != Arm.CORAL_STOW_POSITION_DEG
+        && m_arm.getTargetPosition() != Arm.ALGAE_STOW_POSITION_DEG;
   }
 
   public boolean getSeesCoral() {
