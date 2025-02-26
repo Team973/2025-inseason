@@ -43,7 +43,6 @@ public class Drive implements Subsystem {
 
   private final GreyPigeon m_pigeon;
 
-  private Rotation2d m_targetRobotAngle = new Rotation2d();
   private final OdometrySupplier m_odometrySupplier;
   private final MegaTagSupplier m_leftLLSupplier;
   private final MegaTagSupplier m_rightLLSupplier;

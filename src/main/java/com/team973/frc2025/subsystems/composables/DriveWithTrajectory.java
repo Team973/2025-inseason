@@ -97,7 +97,6 @@ public class DriveWithTrajectory extends DriveComposable {
   }
 
   private boolean m_allianceInitialized = false;
-  private Alliance m_alliance;
 
   private void maybeInitAlliance() {
     if (m_allianceInitialized) {
@@ -108,7 +107,6 @@ public class DriveWithTrajectory extends DriveComposable {
       return;
     }
     m_allianceInitialized = true;
-    m_alliance = alliance.get();
   }
 
   @Override

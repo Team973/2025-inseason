@@ -31,7 +31,6 @@ public class MegaTagSupplier {
   private final GreyPigeon m_pigeon;
   private List<MegaTagReceiver> m_receivers = new ArrayList<MegaTagReceiver>();
   private Alliance m_alliance;
-  private final Logger m_logger;
   private final Logger m_perfLogger;
   private PerfLogger m_syncSensorsLogger;
   // Until we get our seed heading and our alliance (which requires us)
@@ -43,7 +42,6 @@ public class MegaTagSupplier {
       String llName, GreyPigeon pigeon, Pose3d cameraPoseRobotSpace, Logger logger) {
     m_llName = llName;
     m_pigeon = pigeon;
-    m_logger = logger;
     m_perfLogger = logger.subLogger("perf", 0.25);
     m_syncSensorsLogger = new PerfLogger(m_perfLogger.subLogger("syncSensors", 0.25));
 
