@@ -16,8 +16,8 @@ import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
-import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefSide;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.JoystickField;
@@ -86,15 +86,6 @@ public class Robot extends TimedRobot {
       m_reefSelector.range(Rotation2d.fromDegrees(240), Rotation2d.fromDegrees(30), 0.8);
   private final JoystickField.Range m_backLeftFace =
       m_reefSelector.range(Rotation2d.fromDegrees(300), Rotation2d.fromDegrees(30), 0.8);
-
-  private final JoystickField m_sideSelector =
-      new JoystickField(() -> m_driverStick.getLeftXAxis(), () -> m_driverStick.getLeftYAxis());
-  private final JoystickField.Range m_leftReefSide =
-      m_sideSelector.range(Rotation2d.fromDegrees(240), Rotation2d.fromDegrees(60), 0.5);
-  private final JoystickField.Range m_rightReefSide =
-      m_sideSelector.range(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(60), 0.5);
-  private final JoystickField.Range m_centerReef =
-      m_sideSelector.range(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(60), 0.5);
 
   public static enum ControlStatus {
     HighBattery,
@@ -273,9 +264,9 @@ public class Robot extends TimedRobot {
     if (!m_driverStick.getRightTrigger()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
       m_superstructure.setState(Superstructure.State.Manual);
-
     } else {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+      m_superstructure.setState(Superstructure.State.Score);
       m_driveController
           .getDriveWithLimelight()
           .targetReefPosition(
@@ -351,14 +342,12 @@ public class Robot extends TimedRobot {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.F);
     }
 
-    if (m_driverStick.getRightTrigger()) {
-      if (m_leftReefSide.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
-      } else if (m_rightReefSide.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Right);
-      } else if (m_centerReef.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
-      }
+    if (m_coDriverStick.getPOVLeftPressed()) {
+      m_driveController.getDriveWithLimelight().setTargetSide(ReefSide.Left);
+    } else if (m_coDriverStick.getPOVRightPressed()) {
+      m_driveController.getDriveWithLimelight().setTargetSide(ReefSide.Right);
+    } else if (m_coDriverStick.getBackButtonPressed()) {
+      m_driveController.getDriveWithLimelight().setTargetSide(ReefSide.Center);
     }
   }
 

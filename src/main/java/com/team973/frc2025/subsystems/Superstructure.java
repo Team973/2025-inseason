@@ -197,8 +197,6 @@ public class Superstructure implements Subsystem {
 
         switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
           case MoveToApproach:
-            armStow();
-            elevatorStow();
             break;
           case Approach:
             armTargetReefLevel();
