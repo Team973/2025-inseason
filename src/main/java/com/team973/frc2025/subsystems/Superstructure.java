@@ -199,39 +199,35 @@ public class Superstructure implements Subsystem {
       case Score:
         clawIntake();
 
-        if (m_gamePieceMode == GamePiece.Coral) {
-          switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
-            case MoveToApproach:
-              armStow();
-              elevatorStow();
-              break;
-            case Approach:
-              armTargetReefLevel();
-              elevatorTargetReefLevel();
-              break;
-            case MoveToScoring:
-              armTargetReefLevel();
-              elevatorTargetReefLevel();
-              break;
-            case Scoring:
-              m_claw.setControl(Claw.ControlStatus.ScoreCoral);
+        switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
+          case MoveToApproach:
+            armStow();
+            elevatorStow();
+            break;
+          case Approach:
+            armTargetReefLevel();
+            elevatorTargetReefLevel();
+            break;
+          case MoveToScoring:
+            armTargetReefLevel();
+            elevatorTargetReefLevel();
+            break;
+          case Scoring:
+            clawScore();
 
-              armTargetReefLevel();
-              elevatorTargetReefLevel();
-              break;
-            case MoveToBackOff:
-              m_claw.setControl(Claw.ControlStatus.Off);
+            armTargetReefLevel();
+            elevatorTargetReefLevel();
+            break;
+          case MoveToBackOff:
+            m_claw.setControl(Claw.ControlStatus.Off);
 
-              armTargetReefLevel();
-              elevatorTargetReefLevel();
-              break;
-            case BackOff:
-              armStow();
-              elevatorStow();
-              break;
-          }
-        } else {
-          m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
+            armTargetReefLevel();
+            elevatorTargetReefLevel();
+            break;
+          case BackOff:
+            armStow();
+            elevatorStow();
+            break;
         }
 
         // m_climb.setControlMode(Climb.ControlMode.OffState);
