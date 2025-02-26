@@ -93,6 +93,8 @@ public class Robot extends TimedRobot {
       m_sideSelector.range(Rotation2d.fromDegrees(240), Rotation2d.fromDegrees(60), 0.5);
   private final JoystickField.Range m_rightReefSide =
       m_sideSelector.range(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(60), 0.5);
+  private final JoystickField.Range m_centerReef =
+      m_sideSelector.range(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(60), 0.5);
 
   public static enum ControlStatus {
     HighBattery,
@@ -354,6 +356,8 @@ public class Robot extends TimedRobot {
         m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
       } else if (m_rightReefSide.isActive()) {
         m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Right);
+      } else if (m_centerReef.isActive()) {
+        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
       }
     }
   }
