@@ -11,13 +11,11 @@ import java.util.Comparator;
 import java.util.List;
 
 public class CANdleManger implements Subsystem {
-  private final Logger m_logger;
-  public final CANdle m_candle = new CANdle(18, "rio");
+    public final CANdle m_candle = new CANdle(18, "rio");
 
   public List<ISignaler> m_priortyQue;
 
   public CANdleManger(Logger logger) {
-    m_logger = logger;
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true;
     configAll.disableWhenLOS = false;

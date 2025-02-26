@@ -4,7 +4,6 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.team973.lib.util.Logger;
 
 public class GreyCANCoder extends CANcoder {
-  private final Logger m_logger;
 
   public GreyCANCoder(int deviceId, Logger logger) {
     this(deviceId, "", logger);
@@ -12,8 +11,7 @@ public class GreyCANCoder extends CANcoder {
 
   public GreyCANCoder(int deviceId, String canbus, Logger logger) {
     super(deviceId, canbus);
-    m_logger = logger;
-  }
+    }
 
   public void log() {
     // m_logger.log("Position in Rotations", () -> this.getPosition().getValue().magnitude());
