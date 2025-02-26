@@ -36,6 +36,9 @@ public class Elevator implements Subsystem {
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
+  private double m_algaeHighOffset = 0.0;
+  private double m_algaeLowOffset = 0.0;
+
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
   private CANdleManger m_candleManger;
 
@@ -59,11 +62,15 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    public static final double LEVEL_1 = 2.0;
-    public static final double LEVEL_2 = 12.0;
-    public static final double LEVEL_3 = 2.5;
-    public static final double LEVEL_4 = 27.5;
-    public static final double STOW = 0.0;
+    private static final double LEVEL_1 = 2.0;
+    private static final double LEVEL_2 = 12.0;
+    private static final double LEVEL_3 = 2.5;
+    private static final double LEVEL_4 = 27.5;
+    public static final double CORAL_STOW = 0.0;
+
+    private static final double ALGAE_HIGH = 21.0;
+    private static final double ALGAE_LOW = 25.5;
+    public static final double ALGAE_STOW = 5.0;
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
@@ -160,6 +167,12 @@ public class Elevator implements Subsystem {
       case L_4:
         m_levelFourOffset += offset;
         break;
+      case AlgaeHigh:
+        m_algaeHighOffset += offset;
+        break;
+      case AlgaeLow:
+        m_algaeLowOffset += offset;
+        break;
     }
   }
 
@@ -173,6 +186,10 @@ public class Elevator implements Subsystem {
         return Presets.LEVEL_3 + m_levelThreeOffset;
       case L_4:
         return Presets.LEVEL_4 + m_levelFourOffset;
+      case AlgaeHigh:
+        return Presets.ALGAE_HIGH + m_algaeHighOffset;
+      case AlgaeLow:
+        return Presets.ALGAE_LOW + m_algaeLowOffset;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }

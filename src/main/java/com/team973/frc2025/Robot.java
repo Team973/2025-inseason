@@ -306,13 +306,17 @@ public class Robot extends TimedRobot {
     }
 
     if (m_coDriverStick.getAButtonPressed()) {
-      m_superstructure.setTargetReefLevel(ReefLevel.L_1);
+      m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeLow);
     } else if (m_coDriverStick.getXButtonPressed()) {
-      m_superstructure.setTargetReefLevel(ReefLevel.L_2);
+      m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
     } else if (m_coDriverStick.getBButtonPressed()) {
-      m_superstructure.setTargetReefLevel(ReefLevel.L_3);
+      m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
     } else if (m_coDriverStick.getYButtonPressed()) {
-      m_superstructure.setTargetReefLevel(ReefLevel.L_4);
+      m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.AlgaeHigh);
+    }
+
+    if (m_coDriverStick.getRightBumperButtonPressed()) {
+      m_superstructure.toggleGamePieceMode();
     }
 
     if ((climbStick) > 0.8) {
