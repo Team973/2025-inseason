@@ -49,6 +49,7 @@ public final class RobotInfo {
   }
 
   public static class SignalerInfo {
+    public static final int CRASH_SIGNALER_PRIORITY = 9;
     public static final int ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY = 10;
     public static final int ARM_HALL_SENSOR_SIGNALER_PRIORTY = 11;
     public static final int PEICE_IN_CLAW_SIGNALER_PRIORTY = 50;

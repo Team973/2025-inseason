@@ -5,6 +5,7 @@ import com.team973.frc2025.auto.modes.DriveTestAuto;
 import com.team973.frc2025.auto.modes.LeftSideAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
 import com.team973.frc2025.auto.modes.NoAutoAllianceWallCenter;
+import com.team973.frc2025.auto.modes.RightSideAuto;
 import com.team973.frc2025.auto.modes.TaxiAuto;
 import com.team973.frc2025.auto.modes.TestAuto;
 import com.team973.frc2025.subsystems.DriveController;
@@ -26,6 +27,7 @@ public class AutoManager {
   private final AutoMode m_testAuto;
   private final AutoMode m_driveTestAuto;
   private final AutoMode m_leftSideAuto;
+  private final AutoMode m_rightSideAuto;
   private NoAutoAllianceWallCenter m_noAutoAllianceWallCenter;
 
   public AutoManager(Logger logger, DriveController drive, Superstructure superstructure) {
@@ -34,6 +36,7 @@ public class AutoManager {
     m_testAuto = new TestAuto(logger.subLogger("test"), drive, superstructure);
     m_driveTestAuto = new DriveTestAuto(logger.subLogger("driveTest"), drive);
     m_leftSideAuto = new LeftSideAuto(logger.subLogger("LeftSideAuto"), superstructure, drive);
+    m_rightSideAuto = new RightSideAuto(logger.subLogger("RightSideAuto"), superstructure, drive);
     m_noAutoAllianceWallCenter = new NoAutoAllianceWallCenter(logger);
 
     m_availableAutos =
@@ -43,7 +46,8 @@ public class AutoManager {
             m_testAuto,
             m_driveTestAuto,
             m_noAutoAllianceWallCenter,
-            m_leftSideAuto);
+            m_leftSideAuto,
+            m_rightSideAuto);
 
     selectAuto(getSelectedMode());
   }

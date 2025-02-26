@@ -155,8 +155,8 @@ public class Claw implements Subsystem {
           m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         } else {
           // Way too far back
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 20);
-          m_conveyor.setControl(ControlMode.VelocityVoltage, 20);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 40);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 60);
         }
         break;
       case IntakeAlgae:
