@@ -10,7 +10,7 @@ import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Climb implements Subsystem {
-  private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 2.5;
+  private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 7.5;
 
   private final DigitalInput m_bannerSensor = new DigitalInput(9);
 
@@ -54,9 +54,9 @@ public class Climb implements Subsystem {
     defaultMotorConfig.Slot1.kI = 0.0;
     defaultMotorConfig.Slot1.kD = 0.04;
 
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
     defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
