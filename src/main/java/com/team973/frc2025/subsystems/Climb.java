@@ -12,7 +12,7 @@ import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Climb implements Subsystem {
-  private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 15.0;
+  private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 5.0;
   private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
 
   private final DigitalInput m_bannerSensor = new DigitalInput(9);
@@ -41,7 +41,7 @@ public class Climb implements Subsystem {
     m_climb.setConfig(defaultMotorConfig());
 
     m_climb.setPosition(0);
-    m_targetPosition = m_climb.getPosition().getValueAsDouble();
+    m_targetPosition = 0;
 
     candle.addSignaler(m_climbHorizontalSignaler);
     candle.addSignaler(m_climbStopSignaler);
@@ -72,11 +72,11 @@ public class Climb implements Subsystem {
     defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
-    defaultMotorConfig.Voltage.PeakForwardVoltage = 2.0;
-    defaultMotorConfig.Voltage.PeakReverseVoltage = -2.0;
+    defaultMotorConfig.Voltage.PeakForwardVoltage = 12.0;
+    defaultMotorConfig.Voltage.PeakReverseVoltage = -12.0;
 
     defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    defaultMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    defaultMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     return defaultMotorConfig;
   }
 
@@ -133,7 +133,7 @@ public class Climb implements Subsystem {
         break;
       case ClimbLow:
         // m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 82.6, 0);
-        m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, m_targetPosition, 0);
+        m_climb.setControl(GreyTalonFX.ControlMode.PositionVoltage, m_targetPosition, 0);
         break;
       case ClimbStow:
         m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 0, 1);
