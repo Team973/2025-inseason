@@ -346,8 +346,8 @@ public class Robot extends TimedRobot {
         m_superstructure.setState(Superstructure.State.Manual);
       }
 
-      if (Math.abs(climbStick) > 0.5) {
-        m_superstructure.incrementClimbTarget(-climbStick);
+      if (Math.abs(climbStick) > 0.25) {
+        m_superstructure.incrementClimbTarget(climbStick);
       }
 
       if (m_coDriverStick.getStartButtonPressed()) {
