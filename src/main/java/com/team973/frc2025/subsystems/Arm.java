@@ -168,7 +168,7 @@ public class Arm implements Subsystem {
             0);
         break;
       case Zero:
-        m_armMotor.setControl(ControlMode.VelocityVoltage, -1.0);
+        m_armMotor.setControl(ControlMode.DutyCycleOut, -0.1);
         break;
       case Off:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);

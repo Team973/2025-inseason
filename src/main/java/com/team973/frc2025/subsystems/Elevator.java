@@ -69,8 +69,8 @@ public class Elevator implements Subsystem {
     private static final double LEVEL_4 = 27.5;
     public static final double CORAL_STOW = 0.0;
 
-    private static final double ALGAE_HIGH = 21.0;
-    private static final double ALGAE_LOW = 25.5;
+    private static final double ALGAE_HIGH = 18.5;
+    private static final double ALGAE_LOW = 23.5;
     public static final double ALGAE_STOW = 5.0;
   }
 
@@ -209,7 +209,7 @@ public class Elevator implements Subsystem {
             0);
         break;
       case Zero:
-        m_motorRight.setControl(ControlMode.VelocityVoltage, -1.0);
+        m_motorRight.setControl(ControlMode.DutyCycleOut, -0.1);
         break;
       case Off:
         m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
