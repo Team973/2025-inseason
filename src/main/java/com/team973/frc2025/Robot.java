@@ -171,25 +171,29 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    m_ledOff.enable();
+    try {
+      m_ledOff.enable();
 
-    if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
-      m_lastBatteryVoltageHighMSTimestamp = Conversions.Time.getMsecTime();
-      m_lowBatterySignaler.disable();
-    } else if (m_lastBatteryVoltageHighMSTimestamp + m_lowBatteryTimeOutMs
-        < Conversions.Time.getMsecTime()) {
-      m_lowBatterySignaler.enable();
+      if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
+        m_lastBatteryVoltageHighMSTimestamp = Conversions.Time.getMsecTime();
+        m_lowBatterySignaler.disable();
+      } else if (m_lastBatteryVoltageHighMSTimestamp + m_lowBatteryTimeOutMs
+          < Conversions.Time.getMsecTime()) {
+        m_lowBatterySignaler.enable();
+      }
+      if (CrashTracker.getExceptionHappened()) {
+        m_crashSignaler.enable();
+        CrashTracker.resetExceptionHappened();
+      }
+      double startTime = Timer.getFPGATimestamp();
+      logSubsystems();
+
+      updateJoysticks();
+
+      m_robotPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
+    } catch (Exception e) {
+      CrashTracker.logException("Robot Periodic", e);
     }
-    if (CrashTracker.getExceptionHappened()) {
-      m_crashSignaler.enable();
-      CrashTracker.resetExceptionHappened();
-    }
-    double startTime = Timer.getFPGATimestamp();
-    logSubsystems();
-
-    updateJoysticks();
-
-    m_robotPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
   private void setPoseFromAuto() {
@@ -224,127 +228,143 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoManager.init();
-    m_driveController.resetOdometry(m_autoManager.getStartingPose(m_alliance));
+    try {
+      m_autoManager.init();
+      m_driveController.resetOdometry(m_autoManager.getStartingPose(m_alliance));
+    } catch (Exception e) {
+      CrashTracker.logException("Auto Init", e);
+    }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    syncSensors();
-    // TODO: we're doing this badly to make it work
-    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
-    // TODO: Figure out why autos don't work if updateSubsystems() comes before
-    // automanager.run().
-    m_autoManager.run(m_alliance);
-    updateSubsystems();
+    try {
+      syncSensors();
+      // TODO: we're doing this badly to make it work
+      m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
+      // TODO: Figure out why autos don't work if updateSubsystems() comes before
+      // automanager.run().
+      m_autoManager.run(m_alliance);
+      updateSubsystems();
+    } catch (Exception e) {
+      CrashTracker.logException("Auto Periodic", e);
+    }
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
+    try {
+      m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
+    } catch (Exception e) {
+      CrashTracker.logException("Teleop Init", e);
+    }
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    syncSensors();
+    try {
+      syncSensors();
 
-    maybeUpdateScoringSelection();
+      maybeUpdateScoringSelection();
 
-    double allianceScalar = 1.0;
-    if (m_alliance == Alliance.Red) {
-      // Our gyroscope is blue-centric meaning that facing away from the alliance wall
-      // is a 0 degree heading. But the driver station is facing 180 when we are on
-      // the
-      // red alliance. So when we are the red alliance we need to flip the joystick
-      // inputs.
-      // Ideally we would convert this to polar coordinates, rotate by 180, and then
-      // convert
-      // back to cartesian. But the algebra here is equivalent to just negating the X
-      // and Y
-      // so that's what we iwll do for now.
-      allianceScalar = -1.0;
-    }
-    m_driveController
-        .getDriveWithJoysticks()
-        .updateInput(
-            -allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
-            allianceScalar * m_driverStick.getLeftXAxis() * 0.6,
-            m_driverStick.getRightXAxis() * 0.8);
-
-    if (m_driverStick.getLeftBumperButtonPressed()) {
-      m_superstructure.setManualArmivator(true);
-    }
-
-    if (m_driverStick.getLeftTriggerPressed()) {
-      m_superstructure.setManualArmivator(false);
-    }
-
-    if (m_driverStick.getRightBumperButtonPressed()) {
-      m_superstructure.setManualScore(true);
-    } else if (m_driverStick.getRightBumperButtonReleased()) {
-      m_superstructure.setManualScore(false);
-    }
-
-    if (!m_driverStick.getRightTrigger()) {
-      m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-    } else {
-      m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-      m_driveController
-          .getDriveWithLimelight()
-          .targetReefPosition(
-              () -> m_superstructure.readyToScore(), () -> !m_superstructure.getSeesCoral());
-    }
-    double climbStick = m_coDriverStick.getLeftYAxis();
-
-    if (m_coDriverStick.getPOVTopPressed()) {
-      m_superstructure.incrementElevatorOffset(0.5);
-    } else if (m_coDriverStick.getPOVBottomPressed()) {
-      m_superstructure.incrementElevatorOffset(-0.5);
-    } else if (m_coDriverStick.getPOVRightPressed()) {
-      m_superstructure.incrementArmOffset(1.0);
-    } else if (m_coDriverStick.getPOVLeftPressed()) {
-      m_superstructure.incrementArmOffset(-1.0);
-    }
-
-    if (m_coDriverStick.getAButtonPressed()) {
-      m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeLow);
-    } else if (m_coDriverStick.getXButtonPressed()) {
-      m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
-    } else if (m_coDriverStick.getBButtonPressed()) {
-      m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
-    } else if (m_coDriverStick.getYButtonPressed()) {
-      m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.AlgaeHigh);
-    }
-
-    if (m_coDriverStick.getRightBumperButtonPressed()) {
-      m_superstructure.toggleGamePieceMode();
-    }
-
-    if (m_coDriverStick.getBackButton()) {
-      m_superstructure.setState(Superstructure.State.Zero);
-    } else {
-      m_superstructure.setState(Superstructure.State.Manual);
-    }
-
-    if (Math.abs(climbStick) > 0.5) {
-      m_superstructure.incrementClimbTarget(-climbStick);
-    }
-
-    if (m_coDriverStick.getStartButtonPressed()) {
-      // The drivers will always just point the robot _away_ from them. They give
-      // inputs in alliance-wall centric coordinates. The robot itself though is
-      // tracking angle in blue-centric coordinates. So when on the red alliance,
-      // their zero position is actually 180 in blue-centric coordinates.
-      if (m_alliance == Alliance.Blue) {
-        m_driveController.resetAngle(Rotation2d.fromDegrees(0));
-      } else {
-        m_driveController.resetAngle(Rotation2d.fromDegrees(180));
+      double allianceScalar = 1.0;
+      if (m_alliance == Alliance.Red) {
+        // Our gyroscope is blue-centric meaning that facing away from the alliance wall
+        // is a 0 degree heading. But the driver station is facing 180 when we are on
+        // the
+        // red alliance. So when we are the red alliance we need to flip the joystick
+        // inputs.
+        // Ideally we would convert this to polar coordinates, rotate by 180, and then
+        // convert
+        // back to cartesian. But the algebra here is equivalent to just negating the X
+        // and Y
+        // so that's what we iwll do for now.
+        allianceScalar = -1.0;
       }
+      m_driveController
+          .getDriveWithJoysticks()
+          .updateInput(
+              -allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
+              allianceScalar * m_driverStick.getLeftXAxis() * 0.6,
+              m_driverStick.getRightXAxis() * 0.8);
+
+      if (m_driverStick.getLeftBumperButtonPressed()) {
+        m_superstructure.setManualArmivator(true);
+      }
+
+      if (m_driverStick.getLeftTriggerPressed()) {
+        m_superstructure.setManualArmivator(false);
+      }
+
+      if (m_driverStick.getRightBumperButtonPressed()) {
+        m_superstructure.setManualScore(true);
+      } else if (m_driverStick.getRightBumperButtonReleased()) {
+        m_superstructure.setManualScore(false);
+      }
+
+      if (!m_driverStick.getRightTrigger()) {
+        m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+      } else {
+        m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
+        m_driveController
+            .getDriveWithLimelight()
+            .targetReefPosition(
+                () -> m_superstructure.readyToScore(), () -> !m_superstructure.getSeesCoral());
+      }
+      double climbStick = m_coDriverStick.getLeftYAxis();
+
+      if (m_coDriverStick.getPOVTopPressed()) {
+        m_superstructure.incrementElevatorOffset(0.5);
+      } else if (m_coDriverStick.getPOVBottomPressed()) {
+        m_superstructure.incrementElevatorOffset(-0.5);
+      } else if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementArmOffset(1.0);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementArmOffset(-1.0);
+      }
+
+      if (m_coDriverStick.getAButtonPressed()) {
+        m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeLow);
+      } else if (m_coDriverStick.getXButtonPressed()) {
+        m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
+      } else if (m_coDriverStick.getBButtonPressed()) {
+        m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
+      } else if (m_coDriverStick.getYButtonPressed()) {
+        m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.AlgaeHigh);
+      }
+
+      if (m_coDriverStick.getRightBumperButtonPressed()) {
+        m_superstructure.toggleGamePieceMode();
+      }
+
+      if (m_coDriverStick.getBackButton()) {
+        m_superstructure.setState(Superstructure.State.Zero);
+      } else {
+        m_superstructure.setState(Superstructure.State.Manual);
+      }
+
+      if (Math.abs(climbStick) > 0.5) {
+        m_superstructure.incrementClimbTarget(-climbStick);
+      }
+
+      if (m_coDriverStick.getStartButtonPressed()) {
+        // The drivers will always just point the robot _away_ from them. They give
+        // inputs in alliance-wall centric coordinates. The robot itself though is
+        // tracking angle in blue-centric coordinates. So when on the red alliance,
+        // their zero position is actually 180 in blue-centric coordinates.
+        if (m_alliance == Alliance.Blue) {
+          m_driveController.resetAngle(Rotation2d.fromDegrees(0));
+        } else {
+          m_driveController.resetAngle(Rotation2d.fromDegrees(180));
+        }
+      }
+      updateSubsystems();
+    } catch (Exception e) {
+      CrashTracker.logException("Teleop Periodic", e);
     }
-    updateSubsystems();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -383,26 +403,30 @@ public class Robot extends TimedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    double startTime = Timer.getFPGATimestamp();
-    maybeInitAlliance();
-    syncSensors();
-    m_candleManger.update();
-    // TODO: we're doing this badly to make it work
-    m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
+    try {
+      double startTime = Timer.getFPGATimestamp();
+      maybeInitAlliance();
+      syncSensors();
+      m_candleManger.update();
+      // TODO: we're doing this badly to make it work
+      m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
 
-    maybeUpdateScoringSelection();
+      maybeUpdateScoringSelection();
 
-    if (m_coDriverStick.getAButtonPressed()) {
-      m_autoManager.increment();
-      setPoseFromAuto();
-    } else if (m_coDriverStick.getBButtonPressed()) {
-      m_autoManager.decrement();
-      setPoseFromAuto();
+      if (m_coDriverStick.getAButtonPressed()) {
+        m_autoManager.increment();
+        setPoseFromAuto();
+      } else if (m_coDriverStick.getBButtonPressed()) {
+        m_autoManager.decrement();
+        setPoseFromAuto();
+      }
+      SmartDashboard.putString(
+          "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
+
+      m_disabledPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
+    } catch (Exception e) {
+      CrashTracker.logException("Disabled Periodic", e);
     }
-    SmartDashboard.putString(
-        "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
-
-    m_disabledPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
   /** This function is called once when test mode is enabled. */
