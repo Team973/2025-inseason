@@ -234,6 +234,8 @@ public class Elevator implements Subsystem {
     m_logger.log("Level 2 Offset", m_levelTwoOffset);
     m_logger.log("Level 3 Offset", m_levelThreeOffset);
     m_logger.log("Level 4 Offset", m_levelFourOffset);
+    m_logger.log("Algae Low Offset", m_algaeLowOffset);
+    m_logger.log("Algae High Offset", m_algaeHighOffset);
   }
 
   @Override
