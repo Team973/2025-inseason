@@ -229,6 +229,11 @@ public class Elevator implements Subsystem {
         "motorErrorInches",
         motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
     m_logger.log("hallSesnsorReturnElevator", hallsensor());
+
+    m_logger.log("Level 1 Offset", m_levelOneOffset);
+    m_logger.log("Level 2 Offset", m_levelTwoOffset);
+    m_logger.log("Level 3 Offset", m_levelThreeOffset);
+    m_logger.log("Level 4 Offset", m_levelFourOffset);
   }
 
   @Override
