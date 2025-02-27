@@ -40,6 +40,7 @@ public class Climb implements Subsystem {
     m_climb = new GreyTalonFX(23, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("climb motor"));
     m_climb.setConfig(defaultMotorConfig());
 
+    m_climb.setPosition(0);
     m_targetPosition = m_climb.getPosition().getValueAsDouble();
 
     candle.addSignaler(m_climbHorizontalSignaler);
