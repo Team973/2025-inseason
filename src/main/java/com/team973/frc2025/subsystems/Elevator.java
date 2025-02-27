@@ -45,6 +45,7 @@ public class Elevator implements Subsystem {
   public static enum ControlStatus {
     Manual,
     TargetPostion,
+    Zero,
     Off,
   }
 
@@ -206,6 +207,9 @@ public class Elevator implements Subsystem {
             ControlMode.MotionMagicVoltage,
             heightInchesToMotorRotations(m_targetPostionHeightinches),
             0);
+        break;
+      case Zero:
+        m_motorRight.setControl(ControlMode.VelocityVoltage, -1.0);
         break;
       case Off:
         m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
