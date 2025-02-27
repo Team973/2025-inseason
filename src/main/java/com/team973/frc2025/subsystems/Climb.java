@@ -10,7 +10,8 @@ import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Climb implements Subsystem {
-  private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 7.5;
+  private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 15.0;
+  private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
 
   private final DigitalInput m_bannerSensor = new DigitalInput(9);
 
@@ -38,14 +39,14 @@ public class Climb implements Subsystem {
   private static TalonFXConfiguration defaultMotorConfig() {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
     defaultMotorConfig.Slot0.kS = 0.0;
-    defaultMotorConfig.Slot0.kV = 0.0;
-    defaultMotorConfig.Slot0.kA = 0.0;
+    defaultMotorConfig.Slot0.kV = 0.15;
+    defaultMotorConfig.Slot0.kA = 0.01;
     defaultMotorConfig.Slot0.kP = 6.4;
     defaultMotorConfig.Slot0.kI = 0.0;
     defaultMotorConfig.Slot0.kD = 0.04;
-    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 64;
-    defaultMotorConfig.MotionMagic.MotionMagicAcceleration = 64;
-    defaultMotorConfig.MotionMagic.MotionMagicJerk = 160;
+    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = MOTION_MAGIC_CRUISE_VELOCITY;
+    defaultMotorConfig.MotionMagic.MotionMagicAcceleration = MOTION_MAGIC_CRUISE_VELOCITY * 10.0;
+    defaultMotorConfig.MotionMagic.MotionMagicJerk = 1600;
     // slot 1 is for velocity
     defaultMotorConfig.Slot1.kS = 0.0;
     defaultMotorConfig.Slot1.kV = 0;
