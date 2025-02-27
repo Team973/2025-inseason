@@ -43,21 +43,19 @@ public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
-  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"));
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
+  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"), m_candleManger);
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm"), m_candleManger);
+
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(
           RobotInfo.Colors.ORANGE, 3000, RobotInfo.SignalerInfo.LOW_BATTER_SIGNALER_PRIORTY);
 
-  private double m_lastBatteryVoltageHighMSTimestamp;
-  private final double m_lowBatteryTimeOutMs = 1000.0;
-  private final double m_lowBatterMimiumVoltage = 12.1;
-
   private final SolidSignaler m_ledOff =
       new SolidSignaler(RobotInfo.Colors.OFF, 0, RobotInfo.SignalerInfo.OFF_SIGNALER_PRIORTY);
+
   private final BlinkingSignaler m_crashSignaler =
       new BlinkingSignaler(
           RobotInfo.Colors.RED,
@@ -65,6 +63,7 @@ public class Robot extends TimedRobot {
           200,
           1000,
           RobotInfo.SignalerInfo.CRASH_SIGNALER_PRIORITY);
+
   private final Superstructure m_superstructure =
       new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
 
@@ -104,6 +103,10 @@ public class Robot extends TimedRobot {
       m_sideSelector.range(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(60), 0.5);
   private final JoystickField.Range m_centerReef =
       m_sideSelector.range(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(60), 0.5);
+
+  private double m_lastBatteryVoltageHighMSTimestamp;
+  private final double m_lowBatteryTimeOutMs = 1000.0;
+  private final double m_lowBatterMimiumVoltage = 12.1;
 
   public static enum ControlStatus {
     HighBattery,

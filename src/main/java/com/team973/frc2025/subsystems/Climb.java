@@ -4,6 +4,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.shared.RobotInfo.ClimbInfo;
+import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
@@ -23,17 +25,25 @@ public class Climb implements Subsystem {
 
   private final GreyTalonFX m_climb;
 
+  private final SolidSignaler m_climbHorizontalSignaler =
+      new SolidSignaler(RobotInfo.Colors.PINK, 100.0, SignalerInfo.CLIMB_HORIZONTAL_PRIORITY);
+  private final SolidSignaler m_climbStopSignaler =
+      new SolidSignaler(RobotInfo.Colors.ORANGE, 100.0, SignalerInfo.CLIMB_STOP_PRIORITY);
+
   private double m_manualPower = 0;
   private double m_targetPosition;
 
   private ControlMode m_controlMode = ControlMode.ClimbLow;
 
-  public Climb(Logger logger) {
+  public Climb(Logger logger, CANdleManger candle) {
     m_logger = logger;
     m_climb = new GreyTalonFX(23, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("climb motor"));
     m_climb.setConfig(defaultMotorConfig());
 
     m_targetPosition = m_climb.getPosition().getValueAsDouble();
+
+    candle.addSignaler(m_climbHorizontalSignaler);
+    candle.addSignaler(m_climbStopSignaler);
   }
 
   private static TalonFXConfiguration defaultMotorConfig() {
@@ -89,6 +99,10 @@ public class Climb implements Subsystem {
         m_climb.getPosition().getValueAsDouble() + (increment * JOYSTICK_TO_MOTOR_ROTATIONS);
   }
 
+  public double getClimbAngle() {
+    return (m_climb.getPosition().getValueAsDouble() / ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT) * 360.0;
+  }
+
   @Override
   public void log() {
     double climbPosition = m_climb.getPosition().getValueAsDouble();
@@ -98,10 +112,17 @@ public class Climb implements Subsystem {
     m_climb.log();
     m_logger.log("CurrentManualPower", m_manualPower);
     m_logger.log("Target Position", m_targetPosition);
+    m_logger.log("Angle", getClimbAngle());
   }
 
   @Override
-  public void syncSensors() {}
+  public void syncSensors() {
+    if (m_climb.getPosition().getValueAsDouble() >= 225.0) {
+      m_climbStopSignaler.enable();
+    } else if (m_climb.getPosition().getValueAsDouble() >= 90.0) {
+      m_climbHorizontalSignaler.enable();
+    }
+  }
 
   @Override
   public void update() {
