@@ -17,7 +17,10 @@ public class Arm implements Subsystem {
   private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
-  private boolean m_lastHallSensorMode;
+  // We want to track the transition from hall=false to hall=true; when the robot
+  // first boots up, we don't really know what the previous hall state was, so we
+  // assume it was true to avoid false positive.
+  private boolean m_lastHallSensorMode = true;
   private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
   private final SolidSignaler m_armHomedSigaler =
