@@ -27,6 +27,7 @@ public class Superstructure implements Subsystem {
     ClimbStow,
     ClimbLow,
     Manual,
+    Zero,
     Off
   }
 
@@ -263,6 +264,11 @@ public class Superstructure implements Subsystem {
         }
 
         // m_climb.setControlMode(Climb.ControlMode.OffState);
+        break;
+      case Zero:
+        m_arm.setControlStatus(Arm.ControlStatus.Zero);
+        m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
+        m_claw.setControl(Claw.ControlStatus.Off);
         break;
       case Off:
         m_claw.setControl(Claw.ControlStatus.Off);

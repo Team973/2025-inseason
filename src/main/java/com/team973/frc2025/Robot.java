@@ -287,8 +287,6 @@ public class Robot extends TimedRobot {
 
     if (!m_driverStick.getRightTrigger()) {
       m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-      m_superstructure.setState(Superstructure.State.Manual);
-
     } else {
       m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
       m_driveController
@@ -320,6 +318,12 @@ public class Robot extends TimedRobot {
 
     if (m_coDriverStick.getRightBumperButtonPressed()) {
       m_superstructure.toggleGamePieceMode();
+    }
+
+    if (m_coDriverStick.getBackButton()) {
+      m_superstructure.setState(Superstructure.State.Zero);
+    } else {
+      m_superstructure.setState(Superstructure.State.Manual);
     }
 
     if (Math.abs(climbStick) > 0.5) {
