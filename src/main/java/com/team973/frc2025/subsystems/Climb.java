@@ -57,7 +57,7 @@ public class Climb implements Subsystem {
     defaultMotorConfig.Slot0.kD = 0.04;
     defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = MOTION_MAGIC_CRUISE_VELOCITY;
     defaultMotorConfig.MotionMagic.MotionMagicAcceleration = MOTION_MAGIC_CRUISE_VELOCITY * 10.0;
-    defaultMotorConfig.MotionMagic.MotionMagicJerk = 1600;
+    defaultMotorConfig.MotionMagic.MotionMagicJerk = MOTION_MAGIC_CRUISE_VELOCITY * 100.0;
     // slot 1 is for velocity
     defaultMotorConfig.Slot1.kS = 0.0;
     defaultMotorConfig.Slot1.kV = 0;
