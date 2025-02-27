@@ -321,7 +321,7 @@ public class Robot extends TimedRobot {
     }
 
     if (Math.abs(climbStick) > 0.5) {
-      m_superstructure.incrementClimbTarget(climbStick);
+      m_superstructure.incrementClimbTarget(-climbStick);
     }
 
     if (m_coDriverStick.getStartButtonPressed()) {
