@@ -134,19 +134,19 @@ public class Logger {
 
   public void log(String key, DoubleSupplier valueSupplier) {
     if (isLogAllowed(key)) {
-      DogLog.log(m_prefix + key, valueSupplier.getAsDouble());
+      DogLog.log(m_prefix + "/" + key, valueSupplier.getAsDouble());
     }
   }
 
   public void log(String key, IntSupplier valueSupplier) {
     if (isLogAllowed(key)) {
-      DogLog.log(m_prefix + key, valueSupplier.getAsInt());
+      DogLog.log(m_prefix + "/" + key, valueSupplier.getAsInt());
     }
   }
 
   public void log(String key, BooleanSupplier valueSupplier) {
     if (isLogAllowed(key)) {
-      DogLog.log(m_prefix + key, valueSupplier.getAsBoolean());
+      DogLog.log(m_prefix + "/" + key, valueSupplier.getAsBoolean());
     }
   }
 }
