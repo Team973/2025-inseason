@@ -9,16 +9,13 @@ import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Climb implements Subsystem {
   private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 5.0;
   private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
 
-  public static final double HORIZONTAL_POSITION_DEG = 90.0;
-  public static final double STOP_POSITION_DEG = 215.0;
-
-  private final DigitalInput m_bannerSensor = new DigitalInput(9);
+  public static final double HORIZONTAL_POSITION_DEG = 100.0;
+  public static final double STOP_POSITION_DEG = 240.0;
 
   private final Logger m_logger;
 
@@ -77,10 +74,6 @@ public class Climb implements Subsystem {
     return defaultMotorConfig;
   }
 
-  private boolean bannerSensorSeesCoral() {
-    return m_bannerSensor.get();
-  }
-
   public void incrementTarget(double increment) {
     m_targetPosition =
         m_climb.getPosition().getValueAsDouble() + (increment * JOYSTICK_TO_MOTOR_ROTATIONS);
@@ -91,14 +84,13 @@ public class Climb implements Subsystem {
   }
 
   public void setTarget(double target) {
-    m_targetPosition = target;
+    m_targetPosition = (target / 360.0) * ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT;
   }
 
   @Override
   public void log() {
     double climbPosition = m_climb.getPosition().getValueAsDouble();
     m_logger.log("CurrentPositionRotations", climbPosition);
-    m_logger.log("SeesCoral", bannerSensorSeesCoral());
     m_climb.log();
     m_logger.log("CurrentManualPower", m_manualPower);
     m_logger.log("Target Position", m_targetPosition);
@@ -107,9 +99,9 @@ public class Climb implements Subsystem {
 
   @Override
   public void syncSensors() {
-    if (m_climb.getPosition().getValueAsDouble() >= STOP_POSITION_DEG) {
+    if (getClimbAngle() >= STOP_POSITION_DEG) {
       m_climbStopSignaler.enable();
-    } else if (m_climb.getPosition().getValueAsDouble() >= HORIZONTAL_POSITION_DEG) {
+    } else if (getClimbAngle() >= HORIZONTAL_POSITION_DEG) {
       m_climbHorizontalSignaler.enable();
     }
   }
