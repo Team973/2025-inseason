@@ -15,11 +15,10 @@ public class Climb implements Subsystem {
   private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 5.0;
   private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
 
-  private final DigitalInput m_bannerSensor = new DigitalInput(9);
+  public static final double HORIZONTAL_POSITION_DEG = 90.0;
+  public static final double STOP_POSITION_DEG = 215.0;
 
-  private boolean bannerSensorSeesCoral() {
-    return m_bannerSensor.get();
-  }
+  private final DigitalInput m_bannerSensor = new DigitalInput(9);
 
   private final Logger m_logger;
 
@@ -32,8 +31,6 @@ public class Climb implements Subsystem {
 
   private double m_manualPower = 0;
   private double m_targetPosition;
-
-  private ControlMode m_controlMode = ControlMode.ClimbLow;
 
   public Climb(Logger logger, CANdleManger candle) {
     m_logger = logger;
@@ -80,19 +77,8 @@ public class Climb implements Subsystem {
     return defaultMotorConfig;
   }
 
-  public enum ControlMode {
-    ClimbLow,
-    ClimbStow,
-    OffState,
-    JoystickMode,
-  }
-
-  public void setControlMode(ControlMode mode) {
-    m_controlMode = mode;
-  }
-
-  public void setManualPower(double power) {
-    m_manualPower = power;
+  private boolean bannerSensorSeesCoral() {
+    return m_bannerSensor.get();
   }
 
   public void incrementTarget(double increment) {
@@ -104,12 +90,15 @@ public class Climb implements Subsystem {
     return (m_climb.getPosition().getValueAsDouble() / ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT) * 360.0;
   }
 
+  public void setTarget(double target) {
+    m_targetPosition = target;
+  }
+
   @Override
   public void log() {
     double climbPosition = m_climb.getPosition().getValueAsDouble();
     m_logger.log("CurrentPositionRotations", climbPosition);
     m_logger.log("SeesCoral", bannerSensorSeesCoral());
-    m_logger.log("CurrentMode", m_controlMode.toString());
     m_climb.log();
     m_logger.log("CurrentManualPower", m_manualPower);
     m_logger.log("Target Position", m_targetPosition);
@@ -118,30 +107,16 @@ public class Climb implements Subsystem {
 
   @Override
   public void syncSensors() {
-    if (m_climb.getPosition().getValueAsDouble() >= 230.0) {
+    if (m_climb.getPosition().getValueAsDouble() >= STOP_POSITION_DEG) {
       m_climbStopSignaler.enable();
-    } else if (m_climb.getPosition().getValueAsDouble() >= 90.0) {
+    } else if (m_climb.getPosition().getValueAsDouble() >= HORIZONTAL_POSITION_DEG) {
       m_climbHorizontalSignaler.enable();
     }
   }
 
   @Override
   public void update() {
-    switch (m_controlMode) {
-      case OffState:
-        m_climb.setControl(GreyTalonFX.ControlMode.DutyCycleOut, 0, 0);
-        break;
-      case ClimbLow:
-        // m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 82.6, 0);
-        m_climb.setControl(GreyTalonFX.ControlMode.PositionVoltage, m_targetPosition, 0);
-        break;
-      case ClimbStow:
-        m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, 0, 1);
-        break;
-      case JoystickMode:
-        m_climb.setControl(GreyTalonFX.ControlMode.DutyCycleOut, m_manualPower);
-        break;
-    }
+    m_climb.setControl(GreyTalonFX.ControlMode.PositionVoltage, m_targetPosition, 0);
   }
 
   @Override
