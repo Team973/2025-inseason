@@ -174,6 +174,8 @@ public class Elevator implements Subsystem {
       case AlgaeLow:
         m_algaeLowOffset += offset;
         break;
+      case Horizontal:
+        break;
     }
   }
 
@@ -191,6 +193,8 @@ public class Elevator implements Subsystem {
         return Presets.ALGAE_HIGH + m_algaeHighOffset;
       case AlgaeLow:
         return Presets.ALGAE_LOW + m_algaeLowOffset;
+      case Horizontal:
+        return Presets.CORAL_STOW;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }

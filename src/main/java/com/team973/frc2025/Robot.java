@@ -334,6 +334,8 @@ public class Robot extends TimedRobot {
         m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
       } else if (m_coDriverStick.getYButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.AlgaeHigh);
+      } else if (m_coDriverStick.getLeftBumperButtonPressed()) {
+        m_superstructure.setTargetReefLevel(ReefLevel.Horizontal);
       }
 
       if (m_coDriverStick.getRightBumperButtonPressed()) {

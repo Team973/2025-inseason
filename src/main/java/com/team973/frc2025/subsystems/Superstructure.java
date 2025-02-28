@@ -37,7 +37,8 @@ public class Superstructure implements Subsystem {
     L_3,
     L_4,
     AlgaeHigh,
-    AlgaeLow
+    AlgaeLow,
+    Horizontal
   }
 
   public enum GamePiece {

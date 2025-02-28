@@ -28,6 +28,7 @@ public class Arm implements Subsystem {
           RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
 
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
+  private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
   private static final double LEVEL_FOUR_POSITION_DEG = 69.0;
   private static final double LEVEL_THREE_POSITION_DEG = 70.0;
@@ -147,6 +148,8 @@ public class Arm implements Subsystem {
         return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
         return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+      case Horizontal:
+        return HORIZONTAL_POSITION_DEG;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
@@ -206,6 +209,8 @@ public class Arm implements Subsystem {
         break;
       case AlgaeLow:
         m_algaeLowOffset += increment;
+        break;
+      case Horizontal:
         break;
     }
   }
