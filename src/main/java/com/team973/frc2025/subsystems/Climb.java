@@ -118,7 +118,7 @@ public class Climb implements Subsystem {
 
   @Override
   public void syncSensors() {
-    if (m_climb.getPosition().getValueAsDouble() >= 225.0) {
+    if (m_climb.getPosition().getValueAsDouble() >= 230.0) {
       m_climbStopSignaler.enable();
     } else if (m_climb.getPosition().getValueAsDouble() >= 90.0) {
       m_climbHorizontalSignaler.enable();
