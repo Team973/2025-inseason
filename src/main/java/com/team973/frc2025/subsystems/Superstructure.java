@@ -91,6 +91,14 @@ public class Superstructure implements Subsystem {
     return m_claw.getSeesCoral();
   }
 
+  public boolean readyToMoveToBackOff() {
+    if (m_gamePieceMode == GamePiece.Coral) {
+      return !getSeesCoral();
+    }
+
+    return m_claw.getHasAlgae();
+  }
+
   public void log() {
     SmartDashboard.putString("DB/String 0", "Reef Level: " + m_targetReefLevel);
     SmartDashboard.putString(
