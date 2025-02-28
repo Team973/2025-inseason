@@ -15,7 +15,7 @@ public class Climb implements Subsystem {
   private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
 
   public static final double HORIZONTAL_POSITION_DEG = 100.0;
-  public static final double STOP_POSITION_DEG = 240.0;
+  public static final double STOP_POSITION_DEG = 200.0;
 
   private final Logger m_logger;
 
@@ -67,7 +67,7 @@ public class Climb implements Subsystem {
     defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
     defaultMotorConfig.Voltage.PeakForwardVoltage = 12.0;
-    defaultMotorConfig.Voltage.PeakReverseVoltage = -12.0;
+    defaultMotorConfig.Voltage.PeakReverseVoltage = 0.0;
 
     defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     defaultMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
