@@ -29,19 +29,19 @@ public class Arm implements Subsystem {
 
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 64.0; // 79
-  private static final double LEVEL_THREE_POSITION_DEG = 64.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;
-  private static final double LEVEL_ONE_POSITION_DEG = -59.0; // -70.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 69.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 70.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -72.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -60.0;
   public static final double CORAL_STOW_POSITION_DEG = -91.0;
 
-  private static final double ALGAE_HIGH_POSITION_DEG = 38.0;
-  private static final double ALGAE_LOW_POSITION_DEG = -61.0;
-  public static final double ALGAE_STOW_POSITION_DEG = -80.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = 34.0;
+  private static final double ALGAE_LOW_POSITION_DEG = -47.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -90.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
-  private static final double FEED_FORWARD_MAX_VOLT = 0.6; // 0.5;
+  private static final double FEED_FORWARD_MAX_VOLT = 0.6;
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;

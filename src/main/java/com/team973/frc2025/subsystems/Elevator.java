@@ -63,15 +63,15 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    private static final double LEVEL_1 = 2.0;
-    private static final double LEVEL_2 = 12.0;
-    private static final double LEVEL_3 = 2.5;
+    private static final double LEVEL_1 = 4.5;
+    private static final double LEVEL_2 = 13.5;
+    private static final double LEVEL_3 = 3.0;
     private static final double LEVEL_4 = 27.5;
     public static final double CORAL_STOW = 0.0;
 
-    private static final double ALGAE_HIGH = 18.5;
-    private static final double ALGAE_LOW = 23.5;
-    public static final double ALGAE_STOW = 5.0;
+    private static final double ALGAE_HIGH = 20.5;
+    private static final double ALGAE_LOW = 22.5;
+    public static final double ALGAE_STOW = 6.0;
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
