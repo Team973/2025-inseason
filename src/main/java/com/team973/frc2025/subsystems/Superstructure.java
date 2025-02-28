@@ -238,7 +238,7 @@ public class Superstructure implements Subsystem {
         if (m_lastState != m_state) {
           m_manualScore = false;
           m_manualArmivator = false;
-          m_manualIntake = false;
+          m_manualIntake = true;
         }
 
         if (m_manualArmivator) {
