@@ -101,8 +101,8 @@ public class Robot extends TimedRobot {
       m_sideSelector.range(Rotation2d.fromDegrees(240), Rotation2d.fromDegrees(60), 0.5);
   private final JoystickField.Range m_rightReefSide =
       m_sideSelector.range(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(60), 0.5);
-  private final JoystickField.Range m_centerReef =
-      m_sideSelector.range(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(60), 0.5);
+  // private final JoystickField.Range m_centerReef =
+  //     m_sideSelector.range(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(60), 0.5);
 
   private double m_lastBatteryVoltageHighMSTimestamp;
   private final double m_lowBatteryTimeOutMs = 1000.0;
@@ -341,9 +341,9 @@ public class Robot extends TimedRobot {
       }
 
       if (m_coDriverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.setManualIntake(true);
-      } else if (m_coDriverStick.getLeftBumperButtonReleased()) {
         m_superstructure.setManualIntake(false);
+      } else if (m_coDriverStick.getLeftBumperButtonReleased()) {
+        m_superstructure.setManualIntake(true);
       }
 
       if (m_coDriverStick.getBackButton()) {
@@ -406,9 +406,12 @@ public class Robot extends TimedRobot {
         m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
       } else if (m_rightReefSide.isActive()) {
         m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Right);
-      } else if (m_centerReef.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
       }
+
+      // else if (m_centerReef.isActive()) {
+      //
+      // m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
+      // }
     }
   }
 
