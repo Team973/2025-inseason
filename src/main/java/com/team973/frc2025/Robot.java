@@ -334,8 +334,6 @@ public class Robot extends TimedRobot {
         m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
       } else if (m_coDriverStick.getYButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.AlgaeHigh);
-      } else if (m_coDriverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.Horizontal);
       }
 
       if (m_coDriverStick.getRightBumperButtonPressed()) {
@@ -348,7 +346,13 @@ public class Robot extends TimedRobot {
         m_superstructure.setState(Superstructure.State.Manual);
       }
 
-      if (Math.abs(climbStick) > 0.25) {
+      if (m_coDriverStick.getLeftTriggerPressed()) {
+        m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
+        m_superstructure.setTargetReefLevel(ReefLevel.Horizontal);
+        m_superstructure.setManualArmivator(true);
+      } else if (m_coDriverStick.getRightTriggerPressed()) {
+        m_superstructure.setClimbTarget(Climb.STOP_POSITION_DEG);
+      } else if (Math.abs(climbStick) > 0.25) {
         m_superstructure.incrementClimbTarget(climbStick);
       }
 

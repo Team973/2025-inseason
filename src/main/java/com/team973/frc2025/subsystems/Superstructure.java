@@ -165,12 +165,12 @@ public class Superstructure implements Subsystem {
     m_claw.incrementBackup(increment);
   }
 
-  public void setClimbPower(double power) {
-    m_climb.setManualPower(power);
-  }
-
   public void incrementClimbTarget(double increment) {
     m_climb.incrementTarget(increment);
+  }
+
+  public void setClimbTarget(double target) {
+    m_climb.setTarget(target);
   }
 
   public void clawIntake() {
