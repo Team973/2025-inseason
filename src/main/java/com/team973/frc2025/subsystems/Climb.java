@@ -116,7 +116,7 @@ public class Climb implements Subsystem {
 
   @Override
   public void update() {
-    m_climb.setControl(GreyTalonFX.ControlMode.PositionVoltage, m_targetPosition, 0);
+    m_climb.setControl(GreyTalonFX.ControlMode.MotionMagicVoltage, m_targetPosition, 0);
   }
 
   @Override
