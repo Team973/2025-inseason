@@ -18,8 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.BooleanSupplier;
 
 public class DriveWithLimelight extends DriveComposable {
-  private static final double TARGET_DISTANCE_TOLERANCE_METERS = 0.05;
-  private static final double TARGET_ANGLE_TOLERANCE_DEG = 5.0;
+  private static final double SCORING_DISTANCE_TOLERANCE_METERS = 0.06;
+  private static final double APPROACH_DISTANCE_TOLERANCE_METERS = 0.12;
+  private static final double TARGET_ANGLE_TOLERANCE_DEG = 6.0;
 
   private final GreyPoseEstimator m_poseEstimator;
 
@@ -331,16 +332,16 @@ public class DriveWithLimelight extends DriveComposable {
     return Drive.comparePoses(
         m_poseEstimator.getPoseMeters(),
         m_approachPose,
-        TARGET_DISTANCE_TOLERANCE_METERS * 1.2,
-        TARGET_ANGLE_TOLERANCE_DEG * 1.2);
+        APPROACH_DISTANCE_TOLERANCE_METERS,
+        TARGET_ANGLE_TOLERANCE_DEG);
   }
 
   private boolean isAtScoring() {
     return Drive.comparePoses(
         m_poseEstimator.getPoseMeters(),
         m_scoringPose,
-        TARGET_DISTANCE_TOLERANCE_METERS * 1.2,
-        TARGET_ANGLE_TOLERANCE_DEG * 1.2);
+        SCORING_DISTANCE_TOLERANCE_METERS,
+        TARGET_ANGLE_TOLERANCE_DEG);
   }
 
   public Pose2d getCurrentTargetPose2d() {
