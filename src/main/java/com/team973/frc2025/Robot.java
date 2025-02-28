@@ -340,6 +340,12 @@ public class Robot extends TimedRobot {
         m_superstructure.toggleGamePieceMode();
       }
 
+      if (m_coDriverStick.getLeftBumperButtonPressed()) {
+        m_superstructure.setManualIntake(true);
+      } else if (m_coDriverStick.getLeftBumperButtonReleased()) {
+        m_superstructure.setManualIntake(false);
+      }
+
       if (m_coDriverStick.getBackButton()) {
         m_superstructure.setState(Superstructure.State.Zero);
       } else {

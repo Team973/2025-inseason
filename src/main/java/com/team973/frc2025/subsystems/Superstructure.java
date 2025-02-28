@@ -10,8 +10,8 @@ public class Superstructure implements Subsystem {
   private final Arm m_arm;
   private final DriveController m_driveController;
 
-  private State m_state = State.Intake;
-  private State m_lastState = State.Intake;
+  private State m_state = State.Manual;
+  private State m_lastState = State.Manual;
 
   private GamePiece m_gamePieceMode = GamePiece.Coral;
 
@@ -19,13 +19,10 @@ public class Superstructure implements Subsystem {
 
   private boolean m_manualScore = false;
   private boolean m_manualArmivator = false;
+  private boolean m_manualIntake = false;
 
   public enum State {
-    Intake,
     Score,
-    ClimbManual,
-    ClimbStow,
-    ClimbLow,
     Manual,
     Zero,
     Off
@@ -65,6 +62,10 @@ public class Superstructure implements Subsystem {
 
   public void setManualArmivator(boolean manual) {
     m_manualArmivator = manual;
+  }
+
+  public void setManualIntake(boolean intake) {
+    m_manualIntake = intake;
   }
 
   public void setTargetReefLevel(ReefLevel coralLevel, ReefLevel algaeLevel) {
@@ -191,13 +192,6 @@ public class Superstructure implements Subsystem {
 
   public void update() {
     switch (m_state) {
-      case Intake:
-        // m_climb.setControlMode(Climb.ControlMode.OffState);
-
-        clawIntake();
-        armStow();
-        elevatorStow();
-        break;
       case Score:
         clawIntake();
 
@@ -231,23 +225,12 @@ public class Superstructure implements Subsystem {
             elevatorStow();
             break;
         }
-
-        // m_climb.setControlMode(Climb.ControlMode.OffState);
-        break;
-      case ClimbManual:
-        m_claw.setControl(Claw.ControlStatus.Off);
-        // m_climb.setControlMode(Climb.ControlMode.JoystickMode);
-        break;
-      case ClimbStow:
-        // m_climb.setControlMode(Climb.ControlMode.ClimbStow);
-        break;
-      case ClimbLow:
-        // m_climb.setControlMode(Climb.ControlMode.ClimbLow);
         break;
       case Manual:
         if (m_lastState != m_state) {
           m_manualScore = false;
           m_manualArmivator = false;
+          m_manualIntake = false;
         }
 
         if (m_manualArmivator) {
@@ -260,11 +243,11 @@ public class Superstructure implements Subsystem {
 
         if (m_manualScore) {
           clawScore();
-        } else {
+        } else if (m_manualIntake) {
           clawIntake();
+        } else {
+          m_claw.setControl(Claw.ControlStatus.Off);
         }
-
-        // m_climb.setControlMode(Climb.ControlMode.OffState);
         break;
       case Zero:
         m_arm.setControlStatus(Arm.ControlStatus.Zero);
@@ -273,8 +256,6 @@ public class Superstructure implements Subsystem {
         break;
       case Off:
         m_claw.setControl(Claw.ControlStatus.Off);
-        // m_climb.setControlMode(Climb.ControlMode.OffState);
-
         m_arm.setControlStatus(Arm.ControlStatus.Off);
         m_elevator.setControlStatus(Elevator.ControlStatus.Off);
         break;
