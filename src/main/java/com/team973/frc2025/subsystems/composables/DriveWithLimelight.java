@@ -74,9 +74,9 @@ public class DriveWithLimelight extends DriveComposable {
     private static final double REEF_WIDTH_METERS = 0.33;
 
     private static final Translation2d LEFT_REEF_APPROACH_TARGET =
-        new Translation2d(-REEF_WIDTH_METERS / 2.0, 0.8);
+        new Translation2d(-REEF_WIDTH_METERS / 2.0, 0.9);
     private static final Translation2d RIGHT_REEF_APPROACH_TARGET =
-        new Translation2d(REEF_WIDTH_METERS / 2.0, 0.8);
+        new Translation2d(REEF_WIDTH_METERS / 2.0, 0.9);
     private static final double REEF_SCORING_DIST = 0.45;
 
     private static final Translation2d ALGAE_APPROACH_TARGET = new Translation2d(0, 0.8);
