@@ -132,6 +132,14 @@ public class Claw implements Subsystem {
     return Optional.of(m_clawAlgaeSensor.getDistance().getValueAsDouble());
   }
 
+  public boolean getHasAlgae() {
+    if (getAlgaeDistance().isPresent()) {
+      return getAlgaeDistance().get() < 0.06;
+    }
+
+    return false;
+  }
+
   public void coralScoredLED() {
     // TODO: Add back the algee sensor once tunned
     if (getSeesCoral()) {
