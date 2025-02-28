@@ -95,10 +95,13 @@ public class Claw implements Subsystem {
     defaultMotorConfig.Slot0.kI = 0.0;
     defaultMotorConfig.Slot0.kD = 0.0;
 
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
     defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+    defaultMotorConfig.Voltage.PeakForwardVoltage = 12.0;
+    defaultMotorConfig.Voltage.PeakReverseVoltage = -12.0;
 
     defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
