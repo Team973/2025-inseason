@@ -19,7 +19,7 @@ public class Superstructure implements Subsystem {
 
   private boolean m_manualScore = false;
   private boolean m_manualArmivator = false;
-  private boolean m_manualIntake = false;
+  private boolean m_manualIntake = true;
 
   public enum State {
     Score,
@@ -252,7 +252,8 @@ public class Superstructure implements Subsystem {
       case Zero:
         m_arm.setControlStatus(Arm.ControlStatus.Zero);
         m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
-        m_claw.setControl(Claw.ControlStatus.Off);
+
+        clawIntake();
         break;
       case Off:
         m_claw.setControl(Claw.ControlStatus.Off);
