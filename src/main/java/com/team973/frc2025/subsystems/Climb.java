@@ -15,16 +15,24 @@ public class Climb implements Subsystem {
   private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
 
   public static final double HORIZONTAL_POSITION_DEG = 100.0;
-  public static final double STOP_POSITION_DEG = 230.0;
+  public static final double CLIMB_POSITION_DEG = 220.0;
+
+  private static final double STOP_POSITION_DEG = 233.0;
 
   private final Logger m_logger;
 
   private final GreyTalonFX m_climb;
 
   private final SolidSignaler m_climbHorizontalSignaler =
-      new SolidSignaler(RobotInfo.Colors.PINK, 100.0, SignalerInfo.CLIMB_HORIZONTAL_PRIORITY);
-  private final SolidSignaler m_climbStopSignaler =
-      new SolidSignaler(RobotInfo.Colors.ORANGE, 100.0, SignalerInfo.CLIMB_STOP_PRIORITY);
+      new SolidSignaler(RobotInfo.Colors.HOT_PINK, 100.0, SignalerInfo.CLIMB_HORIZONTAL_PRIORITY);
+
+  private final BlinkingSignaler m_climbStopSignaler =
+      new BlinkingSignaler(
+          RobotInfo.Colors.GREEN,
+          RobotInfo.Colors.OFF,
+          500.0,
+          100.0,
+          SignalerInfo.CLIMB_STOP_PRIORITY);
 
   private double m_manualPower = 0;
   private double m_targetPosition;

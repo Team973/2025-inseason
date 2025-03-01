@@ -355,7 +355,7 @@ public class Robot extends TimedRobot {
         m_superstructure.setTargetReefLevel(ReefLevel.Horizontal);
         m_superstructure.setManualArmivator(true);
       } else if (m_coDriverStick.getLeftTriggerPressed()) {
-        m_superstructure.setClimbTarget(Climb.STOP_POSITION_DEG);
+        m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
       } else if (Math.abs(climbStick) > 0.25) {
         m_superstructure.incrementClimbTarget(climbStick);
       }
