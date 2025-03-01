@@ -15,7 +15,7 @@ public class Climb implements Subsystem {
   private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
 
   public static final double HORIZONTAL_POSITION_DEG = 100.0;
-  public static final double STOP_POSITION_DEG = 200.0;
+  public static final double STOP_POSITION_DEG = 230.0;
 
   private final Logger m_logger;
 
@@ -49,7 +49,7 @@ public class Climb implements Subsystem {
     defaultMotorConfig.Slot0.kP = 6.4;
     defaultMotorConfig.Slot0.kI = 0.0;
     defaultMotorConfig.Slot0.kD = 0.04;
-    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = MOTION_MAGIC_CRUISE_VELOCITY;
+    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = MOTION_MAGIC_CRUISE_VELOCITY * 0.5;
     defaultMotorConfig.MotionMagic.MotionMagicAcceleration = MOTION_MAGIC_CRUISE_VELOCITY * 10.0;
     defaultMotorConfig.MotionMagic.MotionMagicJerk = MOTION_MAGIC_CRUISE_VELOCITY * 100.0;
     // slot 1 is for velocity
