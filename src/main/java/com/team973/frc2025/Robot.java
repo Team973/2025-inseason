@@ -102,11 +102,6 @@ public class Robot extends TimedRobot {
   private final JoystickField.Range m_rightReefSide =
       m_sideSelector.range(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(90), 0.5);
 
-  private final JoystickField m_algaeSelector =
-      new JoystickField(() -> m_driverStick.getRightXAxis(), () -> m_driverStick.getRightYAxis());
-  private final JoystickField.Range m_centerReef =
-      m_algaeSelector.range(Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(45), 0.5);
-
   private double m_lastBatteryVoltageHighMSTimestamp;
   private final double m_lowBatteryTimeOutMs = 1000.0;
   private final double m_lowBatterMimiumVoltage = 12.1;
@@ -140,7 +135,6 @@ public class Robot extends TimedRobot {
   private void logSubsystems() {
     m_driveController.log();
     m_superstructure.log();
-    // SmartDashboard.putString("DB/String 3", "Manual: " + m_manualScoringMode);
     m_candleManger.log();
   }
 
@@ -411,10 +405,6 @@ public class Robot extends TimedRobot {
       } else if (m_rightReefSide.isActive()) {
         m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Right);
       }
-      //  else if (m_centerReef.isActive()) {
-      //
-      // m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
-      // }
     }
   }
 
@@ -430,16 +420,6 @@ public class Robot extends TimedRobot {
       m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
 
       maybeUpdateScoringSelection();
-
-      if (m_leftReefSide.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
-      } else if (m_rightReefSide.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Right);
-      }
-      //  else if (m_centerReef.isActive()) {
-      //
-      // m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
-      // }
 
       if (m_coDriverStick.getAButtonPressed()) {
         m_autoManager.increment();
