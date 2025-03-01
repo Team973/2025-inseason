@@ -81,10 +81,36 @@ public class Superstructure implements Subsystem {
   }
 
   public boolean readyToScore() {
-    return m_arm.motorAtTargetRotation()
-        && m_elevator.motorAtTarget()
-        && m_arm.getTargetPosition() != Arm.CORAL_STOW_POSITION_DEG
-        && m_arm.getTargetPosition() != Arm.ALGAE_STOW_POSITION_DEG;
+    if (m_arm.getTargetPosition() == Arm.CORAL_STOW_POSITION_DEG) {
+      return false;
+    }
+
+    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG) {
+      return false;
+    }
+
+    if (m_elevator.getTargetPosition() == Elevator.Presets.CORAL_STOW) {
+      return false;
+    }
+
+    if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW) {
+      return false;
+    }
+
+    if (!m_arm.motorAtTargetRotation()) {
+      return false;
+    }
+
+    if (!m_elevator.motorAtTarget()) {
+      return false;
+    }
+
+    return true;
+
+    // return m_arm.motorAtTargetRotation()
+    //     && m_elevator.motorAtTarget()
+    //     && m_arm.getTargetPosition() != Arm.CORAL_STOW_POSITION_DEG
+    //     && m_arm.getTargetPosition() != Arm.ALGAE_STOW_POSITION_DEG;
   }
 
   public boolean getSeesCoral() {
