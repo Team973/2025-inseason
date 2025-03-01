@@ -64,9 +64,9 @@ public class Elevator implements Subsystem {
 
   public static class Presets {
     private static final double LEVEL_1 = 4.5;
-    private static final double LEVEL_2 = 11.5;
-    private static final double LEVEL_3 = 3.0;
-    private static final double LEVEL_4 = 27.5;
+    private static final double LEVEL_2 = 12.5;
+    private static final double LEVEL_3 = 4.0;
+    private static final double LEVEL_4 = 28.0;
     public static final double CORAL_STOW = 0.0;
 
     private static final double ALGAE_HIGH = 19.0;
@@ -177,6 +177,10 @@ public class Elevator implements Subsystem {
       case Horizontal:
         break;
     }
+  }
+
+  public double getTargetPosition() {
+    return m_targetPostionHeightinches;
   }
 
   public double getTargetPositionFromLevel(ReefLevel level) {
