@@ -64,7 +64,7 @@ public class Elevator implements Subsystem {
 
   public static class Presets {
     private static final double LEVEL_1 = 4.5;
-    private static final double LEVEL_2 = 13.5;
+    private static final double LEVEL_2 = 11.5;
     private static final double LEVEL_3 = 3.0;
     private static final double LEVEL_4 = 27.5;
     public static final double CORAL_STOW = 0.0;
