@@ -284,8 +284,8 @@ public class Robot extends TimedRobot {
       m_driveController
           .getDriveWithJoysticks()
           .updateInput(
-              -allianceScalar * m_driverStick.getLeftYAxis() * 0.6,
-              allianceScalar * m_driverStick.getLeftXAxis() * 0.6,
+              -allianceScalar * m_driverStick.getLeftYAxis(),
+              allianceScalar * m_driverStick.getLeftXAxis(),
               m_driverStick.getRightXAxis() * 0.8);
 
       if (m_driverStick.getLeftBumperButtonPressed()) {
