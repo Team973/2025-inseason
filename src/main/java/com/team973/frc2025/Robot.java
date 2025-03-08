@@ -43,7 +43,8 @@ public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05));
-  private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
+
+  private final CANdleManger m_candleManger = new CANdleManger();
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"), m_candleManger);

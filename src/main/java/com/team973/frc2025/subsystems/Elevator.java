@@ -20,7 +20,6 @@ public class Elevator implements Subsystem {
   private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_targetPostionHeightinches;
   private double m_targetpositionLeway = 0.1;
-  double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
   private boolean m_lastHallSensorMode = true;
   private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
@@ -55,23 +54,19 @@ public class Elevator implements Subsystem {
   }
 
   private double heightInchesToMotorRotations(double postionHeight) {
-    return postionHeight / MOTOR_GEAR_RATIO / 5.0 / 36.0 / Conversions.Distance.INCH_PER_MM;
+    return postionHeight
+        / RobotInfo.ElevatorInfo.MOTOR_GEAR_RATIO
+        / 5.0
+        / 36.0
+        / Conversions.Distance.INCH_PER_MM;
   }
 
   private double motorRotationsToHeightInches(double motorPostion) {
-    return motorPostion * MOTOR_GEAR_RATIO * 5.0 * 36.0 * Conversions.Distance.INCH_PER_MM;
-  }
-
-  public static class Presets {
-    private static final double LEVEL_1 = 4.5;
-    private static final double LEVEL_2 = 12.5;
-    private static final double LEVEL_3 = 4.0;
-    private static final double LEVEL_4 = 28.0;
-    public static final double CORAL_STOW = 0.0;
-
-    private static final double ALGAE_HIGH = 19.0;
-    private static final double ALGAE_LOW = 22.5;
-    public static final double ALGAE_STOW = 6.0;
+    return motorPostion
+        * RobotInfo.ElevatorInfo.MOTOR_GEAR_RATIO
+        * 5.0
+        * 36.0
+        * Conversions.Distance.INCH_PER_MM;
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
@@ -97,31 +92,39 @@ public class Elevator implements Subsystem {
   private static TalonFXConfiguration defaultElevatorMotorConfig() {
     TalonFXConfiguration defaultElevatorMotorConfig = new TalonFXConfiguration();
     // slot zero is for motion maginc
-    defaultElevatorMotorConfig.Slot0.kS = 0.0;
-    defaultElevatorMotorConfig.Slot0.kV = 0.15;
-    defaultElevatorMotorConfig.Slot0.kA = 0.01;
-    defaultElevatorMotorConfig.Slot0.kP = 4.0;
-    defaultElevatorMotorConfig.Slot0.kI = 0.0;
-    defaultElevatorMotorConfig.Slot0.kD = 0.0;
+    defaultElevatorMotorConfig.Slot0.kS = RobotInfo.ElevatorInfo.ELEVATOR_MM_KS;
+    defaultElevatorMotorConfig.Slot0.kV = RobotInfo.ElevatorInfo.ELEVATOR_MM_KV;
+    defaultElevatorMotorConfig.Slot0.kA = RobotInfo.ElevatorInfo.ELEVATOR_MM_KA;
+    defaultElevatorMotorConfig.Slot0.kP = RobotInfo.ElevatorInfo.ELEVATOR_MM_KP;
+    defaultElevatorMotorConfig.Slot0.kI = RobotInfo.ElevatorInfo.ELEVATOR_MM_KI;
+    defaultElevatorMotorConfig.Slot0.kD = RobotInfo.ElevatorInfo.ELEVATOR_MM_KD;
     // slot one is velocity
-    defaultElevatorMotorConfig.Slot1.kS = 0.0;
-    defaultElevatorMotorConfig.Slot1.kV = 0.0;
-    defaultElevatorMotorConfig.Slot1.kA = 0.0;
-    defaultElevatorMotorConfig.Slot1.kP = 125.0;
-    defaultElevatorMotorConfig.Slot1.kI = 0.0;
-    defaultElevatorMotorConfig.Slot1.kD = 0.0;
+    defaultElevatorMotorConfig.Slot1.kS = RobotInfo.ElevatorInfo.ELEVATOR_V_KS;
+    defaultElevatorMotorConfig.Slot1.kV = RobotInfo.ElevatorInfo.ELEVATOR_V_KV;
+    defaultElevatorMotorConfig.Slot1.kA = RobotInfo.ElevatorInfo.ELEVATOR_V_KA;
+    defaultElevatorMotorConfig.Slot1.kP = RobotInfo.ElevatorInfo.ELEVATOR_V_KP;
+    defaultElevatorMotorConfig.Slot1.kI = RobotInfo.ElevatorInfo.ELEVATOR_V_KI;
+    defaultElevatorMotorConfig.Slot1.kD = RobotInfo.ElevatorInfo.ELEVATOR_V_KD;
     defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
-        32.0; // 32.0; // 64; // 32; // 16;
+        RobotInfo.ElevatorInfo.ELEVATOR_MOTION_MAGIC_CRUISE_VELOCITY;
     defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
-        300.0; // 40.0; // 500; // 40; // 20;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 2000.0;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage = 12;
-    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = -12;
-    defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.00;
+        RobotInfo.ElevatorInfo.ELEVATOR_MOTION_MAGIC_ACCELERATION;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk =
+        RobotInfo.ElevatorInfo.ELEVATOR_MOTION_MAGIC_JERK;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit =
+        RobotInfo.ElevatorInfo.ELEVATOR_SATOR_CURRENT_LIMIT;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
+        RobotInfo.ElevatorInfo.ELEVATOR_SATOR_CURRENT_LIMIT_ENABLE;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit =
+        RobotInfo.ElevatorInfo.ELEVATOR_SUPPLY_CURRENT_LIMIT;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
+        RobotInfo.ElevatorInfo.ELEVATOR_SUPPLY_CURRENT_LIMIT_ENABLE;
+    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage =
+        RobotInfo.ElevatorInfo.ELEVATOR_PEAK_FORDWARD_VOLTAGE;
+    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage =
+        RobotInfo.ElevatorInfo.ELEVATOR_PEAK_REVERSE_VOLTAGE;
+    defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
+        RobotInfo.ElevatorInfo.ELEVATOR_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD;
     defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     return defaultElevatorMotorConfig;
   }
@@ -186,19 +189,17 @@ public class Elevator implements Subsystem {
   public double getTargetPositionFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return Presets.LEVEL_1 + m_levelOneOffset;
+        return RobotInfo.ElevatorInfo.LEVEL_1 + m_levelOneOffset;
       case L_2:
-        return Presets.LEVEL_2 + m_levelTwoOffset;
+        return RobotInfo.ElevatorInfo.LEVEL_2 + m_levelTwoOffset;
       case L_3:
-        return Presets.LEVEL_3 + m_levelThreeOffset;
+        return RobotInfo.ElevatorInfo.LEVEL_3 + m_levelThreeOffset;
       case L_4:
-        return Presets.LEVEL_4 + m_levelFourOffset;
+        return RobotInfo.ElevatorInfo.LEVEL_4 + m_levelFourOffset;
       case AlgaeHigh:
-        return Presets.ALGAE_HIGH + m_algaeHighOffset;
+        return RobotInfo.ElevatorInfo.ALGAE_HIGH + m_algaeHighOffset;
       case AlgaeLow:
-        return Presets.ALGAE_LOW + m_algaeLowOffset;
-      case Horizontal:
-        return Presets.CORAL_STOW;
+        return RobotInfo.ElevatorInfo.ALGAE_LOW + m_algaeLowOffset;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }

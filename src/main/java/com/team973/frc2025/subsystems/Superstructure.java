@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -81,19 +82,19 @@ public class Superstructure implements Subsystem {
   }
 
   public boolean readyToScore() {
-    if (m_arm.getTargetPosition() == Arm.CORAL_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == RobotInfo.ArmInfo.CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
-    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == RobotInfo.ArmInfo.ALGAE_STOW_POSITION_DEG) {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == Elevator.Presets.CORAL_STOW) {
+    if (m_elevator.getTargetPosition() == RobotInfo.ElevatorInfo.CORAL_STOW) {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW) {
+    if (m_elevator.getTargetPosition() == RobotInfo.ElevatorInfo.ALGAE_STOW) {
       return false;
     }
 
@@ -155,9 +156,9 @@ public class Superstructure implements Subsystem {
 
   private void armStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_arm.setTargetDeg(Arm.CORAL_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(RobotInfo.ArmInfo.CORAL_STOW_POSITION_DEG);
     } else {
-      m_arm.setTargetDeg(Arm.ALGAE_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(RobotInfo.ArmInfo.ALGAE_STOW_POSITION_DEG);
     }
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }
@@ -169,9 +170,9 @@ public class Superstructure implements Subsystem {
 
   private void elevatorStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_elevator.setTargetPostion(Elevator.Presets.CORAL_STOW);
+      m_elevator.setTargetPostion(RobotInfo.ElevatorInfo.CORAL_STOW);
     } else {
-      m_elevator.setTargetPostion(Elevator.Presets.ALGAE_STOW);
+      m_elevator.setTargetPostion(RobotInfo.ElevatorInfo.ALGAE_STOW);
     }
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }

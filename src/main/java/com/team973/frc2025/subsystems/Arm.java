@@ -26,24 +26,6 @@ public class Arm implements Subsystem {
   private final SolidSignaler m_armHomedSigaler =
       new SolidSignaler(
           RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
-
-  private static final double ARM_HOMING_POSTION_DEG = -90.0;
-  private static final double HORIZONTAL_POSITION_DEG = 0.0;
-
-  private static final double LEVEL_FOUR_POSITION_DEG = 78.0;
-  private static final double LEVEL_THREE_POSITION_DEG = 72.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -63.0;
-  private static final double LEVEL_ONE_POSITION_DEG = -60.0;
-  public static final double CORAL_STOW_POSITION_DEG = -91.0;
-
-  private static final double ALGAE_HIGH_POSITION_DEG = 34.0;
-  private static final double ALGAE_LOW_POSITION_DEG = -47.0;
-  public static final double ALGAE_STOW_POSITION_DEG = -85.0;
-
-  private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
-  private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
-  private static final double FEED_FORWARD_MAX_VOLT = 0.6;
-
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
@@ -62,11 +44,11 @@ public class Arm implements Subsystem {
   }
 
   private double armDegToMotorRotations(double armPostionDeg) {
-    return armPostionDeg / 360.0 / ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
+    return armPostionDeg / 360.0 / RobotInfo.ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
 
   private double motorRotationsToArmDeg(double motorPostion) {
-    return motorPostion * ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
+    return motorPostion * RobotInfo.ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
   public Arm(Logger logger, CANdleManger candle) {
@@ -75,28 +57,32 @@ public class Arm implements Subsystem {
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     m_candleManger = candle;
     m_candleManger.addSignaler(m_armHomedSigaler);
-    armMotorConfig.Slot0.kS = 0.0;
-    armMotorConfig.Slot0.kV = 0.0;
-    armMotorConfig.Slot0.kA = 0.0;
-    armMotorConfig.Slot0.kP = 50.0;
-    armMotorConfig.Slot0.kI = 0.0;
-    armMotorConfig.Slot0.kD = 0.0;
-    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 110.0; // 64.0;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 80.0; // 80.0;
-    armMotorConfig.MotionMagic.MotionMagicJerk = 1000.0;
-    armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
-    armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    armMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
-    armMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    armMotorConfig.Voltage.PeakForwardVoltage = 12.0;
-    armMotorConfig.Voltage.PeakReverseVoltage = -12.0;
+    armMotorConfig.Slot0.kS = RobotInfo.ArmInfo.ARM_KS;
+    armMotorConfig.Slot0.kV = RobotInfo.ArmInfo.ARM_KV;
+    armMotorConfig.Slot0.kA = RobotInfo.ArmInfo.ARM_KA;
+    armMotorConfig.Slot0.kP = RobotInfo.ArmInfo.ARM_KP;
+    armMotorConfig.Slot0.kI = RobotInfo.ArmInfo.ARM_KI;
+    armMotorConfig.Slot0.kD = RobotInfo.ArmInfo.ARM_KD;
+    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        RobotInfo.ArmInfo.ARM_MOTION_MAGIC_CRUISE_VELOCITY;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration =
+        RobotInfo.ArmInfo.ARM_MOTION_MAGIC_ACCELERATION;
+    armMotorConfig.MotionMagic.MotionMagicJerk = RobotInfo.ArmInfo.ARM_MOTION_MAGIC_JERK;
+    armMotorConfig.CurrentLimits.StatorCurrentLimit = RobotInfo.ArmInfo.ARM_SATOR_CURRENT_LIMIT;
+    armMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
+        RobotInfo.ArmInfo.ARM_SATOR_CURRENT_LIMIT_ENABLE;
+    armMotorConfig.CurrentLimits.SupplyCurrentLimit = RobotInfo.ArmInfo.ARM_SUPPLY_CURRENT_LIMIT;
+    armMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
+        RobotInfo.ArmInfo.ARM_SUPPLY_CURRENT_LIMIT_ENABLE;
+    armMotorConfig.Voltage.PeakForwardVoltage = RobotInfo.ArmInfo.ARM_PEAK_FORDWARD_VOLTAGE;
+    armMotorConfig.Voltage.PeakReverseVoltage = RobotInfo.ArmInfo.ARM_PEAK_REVERSE_VOLTAGE;
     // clockwise postive when looking at it from the shaft, is on inside of the left
     // point so that
     // the shaft is pointing left, up is positve, gear ratio is odd
     armMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     armMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_armMotor.setConfig(armMotorConfig);
-    m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
+    m_armMotor.setPosition(armDegToMotorRotations(RobotInfo.ArmInfo.ARM_HOMING_POSTION_DEG));
   }
 
   private boolean hallSensor() {
@@ -105,7 +91,7 @@ public class Arm implements Subsystem {
 
   private void maybeHomeArm() {
     if (m_lastHallSensorMode == false && hallSensor() == true) {
-      m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
+      m_armMotor.setPosition(armDegToMotorRotations(RobotInfo.ArmInfo.ARM_HOMING_POSTION_DEG));
       m_armHomedSigaler.enable();
     }
     m_lastHallSensorMode = hallSensor();
@@ -130,26 +116,25 @@ public class Arm implements Subsystem {
 
   private double getFeedForwardTargetAngle() {
     double armAngleDeg = motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble());
-    return FEED_FORWARD_MAX_VOLT
-        * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
+    return RobotInfo.ArmInfo.FEED_FORWARD_MAX_VOLT
+        * Math.cos((armAngleDeg - RobotInfo.ArmInfo.CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
 
   public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
+        return RobotInfo.ArmInfo.LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
       case L_2:
-        return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
+        return RobotInfo.ArmInfo.LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
       case L_3:
-        return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
+        return RobotInfo.ArmInfo.LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case L_4:
-        return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+        return RobotInfo.ArmInfo.LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
       case AlgaeHigh:
-        return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
+        return RobotInfo.ArmInfo.ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
-        return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
-      case Horizontal:
-        return HORIZONTAL_POSITION_DEG;
+        return RobotInfo.ArmInfo.ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
