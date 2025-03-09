@@ -112,6 +112,12 @@ public class SwerveModule {
     motorConfig.Slot0.kI = DriveInfo.ANGLE_KI;
     motorConfig.Slot0.kD = DriveInfo.ANGLE_KD;
     motorConfig.Slot0.kS = DriveInfo.ANGLE_KF;
+    motorConfig.Slot0.kA = DriveInfo.ANGLE_KA;
+    motorConfig.Slot0.kV = DriveInfo.ANGLE_KV;
+
+    motorConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0;
+    motorConfig.MotionMagic.MotionMagicAcceleration =
+        motorConfig.MotionMagic.MotionMagicCruiseVelocity * 10.0;
 
     motorConfig.CurrentLimits.StatorCurrentLimit = 100.0;
     motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -255,7 +261,7 @@ public class SwerveModule {
     // Prevent module rotation if angle is the same as the previous angle.
     if (desiredState.angle != m_lastState.angle) {
       m_angleMotor.setControl(
-          ControlMode.PositionVoltage,
+          ControlMode.MotionMagicVoltage,
           m_angleMechanism.getRotorRotationFromOutputRotation(desiredState.angle).getRotations());
     }
     m_lastState = desiredState;
