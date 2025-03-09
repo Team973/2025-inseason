@@ -117,7 +117,7 @@ public final class RobotInfo {
     public static final double ANGLE_KI = 0.0;
     public static final double ANGLE_KD = 0.0;
     public static final double ANGLE_KF = 0.0;
-    public static final double ANGLE_KV = 1.5;
+    public static final double ANGLE_KV = 0.1;
     public static final double ANGLE_KA = 0.1;
 
     /* Drive Motor PID Values */
