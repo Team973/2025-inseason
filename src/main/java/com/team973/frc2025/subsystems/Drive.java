@@ -95,7 +95,12 @@ public class Drive implements Subsystem {
             logger.subLogger("providers/ll-right"));
     m_backLLSupplier =
         new MegaTagSupplier(
-            "limelight-back", m_pigeon, new Pose3d(), logger.subLogger("providers/ll-back"));
+            "limelight-back",
+            m_pigeon,
+            new Pose3d(
+                new Translation3d(-0.006, 0.108, 0.959),
+                new Rotation3d(Rotation2d.fromDegrees(180))),
+            logger.subLogger("providers/ll-back"));
 
     m_fusedEstimator =
         new GreyPoseEstimator(
