@@ -113,17 +113,18 @@ public final class RobotInfo {
     public static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */
-    public static final double ANGLE_KP = 6.5;
+    public static final double ANGLE_KP = 0.0;
     public static final double ANGLE_KI = 0.0;
     public static final double ANGLE_KD = 0.0;
     public static final double ANGLE_KF = 0.0;
-    public static final double ANGLE_KV = 0.0;
+    public static final double ANGLE_KV = 0.1;
+    public static final double ANGLE_KA = 0.1;
 
     /* Drive Motor PID Values */
-    public static final double DRIVE_KP = 0.38;
+    public static final double DRIVE_KP = 0.0; // 0.38;
     public static final double DRIVE_KI = 0.0;
     public static final double DRIVE_KD = 0.0;
-    public static final double DRIVE_KF = 0.12;
+    public static final double DRIVE_KF = 0.0; // 0.12;
 
     /* Motor Inverts */
     public static final boolean DRIVE_MOTOR_INVERT = true;
