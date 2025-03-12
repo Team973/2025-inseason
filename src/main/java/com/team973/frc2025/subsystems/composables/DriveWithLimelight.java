@@ -236,7 +236,7 @@ public class DriveWithLimelight extends DriveComposable {
     }
   }
 
-  public TargetStage getTargetStage() {
+  public synchronized TargetStage getTargetStage() {
     return m_targetStage;
   }
 
@@ -365,7 +365,7 @@ public class DriveWithLimelight extends DriveComposable {
     m_thetaController.reset(m_poseEstimator.getPoseMeters().getRotation().getRadians());
   }
 
-  public ChassisSpeeds getOutput() {
+  public synchronized ChassisSpeeds getOutput() {
     if (m_target == null) {
       return new ChassisSpeeds(0, 0, 0);
     }
