@@ -224,6 +224,12 @@ public class Superstructure implements Subsystem {
   public void update() {
     switch (m_state) {
       case Manual:
+        if (m_lastState != m_state) {
+          m_manualArmivator = false;
+          m_manualScore = false;
+          m_manualIntake = true;
+        }
+
         if (m_manualScore) {
           clawScore();
         } else if (m_manualIntake) {
