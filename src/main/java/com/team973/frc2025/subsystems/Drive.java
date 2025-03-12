@@ -98,8 +98,7 @@ public class Drive implements Subsystem {
             "limelight-back",
             m_pigeon,
             new Pose3d(
-                new Translation3d(-0.006, 0.108, 0.959),
-                new Rotation3d(Rotation2d.fromDegrees(180))),
+                new Translation3d(0.0, 0.108, 0.968), new Rotation3d(Rotation2d.fromDegrees(180))),
             logger.subLogger("providers/ll-back"));
 
     m_fusedEstimator =
