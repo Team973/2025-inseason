@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -40,9 +41,12 @@ import java.util.Optional;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
+  private final AtomicBoolean m_readyToScore = new AtomicBoolean(false);
+  private final AtomicBoolean m_readyToBackOff = new AtomicBoolean(false);
+
   private final Logger m_logger = new Logger("robot");
   private final DriveController m_driveController =
-      new DriveController(m_logger.subLogger("drive", 0.05));
+      new DriveController(m_logger.subLogger("drive", 0.05), m_readyToScore, m_readyToBackOff);
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
@@ -117,6 +121,9 @@ public class Robot extends TimedRobot {
     m_candleManger.syncSensors();
     m_superstructure.syncSensors();
 
+    m_readyToScore.set(m_superstructure.readyToScore());
+    m_readyToBackOff.set(m_superstructure.readyToBackOff());
+
     m_syncSensorsLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
@@ -136,6 +143,9 @@ public class Robot extends TimedRobot {
     m_driveController.log();
     m_superstructure.log();
     m_candleManger.log();
+
+    m_logger.log("Ready To Score", m_readyToScore.get());
+    m_logger.log("Ready To Back Off", m_readyToBackOff.get());
   }
 
   private void updateJoysticks() {
@@ -304,11 +314,7 @@ public class Robot extends TimedRobot {
 
       if (m_driverStick.getRightTrigger()) {
         m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
-        m_driveController
-            .getDriveWithLimelight()
-            .targetReefPosition(
-                () -> m_superstructure.readyToScore(),
-                () -> m_superstructure.readyToMoveToBackOff());
+        m_driveController.getDriveWithLimelight().targetReefPosition();
         m_superstructure.setState(Superstructure.State.Score);
       } else {
         m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);

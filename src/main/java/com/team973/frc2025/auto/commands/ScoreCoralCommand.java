@@ -43,10 +43,7 @@ public class ScoreCoralCommand extends AutoCommand {
     m_superstructure.setGamePieceMode(GamePiece.Coral);
     m_superstructure.setState(Superstructure.State.Score);
 
-    m_drive
-        .getDriveWithLimelight()
-        .targetReefPosition(
-            () -> m_superstructure.readyToScore(), () -> m_superstructure.readyToMoveToBackOff());
+    m_drive.getDriveWithLimelight().targetReefPosition();
   }
 
   @Override
