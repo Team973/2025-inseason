@@ -288,14 +288,6 @@ public class Robot extends TimedRobot {
               allianceScalar * m_driverStick.getLeftXAxis(),
               m_driverStick.getRightXAxis() * 0.8);
 
-      if (m_driverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.setManualArmivator(true);
-      }
-
-      if (m_driverStick.getLeftTriggerPressed()) {
-        m_superstructure.setManualArmivator(false);
-      }
-
       if (m_driverStick.getRightBumperButtonPressed()) {
         m_superstructure.setManualScore(true);
       } else if (m_driverStick.getRightBumperButtonReleased()) {
@@ -347,13 +339,11 @@ public class Robot extends TimedRobot {
       if (m_coDriverStick.getBackButton()) {
         m_superstructure.setState(Superstructure.State.Zero);
       } else {
-        m_superstructure.setState(Superstructure.State.Manual);
+        m_superstructure.setState(Superstructure.State.Score);
       }
 
       if (m_coDriverStick.getRightTriggerPressed()) {
         m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
-        m_superstructure.setTargetReefLevel(ReefLevel.Horizontal);
-        m_superstructure.setManualArmivator(true);
       } else if (m_coDriverStick.getLeftTriggerPressed()) {
         m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
       } else if (Math.abs(climbStick) > 0.25) {
