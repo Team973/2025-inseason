@@ -18,7 +18,7 @@ public class Superstructure implements Subsystem {
   private ReefLevel m_targetReefLevel = ReefLevel.L_1;
 
   private boolean m_manualScore = false;
-  private boolean m_manualIntake = false;
+  private boolean m_manualIntake = true;
   private boolean m_manualArmivator = false;
 
   public enum State {
