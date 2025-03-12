@@ -294,15 +294,22 @@ public class Robot extends TimedRobot {
         m_superstructure.setManualScore(false);
       }
 
-      if (!m_driverStick.getRightTrigger()) {
-        m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
-      } else {
+      if (m_driverStick.getRightTrigger()) {
         m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
         m_driveController
             .getDriveWithLimelight()
             .targetReefPosition(
                 () -> m_superstructure.readyToScore(),
                 () -> m_superstructure.readyToMoveToBackOff());
+        m_superstructure.setState(Superstructure.State.Score);
+      } else {
+        m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
+
+        if (m_coDriverStick.getBackButton()) {
+          m_superstructure.setState(Superstructure.State.Zero);
+        } else {
+          m_superstructure.setState(Superstructure.State.Manual);
+        }
       }
       double climbStick = m_coDriverStick.getLeftYAxis();
 
@@ -334,12 +341,6 @@ public class Robot extends TimedRobot {
         m_superstructure.setManualIntake(false);
       } else if (m_coDriverStick.getLeftBumperButtonReleased()) {
         m_superstructure.setManualIntake(true);
-      }
-
-      if (m_coDriverStick.getBackButton()) {
-        m_superstructure.setState(Superstructure.State.Zero);
-      } else {
-        m_superstructure.setState(Superstructure.State.Score);
       }
 
       if (m_coDriverStick.getRightTriggerPressed()) {

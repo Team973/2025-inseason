@@ -10,8 +10,8 @@ public class Superstructure implements Subsystem {
   private final Arm m_arm;
   private final DriveController m_driveController;
 
-  private State m_state = State.Intake;
-  private State m_lastState = State.Intake;
+  private State m_state = State.Manual;
+  private State m_lastState = State.Manual;
 
   private GamePiece m_gamePieceMode = GamePiece.Coral;
 
@@ -19,9 +19,10 @@ public class Superstructure implements Subsystem {
 
   private boolean m_manualScore = false;
   private boolean m_manualIntake = false;
+  private boolean m_manualArmivator = false;
 
   public enum State {
-    Intake,
+    Manual,
     Score,
     Zero,
     Climb,
@@ -170,6 +171,10 @@ public class Superstructure implements Subsystem {
     m_arm.incrementOffset(increment, m_targetReefLevel);
   }
 
+  public void setManualArmivator(boolean manual) {
+    m_manualArmivator = manual;
+  }
+
   public void incrementElevatorOffset(double increment) {
     m_elevator.incrementOffset(increment, m_targetReefLevel);
   }
@@ -218,10 +223,23 @@ public class Superstructure implements Subsystem {
 
   public void update() {
     switch (m_state) {
-      case Intake:
-        clawIntake();
-        armStow();
-        elevatorStow();
+      case Manual:
+        if (m_manualScore) {
+          clawScore();
+        } else if (m_manualIntake) {
+          clawIntake();
+        } else {
+          m_claw.setControl(Claw.ControlStatus.Off);
+        }
+
+        if (m_manualArmivator) {
+          armTargetReefLevel();
+          elevatorTargetReefLevel();
+        } else {
+          armStow();
+          elevatorStow();
+        }
+
         break;
       case Score:
         clawIntake();

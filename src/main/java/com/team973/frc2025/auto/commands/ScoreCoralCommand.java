@@ -51,10 +51,10 @@ public class ScoreCoralCommand extends AutoCommand {
 
   @Override
   public void run(Alliance alliance) {
-		if (m_drive.getDriveWithLimelight().getTargetStage() == TargetStage.Scoring) {
-			m_superstructure.setManualScore(true);
-		}
-	}
+    if (m_drive.getDriveWithLimelight().getTargetStage() == TargetStage.Scoring) {
+      m_superstructure.setManualScore(true);
+    }
+  }
 
   @Override
   public void log(Alliance alliance) {}
