@@ -288,6 +288,14 @@ public class Robot extends TimedRobot {
               allianceScalar * m_driverStick.getLeftXAxis(),
               m_driverStick.getRightXAxis() * 0.8);
 
+      if (m_driverStick.getLeftBumperButtonPressed()) {
+        m_superstructure.setManualArmivator(true);
+      }
+
+      if (m_driverStick.getLeftTriggerPressed()) {
+        m_superstructure.setManualArmivator(false);
+      }
+
       if (m_driverStick.getRightBumperButtonPressed()) {
         m_superstructure.setManualScore(true);
       } else if (m_driverStick.getRightBumperButtonReleased()) {
