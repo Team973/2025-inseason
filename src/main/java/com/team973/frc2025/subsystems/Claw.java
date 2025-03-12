@@ -95,10 +95,13 @@ public class Claw implements Subsystem {
     defaultMotorConfig.Slot0.kI = 0.0;
     defaultMotorConfig.Slot0.kD = 0.0;
 
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 20;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
     defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+    defaultMotorConfig.Voltage.PeakForwardVoltage = 12.0;
+    defaultMotorConfig.Voltage.PeakReverseVoltage = -12.0;
 
     defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
@@ -132,6 +135,14 @@ public class Claw implements Subsystem {
     return Optional.of(m_clawAlgaeSensor.getDistance().getValueAsDouble());
   }
 
+  public boolean getHasAlgae() {
+    if (getAlgaeDistance().isPresent()) {
+      return getAlgaeDistance().get() < 0.06;
+    }
+
+    return false;
+  }
+
   public void coralScoredLED() {
     // TODO: Add back the algee sensor once tunned
     if (getSeesCoral()) {
@@ -160,11 +171,13 @@ public class Claw implements Subsystem {
         }
         break;
       case IntakeAlgae:
-        if (getAlgaeDistance().isEmpty()) {
+        Optional<Double> algaeDistance = getAlgaeDistance();
+
+        if (algaeDistance.isEmpty()) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-        } else if (getAlgaeDistance().get() > 0.4) {
+        } else if (algaeDistance.get() > 0.4) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-        } else if (getAlgaeDistance().get() < 0.06) {
+        } else if (algaeDistance.get() < 0.06) {
           m_clawMotor.setControl(ControlMode.VelocityVoltage, 4);
         } else {
           m_clawMotor.setControl(ControlMode.VelocityVoltage, 30);

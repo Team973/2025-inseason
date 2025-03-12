@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class NoAuto extends AutoMode {
   public NoAuto(Logger logger) {
-    super(logger, new Pose2d(15.99, 4.89, Rotation2d.fromDegrees(0)));
+    super(logger, new Pose2d(15.99, 4.89, Rotation2d.fromDegrees(180)));
   }
 
   public String getName() {
