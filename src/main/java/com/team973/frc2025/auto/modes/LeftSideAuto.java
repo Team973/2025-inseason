@@ -22,9 +22,9 @@ public class LeftSideAuto extends AutoMode {
         new DriveTrajectoryCommand(drive, "E-HP"),
         new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
         new DriveTrajectoryCommand(drive, "HP-F"),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.E, ReefLevel.L_4, ReefSide.Right),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "F-HP"),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.E, ReefLevel.L_4, ReefSide.Right));
+        new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Left));
   }
 
   public String getName() {
