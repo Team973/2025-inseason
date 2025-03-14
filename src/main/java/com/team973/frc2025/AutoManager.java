@@ -51,8 +51,6 @@ public class AutoManager {
             m_leftSideAuto,
             m_rightSideAuto,
             m_babyBirdAuto);
-   
-    selectAuto(getSelectedMode());
   }
 
   public void increment() {
