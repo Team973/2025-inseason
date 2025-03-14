@@ -225,7 +225,6 @@ public class Superstructure implements Subsystem {
     switch (m_state) {
       case Manual:
         if (m_lastState != m_state) {
-          m_manualArmivator = false;
           m_manualScore = false;
           m_manualIntake = true;
         }
@@ -256,12 +255,23 @@ public class Superstructure implements Subsystem {
 
         switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
           case MoveToApproach:
-            armStow();
-            elevatorStow();
+            if (m_driveController.getDriveWithLimelight().isNearApproach()) {
+              armTargetReefLevel();
+              elevatorTargetReefLevel();
+
+              m_manualArmivator = true;
+            } else {
+              armStow();
+              elevatorStow();
+
+              m_manualArmivator = false;
+            }
             break;
           case Approach:
             armTargetReefLevel();
             elevatorTargetReefLevel();
+
+            m_manualArmivator = true;
             break;
           case MoveToScoring:
             armTargetReefLevel();
@@ -284,6 +294,8 @@ public class Superstructure implements Subsystem {
           case BackOff:
             armStow();
             elevatorStow();
+
+            m_manualArmivator = false;
             break;
         }
         break;
@@ -297,9 +309,11 @@ public class Superstructure implements Subsystem {
         m_claw.setControl(Claw.ControlStatus.Off);
 
         setTargetReefLevel(ReefLevel.Horizontal);
-        armTargetReefLevel();
 
-        elevatorStow();
+        armTargetReefLevel();
+        elevatorTargetReefLevel();
+
+        m_manualArmivator = true;
         break;
       case Off:
         m_claw.setControl(Claw.ControlStatus.Off);
