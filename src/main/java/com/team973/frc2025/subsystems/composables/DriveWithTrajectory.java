@@ -96,6 +96,8 @@ public class DriveWithTrajectory extends DriveComposable {
     m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
   }
 
+  public void exit() {}
+
   private boolean m_allianceInitialized = false;
   private Alliance m_alliance;
 

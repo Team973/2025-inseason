@@ -11,6 +11,11 @@ public abstract class DriveComposable {
         rotationProvider.init();
       }
 
+      public void exit() {
+        translationProvider.exit();
+        rotationProvider.exit();
+      }
+
       @Override
       public ChassisSpeeds getOutput() {
         ChassisSpeeds output = new ChassisSpeeds();
@@ -25,6 +30,8 @@ public abstract class DriveComposable {
   }
 
   public abstract void init();
+
+  public abstract void exit();
 
   public abstract ChassisSpeeds getOutput();
 }
