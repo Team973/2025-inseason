@@ -15,7 +15,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.function.BooleanSupplier;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DriveWithLimelight extends DriveComposable {
   private static final double SCORING_DISTANCE_TOLERANCE_METERS = 0.06;
@@ -41,8 +41,8 @@ public class DriveWithLimelight extends DriveComposable {
   private ReefFace m_targetReefFace = ReefFace.A;
   private ReefSide m_targetReefSide = ReefSide.Left;
 
-  private BooleanSupplier m_targetScoringPoseGate = () -> true;
-  private BooleanSupplier m_targetBackOffPoseGate = () -> false;
+  private final AtomicBoolean m_readyToScore;
+  private final AtomicBoolean m_readyToBackOff;
 
   private TargetStage m_targetStage = TargetStage.MoveToApproach;
 
@@ -153,7 +153,11 @@ public class DriveWithLimelight extends DriveComposable {
             AprilTag.fromRed(6), ALGAE_APPROACH_TARGET, ALGAE_PICKUP_DIST, new Rotation2d());
   }
 
-  public DriveWithLimelight(GreyPoseEstimator poseEstimator, Logger logger) {
+  public DriveWithLimelight(
+      GreyPoseEstimator poseEstimator,
+      Logger logger,
+      AtomicBoolean readyToScore,
+      AtomicBoolean readyToBackOff) {
     m_poseEstimator = poseEstimator;
 
     double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
@@ -171,6 +175,9 @@ public class DriveWithLimelight extends DriveComposable {
         Units.degreesToRadians(0.0), Units.degreesToRadians(360.0));
 
     m_logger = logger;
+
+    m_readyToScore = readyToScore;
+    m_readyToBackOff = readyToBackOff;
   }
 
   public void setTargetSide(ReefSide side) {
@@ -229,12 +236,11 @@ public class DriveWithLimelight extends DriveComposable {
     }
   }
 
-  public TargetStage getTargetStage() {
+  public synchronized TargetStage getTargetStage() {
     return m_targetStage;
   }
 
-  public void targetReefPosition(
-      BooleanSupplier targetScoringPoseGate, BooleanSupplier targetBackOffPoseGate) {
+  public void targetReefPosition() {
     if (getTargetReefPosition() != m_target) {
       m_approachPose = getTargetReefPosition().getApproachPose();
       m_scoringPose = getTargetReefPosition().getScoringPose();
@@ -246,9 +252,6 @@ public class DriveWithLimelight extends DriveComposable {
 
       m_targetStage = TargetStage.MoveToApproach;
     }
-
-    m_targetScoringPoseGate = targetScoringPoseGate;
-    m_targetBackOffPoseGate = targetBackOffPoseGate;
   }
 
   public void log() {
@@ -257,9 +260,6 @@ public class DriveWithLimelight extends DriveComposable {
 
     m_logger.log("Target Side", m_targetReefSide.toString());
     m_logger.log("Target Stage", m_targetStage.toString());
-
-    m_logger.log("Target Scoring Pose Gate", m_targetScoringPoseGate.getAsBoolean());
-    m_logger.log("Target BackOff Pose Gate", m_targetBackOffPoseGate.getAsBoolean());
 
     m_logger.log("Is At Approach", isAtApproach());
     m_logger.log("Is At Scoring", isAtScoring());
@@ -365,7 +365,7 @@ public class DriveWithLimelight extends DriveComposable {
     m_thetaController.reset(m_poseEstimator.getPoseMeters().getRotation().getRadians());
   }
 
-  public ChassisSpeeds getOutput() {
+  public synchronized ChassisSpeeds getOutput() {
     if (m_target == null) {
       return new ChassisSpeeds(0, 0, 0);
     }
@@ -377,7 +377,7 @@ public class DriveWithLimelight extends DriveComposable {
         }
         break;
       case Approach:
-        if (m_targetScoringPoseGate.getAsBoolean()) {
+        if (m_readyToScore.get()) {
           m_targetStage = TargetStage.MoveToScoring;
         }
         break;
@@ -387,7 +387,7 @@ public class DriveWithLimelight extends DriveComposable {
         }
         break;
       case Scoring:
-        if (m_targetBackOffPoseGate.getAsBoolean()) {
+        if (m_readyToBackOff.get()) {
           m_targetStage = TargetStage.MoveToBackOff;
         }
         break;

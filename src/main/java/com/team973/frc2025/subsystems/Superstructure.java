@@ -18,13 +18,14 @@ public class Superstructure implements Subsystem {
   private ReefLevel m_targetReefLevel = ReefLevel.L_1;
 
   private boolean m_manualScore = false;
-  private boolean m_manualArmivator = false;
   private boolean m_manualIntake = true;
+  private boolean m_manualArmivator = false;
 
   public enum State {
-    Score,
     Manual,
+    Score,
     Zero,
+    Climb,
     Off
   }
 
@@ -58,10 +59,6 @@ public class Superstructure implements Subsystem {
 
   public void setManualScore(boolean score) {
     m_manualScore = score;
-  }
-
-  public void setManualArmivator(boolean manual) {
-    m_manualArmivator = manual;
   }
 
   public void setManualIntake(boolean intake) {
@@ -106,18 +103,13 @@ public class Superstructure implements Subsystem {
     }
 
     return true;
-
-    // return m_arm.motorAtTargetRotation()
-    //     && m_elevator.motorAtTarget()
-    //     && m_arm.getTargetPosition() != Arm.CORAL_STOW_POSITION_DEG
-    //     && m_arm.getTargetPosition() != Arm.ALGAE_STOW_POSITION_DEG;
   }
 
   public boolean getSeesCoral() {
     return m_claw.getSeesCoral();
   }
 
-  public boolean readyToMoveToBackOff() {
+  public boolean readyToBackOff() {
     if (m_gamePieceMode == GamePiece.Coral) {
       return !getSeesCoral();
     }
@@ -132,7 +124,6 @@ public class Superstructure implements Subsystem {
         "E: " + String.valueOf(m_elevator.getTargetPositionFromLevel(m_targetReefLevel)));
     SmartDashboard.putString(
         "DB/String 2", "A: " + String.valueOf(m_arm.getTargetDegFromLevel(m_targetReefLevel)));
-    SmartDashboard.putString("DB/String 3", "Scoring Pose: " + m_manualArmivator);
     SmartDashboard.putString("DB/String 8", m_gamePieceMode.toString());
 
     m_claw.log();
@@ -180,6 +171,10 @@ public class Superstructure implements Subsystem {
     m_arm.incrementOffset(increment, m_targetReefLevel);
   }
 
+  public void setManualArmivator(boolean manual) {
+    m_manualArmivator = manual;
+  }
+
   public void incrementElevatorOffset(double increment) {
     m_elevator.incrementOffset(increment, m_targetReefLevel);
   }
@@ -209,7 +204,9 @@ public class Superstructure implements Subsystem {
   }
 
   public void clawIntake() {
-    if (m_gamePieceMode == GamePiece.Coral) {
+    if (!m_manualIntake) {
+      m_claw.setControl(Claw.ControlStatus.Off);
+    } else if (m_gamePieceMode == GamePiece.Coral) {
       m_claw.setControl(Claw.ControlStatus.IntakeCoral);
     } else {
       m_claw.setControl(Claw.ControlStatus.IntakeAlgae);
@@ -226,8 +223,36 @@ public class Superstructure implements Subsystem {
 
   public void update() {
     switch (m_state) {
+      case Manual:
+        if (m_lastState != m_state) {
+          m_manualArmivator = false;
+          m_manualScore = false;
+          m_manualIntake = true;
+        }
+
+        if (m_manualScore) {
+          clawScore();
+        } else if (m_manualIntake) {
+          clawIntake();
+        } else {
+          m_claw.setControl(Claw.ControlStatus.Off);
+        }
+
+        if (m_manualArmivator) {
+          armTargetReefLevel();
+          elevatorTargetReefLevel();
+        } else {
+          armStow();
+          elevatorStow();
+        }
+
+        break;
       case Score:
         clawIntake();
+
+        if (m_lastState != m_state) {
+          m_manualScore = false;
+        }
 
         switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
           case MoveToApproach:
@@ -243,7 +268,9 @@ public class Superstructure implements Subsystem {
             elevatorTargetReefLevel();
             break;
           case Scoring:
-            clawScore();
+            if (m_manualScore) {
+              clawScore();
+            }
 
             armTargetReefLevel();
             elevatorTargetReefLevel();
@@ -260,34 +287,19 @@ public class Superstructure implements Subsystem {
             break;
         }
         break;
-      case Manual:
-        if (m_lastState != m_state) {
-          m_manualScore = false;
-          m_manualArmivator = false;
-          m_manualIntake = true;
-        }
-
-        if (m_manualArmivator) {
-          armTargetReefLevel();
-          elevatorTargetReefLevel();
-        } else {
-          armStow();
-          elevatorStow();
-        }
-
-        if (m_manualScore) {
-          clawScore();
-        } else if (m_manualIntake) {
-          clawIntake();
-        } else {
-          m_claw.setControl(Claw.ControlStatus.Off);
-        }
-        break;
       case Zero:
         m_arm.setControlStatus(Arm.ControlStatus.Zero);
         m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
 
         clawIntake();
+        break;
+      case Climb:
+        m_claw.setControl(Claw.ControlStatus.Off);
+
+        setTargetReefLevel(ReefLevel.Horizontal);
+        armTargetReefLevel();
+
+        elevatorStow();
         break;
       case Off:
         m_claw.setControl(Claw.ControlStatus.Off);
