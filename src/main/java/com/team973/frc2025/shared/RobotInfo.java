@@ -48,7 +48,15 @@ public final class RobotInfo {
     public static final int CLAW_ALGAE_CAN_ID = 48;
   }
 
+  public static final class ClimbInfo {
+    public static final double MOTOR_ROT_PER_CLIMB_ROT =
+        1.0 / ((10.0 / 64.0) * (20.0 / 72.0) * (20.0 / 84.0) * (9.0 / 30.0));
+  }
+
   public static class SignalerInfo {
+    public static final int CRASH_SIGNALER_PRIORITY = 5;
+    public static final int CLIMB_STOP_PRIORITY = 6;
+    public static final int CLIMB_HORIZONTAL_PRIORITY = 7;
     public static final int ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY = 10;
     public static final int ARM_HALL_SENSOR_SIGNALER_PRIORTY = 11;
     public static final int PEICE_IN_CLAW_SIGNALER_PRIORTY = 50;
@@ -105,7 +113,7 @@ public final class RobotInfo {
     public static final double CLOSED_LOOP_RAMP = 0.0;
 
     /* Angle Motor PID Values */
-    public static final double ANGLE_KP = 6.5;
+    public static final double ANGLE_KP = 5.5; // 6.5;
     public static final double ANGLE_KI = 0.0;
     public static final double ANGLE_KD = 0.0;
     public static final double ANGLE_KF = 0.0;

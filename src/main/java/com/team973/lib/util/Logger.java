@@ -46,13 +46,14 @@ public class Logger {
     if (m_secondsPerLog == 0) {
       return true;
     }
+    double now = Conversions.Time.getSecTime();
     if (m_keyLastLoggedAt.containsKey(key) == false) {
-      m_keyLastLoggedAt.put(key, Conversions.Time.getSecTime());
+      m_keyLastLoggedAt.put(key, now);
       return true;
     }
     double lastLoggedAt = m_keyLastLoggedAt.get(key);
-    if (lastLoggedAt + m_secondsPerLog < Conversions.Time.getSecTime()) {
-      m_keyLastLoggedAt.put(key, Conversions.Time.getSecTime());
+    if (lastLoggedAt + m_secondsPerLog < now) {
+      m_keyLastLoggedAt.put(key, now);
       return true;
     }
     return false;
@@ -133,19 +134,19 @@ public class Logger {
 
   public void log(String key, DoubleSupplier valueSupplier) {
     if (isLogAllowed(key)) {
-      log(key, valueSupplier.getAsDouble());
+      DogLog.log(m_prefix + "/" + key, valueSupplier.getAsDouble());
     }
   }
 
   public void log(String key, IntSupplier valueSupplier) {
     if (isLogAllowed(key)) {
-      log(key, valueSupplier.getAsInt());
+      DogLog.log(m_prefix + "/" + key, valueSupplier.getAsInt());
     }
   }
 
   public void log(String key, BooleanSupplier valueSupplier) {
     if (isLogAllowed(key)) {
-      log(key, valueSupplier.getAsBoolean());
+      DogLog.log(m_prefix + "/" + key, valueSupplier.getAsBoolean());
     }
   }
 }

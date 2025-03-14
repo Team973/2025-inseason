@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DriveController implements Subsystem {
   private final GreyPigeon m_pigeon;
@@ -47,7 +48,7 @@ public class DriveController implements Subsystem {
     m_drive.startOdometrey();
   }
 
-  public DriveController(Logger logger) {
+  public DriveController(Logger logger, AtomicBoolean readyToScore, AtomicBoolean readyToBackOff) {
     m_pigeon = new GreyPigeon(logger.subLogger("pigeon"));
     m_drive = new Drive(m_pigeon, this, logger);
 
@@ -59,7 +60,10 @@ public class DriveController implements Subsystem {
 
     m_driveWithLimelight =
         new DriveWithLimelight(
-            m_drive.getPoseEstimator(), m_logger.subLogger("driveWithLimelight"));
+            m_drive.getPoseEstimator(),
+            m_logger.subLogger("driveWithLimelight"),
+            readyToScore,
+            readyToBackOff);
 
     m_currentChassisSpeeds = new ChassisSpeeds();
   }

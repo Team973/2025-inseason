@@ -17,7 +17,10 @@ public class Arm implements Subsystem {
   private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
-  private boolean m_lastHallSensorMode;
+  // We want to track the transition from hall=false to hall=true; when the robot
+  // first boots up, we don't really know what the previous hall state was, so we
+  // assume it was true to avoid false positive.
+  private boolean m_lastHallSensorMode = true;
   private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
   private final SolidSignaler m_armHomedSigaler =
@@ -25,20 +28,21 @@ public class Arm implements Subsystem {
           RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
 
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
+  private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 64.0; // 79
-  private static final double LEVEL_THREE_POSITION_DEG = 64.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;
-  private static final double LEVEL_ONE_POSITION_DEG = -59.0; // -70.0;
-  public static final double CORAL_STOW_POSITION_DEG = -92.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 78.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 72.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -63.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -60.0;
+  public static final double CORAL_STOW_POSITION_DEG = -91.0;
 
-  private static final double ALGAE_HIGH_POSITION_DEG = 38.0;
-  private static final double ALGAE_LOW_POSITION_DEG = -61.0;
-  public static final double ALGAE_STOW_POSITION_DEG = -80.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = 34.0;
+  private static final double ALGAE_LOW_POSITION_DEG = -47.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -85.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
-  private static final double FEED_FORWARD_MAX_VOLT = 0.6; // 0.5;
+  private static final double FEED_FORWARD_MAX_VOLT = 0.6;
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
@@ -53,6 +57,7 @@ public class Arm implements Subsystem {
   public static enum ControlStatus {
     Manual,
     TargetPostion,
+    Zero,
     Off,
   }
 
@@ -143,6 +148,8 @@ public class Arm implements Subsystem {
         return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
         return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+      case Horizontal:
+        return HORIZONTAL_POSITION_DEG;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
@@ -166,8 +173,12 @@ public class Arm implements Subsystem {
             getFeedForwardTargetAngle(),
             0);
         break;
+      case Zero:
+        m_armMotor.setControl(ControlMode.DutyCycleOut, -0.1);
+        break;
       case Off:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
+        break;
     }
   }
 
@@ -199,6 +210,8 @@ public class Arm implements Subsystem {
       case AlgaeLow:
         m_algaeLowOffset += increment;
         break;
+      case Horizontal:
+        break;
     }
   }
 
@@ -214,6 +227,13 @@ public class Arm implements Subsystem {
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
     m_logger.log("HallsensorArm", hallSensor());
+
+    m_logger.log("Level 1 Offset", m_levelOneOffset);
+    m_logger.log("Level 2 Offset", m_levelTwoOffset);
+    m_logger.log("Level 3 Offset", m_levelThreeOffset);
+    m_logger.log("Level 4 Offset", m_levelFourOffset);
+    m_logger.log("Algae Low Offset", m_algaeLowOffset);
+    m_logger.log("Algae High Offset", m_algaeHighOffset);
   }
 
   @Override
