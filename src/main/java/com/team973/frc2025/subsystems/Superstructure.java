@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -232,6 +233,9 @@ public class Superstructure implements Subsystem {
   public void toggleGamePieceMode() {
     if (m_gamePieceMode == GamePiece.Coral) {
       setGamePieceMode(GamePiece.Algae);
+      setTargetReefLevel(
+          getAlgaePresetFromReefFace(
+              m_driveController.getDriveWithLimelight().getTargetReefFace()));
     } else {
       setGamePieceMode(GamePiece.Coral);
     }
@@ -264,6 +268,21 @@ public class Superstructure implements Subsystem {
       m_claw.setControl(Claw.ControlStatus.ScoreCoral);
     } else {
       m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
+    }
+  }
+
+  private ReefLevel getAlgaePresetFromReefFace(ReefFace face) {
+    switch (face) {
+      case A:
+      case C:
+      case E:
+        return ReefLevel.AlgaeHigh;
+      case B:
+      case D:
+      case F:
+        return ReefLevel.AlgaeLow;
+      default:
+        throw new IllegalArgumentException(face.toString());
     }
   }
 
