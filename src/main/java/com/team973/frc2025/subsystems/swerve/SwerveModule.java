@@ -275,28 +275,16 @@ public class SwerveModule {
     m_driveMotor.log();
     m_angleMotor.log();
     m_angleEncoder.log();
+
+    SwerveModuleState currentState = getState();
+
+    m_logger.log("drive/targetVelMPS", m_lastState.speedMetersPerSecond);
+    m_logger.log("drive/currentVelMPS", currentState.speedMetersPerSecond);
     m_logger.log(
-        "Current Velocity MPS",
-        m_driveMechanism.getOutputDistanceFromRotorRotation(
-            (Rotation2d.fromRotations(m_driveMotor.getVelocity().getValueAsDouble()))));
-    m_logger.log("Integrated", getState().angle.getDegrees());
-    m_logger.log("Position", getPosition().distanceMeters);
-    m_logger.log(
-        "Target Drive Velocity RPS",
-        m_driveMechanism
-            .getRotorRotationFromOutputDistance(m_lastState.speedMetersPerSecond)
-            .getRotations());
-    m_logger.log(
-        "Drive Velocity MPS",
-        m_driveMotor.getVelocity().getValueAsDouble()
-            * DriveInfo.DRIVE_GEAR_RATIO
-            * DriveInfo.LINEAR_METERS_PER_WHEEL_ROTATIONS);
-    m_logger.log(
-        "Angle Rot",
+        "steer/targetPosRot",
         m_angleMechanism.getRotorRotationFromOutputRotation(m_lastState.angle).getRotations());
     m_logger.log(
-        "Target Angle Rot",
-        m_angleMechanism.getRotorRotationFromOutputRotation(m_lastState.angle).getRotations());
-    m_logger.log("Target Drive Velocity MPS", m_lastState.speedMetersPerSecond);
+        "steer/currentPosRot",
+        m_angleMechanism.getRotorRotationFromOutputRotation(currentState.angle).getRotations());
   }
 }

@@ -1,6 +1,7 @@
 package com.team973.frc2025;
 
 import choreo.util.ChoreoAllianceFlipUtil;
+import com.team973.frc2025.auto.modes.BabyBird;
 import com.team973.frc2025.auto.modes.DriveTestAuto;
 import com.team973.frc2025.auto.modes.LeftSideAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
@@ -18,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AutoManager {
-  private AutoMode m_currentMode;
   private final List<AutoMode> m_availableAutos;
   private int m_selectedMode = 0;
 
@@ -28,7 +28,8 @@ public class AutoManager {
   private final AutoMode m_driveTestAuto;
   private final AutoMode m_leftSideAuto;
   private final AutoMode m_rightSideAuto;
-  private NoAutoAllianceWallCenter m_noAutoAllianceWallCenter;
+  private final AutoMode m_noAutoAllianceWallCenter;
+  private final AutoMode m_babyBirdAuto;
 
   public AutoManager(Logger logger, DriveController drive, Superstructure superstructure) {
     m_noAuto = new NoAuto(logger);
@@ -38,6 +39,7 @@ public class AutoManager {
     m_leftSideAuto = new LeftSideAuto(logger.subLogger("LeftSideAuto"), superstructure, drive);
     m_rightSideAuto = new RightSideAuto(logger.subLogger("RightSideAuto"), superstructure, drive);
     m_noAutoAllianceWallCenter = new NoAutoAllianceWallCenter(logger);
+    m_babyBirdAuto = new BabyBird(logger, drive, superstructure);
 
     m_availableAutos =
         Arrays.asList(
@@ -47,9 +49,8 @@ public class AutoManager {
             m_driveTestAuto,
             m_noAutoAllianceWallCenter,
             m_leftSideAuto,
-            m_rightSideAuto);
-
-    selectAuto(getSelectedMode());
+            m_rightSideAuto,
+            m_babyBirdAuto);
   }
 
   public void increment() {
@@ -57,7 +58,6 @@ public class AutoManager {
     if (m_selectedMode >= m_availableAutos.size()) {
       m_selectedMode = 0;
     }
-    selectAuto(getSelectedMode());
   }
 
   public void decrement() {
@@ -65,7 +65,6 @@ public class AutoManager {
     if (m_selectedMode < 0) {
       m_selectedMode = m_availableAutos.size() - 1;
     }
-    selectAuto(getSelectedMode());
   }
 
   public AutoMode getSelectedMode() {
@@ -74,23 +73,18 @@ public class AutoManager {
 
   public Pose2d getStartingPose(Alliance alliance) {
     if (alliance == Alliance.Red) {
-      return ChoreoAllianceFlipUtil.flip(m_currentMode.getStartingPose());
+      return ChoreoAllianceFlipUtil.flip(getSelectedMode().getStartingPose());
     } else {
-      return m_currentMode.getStartingPose();
+      return getSelectedMode().getStartingPose();
     }
   }
 
   public void run(Alliance alliance) {
-    m_currentMode.run(alliance);
-    m_currentMode.log(alliance);
+    getSelectedMode().run(alliance);
+    getSelectedMode().log(alliance);
   }
 
   public void init() {
-    selectAuto(m_availableAutos.get(m_selectedMode));
-    m_currentMode.init();
-  }
-
-  private void selectAuto(AutoMode mode) {
-    m_currentMode = mode;
+    getSelectedMode().init();
   }
 }
