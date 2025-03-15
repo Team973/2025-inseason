@@ -226,18 +226,11 @@ public class Superstructure implements Subsystem {
   }
 
   private ReefLevel getAlgaePresetFromReefFace(ReefFace face) {
-    switch (face) {
-      case A:
-      case C:
-      case E:
-        return ReefLevel.AlgaeHigh;
-      case B:
-      case D:
-      case F:
-        return ReefLevel.AlgaeLow;
-      default:
-        throw new IllegalArgumentException(face.toString());
-    }
+    return switch (face) {
+      case A, C, E -> ReefLevel.AlgaeHigh;
+      case B, D, F -> ReefLevel.AlgaeLow;
+      default -> throw new IllegalArgumentException(face.toString());
+    };
   }
 
   public void update() {
