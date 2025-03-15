@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class CANdleManger implements Subsystem {
-    public final CANdle m_candle = new CANdle(18, "rio");
+  public final CANdle m_candle = new CANdle(18, "rio");
 
   public List<ISignaler> m_priortyQue;
 
