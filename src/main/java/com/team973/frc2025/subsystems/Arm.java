@@ -72,9 +72,9 @@ public class Arm implements Subsystem {
   public Arm(Logger logger, CANdleManger candle) {
     m_logger = logger;
     m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
-    TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     m_candleManger = candle;
     m_candleManger.addSignaler(m_armHomedSigaler);
+    TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.0;
     armMotorConfig.Slot0.kA = 0.0;

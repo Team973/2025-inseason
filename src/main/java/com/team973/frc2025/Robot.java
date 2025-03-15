@@ -18,6 +18,7 @@ import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
+import com.team973.frc2025.subsystems.Wrist;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Conversions;
@@ -52,6 +53,7 @@ public class Robot extends TimedRobot {
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"), m_candleManger);
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm"), m_candleManger);
+  private final Wrist m_wrist = new Wrist(new Logger("wrist"));
 
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(
@@ -69,7 +71,7 @@ public class Robot extends TimedRobot {
           RobotInfo.SignalerInfo.CRASH_SIGNALER_PRIORITY);
 
   private final Superstructure m_superstructure =
-      new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
+      new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_wrist, m_driveController);
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_superstructure);
