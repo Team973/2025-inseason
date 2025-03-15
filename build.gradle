@@ -11,7 +11,7 @@ java {
 
 def ROBOT_MAIN_CLASS = "com.team973.frc2025.Main"
 
-tasks.register("downloadLog", DownloadLog)
+tasks.register("downloadLogs", DownloadLogs)
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
