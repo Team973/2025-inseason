@@ -18,11 +18,13 @@ public class LeftSideAuto extends AutoMode {
     super(
         logger,
         new Pose2d(7.3, 5.7, Rotation2d.fromDegrees(180)),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.E, ReefLevel.L_4, ReefSide.Left),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.E, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "E-HP"),
         new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
-        new DriveTrajectoryCommand(drive, "HP-E"),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.E, ReefLevel.L_4, ReefSide.Right));
+        new DriveTrajectoryCommand(drive, "HP-F"),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Right),
+        new DriveTrajectoryCommand(drive, "F-HP"),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Left));
   }
 
   public String getName() {

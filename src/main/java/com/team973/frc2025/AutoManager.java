@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AutoManager {
-  private AutoMode m_currentMode;
   private final List<AutoMode> m_availableAutos;
   private int m_selectedMode = 0;
 
@@ -52,8 +51,6 @@ public class AutoManager {
             m_leftSideAuto,
             m_rightSideAuto,
             m_babyBirdAuto);
-
-    selectAuto(getSelectedMode());
   }
 
   public void increment() {
@@ -61,7 +58,6 @@ public class AutoManager {
     if (m_selectedMode >= m_availableAutos.size()) {
       m_selectedMode = 0;
     }
-    selectAuto(getSelectedMode());
   }
 
   public void decrement() {
@@ -69,7 +65,6 @@ public class AutoManager {
     if (m_selectedMode < 0) {
       m_selectedMode = m_availableAutos.size() - 1;
     }
-    selectAuto(getSelectedMode());
   }
 
   public AutoMode getSelectedMode() {
@@ -78,23 +73,18 @@ public class AutoManager {
 
   public Pose2d getStartingPose(Alliance alliance) {
     if (alliance == Alliance.Red) {
-      return ChoreoAllianceFlipUtil.flip(m_currentMode.getStartingPose());
+      return ChoreoAllianceFlipUtil.flip(getSelectedMode().getStartingPose());
     } else {
-      return m_currentMode.getStartingPose();
+      return getSelectedMode().getStartingPose();
     }
   }
 
   public void run(Alliance alliance) {
-    m_currentMode.run(alliance);
-    m_currentMode.log(alliance);
+    getSelectedMode().run(alliance);
+    getSelectedMode().log(alliance);
   }
 
   public void init() {
-    selectAuto(m_availableAutos.get(m_selectedMode));
-    m_currentMode.init();
-  }
-
-  private void selectAuto(AutoMode mode) {
-    m_currentMode = mode;
+    getSelectedMode().init();
   }
 }
