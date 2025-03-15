@@ -1,0 +1,195 @@
+package com.team973.frc2025.subsystems;
+
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
+import com.team973.lib.devices.GreyTalonFX;
+import com.team973.lib.devices.GreyTalonFX.ControlMode;
+import com.team973.lib.util.Logger;
+import com.team973.lib.util.Subsystem;
+
+public class Wrist implements Subsystem {
+  private final Logger m_logger;
+  private final GreyTalonFX m_wristMotor;
+  private ControlStatus m_controlStatus = ControlStatus.Off;
+  private double m_manualWristPower;
+  private double m_wristTargetPostionDeg;
+
+  private static final double WRIST_HOMING_POSTION_DEG = -90.0;
+  private static final double HORIZONTAL_POSITION_DEG = 0.0;
+
+  private static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS = 0;
+
+  private static final double LEVEL_FOUR_POSITION_DEG = 0.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 0.0;
+  private static final double LEVEL_TWO_POSITION_DEG = 0.0;
+  private static final double LEVEL_ONE_POSITION_DEG = 0.0;
+  public static final double CORAL_STOW_POSITION_DEG = 0.0;
+
+  private static final double ALGAE_HIGH_POSITION_DEG = 0.0;
+  private static final double ALGAE_LOW_POSITION_DEG = 0.0;
+  public static final double ALGAE_STOW_POSITION_DEG = 0.0;
+
+  private double m_levelOneOffset = 0.0;
+  private double m_levelTwoOffset = 0.0;
+  private double m_levelThreeOffset = 0.0;
+  private double m_levelFourOffset = 0.0;
+
+  private double m_algaeHighOffset = 0.0;
+  private double m_algaeLowOffset = 0.0;
+
+  public Wrist(Logger logger) {
+    m_logger = logger;
+    m_wristMotor = new GreyTalonFX(0, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
+    TalonFXConfiguration wristMotorConfig = new TalonFXConfiguration();
+    wristMotorConfig.Slot0.kS = 0.0;
+    wristMotorConfig.Slot0.kV = 0.0;
+    wristMotorConfig.Slot0.kA = 0.0;
+    wristMotorConfig.Slot0.kP = 0.0;
+    wristMotorConfig.Slot0.kI = 0.0;
+    wristMotorConfig.Slot0.kD = 0.0;
+    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 20.0; // 64.0;
+    wristMotorConfig.MotionMagic.MotionMagicAcceleration = 30.0; // 80.0;
+    wristMotorConfig.MotionMagic.MotionMagicJerk = 80.0;
+    wristMotorConfig.CurrentLimits.StatorCurrentLimit = 20.0;
+    wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimit = 15.0;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    wristMotorConfig.Voltage.PeakForwardVoltage = 4.0;
+    wristMotorConfig.Voltage.PeakReverseVoltage = -4.0;
+    // TODO: ask for the inverted value
+    wristMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    wristMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    m_wristMotor.setConfig(wristMotorConfig);
+    m_wristMotor.setPosition(wristDegToMotorRotations(WRIST_HOMING_POSTION_DEG));
+  }
+
+  public static enum ControlStatus {
+    Manual,
+    TargetPostion,
+    Zero,
+    Off,
+  }
+
+  private double wristDegToMotorRotations(double wristPostionDeg) {
+    return wristPostionDeg / 360.0 / WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
+  }
+
+  private double motorRotationsToArmDeg(double motorPostion) {
+    return motorPostion * WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
+  }
+
+  public double getArmPostionDeg() {
+    return motorRotationsToArmDeg(m_wristMotor.getPosition().getValueAsDouble());
+  }
+
+  public void setControlStatus(ControlStatus targetpostion) {
+    m_controlStatus = targetpostion;
+  }
+
+  public double getTargetDegFromLevel(ReefLevel level) {
+    switch (level) {
+      case L_1:
+        return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
+      case L_2:
+        return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
+      case L_3:
+        return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
+      case L_4:
+        return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+      case AlgaeHigh:
+        return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
+      case AlgaeLow:
+        return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+      case Horizontal:
+        return HORIZONTAL_POSITION_DEG;
+      default:
+        throw new IllegalArgumentException(String.valueOf(level));
+    }
+  }
+
+  public void incrementOffset(double increment, ReefLevel level) {
+    switch (level) {
+      case L_1:
+        m_levelOneOffset += increment;
+        break;
+      case L_2:
+        m_levelTwoOffset += increment;
+        break;
+      case L_3:
+        m_levelThreeOffset += increment;
+        break;
+      case L_4:
+        m_levelFourOffset += increment;
+        break;
+      case AlgaeHigh:
+        m_algaeHighOffset += increment;
+        break;
+      case AlgaeLow:
+        m_algaeLowOffset += increment;
+        break;
+      case Horizontal:
+        break;
+    }
+  }
+
+  public double getTargetPosition() {
+    return m_wristTargetPostionDeg;
+  }
+
+  public void setMotorManualOutput(double joystick) {
+    m_controlStatus = ControlStatus.Manual;
+    m_manualWristPower = joystick * 0.1;
+  }
+
+  public void setTargetDeg(double setPostionDeg) {
+    m_wristTargetPostionDeg = setPostionDeg;
+    m_controlStatus = ControlStatus.TargetPostion;
+  }
+
+  public boolean motorAtTargetRotation() {
+    return (Math.abs(
+            wristDegToMotorRotations(m_wristTargetPostionDeg)
+                - m_wristMotor.getPosition().getValueAsDouble())
+        < 0.1);
+  }
+
+  @Override
+  public void syncSensors() {}
+
+  @Override
+  public void update() {
+    switch (m_controlStatus) {
+      case Manual:
+        m_wristMotor.setControl(ControlMode.VoltageOut, (m_manualWristPower * 12.0), 0);
+        break;
+      case TargetPostion:
+        m_wristMotor.setControl(
+            ControlMode.VelocityVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
+        break;
+      case Zero:
+        m_wristMotor.setControl(ControlMode.DutyCycleOut, -0.1);
+        break;
+      case Off:
+        m_wristMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
+        break;
+    }
+  }
+
+  @Override
+  public void log() {
+    m_logger.log("wristDegPostion", getArmPostionDeg());
+    m_wristMotor.log();
+    m_logger.log("wristTargetPostionDeg", m_wristTargetPostionDeg);
+    m_logger.log("wristMode", m_controlStatus.toString());
+    m_logger.log(
+        "motorwristErrorDeg",
+        motorRotationsToArmDeg(m_wristMotor.getClosedLoopError().getValueAsDouble()));
+    m_logger.log("manualPower", m_manualWristPower);
+  }
+
+  @Override
+  public void reset() {}
+}
