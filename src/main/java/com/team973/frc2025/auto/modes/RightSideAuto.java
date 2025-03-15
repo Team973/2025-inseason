@@ -20,9 +20,11 @@ public class RightSideAuto extends AutoMode {
         new Pose2d(7.3, 1.3, Rotation2d.fromDegrees(180)),
         new ScoreCoralCommand(drive, superstructure, ReefFace.C, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "C-HP"),
-        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
-        new DriveTrajectoryCommand(drive, "HP-C"),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.C, ReefLevel.L_4, ReefSide.Left));
+        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0),
+        new DriveTrajectoryCommand(drive, "HP-B"),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Left),
+        new DriveTrajectoryCommand(drive, "B-HP"),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Right));
   }
 
   public String getName() {
