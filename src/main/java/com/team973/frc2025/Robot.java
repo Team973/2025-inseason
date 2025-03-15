@@ -48,6 +48,10 @@ public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05), m_readyToScore, m_readyToBackOff);
+  private final Joystick m_driverStick =
+      new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
+  private final Joystick m_coDriverStick =
+      new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
@@ -75,11 +79,6 @@ public class Robot extends TimedRobot {
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_superstructure);
-
-  private final Joystick m_driverStick =
-      new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
-  private final Joystick m_coDriverStick =
-      new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
 
   private PerfLogger m_syncSensorsLogger =
       new PerfLogger(m_logger.subLogger("perf/syncSensors", 0.25));
@@ -353,11 +352,11 @@ public class Robot extends TimedRobot {
         m_superstructure.toggleGamePieceMode();
       }
 
-      if (m_coDriverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.setManualIntake(false);
-      } else if (m_coDriverStick.getLeftBumperButtonReleased()) {
-        m_superstructure.setManualIntake(true);
-      }
+      // if (m_coDriverStick.getLeftBumperButtonPressed()) {
+      //   m_superstructure.setManualIntake(false);
+      // } else if (m_coDriverStick.getLeftBumperButtonReleased()) {
+      //   m_superstructure.setManualIntake(true);
+      // }
 
       if (m_coDriverStick.getRightTriggerPressed()) {
         m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
@@ -382,6 +381,9 @@ public class Robot extends TimedRobot {
       updateSubsystems();
     } catch (Exception e) {
       CrashTracker.logException("Teleop Periodic", e);
+    }
+    if (m_coDriverStick.getRightBumperButton()) {
+      m_wrist.setMotorManualOutput(m_coDriverStick.getLeftY());
     }
   }
 

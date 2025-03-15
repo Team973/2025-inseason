@@ -15,6 +15,7 @@ public class Wrist implements Subsystem {
   private final GreyTalonFX m_wristMotor;
   private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_manualWristPower;
+  private double m_leftstickY;
   private double m_wristTargetPostionDeg;
 
   private static final double WRIST_HOMING_POSTION_DEG = -90.0;
@@ -163,7 +164,7 @@ public class Wrist implements Subsystem {
   public void update() {
     switch (m_controlStatus) {
       case Manual:
-        m_wristMotor.setControl(ControlMode.VoltageOut, (m_manualWristPower * 12.0), 0);
+        m_wristMotor.setControl(ControlMode.VoltageOut, m_manualWristPower, 0);
         break;
       case TargetPostion:
         m_wristMotor.setControl(
