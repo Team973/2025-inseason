@@ -48,6 +48,11 @@ public final class RobotInfo {
     public static final int CLAW_ALGAE_CAN_ID = 48;
   }
 
+  public static class WristInfo {
+    public static final int MOTOR_ID = 0; // TODO
+    public static final int ENCODER_ID = 0; // TODO
+  }
+
   public static final class ClimbInfo {
     public static final double MOTOR_ROT_PER_CLIMB_ROT =
         1.0 / ((10.0 / 64.0) * (20.0 / 72.0) * (20.0 / 84.0) * (9.0 / 30.0));

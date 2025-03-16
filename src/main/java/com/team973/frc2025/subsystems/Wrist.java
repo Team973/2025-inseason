@@ -4,7 +4,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.shared.RobotInfo.WristInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
+import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
@@ -12,13 +14,12 @@ import com.team973.lib.util.Subsystem;
 
 public class Wrist implements Subsystem {
   private final Logger m_logger;
-  private final GreyTalonFX m_wristMotor;
-  private ControlStatus m_controlStatus = ControlStatus.Off;
-  private double m_manualWristPower;
-  private double m_leftstickY;
-  private double m_wristTargetPostionDeg;
 
-  private static final double WRIST_HOMING_POSTION_DEG = -90.0;
+  private final GreyTalonFX m_wristMotor;
+  private final GreyCANCoder m_encoder;
+
+  private ControlStatus m_controlStatus = ControlStatus.Manual;
+
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
   private static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS = 0;
@@ -41,9 +42,19 @@ public class Wrist implements Subsystem {
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
 
+  private double m_manualWristPower = 0.0;
+  private double m_wristTargetPostionDeg = 0.0;
+
   public Wrist(Logger logger) {
     m_logger = logger;
-    m_wristMotor = new GreyTalonFX(0, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
+
+    m_wristMotor =
+        new GreyTalonFX(
+            WristInfo.MOTOR_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
+    m_encoder =
+        new GreyCANCoder(
+            WristInfo.ENCODER_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+
     TalonFXConfiguration wristMotorConfig = new TalonFXConfiguration();
     wristMotorConfig.Slot0.kS = 0.0;
     wristMotorConfig.Slot0.kV = 0.0;
@@ -64,7 +75,6 @@ public class Wrist implements Subsystem {
     wristMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     wristMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_wristMotor.setConfig(wristMotorConfig);
-    m_wristMotor.setPosition(wristDegToMotorRotations(WRIST_HOMING_POSTION_DEG));
   }
 
   public static enum ControlStatus {
@@ -142,7 +152,7 @@ public class Wrist implements Subsystem {
 
   public void setMotorManualOutput(double joystick) {
     m_controlStatus = ControlStatus.Manual;
-    m_manualWristPower = joystick * 0.1;
+    m_manualWristPower = joystick;
   }
 
   public void setTargetDeg(double setPostionDeg) {
@@ -164,7 +174,7 @@ public class Wrist implements Subsystem {
   public void update() {
     switch (m_controlStatus) {
       case Manual:
-        m_wristMotor.setControl(ControlMode.VoltageOut, m_manualWristPower, 0);
+        m_wristMotor.setControl(ControlMode.DutyCycleOut, m_manualWristPower, 0);
         break;
       case TargetPostion:
         m_wristMotor.setControl(
@@ -181,8 +191,10 @@ public class Wrist implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log("wristDegPostion", getArmPostionDeg());
     m_wristMotor.log();
+    m_encoder.log();
+
+    m_logger.log("wristDegPostion", getArmPostionDeg());
     m_logger.log("wristTargetPostionDeg", m_wristTargetPostionDeg);
     m_logger.log("wristMode", m_controlStatus.toString());
     m_logger.log(
