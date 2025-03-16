@@ -46,6 +46,7 @@ public class Logger {
     if (m_secondsPerLog == 0) {
       return true;
     }
+    double now = Conversions.Time.getSecTime();
     if (m_keyLastLoggedAt.containsKey(key) == false) {
       m_keyLastLoggedAt.put(key, Conversions.Time.getSecTime());
       return true;
