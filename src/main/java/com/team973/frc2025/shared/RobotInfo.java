@@ -14,7 +14,7 @@ public final class RobotInfo {
     W1W,
   }
 
-  public static final BotVersion BOT_VERSION = BotVersion.AlphaBot;
+  public static final BotVersion BOT_VERSION = BotVersion.W1W;
 
   public static double fromBotVersion(double alphaValue, double w1wvalue) {
     switch (BOT_VERSION) {
