@@ -1,5 +1,7 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.shared.RobotInfo.ArmInfo;
+import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -219,6 +221,27 @@ public class Superstructure implements Subsystem {
     } else {
       m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
     }
+  }
+
+  public void targetCoordinate(double x, double y) {
+    if (y > ElevatorInfo.MAX_HEIGHT_METERS || y < 0 || x > ArmInfo.ARM_LENGTH_METERS || x < 0) {
+      armStow();
+      elevatorStow();
+      return;
+    }
+
+    double armAngleDeg = Math.toDegrees(Math.acos(x / ArmInfo.ARM_LENGTH_METERS));
+
+    double upperElevator = y - (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
+    double lowerElevator = y + (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
+
+    if (lowerElevator < 0) {
+      m_elevator.setTargetPostion(upperElevator);
+    } else {
+      m_elevator.setTargetPostion(lowerElevator);
+    }
+
+    m_arm.setTargetDeg(armAngleDeg);
   }
 
   public void update() {
