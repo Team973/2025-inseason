@@ -13,21 +13,21 @@ import com.team973.lib.util.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class LeftSideAuto extends AutoMode {
-  public LeftSideAuto(Logger logger, Superstructure superstructure, DriveController drive) {
+public class RightSideAuto extends AutoMode {
+  public RightSideAuto(Logger logger, Superstructure superstructure, DriveController drive) {
     super(
         logger,
-        new Pose2d(7.3, 5.7, Rotation2d.fromDegrees(180)),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.E, ReefLevel.L_4, ReefSide.Right),
-        new DriveTrajectoryCommand(drive, "E-HP"),
-        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
-        new DriveTrajectoryCommand(drive, "HP-F"),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Right),
-        new DriveTrajectoryCommand(drive, "F-HP"),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Left));
+        new Pose2d(7.3, 1.3, Rotation2d.fromDegrees(180)),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.C, ReefLevel.L_4, ReefSide.Right),
+        new DriveTrajectoryCommand(drive, "C-HP"),
+        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0),
+        new DriveTrajectoryCommand(drive, "HP-B"),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Left),
+        new DriveTrajectoryCommand(drive, "B-HP"),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Right));
   }
 
   public String getName() {
-    return "Left Side Auto";
+    return "right Side Auto";
   }
 }

@@ -22,7 +22,7 @@ public class Elevator implements Subsystem {
   private double m_targetpositionLeway = 0.1;
   double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
-  private boolean m_lastHallSensorMode;
+  private boolean m_lastHallSensorMode = true;
   private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
 
   private final SolidSignaler m_elevatorHomedBlinker =
@@ -45,6 +45,7 @@ public class Elevator implements Subsystem {
   public static enum ControlStatus {
     Manual,
     TargetPostion,
+    Zero,
     Off,
   }
 
@@ -62,15 +63,15 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    private static final double LEVEL_1 = 2.0;
-    private static final double LEVEL_2 = 12.0;
-    private static final double LEVEL_3 = 2.5;
-    private static final double LEVEL_4 = 27.5;
+    private static final double LEVEL_1 = 4.5;
+    private static final double LEVEL_2 = 12.5;
+    private static final double LEVEL_3 = 4.0;
+    private static final double LEVEL_4 = 28.0;
     public static final double CORAL_STOW = 0.0;
 
-    private static final double ALGAE_HIGH = 21.0;
-    private static final double ALGAE_LOW = 25.5;
-    public static final double ALGAE_STOW = 5.0;
+    private static final double ALGAE_HIGH = 19.0;
+    private static final double ALGAE_LOW = 22.5;
+    public static final double ALGAE_STOW = 6.0;
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
@@ -173,7 +174,13 @@ public class Elevator implements Subsystem {
       case AlgaeLow:
         m_algaeLowOffset += offset;
         break;
+      case Horizontal:
+        break;
     }
+  }
+
+  public double getTargetPosition() {
+    return m_targetPostionHeightinches;
   }
 
   public double getTargetPositionFromLevel(ReefLevel level) {
@@ -190,6 +197,8 @@ public class Elevator implements Subsystem {
         return Presets.ALGAE_HIGH + m_algaeHighOffset;
       case AlgaeLow:
         return Presets.ALGAE_LOW + m_algaeLowOffset;
+      case Horizontal:
+        return Presets.CORAL_STOW;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
@@ -206,6 +215,9 @@ public class Elevator implements Subsystem {
             ControlMode.MotionMagicVoltage,
             heightInchesToMotorRotations(m_targetPostionHeightinches),
             0);
+        break;
+      case Zero:
+        m_motorRight.setControl(ControlMode.DutyCycleOut, -0.1);
         break;
       case Off:
         m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
@@ -229,6 +241,13 @@ public class Elevator implements Subsystem {
         "motorErrorInches",
         motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
     m_logger.log("hallSesnsorReturnElevator", hallsensor());
+
+    m_logger.log("Level 1 Offset", m_levelOneOffset);
+    m_logger.log("Level 2 Offset", m_levelTwoOffset);
+    m_logger.log("Level 3 Offset", m_levelThreeOffset);
+    m_logger.log("Level 4 Offset", m_levelFourOffset);
+    m_logger.log("Algae Low Offset", m_algaeLowOffset);
+    m_logger.log("Algae High Offset", m_algaeHighOffset);
   }
 
   @Override
