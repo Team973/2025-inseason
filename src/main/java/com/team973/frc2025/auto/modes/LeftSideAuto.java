@@ -16,12 +16,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class LeftSideAuto extends AutoMode {
-  public LeftSideAuto(Logger logger, Superstructure superstructure, DriveController drive) {
+  public LeftSideAuto(
+      Logger logger, Superstructure superstructure, DriveController drive, boolean doBabyBird) {
     super(
         logger,
         new Pose2d(7.3, 5.7, Rotation2d.fromDegrees(180)),
         new BranchCommand(
-            logger, false, new DriveTrajectoryCommand(drive, "Babybird-Left"), new NoOpCommand()),
+            logger,
+            doBabyBird,
+            new DriveTrajectoryCommand(drive, "Babybird-Left"),
+            new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.E, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "E-HP"),
         new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
