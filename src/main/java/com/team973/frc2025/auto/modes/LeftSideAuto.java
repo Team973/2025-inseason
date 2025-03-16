@@ -3,6 +3,8 @@ package com.team973.frc2025.auto.modes;
 import com.team973.frc2025.auto.commands.DriveTrajectoryCommand;
 import com.team973.frc2025.auto.commands.ScoreCoralCommand;
 import com.team973.frc2025.auto.commands.util.BlockingLambdaCommand;
+import com.team973.frc2025.auto.commands.util.BranchCommand;
+import com.team973.frc2025.auto.commands.util.NoOpCommand;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
@@ -18,6 +20,8 @@ public class LeftSideAuto extends AutoMode {
     super(
         logger,
         new Pose2d(7.3, 5.7, Rotation2d.fromDegrees(180)),
+        new BranchCommand(
+            logger, false, new DriveTrajectoryCommand(drive, "Babybird-Left"), new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.E, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "E-HP"),
         new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
