@@ -46,14 +46,13 @@ public class Logger {
     if (m_secondsPerLog == 0) {
       return true;
     }
-    double now = Conversions.Time.getSecTime();
     if (m_keyLastLoggedAt.containsKey(key) == false) {
-      m_keyLastLoggedAt.put(key, now);
+      m_keyLastLoggedAt.put(key, Conversions.Time.getSecTime());
       return true;
     }
     double lastLoggedAt = m_keyLastLoggedAt.get(key);
-    if (lastLoggedAt + m_secondsPerLog < now) {
-      m_keyLastLoggedAt.put(key, now);
+    if (lastLoggedAt + m_secondsPerLog < Conversions.Time.getSecTime()) {
+      m_keyLastLoggedAt.put(key, Conversions.Time.getSecTime());
       return true;
     }
     return false;
