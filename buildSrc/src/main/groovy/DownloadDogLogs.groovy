@@ -2,9 +2,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-public abstract class DownloadLogs extends DefaultTask {
+public abstract class DownloadDogLogs extends DefaultTask {
   @TaskAction
-  public void downloadLogs() {
+  public void downloadDogLogs() {
     def logPath = "/home/lvuser/logs/"
     def robotHostName = "lvuser@roborio-${project.frc.getTeamNumber()}-frc.local"
     def sshOps = "-o StrictHostKeyChecking=no"
