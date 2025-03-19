@@ -72,22 +72,22 @@ public final class RobotInfo {
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 2;
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 3;
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 4;
-    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = fromBotVersion(-311.133, 264.902);
+    public static final double FRONT_LEFT_MODULE_STEER_OFFSET = fromBotVersion(-743.027, 264.902);
 
     public static final int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 8;
     public static final int FRONT_RIGHT_MODULE_STEER_MOTOR = 9;
     public static final int FRONT_RIGHT_MODULE_STEER_ENCODER = 10;
-    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = fromBotVersion(-328.096, 153.721);
+    public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = fromBotVersion(-684.931, 153.721);
 
     public static final int BACK_LEFT_MODULE_DRIVE_MOTOR = 5;
     public static final int BACK_LEFT_MODULE_STEER_MOTOR = 6;
     public static final int BACK_LEFT_MODULE_STEER_ENCODER = 7;
-    public static final double BACK_LEFT_MODULE_STEER_OFFSET = fromBotVersion(-171.299, 50.713);
+    public static final double BACK_LEFT_MODULE_STEER_OFFSET = fromBotVersion(-1249.628, 50.713);
 
     public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR = 11;
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 12;
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 13;
-    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = fromBotVersion(156.533, 100.107);
+    public static final double BACK_RIGHT_MODULE_STEER_OFFSET = fromBotVersion(-490.517, 100.107);
 
     public static final double DRIVE_GEAR_RATIO =
         (10.0 / 54.0) * (40.0 / 16.0) * (15.0 / 45.0); // x3:10, 6.48:1
