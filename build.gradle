@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2025.1.1"
+    id "edu.wpi.first.GradleRIO" version "2025.3.1"
     id "com.diffplug.spotless" version "6.20.0"
 }
 
@@ -8,6 +8,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
+
 
 def ROBOT_MAIN_CLASS = "com.team973.frc2025.Main"
 
@@ -154,6 +155,39 @@ spotless {
     indentWithSpaces(2)
     endWithNewline()
   }
+}
+
+tasks.register('printLog') {
+    group = "application"
+    description = "Runs an alternative main class"
+    doLast {
+        def javaBin = "${System.getProperty("java.home")}/bin/java"
+        def classpath = sourceSets.main.runtimeClasspath.asPath
+        def mainClass = "com.team973.analysis.MotorDraw"
+        def logPath = "logs/FRC_20250301_013856_CAOC_Q53.wpilog"
+        def process = new ProcessBuilder(javaBin, "-cp", classpath, mainClass, logPath)
+            .redirectErrorStream(false)
+            .start()
+
+        // This is honestly just a hack because gradle otherwise insists on
+        // buffering the output and then running out of memory because the
+        // log is massive.
+        def printStream = { InputStream stream, PrintStream out ->
+            new Thread({
+                def reader = new BufferedReader(new InputStreamReader(stream))
+                reader.lines().forEach { out.println(it) }
+            }).start()
+        }
+
+        // Capture both stdout and stderr separately
+        printStream(process.inputStream, System.out)
+        printStream(process.errorStream, System.err)
+
+        def exitCode = process.waitFor()
+        if (exitCode != 0) {
+            throw new GradleException("Process exited with code $exitCode. Check above logs for errors.")
+        }
+    }
 }
 
 project.compileJava.dependsOn spotlessApply
