@@ -358,13 +358,19 @@ public class Robot extends TimedRobot {
         m_superstructure.setManualIntake(true);
       }
 
+      if (m_coDriverStick.getRightTrigger()) {
+        m_wrist.setMotorManualOutput(0.1);
+      } else if (m_coDriverStick.getLeftTrigger()) {
+        m_wrist.setMotorManualOutput(-0.1);
+      } else {
+        m_wrist.setMotorManualOutput(0.0);
+      }
+
       if (m_coDriverStick.getRightTriggerPressed()) {
         // m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
         // m_superstructure.setState(Superstructure.State.Climb);
-        m_wrist.setMotorManualOutput(0.1);
       } else if (m_coDriverStick.getLeftTriggerPressed()) {
         // m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
-        m_wrist.setMotorManualOutput(-0.1);
       } else if (Math.abs(climbStick) > 0.25) {
         m_superstructure.incrementClimbTarget(climbStick);
       }
