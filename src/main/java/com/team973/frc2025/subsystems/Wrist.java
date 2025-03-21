@@ -22,12 +22,13 @@ public class Wrist implements Subsystem {
 
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS = 0;
+  private static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
+      10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
 
   private static final double LEVEL_FOUR_POSITION_DEG = 0.0;
   private static final double LEVEL_THREE_POSITION_DEG = 0.0;
-  private static final double LEVEL_TWO_POSITION_DEG = 0.0;
-  private static final double LEVEL_ONE_POSITION_DEG = 0.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -65.0;
+  private static final double LEVEL_ONE_POSITION_DEG = 20.0;
   public static final double CORAL_STOW_POSITION_DEG = 0.0;
 
   private static final double ALGAE_HIGH_POSITION_DEG = 0.0;
@@ -59,20 +60,19 @@ public class Wrist implements Subsystem {
     wristMotorConfig.Slot0.kS = 0.0;
     wristMotorConfig.Slot0.kV = 0.0;
     wristMotorConfig.Slot0.kA = 0.0;
-    wristMotorConfig.Slot0.kP = 0.0;
+    wristMotorConfig.Slot0.kP = 10.0; // 10
     wristMotorConfig.Slot0.kI = 0.0;
     wristMotorConfig.Slot0.kD = 0.0;
-    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 20.0; // 64.0;
-    wristMotorConfig.MotionMagic.MotionMagicAcceleration = 30.0; // 80.0;
-    wristMotorConfig.MotionMagic.MotionMagicJerk = 80.0;
+    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 51.0; // 51.0;
+    wristMotorConfig.MotionMagic.MotionMagicAcceleration = 590.0; // 80.0;
+    wristMotorConfig.MotionMagic.MotionMagicJerk = 5900.0;
     wristMotorConfig.CurrentLimits.StatorCurrentLimit = 20.0;
     wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     wristMotorConfig.CurrentLimits.SupplyCurrentLimit = 15.0;
     wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    wristMotorConfig.Voltage.PeakForwardVoltage = 4.0;
-    wristMotorConfig.Voltage.PeakReverseVoltage = -4.0;
-    // TODO: ask for the inverted value
-    wristMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    wristMotorConfig.Voltage.PeakForwardVoltage = 12.0;
+    wristMotorConfig.Voltage.PeakReverseVoltage = -12.0;
+    wristMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     wristMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_wristMotor.setConfig(wristMotorConfig);
   }
@@ -88,12 +88,12 @@ public class Wrist implements Subsystem {
     return wristPostionDeg / 360.0 / WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
 
-  private double motorRotationsToArmDeg(double motorPostion) {
+  private double motorRotationsToWristDeg(double motorPostion) {
     return motorPostion * WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
-  public double getArmPostionDeg() {
-    return motorRotationsToArmDeg(m_wristMotor.getPosition().getValueAsDouble());
+  public double getWristPostionDeg() {
+    return motorRotationsToWristDeg(m_wristMotor.getPosition().getValueAsDouble());
   }
 
   public void setControlStatus(ControlStatus targetpostion) {
@@ -178,7 +178,7 @@ public class Wrist implements Subsystem {
         break;
       case TargetPostion:
         m_wristMotor.setControl(
-            ControlMode.PositionVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
+            ControlMode.MotionMagicVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
         break;
       case Zero:
         m_wristMotor.setControl(ControlMode.DutyCycleOut, -0.1);
@@ -194,12 +194,12 @@ public class Wrist implements Subsystem {
     m_wristMotor.log();
     m_encoder.log();
 
-    m_logger.log("wristDegPostion", getArmPostionDeg());
+    m_logger.log("wristDegPostion", getWristPostionDeg());
     m_logger.log("wristTargetPostionDeg", m_wristTargetPostionDeg);
     m_logger.log("wristMode", m_controlStatus.toString());
     m_logger.log(
         "motorwristErrorDeg",
-        motorRotationsToArmDeg(m_wristMotor.getClosedLoopError().getValueAsDouble()));
+        motorRotationsToWristDeg(m_wristMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("manualPower", m_manualWristPower);
   }
 
