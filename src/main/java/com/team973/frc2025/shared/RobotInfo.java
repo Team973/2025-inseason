@@ -49,7 +49,7 @@ public final class RobotInfo {
   }
 
   public static class WristInfo {
-    public static final int MOTOR_ID = 0; // TODO
+    public static final int MOTOR_ID = 31; // TODO
     public static final int ENCODER_ID = 0; // TODO
   }
 

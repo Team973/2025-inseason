@@ -178,7 +178,7 @@ public class Wrist implements Subsystem {
         break;
       case TargetPostion:
         m_wristMotor.setControl(
-            ControlMode.VelocityVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
+            ControlMode.PositionVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
         break;
       case Zero:
         m_wristMotor.setControl(ControlMode.DutyCycleOut, -0.1);
