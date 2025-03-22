@@ -32,10 +32,10 @@ public final class RobotInfo {
 
   public static class ArmInfo {
     public static final int HALL_SENSOR_ID = 1;
-    public static final int ENCODER_CAN_ID = 0;
+    public static final int ENCODER_CAN_ID = 32;
     public static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
 
-    public static final double ENCODER_OFFSET_DEG = 0.0;
+    public static final double ENCODER_OFFSET_ROTATIONS = -0.01;
   }
 
   public static class ElevatorInfo {

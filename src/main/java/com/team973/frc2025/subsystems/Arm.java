@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -34,11 +35,11 @@ public class Arm implements Subsystem {
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 60.0; // 78.0;
-  private static final double LEVEL_THREE_POSITION_DEG = 60.0; // 72.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -60.0; // -63.0;
-  private static final double LEVEL_ONE_POSITION_DEG = -60.0; // -60.0;
-  public static final double CORAL_STOW_POSITION_DEG = -90; // -91.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 61.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 64.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -68.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -69.0;
+  public static final double CORAL_STOW_POSITION_DEG = -90;
 
   private static final double ALGAE_HIGH_POSITION_DEG = 0.0; // 34.0;
   private static final double ALGAE_LOW_POSITION_DEG = 0.0; // -47.0;
@@ -79,6 +80,7 @@ public class Arm implements Subsystem {
     m_armEncoder =
         new GreyCANCoder(
             ArmInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+
     m_candleManger.addSignaler(m_armHomedSigaler);
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
@@ -102,7 +104,10 @@ public class Arm implements Subsystem {
     armMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     armMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_armMotor.setConfig(armMotorConfig);
-    m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
+
+    BaseStatusSignal.waitForAll(0.5, m_armEncoder.getAbsolutePosition());
+
+    m_armMotor.setPosition(armDegToMotorRotations(getCanCoderPostionDeg()));
   }
 
   private boolean hallSensor() {
@@ -122,9 +127,10 @@ public class Arm implements Subsystem {
     m_manualArmPower = joystick * 0.1;
   }
 
-  private double getCanCoderPostion() {
-    return (m_armEncoder.getAbsolutePosition().getValueAsDouble()) * 360.0
-        - ArmInfo.ENCODER_OFFSET_DEG;
+  private double getCanCoderPostionDeg() {
+    return (m_armEncoder.getAbsolutePosition().getValueAsDouble()
+            - ArmInfo.ENCODER_OFFSET_ROTATIONS)
+        * 360.0;
   }
 
   public void setTargetDeg(double setPostionDeg) {
@@ -238,7 +244,7 @@ public class Arm implements Subsystem {
     m_logger.log("manualPower", m_manualArmPower);
     m_logger.log("HallsensorArm", hallSensor());
 
-    m_logger.log("getCanCoderPostion", getCanCoderPostion());
+    m_logger.log("getCanCoderPostion", getCanCoderPostionDeg());
 
     m_logger.log("Level 1 Offset", m_levelOneOffset);
     m_logger.log("Level 2 Offset", m_levelTwoOffset);
