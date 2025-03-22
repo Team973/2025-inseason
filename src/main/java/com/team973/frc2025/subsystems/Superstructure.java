@@ -64,6 +64,12 @@ public class Superstructure implements Subsystem {
     m_state = state;
   }
 
+  // public double setStowMode() {
+  //   if (m_claw.getSeesCoral()){
+  //     return
+  //   }
+  // }
+
   public void setManualScore(boolean score) {
     m_manualScore = score;
   }
@@ -101,7 +107,8 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    if (m_wrist.getTargetPosition() == Wrist.CORAL_STOW_POSITION_DEG) {
+    if (m_wrist.getTargetPosition() == Wrist.WITH_CORAL_STOW_POSTION_DEG
+        || m_wrist.getTargetPosition() == Wrist.WITHOUT_CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
@@ -190,7 +197,7 @@ public class Superstructure implements Subsystem {
 
   private void wristStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_wrist.setTargetDeg(Wrist.CORAL_STOW_POSITION_DEG);
+      m_wrist.setTargetDeg(Wrist.WITHOUT_CORAL_STOW_POSITION_DEG);
     } else {
       m_wrist.setTargetDeg(Wrist.ALGAE_STOW_POSITION_DEG);
     }
