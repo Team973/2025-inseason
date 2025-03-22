@@ -16,7 +16,7 @@ public class Wrist implements Subsystem {
   private final Logger m_logger;
 
   private final GreyTalonFX m_wristMotor;
-  private final GreyCANCoder m_encoder;
+  private final GreyCANCoder m_wristEncoder;
 
   private ControlStatus m_controlStatus = ControlStatus.Manual;
 
@@ -35,6 +35,8 @@ public class Wrist implements Subsystem {
   private static final double ALGAE_LOW_POSITION_DEG = 0.0;
   public static final double ALGAE_STOW_POSITION_DEG = -16.0;
 
+  private static final double ENCODER_OFFSET_DEG = 0.0;
+
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
@@ -52,7 +54,7 @@ public class Wrist implements Subsystem {
     m_wristMotor =
         new GreyTalonFX(
             WristInfo.MOTOR_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
-    m_encoder =
+    m_wristEncoder =
         new GreyCANCoder(
             WristInfo.ENCODER_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
@@ -155,6 +157,10 @@ public class Wrist implements Subsystem {
     m_manualWristPower = joystick;
   }
 
+  private double getCanCoderPostion() {
+    return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()) * 360.0 - ENCODER_OFFSET_DEG;
+  }
+
   public void setTargetDeg(double setPostionDeg) {
     m_wristTargetPostionDeg = setPostionDeg;
     m_controlStatus = ControlStatus.TargetPostion;
@@ -192,7 +198,7 @@ public class Wrist implements Subsystem {
   @Override
   public void log() {
     m_wristMotor.log();
-    m_encoder.log();
+    m_wristEncoder.log();
 
     m_logger.log("wristDegPostion", getWristPostionDeg());
     m_logger.log("wristTargetPostionDeg", m_wristTargetPostionDeg);
@@ -201,6 +207,7 @@ public class Wrist implements Subsystem {
         "motorwristErrorDeg",
         motorRotationsToWristDeg(m_wristMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("manualPower", m_manualWristPower);
+    m_logger.log("getCanCoderPostion", getCanCoderPostion());
   }
 
   @Override
