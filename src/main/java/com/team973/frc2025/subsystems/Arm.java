@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
@@ -27,14 +28,29 @@ public class Arm implements Subsystem {
           RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
 
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
-  public static final double HORIZONTAL_POSITION_DEG = 0.0;
+  private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
+  private static final double LEVEL_FOUR_POSITION_DEG = 78.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 72.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -63.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -60.0;
   public static final double CORAL_STOW_POSITION_DEG = -91.0;
+
+  private static final double ALGAE_HIGH_POSITION_DEG = 34.0;
+  private static final double ALGAE_LOW_POSITION_DEG = -47.0;
   public static final double ALGAE_STOW_POSITION_DEG = -85.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.6;
+
+  private double m_levelOneOffset = 0.0;
+  private double m_levelTwoOffset = 0.0;
+  private double m_levelThreeOffset = 0.0;
+  private double m_levelFourOffset = 0.0;
+
+  private double m_algaeHighOffset = 0.0;
+  private double m_algaeLowOffset = 0.0;
 
   private CANdleManger m_candleManger;
 
@@ -118,6 +134,27 @@ public class Arm implements Subsystem {
         * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
 
+  public double getTargetDegFromLevel(ReefLevel level) {
+    switch (level) {
+      case L_1:
+        return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
+      case L_2:
+        return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
+      case L_3:
+        return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
+      case L_4:
+        return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+      case AlgaeHigh:
+        return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
+      case AlgaeLow:
+        return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+      case Horizontal:
+        return HORIZONTAL_POSITION_DEG;
+      default:
+        throw new IllegalArgumentException(String.valueOf(level));
+    }
+  }
+
   public double getTargetPosition() {
     return m_armTargetPostionDeg;
   }
@@ -153,6 +190,31 @@ public class Arm implements Subsystem {
     m_controlStatus = status;
   }
 
+  public void incrementOffset(double increment, ReefLevel level) {
+    switch (level) {
+      case L_1:
+        m_levelOneOffset += increment;
+        break;
+      case L_2:
+        m_levelTwoOffset += increment;
+        break;
+      case L_3:
+        m_levelThreeOffset += increment;
+        break;
+      case L_4:
+        m_levelFourOffset += increment;
+        break;
+      case AlgaeHigh:
+        m_algaeHighOffset += increment;
+        break;
+      case AlgaeLow:
+        m_algaeLowOffset += increment;
+        break;
+      case Horizontal:
+        break;
+    }
+  }
+
   @Override
   public void log() {
     m_logger.log("armDegPostion", getArmPostionDeg());
@@ -165,6 +227,13 @@ public class Arm implements Subsystem {
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
     m_logger.log("HallsensorArm", hallSensor());
+
+    m_logger.log("Level 1 Offset", m_levelOneOffset);
+    m_logger.log("Level 2 Offset", m_levelTwoOffset);
+    m_logger.log("Level 3 Offset", m_levelThreeOffset);
+    m_logger.log("Level 4 Offset", m_levelFourOffset);
+    m_logger.log("Algae Low Offset", m_algaeLowOffset);
+    m_logger.log("Algae High Offset", m_algaeHighOffset);
   }
 
   @Override

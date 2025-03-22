@@ -327,6 +327,16 @@ public class Robot extends TimedRobot {
       }
       double climbStick = m_coDriverStick.getLeftYAxis();
 
+      if (m_coDriverStick.getPOVTopPressed()) {
+        m_superstructure.incrementElevatorOffset(0.5);
+      } else if (m_coDriverStick.getPOVBottomPressed()) {
+        m_superstructure.incrementElevatorOffset(-0.5);
+      } else if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementArmOffset(1.0);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementArmOffset(-1.0);
+      }
+
       if (m_coDriverStick.getAButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeLow);
       } else if (m_coDriverStick.getXButtonPressed()) {
