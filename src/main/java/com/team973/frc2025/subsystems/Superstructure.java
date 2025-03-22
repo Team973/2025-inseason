@@ -56,6 +56,61 @@ public class Superstructure implements Subsystem {
     Algae
   }
 
+  private static class ArmivatorPose {
+    private final double m_elevatorHeight;
+    private final double m_armAngle;
+
+    public ArmivatorPose(double elevatorHeight, double armAngle) {
+      m_elevatorHeight = elevatorHeight;
+      m_armAngle = armAngle;
+    }
+
+    public double getElevatorHeight() {
+      return m_elevatorHeight;
+    }
+
+    public double getArmAngle() {
+      return m_armAngle;
+    }
+
+    public static ArmivatorPose fromCoordinate(double x, double y) {
+      if (x > ArmInfo.ARM_LENGTH_METERS) {
+        x = ArmInfo.ARM_LENGTH_METERS;
+      } else if (x < 0) {
+        x = 0;
+      }
+
+      if (y > ElevatorInfo.MAX_HEIGHT_METERS) {
+        y = ElevatorInfo.MAX_HEIGHT_METERS;
+      } else if (y < 0) {
+        y = 0;
+      }
+
+      double armAngleDeg = Math.toDegrees(Math.acos(x / ArmInfo.ARM_LENGTH_METERS));
+      double elevatorHeight;
+
+      double upperElevator =
+          y + (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
+      double lowerElevator =
+          y - (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
+
+      if (lowerElevator < 0) {
+        elevatorHeight = upperElevator;
+        armAngleDeg *= -1;
+      } else {
+        elevatorHeight = lowerElevator;
+      }
+
+      if (armAngleDeg > ArmInfo.ARM_MAX_ANGLE_DEG) {
+        armAngleDeg = ArmInfo.ARM_MAX_ANGLE_DEG;
+      } else if (armAngleDeg < ArmInfo.ARM_MIN_ANGLE_DEG) {
+        armAngleDeg = ArmInfo.ARM_MIN_ANGLE_DEG;
+      }
+
+      return new ArmivatorPose(elevatorHeight, armAngleDeg);
+    }
+  }
+
   public Superstructure(
       Claw claw, Climb climb, Elevator elevator, Arm arm, DriveController driveController) {
     m_claw = claw;
@@ -237,29 +292,10 @@ public class Superstructure implements Subsystem {
     double x = m_driveController.getDriveWithLimelight().getDistFromScoring();
     double y = m_targetReefLevel.getHeight();
 
-    if (y > ElevatorInfo.MAX_HEIGHT_METERS || y < 0 || x > ArmInfo.ARM_LENGTH_METERS || x < 0) {
-      return;
-    }
+    ArmivatorPose pose = ArmivatorPose.fromCoordinate(x, y);
 
-    double armAngleDeg = Math.toDegrees(Math.acos(x / ArmInfo.ARM_LENGTH_METERS));
-    double elevatorHeight;
-
-    double upperElevator = y + (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
-    double lowerElevator = y - (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
-
-    if (lowerElevator < 0) {
-      elevatorHeight = upperElevator;
-      armAngleDeg *= -1;
-    } else {
-      elevatorHeight = lowerElevator;
-    }
-
-    if (armAngleDeg > ArmInfo.ARM_MAX_ANGLE_DEG || armAngleDeg < ArmInfo.ARM_MIN_ANGLE_DEG) {
-      return;
-    }
-
-    m_arm.setTargetDeg(armAngleDeg);
-    m_elevator.setTargetPostion(elevatorHeight);
+    m_arm.setTargetDeg(pose.getArmAngle());
+    m_elevator.setTargetPostion(pose.getElevatorHeight());
   }
 
   public void update() {
