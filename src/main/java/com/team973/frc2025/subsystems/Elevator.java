@@ -5,7 +5,6 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Conversions;
@@ -31,14 +30,6 @@ public class Elevator implements Subsystem {
           250,
           RobotInfo.SignalerInfo.ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY);
 
-  private double m_levelOneOffset = 0.0;
-  private double m_levelTwoOffset = 0.0;
-  private double m_levelThreeOffset = 0.0;
-  private double m_levelFourOffset = 0.0;
-
-  private double m_algaeHighOffset = 0.0;
-  private double m_algaeLowOffset = 0.0;
-
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
   private CANdleManger m_candleManger;
 
@@ -63,14 +54,7 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    private static final double LEVEL_1 = 4.5;
-    private static final double LEVEL_2 = 12.5;
-    private static final double LEVEL_3 = 4.0;
-    private static final double LEVEL_4 = 28.0;
     public static final double CORAL_STOW = 0.0;
-
-    private static final double ALGAE_HIGH = 19.0;
-    private static final double ALGAE_LOW = 22.5;
     public static final double ALGAE_STOW = 6.0;
   }
 
@@ -154,54 +138,8 @@ public class Elevator implements Subsystem {
     m_controlStatus = ControlStatus.TargetPostion;
   }
 
-  public void incrementOffset(double offset, ReefLevel level) {
-    switch (level) {
-      case L_1:
-        m_levelOneOffset += offset;
-        break;
-      case L_2:
-        m_levelTwoOffset += offset;
-        break;
-      case L_3:
-        m_levelThreeOffset += offset;
-        break;
-      case L_4:
-        m_levelFourOffset += offset;
-        break;
-      case AlgaeHigh:
-        m_algaeHighOffset += offset;
-        break;
-      case AlgaeLow:
-        m_algaeLowOffset += offset;
-        break;
-      case Horizontal:
-        break;
-    }
-  }
-
   public double getTargetPosition() {
     return m_targetPostionHeightinches;
-  }
-
-  public double getTargetPositionFromLevel(ReefLevel level) {
-    switch (level) {
-      case L_1:
-        return Presets.LEVEL_1 + m_levelOneOffset;
-      case L_2:
-        return Presets.LEVEL_2 + m_levelTwoOffset;
-      case L_3:
-        return Presets.LEVEL_3 + m_levelThreeOffset;
-      case L_4:
-        return Presets.LEVEL_4 + m_levelFourOffset;
-      case AlgaeHigh:
-        return Presets.ALGAE_HIGH + m_algaeHighOffset;
-      case AlgaeLow:
-        return Presets.ALGAE_LOW + m_algaeLowOffset;
-      case Horizontal:
-        return Presets.CORAL_STOW;
-      default:
-        throw new IllegalArgumentException(String.valueOf(level));
-    }
   }
 
   @Override
@@ -241,13 +179,6 @@ public class Elevator implements Subsystem {
         "motorErrorInches",
         motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
     m_logger.log("hallSesnsorReturnElevator", hallsensor());
-
-    m_logger.log("Level 1 Offset", m_levelOneOffset);
-    m_logger.log("Level 2 Offset", m_levelTwoOffset);
-    m_logger.log("Level 3 Offset", m_levelThreeOffset);
-    m_logger.log("Level 4 Offset", m_levelFourOffset);
-    m_logger.log("Algae Low Offset", m_algaeLowOffset);
-    m_logger.log("Algae High Offset", m_algaeHighOffset);
   }
 
   @Override

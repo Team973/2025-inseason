@@ -131,11 +131,6 @@ public class Superstructure implements Subsystem {
 
   public void log() {
     SmartDashboard.putString("DB/String 0", "Reef Level: " + m_targetReefLevel);
-    SmartDashboard.putString(
-        "DB/String 1",
-        "E: " + String.valueOf(m_elevator.getTargetPositionFromLevel(m_targetReefLevel)));
-    SmartDashboard.putString(
-        "DB/String 2", "A: " + String.valueOf(m_arm.getTargetDegFromLevel(m_targetReefLevel)));
     SmartDashboard.putString("DB/String 8", m_gamePieceMode.toString());
 
     m_claw.log();
@@ -151,11 +146,6 @@ public class Superstructure implements Subsystem {
     m_arm.syncSensors();
   }
 
-  private void armTargetReefLevel() {
-    m_arm.setTargetDeg(m_arm.getTargetDegFromLevel(m_targetReefLevel));
-    m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
-  }
-
   private void armStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
       m_arm.setTargetDeg(Arm.CORAL_STOW_POSITION_DEG);
@@ -163,11 +153,6 @@ public class Superstructure implements Subsystem {
       m_arm.setTargetDeg(Arm.ALGAE_STOW_POSITION_DEG);
     }
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
-  }
-
-  private void elevatorTargetReefLevel() {
-    m_elevator.setTargetPostion(m_elevator.getTargetPositionFromLevel(m_targetReefLevel));
-    m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }
 
   private void elevatorStow() {
@@ -179,16 +164,8 @@ public class Superstructure implements Subsystem {
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }
 
-  public void incrementArmOffset(double increment) {
-    m_arm.incrementOffset(increment, m_targetReefLevel);
-  }
-
   public void setManualArmivator(boolean manual) {
     m_manualArmivator = manual;
-  }
-
-  public void incrementElevatorOffset(double increment) {
-    m_elevator.incrementOffset(increment, m_targetReefLevel);
   }
 
   public void setGamePieceMode(GamePiece gamePiece) {
@@ -233,7 +210,7 @@ public class Superstructure implements Subsystem {
     }
   }
 
-  public void targetCoordinate() {
+  public void armivatorTargetReef() {
     double x = m_driveController.getDriveWithLimelight().getDistFromScoring();
     double y = m_targetReefLevel.getHeight();
 
@@ -259,7 +236,10 @@ public class Superstructure implements Subsystem {
     }
 
     m_arm.setTargetDeg(armAngleDeg);
+    m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
+
     m_elevator.setTargetPostion(elevatorHeight);
+    m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }
 
   public void update() {
@@ -279,8 +259,7 @@ public class Superstructure implements Subsystem {
         }
 
         if (m_manualArmivator) {
-          armTargetReefLevel();
-          elevatorTargetReefLevel();
+          armivatorTargetReef();
         } else {
           armStow();
           elevatorStow();
@@ -297,8 +276,7 @@ public class Superstructure implements Subsystem {
         switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
           case MoveToApproach:
             if (m_driveController.getDriveWithLimelight().isNearApproach()) {
-              armTargetReefLevel();
-              elevatorTargetReefLevel();
+              armivatorTargetReef();
 
               m_manualArmivator = true;
             } else {
@@ -309,28 +287,24 @@ public class Superstructure implements Subsystem {
             }
             break;
           case Approach:
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
+            armivatorTargetReef();
 
             m_manualArmivator = true;
             break;
           case MoveToScoring:
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
+            armivatorTargetReef();
             break;
           case Scoring:
             if (m_manualScore) {
               clawScore();
             }
 
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
+            armivatorTargetReef();
             break;
           case MoveToBackOff:
             m_claw.setControl(Claw.ControlStatus.Off);
 
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
+            armivatorTargetReef();
             break;
           case BackOff:
             armStow();
@@ -349,10 +323,11 @@ public class Superstructure implements Subsystem {
       case Climb:
         m_claw.setControl(Claw.ControlStatus.Off);
 
-        setTargetReefLevel(ReefLevel.Horizontal);
+        m_arm.setTargetDeg(Arm.HORIZONTAL_POSITION_DEG);
+        m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
 
-        armTargetReefLevel();
-        elevatorTargetReefLevel();
+        m_elevator.setTargetPostion(Elevator.Presets.CORAL_STOW);
+        m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
 
         m_manualArmivator = true;
         break;
