@@ -3,6 +3,7 @@ package com.team973.frc2025.subsystems;
 import com.team973.frc2025.shared.RobotInfo.ArmInfo;
 import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Superstructure implements Subsystem {
@@ -32,29 +33,13 @@ public class Superstructure implements Subsystem {
   }
 
   public enum ReefLevel {
-    L_1(0, 0),
-    L_2(0, 0),
-    L_3(0, 0),
-    L_4(0, 0),
-    AlgaeHigh(0, 0),
-    AlgaeLow(0, 0),
-    Horizontal(0, 0);
-
-    private final double m_x;
-    private final double m_y;
-
-    private ReefLevel(double x, double y) {
-      m_x = x;
-      m_y = y;
-    }
-
-    public double getX() {
-      return m_x;
-    }
-
-    public double getY() {
-      return m_y;
-    }
+    L_1,
+    L_2,
+    L_3,
+    L_4,
+    AlgaeHigh,
+    AlgaeLow,
+    Horizontal
   }
 
   public enum GamePiece {
@@ -239,22 +224,22 @@ public class Superstructure implements Subsystem {
     }
   }
 
-  public void targetCoordinate(ReefLevel level) {
-    if (level.getY() > ElevatorInfo.MAX_HEIGHT_METERS
-        || level.getY() < 0
-        || level.getX() > ArmInfo.ARM_LENGTH_METERS
-        || level.getX() < 0) {
+  public void targetCoordinate(Translation2d coordinate) {
+    if (coordinate.getY() > ElevatorInfo.MAX_HEIGHT_METERS
+        || coordinate.getY() < 0
+        || coordinate.getX() > ArmInfo.ARM_LENGTH_METERS
+        || coordinate.getX() < 0) {
       armStow();
       elevatorStow();
       return;
     }
 
-    double armAngleDeg = Math.toDegrees(Math.acos(level.getX() / ArmInfo.ARM_LENGTH_METERS));
+    double armAngleDeg = Math.toDegrees(Math.acos(coordinate.getX() / ArmInfo.ARM_LENGTH_METERS));
 
     double upperElevator =
-        level.getY() + (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
+        coordinate.getY() + (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
     double lowerElevator =
-        level.getY() - (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
+        coordinate.getY() - (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
 
     if (lowerElevator < 0) {
       m_elevator.setTargetPostion(upperElevator);
