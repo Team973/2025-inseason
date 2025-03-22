@@ -20,21 +20,6 @@ public class Wrist implements Subsystem {
 
   private ControlStatus m_controlStatus = ControlStatus.Manual;
 
-  private static final double HORIZONTAL_POSITION_DEG = 0.0;
-
-  private static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
-      10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
-
-  private static final double LEVEL_FOUR_POSITION_DEG = 0.0;
-  private static final double LEVEL_THREE_POSITION_DEG = 0.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -65.0;
-  private static final double LEVEL_ONE_POSITION_DEG = 20.0;
-  public static final double CORAL_STOW_POSITION_DEG = 0.0;
-
-  private static final double ALGAE_HIGH_POSITION_DEG = 0.0;
-  private static final double ALGAE_LOW_POSITION_DEG = 0.0;
-  public static final double ALGAE_STOW_POSITION_DEG = 0.0;
-
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
@@ -57,21 +42,21 @@ public class Wrist implements Subsystem {
             WristInfo.ENCODER_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
     TalonFXConfiguration wristMotorConfig = new TalonFXConfiguration();
-    wristMotorConfig.Slot0.kS = 0.0;
-    wristMotorConfig.Slot0.kV = 0.0;
-    wristMotorConfig.Slot0.kA = 0.0;
-    wristMotorConfig.Slot0.kP = 10.0; // 10
-    wristMotorConfig.Slot0.kI = 0.0;
-    wristMotorConfig.Slot0.kD = 0.0;
-    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 51.0; // 51.0;
-    wristMotorConfig.MotionMagic.MotionMagicAcceleration = 590.0; // 80.0;
-    wristMotorConfig.MotionMagic.MotionMagicJerk = 5900.0;
-    wristMotorConfig.CurrentLimits.StatorCurrentLimit = 20.0;
-    wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    wristMotorConfig.CurrentLimits.SupplyCurrentLimit = 15.0;
-    wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    wristMotorConfig.Voltage.PeakForwardVoltage = 12.0;
-    wristMotorConfig.Voltage.PeakReverseVoltage = -12.0;
+    wristMotorConfig.Slot0.kS = RobotInfo.WristInfo.WRIST_KS;
+    wristMotorConfig.Slot0.kV = RobotInfo.WristInfo.WRIST_KV;
+    wristMotorConfig.Slot0.kA = RobotInfo.WristInfo.WRIST_KA;
+    wristMotorConfig.Slot0.kP = RobotInfo.WristInfo.WRIST_KP;
+    wristMotorConfig.Slot0.kI = RobotInfo.WristInfo.WRIST_KI;
+    wristMotorConfig.Slot0.kD = RobotInfo.WristInfo.WRIST_KD;
+    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = RobotInfo.WristInfo.WRIST_MOTION_MAGIC_CRUISE_VELOCITY;
+    wristMotorConfig.MotionMagic.MotionMagicAcceleration = RobotInfo.WristInfo.WRIST_MOTION_MAGIC_ACCELERATION;
+    wristMotorConfig.MotionMagic.MotionMagicJerk = RobotInfo.WristInfo.WRIST_MOTION_MAGIC_JERK;
+    wristMotorConfig.CurrentLimits.StatorCurrentLimit = RobotInfo.WristInfo.WRIST_SATOR_CURRENT_LIMIT;
+    wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable = RobotInfo.WristInfo.WRIST_SATOR_CURRENT_LIMIT_ENABLE;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimit =RobotInfo.WristInfo.WRIST_SUPPLY_CURRENT_LIMIT;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = RobotInfo.WristInfo.WRIST_SUPPLY_CURRENT_LIMIT_ENABLE;
+    wristMotorConfig.Voltage.PeakForwardVoltage = RobotInfo.WristInfo.WRIST_PEAK_FORDWARD_VOLTAGE;
+    wristMotorConfig.Voltage.PeakReverseVoltage = RobotInfo.WristInfo.WRIST_PEAK_REVERSE_VOLTAGE;
     wristMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     wristMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_wristMotor.setConfig(wristMotorConfig);
@@ -85,11 +70,11 @@ public class Wrist implements Subsystem {
   }
 
   private double wristDegToMotorRotations(double wristPostionDeg) {
-    return wristPostionDeg / 360.0 / WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
+    return wristPostionDeg / 360.0 / RobotInfo.WristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
 
   private double motorRotationsToWristDeg(double motorPostion) {
-    return motorPostion * WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
+    return motorPostion * RobotInfo.WristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
   public double getWristPostionDeg() {
@@ -103,19 +88,19 @@ public class Wrist implements Subsystem {
   public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
+        return RobotInfo.WristInfo.LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
       case L_2:
-        return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
+        return RobotInfo.WristInfo.LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
       case L_3:
-        return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
+        return RobotInfo.WristInfo.LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case L_4:
-        return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+        return RobotInfo.WristInfo.LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
       case AlgaeHigh:
-        return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
+        return RobotInfo.WristInfo.ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
-        return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+        return RobotInfo.WristInfo.ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
       case Horizontal:
-        return HORIZONTAL_POSITION_DEG;
+        return RobotInfo.WristInfo.HORIZONTAL_POSITION_DEG;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }

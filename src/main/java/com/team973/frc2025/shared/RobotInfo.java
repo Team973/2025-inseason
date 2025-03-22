@@ -138,6 +138,8 @@ public final class RobotInfo {
   }
 
   public static class ClimbInfo {
+    public static final double MOTOR_ROT_PER_CLIMB_ROT =
+        1.0 / ((10.0 / 64.0) * (20.0 / 72.0) * (20.0 / 84.0) * (9.0 / 30.0));
     public static final double CLIMB_KS = 0.0;
     public static final double CLIMB_KV = 0.0;
     public static final double CLIMB_KA = 0.0;
@@ -158,9 +160,41 @@ public final class RobotInfo {
     public static final double CLIMB_PEAK_FORDWARD_VOLTAGE = 2.0;
     public static final double CLIMB_PEAK_REVERSE_VOLTAGE = -2.0;
   }
+
   public static class WristInfo {
     public static final int MOTOR_ID = 31; // TODO
     public static final int ENCODER_ID = 0; // TODO
+    public static final double HORIZONTAL_POSITION_DEG = 0.0;
+
+    public static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
+        10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
+    public static final double LEVEL_FOUR_POSITION_DEG = 0.0;
+    public static final double LEVEL_THREE_POSITION_DEG = 0.0;
+    public static final double LEVEL_TWO_POSITION_DEG = -65.0;
+    public static final double LEVEL_ONE_POSITION_DEG = 20.0;
+    public static final double CORAL_STOW_POSITION_DEG = 0.0;
+
+    public static final double ALGAE_HIGH_POSITION_DEG = 0.0;
+    public static final double ALGAE_LOW_POSITION_DEG = 0.0;
+    public static final double ALGAE_STOW_POSITION_DEG = 0.0;
+    public static final double WRIST_KS = 0.0;
+    public static final double WRIST_KV = 0.0;
+    public static final double WRIST_KA = 0.0;
+    public static final double WRIST_KP = 10.0;
+    public static final double WRIST_KI = 0.0;
+    public static final double WRIST_KD = 0.0;
+
+    public static final double WRIST_MOTION_MAGIC_CRUISE_VELOCITY = 51.0;
+    public static final double WRIST_MOTION_MAGIC_ACCELERATION = 590.0; 
+    public static final double WRIST_MOTION_MAGIC_JERK = 5900.0;
+
+    public static final double WRIST_SATOR_CURRENT_LIMIT = 20.0;
+    public static final boolean WRIST_SATOR_CURRENT_LIMIT_ENABLE = true;
+    public static final double WRIST_SUPPLY_CURRENT_LIMIT = 15.0;
+    public static final boolean WRIST_SUPPLY_CURRENT_LIMIT_ENABLE = true;
+
+    public static final double WRIST_PEAK_FORDWARD_VOLTAGE = 12.0;
+    public static final double WRIST_PEAK_REVERSE_VOLTAGE = -12.0;
   }
 
   public static class SignalerInfo {
@@ -316,4 +350,3 @@ public final class RobotInfo {
     public static final Color HOT_PINK = new Color(255, 105, 180);
   }
 }
-

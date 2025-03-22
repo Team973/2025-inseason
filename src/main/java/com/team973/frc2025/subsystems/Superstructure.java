@@ -191,9 +191,9 @@ public class Superstructure implements Subsystem {
 
   private void wristStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_wrist.setTargetDeg(Wrist.CORAL_STOW_POSITION_DEG);
+      m_wrist.setTargetDeg(RobotInfo.WristInfo.CORAL_STOW_POSITION_DEG);
     } else {
-      m_wrist.setTargetDeg(Wrist.ALGAE_STOW_POSITION_DEG);
+      m_wrist.setTargetDeg(RobotInfo.WristInfo.ALGAE_STOW_POSITION_DEG);
     }
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
