@@ -4,7 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.WristInfo;
+import com.team973.frc2025.shared.RobotInfo.ArmInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
@@ -44,11 +44,8 @@ public class Arm implements Subsystem {
   private static final double ALGAE_LOW_POSITION_DEG = 0.0; // -47.0;
   public static final double ALGAE_STOW_POSITION_DEG = 0.0; // -85.0;
 
-  private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.32;
-
-  private static final double ENCODER_OFFSET_DEG = 0.0;
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
@@ -68,11 +65,11 @@ public class Arm implements Subsystem {
   }
 
   private double armDegToMotorRotations(double armPostionDeg) {
-    return armPostionDeg / 360.0 / ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
+    return armPostionDeg / 360.0 / ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
 
   private double motorRotationsToArmDeg(double motorPostion) {
-    return motorPostion * ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
+    return motorPostion * ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
   public Arm(Logger logger, CANdleManger candle) {
@@ -81,7 +78,7 @@ public class Arm implements Subsystem {
     m_candleManger = candle;
     m_armEncoder =
         new GreyCANCoder(
-            WristInfo.ENCODER_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+            ArmInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
     m_candleManger.addSignaler(m_armHomedSigaler);
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
@@ -126,7 +123,8 @@ public class Arm implements Subsystem {
   }
 
   private double getCanCoderPostion() {
-    return (m_armEncoder.getAbsolutePosition().getValueAsDouble()) * 360.0 - ENCODER_OFFSET_DEG;
+    return (m_armEncoder.getAbsolutePosition().getValueAsDouble()) * 360.0
+        - ArmInfo.ENCODER_OFFSET_DEG;
   }
 
   public void setTargetDeg(double setPostionDeg) {
