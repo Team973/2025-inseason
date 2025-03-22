@@ -229,8 +229,6 @@ public class Superstructure implements Subsystem {
         || coordinate.getY() < 0
         || coordinate.getX() > ArmInfo.ARM_LENGTH_METERS
         || coordinate.getX() < 0) {
-      armStow();
-      elevatorStow();
       return;
     }
 
