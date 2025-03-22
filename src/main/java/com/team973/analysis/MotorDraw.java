@@ -7,12 +7,9 @@ package com.team973.analysis;
 import edu.wpi.first.util.datalog.DataLogReader;
 import edu.wpi.first.util.datalog.DataLogRecord;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Map;
 
 public final class MotorDraw {
@@ -64,80 +61,14 @@ public final class MotorDraw {
         } catch (InputMismatchException ex) {
           System.out.println("Start(INVALID)");
         }
-      } else if (record.isFinish()) {
-        try {
-          int entry = record.getFinishEntry();
-          System.out.println("Finish(" + entry + ") [" + (record.getTimestamp() / 1000000.0) + "]");
-          if (!entries.containsKey(entry)) {
-            System.out.println("...ID not found");
-          } else {
-            entries.remove(entry);
-          }
-        } catch (InputMismatchException ex) {
-          System.out.println("Finish(INVALID)");
-        }
-      } else if (record.isSetMetadata()) {
-        try {
-          DataLogRecord.MetadataRecordData data = record.getSetMetadataData();
-          System.out.println(
-              "SetMetadata("
-                  + data.entry
-                  + ", '"
-                  + data.metadata
-                  + "') ["
-                  + (record.getTimestamp() / 1000000.0)
-                  + "]");
-          if (!entries.containsKey(data.entry)) {
-            System.out.println("...ID not found");
-          }
-        } catch (InputMismatchException ex) {
-          System.out.println("SetMetadata(INVALID)");
-        }
-      } else if (record.isControl()) {
-        System.out.println("Unrecognized control record");
-      } else {
-        System.out.print("Data(" + record.getEntry() + ", size=" + record.getSize() + ") ");
+      } else if (!record.isControl()) {
         DataLogRecord.StartRecordData entry = entries.get(record.getEntry());
         if (entry == null) {
-          System.out.println("<ID not found>");
           continue;
         }
-        System.out.println(
-            "<name='"
-                + entry.name
-                + "', type='"
-                + entry.type
-                + "'> ["
-                + (record.getTimestamp() / 1000000.0)
-                + "]");
-
-        try {
-          // handle systemTime specially
-          if ("systemTime".equals(entry.name) && "int64".equals(entry.type)) {
-            long val = record.getInteger();
-            System.out.println(
-                "  "
-                    + m_timeFormatter.format(
-                        LocalDateTime.ofEpochSecond(val / 1000000, 0, ZoneOffset.UTC))
-                    + "."
-                    + String.format("%06d", val % 1000000));
-            continue;
-          }
-
-          switch (entry.type) {
-            case "double" -> System.out.println("  " + record.getDouble());
-            case "int64" -> System.out.println("  " + record.getInteger());
-            case "string", "json" -> System.out.println("  '" + record.getString() + "'");
-            case "boolean" -> System.out.println("  " + record.getBoolean());
-            case "double[]" -> System.out.println("  " + List.of(record.getDoubleArray()));
-            case "int64[]" -> System.out.println("  " + List.of(record.getIntegerArray()));
-            case "string[]" -> System.out.println("  " + List.of(record.getStringArray()));
-            default -> {
-              // NOP
-            }
-          }
-        } catch (InputMismatchException ex) {
-          System.out.println("  invalid");
+        if (entry.name.equals("/Robot/robot/claw/conveyorMotor/Voltage")) {
+          System.out.printf(
+              "Conveyor took %fv at %fs\n", record.getDouble(), record.getTimestamp() / 1000000.0);
         }
       }
     }
