@@ -48,13 +48,17 @@ public class Wrist implements Subsystem {
     wristMotorConfig.Slot0.kP = WristInfo.WRIST_KP;
     wristMotorConfig.Slot0.kI = WristInfo.WRIST_KI;
     wristMotorConfig.Slot0.kD = WristInfo.WRIST_KD;
-    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = WristInfo.WRIST_MOTION_MAGIC_CRUISE_VELOCITY;
-    wristMotorConfig.MotionMagic.MotionMagicAcceleration = WristInfo.WRIST_MOTION_MAGIC_ACCELERATION;
+    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        WristInfo.WRIST_MOTION_MAGIC_CRUISE_VELOCITY;
+    wristMotorConfig.MotionMagic.MotionMagicAcceleration =
+        WristInfo.WRIST_MOTION_MAGIC_ACCELERATION;
     wristMotorConfig.MotionMagic.MotionMagicJerk = WristInfo.WRIST_MOTION_MAGIC_JERK;
     wristMotorConfig.CurrentLimits.StatorCurrentLimit = WristInfo.WRIST_SATOR_CURRENT_LIMIT;
-    wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable = WristInfo.WRIST_SATOR_CURRENT_LIMIT_ENABLE;
-    wristMotorConfig.CurrentLimits.SupplyCurrentLimit =WristInfo.WRIST_SUPPLY_CURRENT_LIMIT;
-    wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = WristInfo.WRIST_SUPPLY_CURRENT_LIMIT_ENABLE;
+    wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
+        WristInfo.WRIST_SATOR_CURRENT_LIMIT_ENABLE;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimit = WristInfo.WRIST_SUPPLY_CURRENT_LIMIT;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
+        WristInfo.WRIST_SUPPLY_CURRENT_LIMIT_ENABLE;
     wristMotorConfig.Voltage.PeakForwardVoltage = WristInfo.WRIST_PEAK_FORDWARD_VOLTAGE;
     wristMotorConfig.Voltage.PeakReverseVoltage = WristInfo.WRIST_PEAK_REVERSE_VOLTAGE;
     wristMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

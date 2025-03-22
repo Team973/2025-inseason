@@ -185,7 +185,7 @@ public final class RobotInfo {
     public static final double WRIST_KD = 0.0;
 
     public static final double WRIST_MOTION_MAGIC_CRUISE_VELOCITY = 51.0;
-    public static final double WRIST_MOTION_MAGIC_ACCELERATION = 590.0; 
+    public static final double WRIST_MOTION_MAGIC_ACCELERATION = 590.0;
     public static final double WRIST_MOTION_MAGIC_JERK = 5900.0;
 
     public static final double WRIST_SATOR_CURRENT_LIMIT = 20.0;
