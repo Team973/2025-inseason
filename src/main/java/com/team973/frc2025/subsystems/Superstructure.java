@@ -37,10 +37,10 @@ public class Superstructure implements Subsystem {
   }
 
   public enum ReefLevel {
-    L_1(0),
-    L_2(0),
-    L_3(0),
-    L_4(0),
+    L_1(0.514),
+    L_2(0.81),
+    L_3(1.21),
+    L_4(1.83),
     AlgaeHigh(0),
     AlgaeLow(0),
     Horizontal(0);
@@ -305,7 +305,7 @@ public class Superstructure implements Subsystem {
 
   public void armivatorTargetReef() {
     double x = m_driveController.getDriveWithLimelight().getDistFromScoring();
-    double y = m_targetReefLevel.getHeight();
+    double y = m_targetReefLevel.getHeight() - ElevatorInfo.FLOOR_TO_ELEVATOR_ZERO_METERS;
 
     ArmivatorPose pose = ArmivatorPose.fromCoordinate(x, y);
 
