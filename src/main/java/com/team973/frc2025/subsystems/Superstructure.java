@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.ArmInfo;
 import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
 import com.team973.lib.util.Subsystem;
@@ -22,6 +23,10 @@ public class Superstructure implements Subsystem {
   private boolean m_manualScore = false;
   private boolean m_manualIntake = true;
   private boolean m_manualArmivator = false;
+
+  private final SolidSignaler m_armTargetOutOfBoundsSignaler =
+      new SolidSignaler(
+          RobotInfo.Colors.PINK, 250, RobotInfo.SignalerInfo.ARM_TARGET_OUT_OF_BOUNDS_PRIORITY);
 
   public enum State {
     Manual,
@@ -59,10 +64,12 @@ public class Superstructure implements Subsystem {
   private static class ArmivatorPose {
     private final double m_elevatorHeight;
     private final double m_armAngle;
+    private final boolean m_targetIsOutOfBounds;
 
-    public ArmivatorPose(double elevatorHeight, double armAngle) {
+    public ArmivatorPose(double elevatorHeight, double armAngle, boolean targetIsOutOfBounds) {
       m_elevatorHeight = elevatorHeight;
       m_armAngle = armAngle;
+      m_targetIsOutOfBounds = targetIsOutOfBounds;
     }
 
     public double getElevatorHeight() {
@@ -71,6 +78,10 @@ public class Superstructure implements Subsystem {
 
     public double getArmAngle() {
       return m_armAngle;
+    }
+
+    public boolean getTargetIsOutOfBounds() {
+      return m_targetIsOutOfBounds;
     }
 
     public static ArmivatorPose fromCoordinate(double x, double y) {
@@ -101,13 +112,17 @@ public class Superstructure implements Subsystem {
         elevatorHeight = lowerElevator;
       }
 
+      boolean targetIsOutOfBounds = true;
+
       if (armAngleDeg > ArmInfo.ARM_MAX_ANGLE_DEG) {
         armAngleDeg = ArmInfo.ARM_MAX_ANGLE_DEG;
       } else if (armAngleDeg < ArmInfo.ARM_MIN_ANGLE_DEG) {
         armAngleDeg = ArmInfo.ARM_MIN_ANGLE_DEG;
+      } else {
+        targetIsOutOfBounds = false;
       }
 
-      return new ArmivatorPose(elevatorHeight, armAngleDeg);
+      return new ArmivatorPose(elevatorHeight, armAngleDeg, targetIsOutOfBounds);
     }
   }
 
@@ -296,6 +311,12 @@ public class Superstructure implements Subsystem {
 
     m_arm.setTargetDeg(pose.getArmAngle());
     m_elevator.setTargetPostion(pose.getElevatorHeight());
+
+    if (pose.getTargetIsOutOfBounds()) {
+      m_armTargetOutOfBoundsSignaler.enable();
+    } else {
+      m_armTargetOutOfBoundsSignaler.disable();
+    }
   }
 
   public void update() {

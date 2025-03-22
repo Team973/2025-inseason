@@ -61,6 +61,7 @@ public final class RobotInfo {
     public static final int CRASH_SIGNALER_PRIORITY = 5;
     public static final int CLIMB_STOP_PRIORITY = 6;
     public static final int CLIMB_HORIZONTAL_PRIORITY = 7;
+    public static final int ARM_TARGET_OUT_OF_BOUNDS_PRIORITY = 8;
     public static final int ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY = 10;
     public static final int ARM_HALL_SENSOR_SIGNALER_PRIORTY = 11;
     public static final int PEICE_IN_CLAW_SIGNALER_PRIORTY = 50;
