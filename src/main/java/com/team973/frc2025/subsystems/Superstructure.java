@@ -153,6 +153,12 @@ public class Superstructure implements Subsystem {
         targetIsOutOfBounds = false;
       }
 
+      if (elevatorHeight > config.maxElevatorHeightMeters) {
+        elevatorHeight = config.maxElevatorHeightMeters;
+      } else if (elevatorHeight < 0) {
+        elevatorHeight = 0;
+      }
+
       return new ArmivatorPose(elevatorHeight, armAngleDeg, targetIsOutOfBounds);
     }
 
