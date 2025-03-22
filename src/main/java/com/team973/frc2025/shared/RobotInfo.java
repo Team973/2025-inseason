@@ -39,7 +39,7 @@ public final class RobotInfo {
 
   public static class ElevatorInfo {
     public static final int HALL_SENSOR_ID = 0;
-    public static final double MAX_HEIGHT_METERS = 28.0;
+    public static final double MAX_HEIGHT_METERS = 0.7112;
     public static final double FLOOR_TO_ELEVATOR_ZERO_METERS = 0.8636;
   }
 

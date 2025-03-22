@@ -3,6 +3,7 @@ package com.team973.frc2025.subsystems;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.ArmInfo;
 import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
+import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -61,7 +62,7 @@ public class Superstructure implements Subsystem {
     Algae
   }
 
-  private static class ArmivatorPose {
+  public static class ArmivatorPose {
     private final double m_elevatorHeight;
     private final double m_armAngle;
     private final boolean m_targetIsOutOfBounds;
@@ -310,7 +311,7 @@ public class Superstructure implements Subsystem {
     ArmivatorPose pose = ArmivatorPose.fromCoordinate(x, y);
 
     m_arm.setTargetDeg(pose.getArmAngle());
-    m_elevator.setTargetPostion(pose.getElevatorHeight());
+    m_elevator.setTargetPostion(pose.getElevatorHeight() * Conversions.Distance.INCHES_PER_METER);
 
     if (pose.getTargetIsOutOfBounds()) {
       m_armTargetOutOfBoundsSignaler.enable();
