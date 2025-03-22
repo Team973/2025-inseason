@@ -101,13 +101,13 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    // if (m_wrist.getTargetPosition() == Wrist.CORAL_STOW_POSITION_DEG) {
-    //   return false;
-    // }
+    if (m_wrist.getTargetPosition() == Wrist.CORAL_STOW_POSITION_DEG) {
+      return false;
+    }
 
-    // if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG) {
-    //   return false;
-    // }
+    if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG) {
+      return false;
+    }
 
     if (!m_arm.motorAtTargetRotation()) {
       return false;
@@ -117,9 +117,9 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    // if (!m_wrist.motorAtTargetRotation()) {
-    //   return false;
-    // }
+    if (!m_wrist.motorAtTargetRotation()) {
+      return false;
+    }
 
     return true;
   }
