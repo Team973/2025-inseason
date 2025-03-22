@@ -155,6 +155,11 @@ public class Superstructure implements Subsystem {
 
       return new ArmivatorPose(elevatorHeight, armAngleDeg, targetIsOutOfBounds);
     }
+
+    public String toString() {
+      return String.format(
+          "ArmivatorPose(Arm=%fdeg,Elevator=%fm)", getArmAngleDeg(), getElevatorHeightMeters());
+    }
   }
 
   public Superstructure(
