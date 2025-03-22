@@ -233,7 +233,7 @@ public class Superstructure implements Subsystem {
     }
   }
 
-  public void targetCoordinate() {
+  public void armivatorTargetReef() {
     double x = m_driveController.getDriveWithLimelight().getDistFromScoring();
     double y = m_targetReefLevel.getHeight();
 
