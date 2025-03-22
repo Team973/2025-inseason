@@ -2,6 +2,7 @@ package com.team973.frc2025;
 
 import choreo.util.ChoreoAllianceFlipUtil;
 import com.team973.frc2025.auto.modes.BabyBird;
+import com.team973.frc2025.auto.modes.CenterAuto;
 import com.team973.frc2025.auto.modes.DriveTestAuto;
 import com.team973.frc2025.auto.modes.LeftSideAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
@@ -31,6 +32,7 @@ public class AutoManager {
   private final AutoMode m_rightSideAuto;
   private final AutoMode m_rightSideBabybirdAuto;
   private final AutoMode m_noAutoAllianceWallCenter;
+  private final AutoMode m_centerAuto;
   private final AutoMode m_babyBirdAuto;
 
   public AutoManager(Logger logger, DriveController drive, Superstructure superstructure) {
@@ -47,6 +49,7 @@ public class AutoManager {
     m_rightSideBabybirdAuto =
         new RightSideAuto(logger.subLogger("RightSideBabybirdAuto"), superstructure, drive, true);
     m_noAutoAllianceWallCenter = new NoAutoAllianceWallCenter(logger);
+    m_centerAuto = new CenterAuto(logger.subLogger("CenterAuto"), superstructure, drive);
     m_babyBirdAuto = new BabyBird(logger, drive, superstructure);
 
     m_availableAutos =
@@ -60,6 +63,7 @@ public class AutoManager {
             m_leftSideBabybirdAuto,
             m_rightSideAuto,
             m_rightSideBabybirdAuto,
+            m_centerAuto,
             m_babyBirdAuto);
   }
 

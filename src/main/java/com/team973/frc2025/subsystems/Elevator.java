@@ -38,6 +38,7 @@ public class Elevator implements Subsystem {
 
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
+  private double m_algaeNetOffset = 0.0;
 
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
   private CANdleManger m_candleManger;
@@ -72,6 +73,7 @@ public class Elevator implements Subsystem {
     private static final double ALGAE_HIGH = 19.0;
     private static final double ALGAE_LOW = 22.5;
     public static final double ALGAE_STOW = 6.0;
+    private static final double ALGAE_NET = 28.0;
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
@@ -173,6 +175,9 @@ public class Elevator implements Subsystem {
         break;
       case AlgaeLow:
         m_algaeLowOffset += offset;
+        break;
+      case Net:
+        m_algaeNetOffset += offset;
         break;
       case Horizontal:
         break;

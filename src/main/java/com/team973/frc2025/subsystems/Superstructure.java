@@ -36,6 +36,7 @@ public class Superstructure implements Subsystem {
     L_4,
     AlgaeHigh,
     AlgaeLow,
+    Net,
     Horizontal
   }
 

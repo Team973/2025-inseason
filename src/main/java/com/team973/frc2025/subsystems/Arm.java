@@ -39,6 +39,7 @@ public class Arm implements Subsystem {
   private static final double ALGAE_HIGH_POSITION_DEG = 34.0;
   private static final double ALGAE_LOW_POSITION_DEG = -47.0;
   public static final double ALGAE_STOW_POSITION_DEG = -85.0;
+  private static final double ALGAE_NET_POSITION_DEG = 78.0;
 
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
@@ -51,6 +52,7 @@ public class Arm implements Subsystem {
 
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
+  private double m_algaeNetOffset = 0.0;
 
   private CANdleManger m_candleManger;
 
@@ -148,6 +150,8 @@ public class Arm implements Subsystem {
         return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
         return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+      case Net:
+        return ALGAE_NET_POSITION_DEG + m_algaeNetOffset;
       case Horizontal:
         return HORIZONTAL_POSITION_DEG;
       default:
