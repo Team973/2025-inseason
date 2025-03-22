@@ -92,10 +92,16 @@ public class Superstructure implements Subsystem {
         x = 0;
       }
 
-      if (y > ElevatorInfo.MAX_HEIGHT_METERS) {
-        y = ElevatorInfo.MAX_HEIGHT_METERS;
-      } else if (y < 0) {
-        y = 0;
+      double maxTargetHeight =
+          ElevatorInfo.MAX_HEIGHT_METERS
+              + Math.sin(Math.toRadians(ArmInfo.ARM_MAX_ANGLE_DEG)) * ArmInfo.ARM_LENGTH_METERS;
+      double minTargetHeight =
+          Math.sin(Math.toRadians(ArmInfo.ARM_MIN_ANGLE_DEG)) * ArmInfo.ARM_LENGTH_METERS;
+
+      if (y > maxTargetHeight) {
+        y = maxTargetHeight;
+      } else if (y < minTargetHeight) {
+        y = minTargetHeight;
       }
 
       double armAngleDeg = Math.toDegrees(Math.acos(x / ArmInfo.ARM_LENGTH_METERS));
