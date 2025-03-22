@@ -22,8 +22,6 @@ public class GreyPigeon {
 
   private static final Rotation2d DEFAULT_LEVEL_TOLERANCE = Rotation2d.fromDegrees(2.0);
 
-  private double m_yawOffsetDegrees = 0.0;
-
   private final StatusSignal<Angle> m_yawStatusSignal;
   private final StatusSignal<Angle> m_pitchStatusSignal;
   private final StatusSignal<Angle> m_rollStatusSignal;

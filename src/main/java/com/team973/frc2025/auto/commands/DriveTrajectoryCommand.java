@@ -29,6 +29,10 @@ public class DriveTrajectoryCommand extends AutoCommand {
       DriveController drive, String trajectoryName, CommandOnEvent... events) {
     m_drive = drive;
     m_trajectory = Choreo.loadTrajectory(trajectoryName);
+    if (m_trajectory.isEmpty()) {
+      throw new IllegalArgumentException(
+          "Could not load tajectory that is named '" + trajectoryName + "'");
+    }
 
     m_events = new HashMap<>();
 
