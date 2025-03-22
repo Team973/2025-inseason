@@ -70,37 +70,41 @@ public class Superstructure implements Subsystem {
   }
 
   public static class ArmivatorPose {
-    private final double m_elevatorHeight;
-    private final double m_armAngle;
+    private final double m_elevatorHeightMeters;
+    private final double m_armAngleDeg;
     private final boolean m_targetIsOutOfBounds;
 
     public static class Config {
-      public final double armLength;
-      public final double maxArmAngle;
-      public final double minArmAngle;
-      public final double maxElevatorHeight;
+      public final double armLengthMeters;
+      public final double maxArmAngleDeg;
+      public final double minArmAngleDeg;
+      public final double maxElevatorHeightMeters;
 
       public Config(
-          double armLength, double maxArmAngle, double minArmAngle, double maxElevatorHeight) {
-        this.armLength = armLength;
-        this.maxArmAngle = maxArmAngle;
-        this.minArmAngle = minArmAngle;
-        this.maxElevatorHeight = maxElevatorHeight;
+          double armLengthMeters,
+          double maxArmAngleDeg,
+          double minArmAngleDeg,
+          double maxElevatorHeightMeters) {
+        this.armLengthMeters = armLengthMeters;
+        this.maxArmAngleDeg = maxArmAngleDeg;
+        this.minArmAngleDeg = minArmAngleDeg;
+        this.maxElevatorHeightMeters = maxElevatorHeightMeters;
       }
     }
 
-    public ArmivatorPose(double elevatorHeight, double armAngle, boolean targetIsOutOfBounds) {
-      m_elevatorHeight = elevatorHeight;
-      m_armAngle = armAngle;
+    public ArmivatorPose(
+        double elevatorHeightMeters, double armAngleDeg, boolean targetIsOutOfBounds) {
+      m_elevatorHeightMeters = elevatorHeightMeters;
+      m_armAngleDeg = armAngleDeg;
       m_targetIsOutOfBounds = targetIsOutOfBounds;
     }
 
-    public double getElevatorHeight() {
-      return m_elevatorHeight;
+    public double getElevatorHeightMeters() {
+      return m_elevatorHeightMeters;
     }
 
-    public double getArmAngle() {
-      return m_armAngle;
+    public double getArmAngleDeg() {
+      return m_armAngleDeg;
     }
 
     public boolean getTargetIsOutOfBounds() {
@@ -108,16 +112,17 @@ public class Superstructure implements Subsystem {
     }
 
     public static ArmivatorPose fromCoordinate(double x, double y, Config config) {
-      if (x > config.armLength) {
-        x = config.armLength;
+      if (x > config.armLengthMeters) {
+        x = config.armLengthMeters;
       } else if (x < 0) {
         x = 0;
       }
 
       double maxTargetHeight =
-          config.maxElevatorHeight
-              + Math.sin(Math.toRadians(config.maxArmAngle)) * config.armLength;
-      double minTargetHeight = Math.sin(Math.toRadians(config.minArmAngle)) * config.armLength;
+          config.maxElevatorHeightMeters
+              + Math.sin(Math.toRadians(config.maxArmAngleDeg)) * config.armLengthMeters;
+      double minTargetHeight =
+          Math.sin(Math.toRadians(config.minArmAngleDeg)) * config.armLengthMeters;
 
       if (y > maxTargetHeight) {
         y = maxTargetHeight;
@@ -125,11 +130,11 @@ public class Superstructure implements Subsystem {
         y = minTargetHeight;
       }
 
-      double armAngleDeg = Math.toDegrees(Math.acos(x / config.armLength));
+      double armAngleDeg = Math.toDegrees(Math.acos(x / config.armLengthMeters));
       double elevatorHeight;
 
-      double upperElevator = y + (Math.sin(Math.toRadians(armAngleDeg)) * config.armLength);
-      double lowerElevator = y - (Math.sin(Math.toRadians(armAngleDeg)) * config.armLength);
+      double upperElevator = y + (Math.sin(Math.toRadians(armAngleDeg)) * config.armLengthMeters);
+      double lowerElevator = y - (Math.sin(Math.toRadians(armAngleDeg)) * config.armLengthMeters);
 
       if (lowerElevator < 0) {
         elevatorHeight = upperElevator;
@@ -140,10 +145,10 @@ public class Superstructure implements Subsystem {
 
       boolean targetIsOutOfBounds = true;
 
-      if (armAngleDeg > config.maxArmAngle) {
-        armAngleDeg = config.maxArmAngle;
-      } else if (armAngleDeg < config.minArmAngle) {
-        armAngleDeg = config.minArmAngle;
+      if (armAngleDeg > config.maxArmAngleDeg) {
+        armAngleDeg = config.maxArmAngleDeg;
+      } else if (armAngleDeg < config.minArmAngleDeg) {
+        armAngleDeg = config.minArmAngleDeg;
       } else {
         targetIsOutOfBounds = false;
       }
@@ -335,8 +340,9 @@ public class Superstructure implements Subsystem {
 
     ArmivatorPose pose = ArmivatorPose.fromCoordinate(x, y, ARMIVATOR_CONFIG);
 
-    m_arm.setTargetDeg(pose.getArmAngle());
-    m_elevator.setTargetPostion(pose.getElevatorHeight() * Conversions.Distance.INCHES_PER_METER);
+    m_arm.setTargetDeg(pose.getArmAngleDeg());
+    m_elevator.setTargetPostion(
+        pose.getElevatorHeightMeters() * Conversions.Distance.INCHES_PER_METER);
 
     if (pose.getTargetIsOutOfBounds()) {
       m_armTargetOutOfBoundsSignaler.enable();
