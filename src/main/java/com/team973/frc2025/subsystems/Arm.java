@@ -30,19 +30,19 @@ public class Arm implements Subsystem {
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 78.0;
-  private static final double LEVEL_THREE_POSITION_DEG = 72.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -63.0;
-  private static final double LEVEL_ONE_POSITION_DEG = -60.0;
-  public static final double CORAL_STOW_POSITION_DEG = -91.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 60.0; // 78.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 60.0; // 72.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -60.0; // -63.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -60.0; // -60.0;
+  public static final double CORAL_STOW_POSITION_DEG = -90; // -91.0;
 
-  private static final double ALGAE_HIGH_POSITION_DEG = 34.0;
-  private static final double ALGAE_LOW_POSITION_DEG = -47.0;
-  public static final double ALGAE_STOW_POSITION_DEG = -85.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = 0.0; // 34.0;
+  private static final double ALGAE_LOW_POSITION_DEG = 0.0; // -47.0;
+  public static final double ALGAE_STOW_POSITION_DEG = 0.0; // -85.0;
 
-  private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
+  private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
-  private static final double FEED_FORWARD_MAX_VOLT = 0.6;
+  private static final double FEED_FORWARD_MAX_VOLT = 0.32;
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
@@ -78,12 +78,12 @@ public class Arm implements Subsystem {
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.0;
     armMotorConfig.Slot0.kA = 0.0;
-    armMotorConfig.Slot0.kP = 50.0;
+    armMotorConfig.Slot0.kP = 2.0;
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
-    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 110.0; // 64.0;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 80.0; // 80.0;
-    armMotorConfig.MotionMagic.MotionMagicJerk = 1000.0;
+    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0; // 64.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 390.0; // 80.0;
+    armMotorConfig.MotionMagic.MotionMagicJerk = 0.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     armMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
@@ -163,8 +163,7 @@ public class Arm implements Subsystem {
   public void update() {
     switch (m_controlStatus) {
       case Manual:
-        m_armMotor.setControl(
-            ControlMode.VoltageOut, (m_manualArmPower * 12.0) + getFeedForwardTargetAngle(), 0);
+        m_armMotor.setControl(ControlMode.VoltageOut, (m_manualArmPower * 12.0), 0);
         break;
       case TargetPostion:
         m_armMotor.setControl(

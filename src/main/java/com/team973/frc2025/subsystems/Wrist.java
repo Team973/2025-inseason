@@ -25,15 +25,15 @@ public class Wrist implements Subsystem {
   private static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
       10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 0.0;
-  private static final double LEVEL_THREE_POSITION_DEG = 0.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -65.0;
-  private static final double LEVEL_ONE_POSITION_DEG = 20.0;
-  public static final double CORAL_STOW_POSITION_DEG = 0.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = -190.0;
+  private static final double LEVEL_THREE_POSITION_DEG = -190.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -60.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -60.0;
+  public static final double CORAL_STOW_POSITION_DEG = -16.0;
 
   private static final double ALGAE_HIGH_POSITION_DEG = 0.0;
   private static final double ALGAE_LOW_POSITION_DEG = 0.0;
-  public static final double ALGAE_STOW_POSITION_DEG = 0.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -16.0;
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;

@@ -328,15 +328,15 @@ public class Robot extends TimedRobot {
       }
       double climbStick = m_coDriverStick.getLeftYAxis();
 
-      if (m_coDriverStick.getPOVTopPressed()) {
-        m_superstructure.incrementElevatorOffset(0.5);
-      } else if (m_coDriverStick.getPOVBottomPressed()) {
-        m_superstructure.incrementElevatorOffset(-0.5);
-      } else if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementArmOffset(1.0);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementArmOffset(-1.0);
-      }
+      // if (m_coDriverStick.getPOVTopPressed()) {
+      //   m_superstructure.incrementElevatorOffset(0.5);
+      // } else if (m_coDriverStick.getPOVBottomPressed()) {
+      //   m_superstructure.incrementElevatorOffset(-0.5);
+      // } else if (m_coDriverStick.getPOVRightPressed()) {
+      //   m_superstructure.incrementArmOffset(1.0);
+      // } else if (m_coDriverStick.getPOVLeftPressed()) {
+      //   m_superstructure.incrementArmOffset(-1.0);
+      // }
 
       if (m_coDriverStick.getAButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeLow);
@@ -359,11 +359,11 @@ public class Robot extends TimedRobot {
       }
 
       if (m_coDriverStick.getRightTrigger()) {
-        m_wrist.setMotorManualOutput(0.1);
+        m_arm.setMotorManualOutput(0.1);
       } else if (m_coDriverStick.getLeftTrigger()) {
-        m_wrist.setMotorManualOutput(-0.1);
+        m_arm.setMotorManualOutput(-0.1);
       } else {
-        m_wrist.setMotorManualOutput(0.0);
+        m_arm.setMotorManualOutput(0.0);
       }
 
       if (m_coDriverStick.getRightTriggerPressed()) {
