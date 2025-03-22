@@ -64,12 +64,6 @@ public class Superstructure implements Subsystem {
     m_state = state;
   }
 
-  // public double setStowMode() {
-  //   if (m_claw.getSeesCoral()){
-  //     return
-  //   }
-  // }
-
   public void setManualScore(boolean score) {
     m_manualScore = score;
   }
@@ -91,7 +85,8 @@ public class Superstructure implements Subsystem {
   }
 
   public boolean readyToScore() {
-    if (m_arm.getTargetPosition() == Arm.CORAL_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == Arm.WITH_CORAL_STOW_POSITION_DEG
+        || m_arm.getTargetPosition() == Arm.WITHOUT_CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
@@ -107,7 +102,7 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    if (m_wrist.getTargetPosition() == Wrist.WITH_CORAL_STOW_POSTION_DEG
+    if (m_wrist.getTargetPosition() == Wrist.WITH_CORAL_STOW_POSITION_DEG
         || m_wrist.getTargetPosition() == Wrist.WITHOUT_CORAL_STOW_POSITION_DEG) {
       return false;
     }
@@ -174,10 +169,15 @@ public class Superstructure implements Subsystem {
 
   private void armStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_arm.setTargetDeg(Arm.CORAL_STOW_POSITION_DEG);
+      if (m_claw.getSeesCoral()) {
+        m_arm.setTargetDeg(Arm.WITH_CORAL_STOW_POSITION_DEG);
+      } else {
+        m_arm.setTargetDeg(Arm.WITHOUT_CORAL_STOW_POSITION_DEG);
+      }
     } else {
       m_arm.setTargetDeg(Arm.ALGAE_STOW_POSITION_DEG);
     }
+
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }
 
@@ -197,7 +197,11 @@ public class Superstructure implements Subsystem {
 
   private void wristStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_wrist.setTargetDeg(Wrist.WITHOUT_CORAL_STOW_POSITION_DEG);
+      if (m_claw.getSeesCoral()) {
+        m_wrist.setTargetDeg(Wrist.WITH_CORAL_STOW_POSITION_DEG);
+      } else {
+        m_wrist.setTargetDeg(Wrist.WITHOUT_CORAL_STOW_POSITION_DEG);
+      }
     } else {
       m_wrist.setTargetDeg(Wrist.ALGAE_STOW_POSITION_DEG);
     }
