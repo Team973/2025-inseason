@@ -4,7 +4,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.shared.RobotInfo.WristInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
+import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
@@ -17,6 +19,8 @@ public class Arm implements Subsystem {
   private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
+
+  private final GreyCANCoder m_armEncoder;
   // We want to track the transition from hall=false to hall=true; when the robot
   // first boots up, we don't really know what the previous hall state was, so we
   // assume it was true to avoid false positive.
@@ -43,6 +47,8 @@ public class Arm implements Subsystem {
   private static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.32;
+
+  private static final double ENCODER_OFFSET_DEG = 0.0;
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
@@ -73,6 +79,9 @@ public class Arm implements Subsystem {
     m_logger = logger;
     m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
     m_candleManger = candle;
+    m_armEncoder =
+        new GreyCANCoder(
+            WristInfo.ENCODER_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
     m_candleManger.addSignaler(m_armHomedSigaler);
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
@@ -114,6 +123,10 @@ public class Arm implements Subsystem {
   public void setMotorManualOutput(double joystick) {
     m_controlStatus = ControlStatus.Manual;
     m_manualArmPower = joystick * 0.1;
+  }
+
+  private double getCanCoderPostion() {
+    return (m_armEncoder.getAbsolutePosition().getValueAsDouble()) * 360.0 - ENCODER_OFFSET_DEG;
   }
 
   public void setTargetDeg(double setPostionDeg) {
@@ -226,6 +239,8 @@ public class Arm implements Subsystem {
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
     m_logger.log("HallsensorArm", hallSensor());
+
+    m_logger.log("getCanCoderPostion", getCanCoderPostion());
 
     m_logger.log("Level 1 Offset", m_levelOneOffset);
     m_logger.log("Level 2 Offset", m_levelTwoOffset);
