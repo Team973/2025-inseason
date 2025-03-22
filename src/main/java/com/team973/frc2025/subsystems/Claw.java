@@ -23,8 +23,8 @@ public class Claw implements Subsystem {
   private final GreyTalonFX m_clawMotor;
   private final GreyTalonFX m_conveyor;
 
-  private final DigitalInput m_conveyorBackSensor;
-  private final DigitalInput m_conveyorFrontSensor;
+  private final DigitalInput m_frontClawSensor;
+  private final DigitalInput m_backClawSensor;
   private final CANrange m_clawAlgaeSensor;
 
   private ControlStatus m_mode = ControlStatus.Off;
@@ -63,8 +63,8 @@ public class Claw implements Subsystem {
             RobotInfo.CANIVORE_CANBUS,
             m_logger.subLogger("conveyorMotor", 0.2));
 
-    m_conveyorBackSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
-    m_conveyorFrontSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
+    m_frontClawSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
+    m_backClawSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
     m_clawAlgaeSensor = new CANrange(ClawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
@@ -115,11 +115,11 @@ public class Claw implements Subsystem {
   }
 
   private boolean getConveyorBackSensor() {
-    return m_conveyorBackSensor.get();
+    return m_frontClawSensor.get();
   }
 
   private boolean getConveyorFrontSensor() {
-    return m_conveyorFrontSensor.get();
+    return m_backClawSensor.get();
   }
 
   public boolean getSeesCoral() {
