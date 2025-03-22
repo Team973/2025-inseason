@@ -22,9 +22,6 @@ public class Wrist implements Subsystem {
 
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
-      10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
-
   private static final double LEVEL_FOUR_POSITION_DEG = -190.0;
   private static final double LEVEL_THREE_POSITION_DEG = -190.0;
   private static final double LEVEL_TWO_POSITION_DEG = -60.0;
@@ -34,8 +31,6 @@ public class Wrist implements Subsystem {
   private static final double ALGAE_HIGH_POSITION_DEG = 0.0;
   private static final double ALGAE_LOW_POSITION_DEG = 0.0;
   public static final double ALGAE_STOW_POSITION_DEG = -16.0;
-
-  private static final double ENCODER_OFFSET_DEG = 0.0;
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
@@ -53,10 +48,10 @@ public class Wrist implements Subsystem {
 
     m_wristMotor =
         new GreyTalonFX(
-            WristInfo.MOTOR_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
+            WristInfo.MOTOR_CAN_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
     m_wristEncoder =
         new GreyCANCoder(
-            WristInfo.ENCODER_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+            WristInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
     TalonFXConfiguration wristMotorConfig = new TalonFXConfiguration();
     wristMotorConfig.Slot0.kS = 0.0;
@@ -87,11 +82,11 @@ public class Wrist implements Subsystem {
   }
 
   private double wristDegToMotorRotations(double wristPostionDeg) {
-    return wristPostionDeg / 360.0 / WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
+    return wristPostionDeg / 360.0 / WristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
 
   private double motorRotationsToWristDeg(double motorPostion) {
-    return motorPostion * WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
+    return motorPostion * WristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
   public double getWristPostionDeg() {
@@ -158,7 +153,8 @@ public class Wrist implements Subsystem {
   }
 
   private double getCanCoderPostion() {
-    return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()) * 360.0 - ENCODER_OFFSET_DEG;
+    return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()) * 360.0
+        - WristInfo.ENCODER_OFFSET_DEG;
   }
 
   public void setTargetDeg(double setPostionDeg) {
