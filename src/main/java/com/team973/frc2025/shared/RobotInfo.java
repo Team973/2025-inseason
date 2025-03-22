@@ -157,9 +157,10 @@ public final class RobotInfo {
 
     public static final double CLIMB_PEAK_FORDWARD_VOLTAGE = 2.0;
     public static final double CLIMB_PEAK_REVERSE_VOLTAGE = -2.0;
-
-    public static final double MOTOR_ROT_PER_CLIMB_ROT =
-        1.0 / ((10.0 / 64.0) * (20.0 / 72.0) * (20.0 / 84.0) * (9.0 / 30.0));
+  }
+  public static class WristInfo {
+    public static final int MOTOR_ID = 31; // TODO
+    public static final int ENCODER_ID = 0; // TODO
   }
 
   public static class SignalerInfo {
@@ -315,3 +316,4 @@ public final class RobotInfo {
     public static final Color HOT_PINK = new Color(255, 105, 180);
   }
 }
+

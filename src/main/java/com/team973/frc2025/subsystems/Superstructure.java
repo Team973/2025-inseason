@@ -9,6 +9,7 @@ public class Superstructure implements Subsystem {
   private final Climb m_climb;
   private final Elevator m_elevator;
   private final Arm m_arm;
+  private final Wrist m_wrist;
   private final DriveController m_driveController;
 
   private State m_state = State.Manual;
@@ -46,11 +47,17 @@ public class Superstructure implements Subsystem {
   }
 
   public Superstructure(
-      Claw claw, Climb climb, Elevator elevator, Arm arm, DriveController driveController) {
+      Claw claw,
+      Climb climb,
+      Elevator elevator,
+      Arm arm,
+      Wrist wrist,
+      DriveController driveController) {
     m_claw = claw;
     m_climb = climb;
     m_elevator = elevator;
     m_arm = arm;
+    m_wrist = wrist;
     m_driveController = driveController;
   }
 
@@ -95,6 +102,14 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
+    // if (m_wrist.getTargetPosition() == Wrist.CORAL_STOW_POSITION_DEG) {
+    //   return false;
+    // }
+
+    // if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG) {
+    //   return false;
+    // }
+
     if (!m_arm.motorAtTargetRotation()) {
       return false;
     }
@@ -102,6 +117,10 @@ public class Superstructure implements Subsystem {
     if (!m_elevator.motorAtTarget()) {
       return false;
     }
+
+    // if (!m_wrist.motorAtTargetRotation()) {
+    //   return false;
+    // }
 
     return true;
   }
@@ -131,6 +150,7 @@ public class Superstructure implements Subsystem {
     m_climb.log();
     m_elevator.log();
     m_arm.log();
+    m_wrist.log();
   }
 
   public void syncSensors() {
@@ -138,6 +158,7 @@ public class Superstructure implements Subsystem {
     m_climb.syncSensors();
     m_elevator.syncSensors();
     m_arm.syncSensors();
+    m_wrist.syncSensors();
   }
 
   private void armTargetReefLevel() {
@@ -166,6 +187,24 @@ public class Superstructure implements Subsystem {
       m_elevator.setTargetPostion(RobotInfo.ElevatorInfo.ALGAE_STOW);
     }
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
+  }
+
+  private void wristStow() {
+    if (m_gamePieceMode == GamePiece.Coral) {
+      m_wrist.setTargetDeg(Wrist.CORAL_STOW_POSITION_DEG);
+    } else {
+      m_wrist.setTargetDeg(Wrist.ALGAE_STOW_POSITION_DEG);
+    }
+    m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
+  }
+
+  private void wristTargetReefLevel() {
+    m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel));
+    m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
+  }
+
+  public void incrementWristOffset(double increment) {
+    m_wrist.incrementOffset(increment, m_targetReefLevel);
   }
 
   public void incrementArmOffset(double increment) {
@@ -241,9 +280,11 @@ public class Superstructure implements Subsystem {
         if (m_manualArmivator) {
           armTargetReefLevel();
           elevatorTargetReefLevel();
+          wristTargetReefLevel();
         } else {
           armStow();
           elevatorStow();
+          wristStow();
         }
 
         break;
@@ -258,12 +299,14 @@ public class Superstructure implements Subsystem {
           case MoveToApproach:
             if (m_driveController.getDriveWithLimelight().isNearApproach()) {
               armTargetReefLevel();
+              wristTargetReefLevel();
               elevatorTargetReefLevel();
 
               m_manualArmivator = true;
             } else {
               armStow();
               elevatorStow();
+              wristStow();
 
               m_manualArmivator = false;
             }
@@ -271,12 +314,14 @@ public class Superstructure implements Subsystem {
           case Approach:
             armTargetReefLevel();
             elevatorTargetReefLevel();
+            wristTargetReefLevel();
 
             m_manualArmivator = true;
             break;
           case MoveToScoring:
             armTargetReefLevel();
             elevatorTargetReefLevel();
+            wristTargetReefLevel();
             break;
           case Scoring:
             if (m_manualScore) {
@@ -285,16 +330,19 @@ public class Superstructure implements Subsystem {
 
             armTargetReefLevel();
             elevatorTargetReefLevel();
+            wristTargetReefLevel();
             break;
           case MoveToBackOff:
             m_claw.setControl(Claw.ControlStatus.Off);
 
             armTargetReefLevel();
             elevatorTargetReefLevel();
+            wristTargetReefLevel();
             break;
           case BackOff:
             armStow();
             elevatorStow();
+            wristStow();
 
             m_manualArmivator = false;
             break;
@@ -303,6 +351,7 @@ public class Superstructure implements Subsystem {
       case Zero:
         m_arm.setControlStatus(Arm.ControlStatus.Zero);
         m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
+        m_wrist.setControlStatus(Wrist.ControlStatus.Zero);
 
         clawIntake();
         break;
@@ -313,6 +362,7 @@ public class Superstructure implements Subsystem {
 
         armTargetReefLevel();
         elevatorTargetReefLevel();
+        wristTargetReefLevel();
 
         m_manualArmivator = true;
         break;
@@ -320,6 +370,7 @@ public class Superstructure implements Subsystem {
         m_claw.setControl(Claw.ControlStatus.Off);
         m_arm.setControlStatus(Arm.ControlStatus.Off);
         m_elevator.setControlStatus(Elevator.ControlStatus.Off);
+        m_wrist.setControlStatus(Wrist.ControlStatus.Off);
         break;
     }
 
@@ -329,6 +380,7 @@ public class Superstructure implements Subsystem {
     m_climb.update();
     m_elevator.update();
     m_arm.update();
+    m_wrist.update();
   }
 
   public void reset() {
@@ -336,5 +388,6 @@ public class Superstructure implements Subsystem {
     m_climb.reset();
     m_elevator.reset();
     m_arm.reset();
+    m_wrist.reset();
   }
 }
