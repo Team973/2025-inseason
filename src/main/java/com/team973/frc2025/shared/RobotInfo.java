@@ -33,6 +33,8 @@ public final class RobotInfo {
   public static class ArmInfo {
     public static final int HALL_SENSOR_ID = 1;
     public static final double ARM_LENGTH_METERS = 0; // TODO
+    public static final double ARM_MAX_ANGLE_DEG = 0; // TODO
+    public static final double ARM_MIN_ANGLE_DEG = 0; // TODO
   }
 
   public static class ElevatorInfo {

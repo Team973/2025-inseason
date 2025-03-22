@@ -242,17 +242,24 @@ public class Superstructure implements Subsystem {
     }
 
     double armAngleDeg = Math.toDegrees(Math.acos(x / ArmInfo.ARM_LENGTH_METERS));
+    double elevatorHeight;
 
     double upperElevator = y + (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
     double lowerElevator = y - (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
 
     if (lowerElevator < 0) {
-      m_elevator.setTargetPostion(upperElevator);
-      m_arm.setTargetDeg(-armAngleDeg);
+      elevatorHeight = upperElevator;
+      armAngleDeg *= -1;
     } else {
-      m_elevator.setTargetPostion(lowerElevator);
-      m_arm.setTargetDeg(armAngleDeg);
+      elevatorHeight = lowerElevator;
     }
+
+    if (armAngleDeg > ArmInfo.ARM_MAX_ANGLE_DEG || armAngleDeg < ArmInfo.ARM_MIN_ANGLE_DEG) {
+      return;
+    }
+
+    m_arm.setTargetDeg(armAngleDeg);
+    m_elevator.setTargetPostion(elevatorHeight);
   }
 
   public void update() {
