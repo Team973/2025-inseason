@@ -14,6 +14,13 @@ public class Superstructure implements Subsystem {
   private final Arm m_arm;
   private final DriveController m_driveController;
 
+  private static final ArmivatorPose.Config ARMIVATOR_CONFIG =
+      new ArmivatorPose.Config(
+          ArmInfo.ARM_LENGTH_METERS,
+          ArmInfo.ARM_MAX_ANGLE_DEG,
+          ArmInfo.ARM_MIN_ANGLE_DEG,
+          ElevatorInfo.MAX_HEIGHT_METERS);
+
   private State m_state = State.Manual;
   private State m_lastState = State.Manual;
 
@@ -67,6 +74,21 @@ public class Superstructure implements Subsystem {
     private final double m_armAngle;
     private final boolean m_targetIsOutOfBounds;
 
+    public static class Config {
+      public final double armLength;
+      public final double maxArmAngle;
+      public final double minArmAngle;
+      public final double maxElevatorHeight;
+
+      public Config(
+          double armLength, double maxArmAngle, double minArmAngle, double maxElevatorHeight) {
+        this.armLength = armLength;
+        this.maxArmAngle = maxArmAngle;
+        this.minArmAngle = minArmAngle;
+        this.maxElevatorHeight = maxElevatorHeight;
+      }
+    }
+
     public ArmivatorPose(double elevatorHeight, double armAngle, boolean targetIsOutOfBounds) {
       m_elevatorHeight = elevatorHeight;
       m_armAngle = armAngle;
@@ -85,18 +107,17 @@ public class Superstructure implements Subsystem {
       return m_targetIsOutOfBounds;
     }
 
-    public static ArmivatorPose fromCoordinate(double x, double y) {
-      if (x > ArmInfo.ARM_LENGTH_METERS) {
-        x = ArmInfo.ARM_LENGTH_METERS;
+    public static ArmivatorPose fromCoordinate(double x, double y, Config config) {
+      if (x > config.armLength) {
+        x = config.armLength;
       } else if (x < 0) {
         x = 0;
       }
 
       double maxTargetHeight =
-          ElevatorInfo.MAX_HEIGHT_METERS
-              + Math.sin(Math.toRadians(ArmInfo.ARM_MAX_ANGLE_DEG)) * ArmInfo.ARM_LENGTH_METERS;
-      double minTargetHeight =
-          Math.sin(Math.toRadians(ArmInfo.ARM_MIN_ANGLE_DEG)) * ArmInfo.ARM_LENGTH_METERS;
+          config.maxElevatorHeight
+              + Math.sin(Math.toRadians(config.maxArmAngle)) * config.armLength;
+      double minTargetHeight = Math.sin(Math.toRadians(config.minArmAngle)) * config.armLength;
 
       if (y > maxTargetHeight) {
         y = maxTargetHeight;
@@ -104,13 +125,11 @@ public class Superstructure implements Subsystem {
         y = minTargetHeight;
       }
 
-      double armAngleDeg = Math.toDegrees(Math.acos(x / ArmInfo.ARM_LENGTH_METERS));
+      double armAngleDeg = Math.toDegrees(Math.acos(x / config.armLength));
       double elevatorHeight;
 
-      double upperElevator =
-          y + (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
-      double lowerElevator =
-          y - (Math.sin(Math.toRadians(armAngleDeg)) * ArmInfo.ARM_LENGTH_METERS);
+      double upperElevator = y + (Math.sin(Math.toRadians(armAngleDeg)) * config.armLength);
+      double lowerElevator = y - (Math.sin(Math.toRadians(armAngleDeg)) * config.armLength);
 
       if (lowerElevator < 0) {
         elevatorHeight = upperElevator;
@@ -121,10 +140,10 @@ public class Superstructure implements Subsystem {
 
       boolean targetIsOutOfBounds = true;
 
-      if (armAngleDeg > ArmInfo.ARM_MAX_ANGLE_DEG) {
-        armAngleDeg = ArmInfo.ARM_MAX_ANGLE_DEG;
-      } else if (armAngleDeg < ArmInfo.ARM_MIN_ANGLE_DEG) {
-        armAngleDeg = ArmInfo.ARM_MIN_ANGLE_DEG;
+      if (armAngleDeg > config.maxArmAngle) {
+        armAngleDeg = config.maxArmAngle;
+      } else if (armAngleDeg < config.minArmAngle) {
+        armAngleDeg = config.minArmAngle;
       } else {
         targetIsOutOfBounds = false;
       }
@@ -314,7 +333,7 @@ public class Superstructure implements Subsystem {
     double x = m_driveController.getDriveWithLimelight().getDistFromScoring();
     double y = m_targetReefLevel.getHeight() - ElevatorInfo.FLOOR_TO_ELEVATOR_ZERO_METERS;
 
-    ArmivatorPose pose = ArmivatorPose.fromCoordinate(x, y);
+    ArmivatorPose pose = ArmivatorPose.fromCoordinate(x, y, ARMIVATOR_CONFIG);
 
     m_arm.setTargetDeg(pose.getArmAngle());
     m_elevator.setTargetPostion(pose.getElevatorHeight() * Conversions.Distance.INCHES_PER_METER);

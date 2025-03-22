@@ -1,13 +1,15 @@
 import static org.junit.Assert.assertEquals;
 
-import com.team973.frc2025.shared.RobotInfo.ArmInfo;
 import com.team973.frc2025.subsystems.Superstructure.ArmivatorPose;
 import org.junit.jupiter.api.Test;
 
 public class ArmivatorPoseTest {
+  private static final ArmivatorPose.Config ARMIVATOR_TEST_CONFIG =
+      new ArmivatorPose.Config(0.451104, 75.0, -80.0, 0.7112);
+
   @Test
   void testOne() throws Exception {
-    ArmivatorPose pose = ArmivatorPose.fromCoordinate(0.3, 0.2);
+    ArmivatorPose pose = ArmivatorPose.fromCoordinate(0.3, 0.2, ARMIVATOR_TEST_CONFIG);
 
     System.out.println(pose.getArmAngle());
     System.out.println(pose.getElevatorHeight());
@@ -18,7 +20,7 @@ public class ArmivatorPoseTest {
 
   @Test
   void testTwo() throws Exception {
-    ArmivatorPose pose = ArmivatorPose.fromCoordinate(0.4, 0.6);
+    ArmivatorPose pose = ArmivatorPose.fromCoordinate(0.4, 0.6, ARMIVATOR_TEST_CONFIG);
 
     System.out.println(pose.getArmAngle());
     System.out.println(pose.getElevatorHeight());
@@ -29,18 +31,18 @@ public class ArmivatorPoseTest {
 
   @Test
   void testThree() throws Exception {
-    ArmivatorPose pose = ArmivatorPose.fromCoordinate(0.05, 1.15);
+    ArmivatorPose pose = ArmivatorPose.fromCoordinate(0.05, 1.15, ARMIVATOR_TEST_CONFIG);
 
     System.out.println(pose.getArmAngle());
     System.out.println(pose.getElevatorHeight());
 
-    assertEquals(ArmInfo.ARM_MAX_ANGLE_DEG, pose.getArmAngle(), 0.01);
+    assertEquals(ARMIVATOR_TEST_CONFIG.maxArmAngle, pose.getArmAngle(), 0.01);
     assertEquals(0.702, pose.getElevatorHeight(), 0.01);
   }
 
   @Test
   void testFour() throws Exception {
-    ArmivatorPose pose = ArmivatorPose.fromCoordinate(20.0, 0.6);
+    ArmivatorPose pose = ArmivatorPose.fromCoordinate(20.0, 0.6, ARMIVATOR_TEST_CONFIG);
 
     System.out.println(pose.getArmAngle());
     System.out.println(pose.getElevatorHeight());
