@@ -90,7 +90,7 @@ public class Arm implements Subsystem {
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
     armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0; // 64.0;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 273.0; // 80.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 218.0; // 80.0;
     armMotorConfig.MotionMagic.MotionMagicJerk = 0.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
