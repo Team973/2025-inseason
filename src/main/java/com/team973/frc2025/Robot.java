@@ -328,15 +328,15 @@ public class Robot extends TimedRobot {
       }
       double climbStick = m_coDriverStick.getLeftYAxis();
 
-      // if (m_coDriverStick.getPOVTopPressed()) {
-      //   m_superstructure.incrementElevatorOffset(0.5);
-      // } else if (m_coDriverStick.getPOVBottomPressed()) {
-      //   m_superstructure.incrementElevatorOffset(-0.5);
-      // } else if (m_coDriverStick.getPOVRightPressed()) {
-      //   m_superstructure.incrementArmOffset(1.0);
-      // } else if (m_coDriverStick.getPOVLeftPressed()) {
-      //   m_superstructure.incrementArmOffset(-1.0);
-      // }
+      if (m_coDriverStick.getPOVTopPressed()) {
+        m_superstructure.incrementElevatorOffset(0.5);
+      } else if (m_coDriverStick.getPOVBottomPressed()) {
+        m_superstructure.incrementElevatorOffset(-0.5);
+      } else if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementArmOffset(1.0);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementArmOffset(-1.0);
+      }
 
       if (m_coDriverStick.getAButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeLow);
@@ -358,17 +358,9 @@ public class Robot extends TimedRobot {
         m_superstructure.setManualIntake(true);
       }
 
-      if (m_coDriverStick.getRightTrigger()) {
-        m_arm.setMotorManualOutput(0.1);
-      } else if (m_coDriverStick.getLeftTrigger()) {
-        m_arm.setMotorManualOutput(-0.1);
-      } else {
-        m_arm.setMotorManualOutput(0.0);
-      }
-
       if (m_coDriverStick.getRightTriggerPressed()) {
-        // m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
-        // m_superstructure.setState(Superstructure.State.Climb);
+        m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
+        m_superstructure.setState(Superstructure.State.Climb);
       } else if (m_coDriverStick.getLeftTriggerPressed()) {
         // m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
       } else if (Math.abs(climbStick) > 0.25) {
