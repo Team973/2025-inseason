@@ -36,14 +36,14 @@ public class Arm implements Subsystem {
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
   private static final double LEVEL_FOUR_POSITION_DEG = 61.0;
-  private static final double LEVEL_THREE_POSITION_DEG = 64.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 65.0;
   private static final double LEVEL_TWO_POSITION_DEG = -68.0;
   private static final double LEVEL_ONE_POSITION_DEG = -69.0;
-  public static final double CORAL_STOW_POSITION_DEG = -90;
+  public static final double CORAL_STOW_POSITION_DEG = -92.0;
 
-  private static final double ALGAE_HIGH_POSITION_DEG = 0.0; // 34.0;
-  private static final double ALGAE_LOW_POSITION_DEG = 0.0; // -47.0;
-  public static final double ALGAE_STOW_POSITION_DEG = 0.0; // -85.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = 52.5; // 34.0;
+  private static final double ALGAE_LOW_POSITION_DEG = -58.0; // -47.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -85.0; // -85.0;
 
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.32;
@@ -90,7 +90,7 @@ public class Arm implements Subsystem {
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
     armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0; // 64.0;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 390.0; // 80.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 273.0; // 80.0;
     armMotorConfig.MotionMagic.MotionMagicJerk = 0.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
