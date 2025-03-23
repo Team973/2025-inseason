@@ -57,8 +57,7 @@ public class Robot extends TimedRobot {
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"), m_candleManger);
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm"), m_candleManger);
-  private final Wrist m_wrist = new Wrist(new Logger("wrist"));
-
+  private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist"));
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(
           RobotInfo.Colors.ORANGE, 3000, RobotInfo.SignalerInfo.LOW_BATTER_SIGNALER_PRIORTY);
@@ -356,14 +355,6 @@ public class Robot extends TimedRobot {
         m_superstructure.setManualIntake(false);
       } else if (m_coDriverStick.getLeftBumperButtonReleased()) {
         m_superstructure.setManualIntake(true);
-      }
-
-      if (m_coDriverStick.getRightTrigger()) {
-        m_arm.setMotorManualOutput(0.1);
-      } else if (m_coDriverStick.getLeftTrigger()) {
-        m_arm.setMotorManualOutput(-0.1);
-      } else {
-        m_arm.setMotorManualOutput(0.0);
       }
 
       if (m_coDriverStick.getRightTriggerPressed()) {
