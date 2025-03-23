@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DriveWithLimelight extends DriveComposable {
   private static final double SCORING_DISTANCE_TOLERANCE_METERS = 0.06;
   private static final double APPROACH_DISTANCE_TOLERANCE_METERS = 0.12;
-  private static final double NEAR_APPROACH_DISTANCE_TOLERANCE_METERS = 0.65;
+  private static final double NEAR_APPROACH_DISTANCE_TOLERANCE_METERS = 1.5;
 
   private static final double TARGET_ANGLE_TOLERANCE_DEG = 6.0;
 
