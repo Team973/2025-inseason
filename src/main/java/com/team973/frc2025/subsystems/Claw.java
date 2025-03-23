@@ -23,8 +23,8 @@ public class Claw implements Subsystem {
   private final GreyTalonFX m_clawMotor;
   private final GreyTalonFX m_conveyor;
 
-  private final DigitalInput m_frontClawSensor;
   private final DigitalInput m_backClawSensor;
+  private final DigitalInput m_frontClawSensor;
   private final CANrange m_clawAlgaeSensor;
 
   private ControlStatus m_mode = ControlStatus.Off;
@@ -63,8 +63,8 @@ public class Claw implements Subsystem {
             RobotInfo.CANIVORE_CANBUS,
             m_logger.subLogger("conveyorMotor", 0.2));
 
-    m_frontClawSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
-    m_backClawSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
+    m_backClawSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
+    m_frontClawSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
     m_clawAlgaeSensor = new CANrange(ClawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
@@ -114,16 +114,16 @@ public class Claw implements Subsystem {
     return (Math.abs(m_targetHoldPosition - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
   }
 
-  private boolean getConveyorBackSensor() {
-    return m_frontClawSensor.get();
-  }
-
-  private boolean getConveyorFrontSensor() {
+  private boolean getClawBackSensor() {
     return m_backClawSensor.get();
   }
 
+  private boolean getClawFrontSensor() {
+    return !m_frontClawSensor.get();
+  }
+
   public boolean getSeesCoral() {
-    return getConveyorFrontSensor() || getConveyorBackSensor();
+    return getClawFrontSensor() || getClawBackSensor();
   }
 
   private Optional<Double> getAlgaeDistance() {
@@ -156,11 +156,11 @@ public class Claw implements Subsystem {
   public void update() {
     switch (m_mode) {
       case IntakeCoral:
-        if (getConveyorFrontSensor()) {
+        if (getClawFrontSensor()) {
           // Too far forward --- back up!
           m_clawMotor.setControl(ControlMode.VelocityVoltage, -10);
           m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
-        } else if (getConveyorBackSensor() && !getConveyorFrontSensor()) {
+        } else if (getClawBackSensor() && !getClawFrontSensor()) {
           // Perfect spot!
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
           m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
@@ -215,8 +215,8 @@ public class Claw implements Subsystem {
 
     m_logger.log("Claw Motor Voltage", m_clawMotor.getMotorVoltage().getValueAsDouble());
 
-    m_logger.log("Conveyor Back Sensor", getConveyorBackSensor());
-    m_logger.log("Conveyor Front Sensor", getConveyorFrontSensor());
+    m_logger.log("Conveyor Back Sensor", getClawBackSensor());
+    m_logger.log("Conveyor Front Sensor", getClawFrontSensor());
 
     m_logger.log("Algae Sensor Strength", m_clawAlgaeSensor.getSignalStrength().getValueAsDouble());
     m_logger.log(

@@ -23,16 +23,16 @@ public class Wrist implements Subsystem {
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
   private static final double LEVEL_FOUR_POSITION_DEG = -195.0;
-  private static final double LEVEL_THREE_POSITION_DEG = -184.0;
+  private static final double LEVEL_THREE_POSITION_DEG = -191.0;
   private static final double LEVEL_TWO_POSITION_DEG = -54.0;
   private static final double LEVEL_ONE_POSITION_DEG = 4.0;
 
-  public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -16.0;
+  public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -14.5;
   public static final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
 
-  private static final double ALGAE_HIGH_POSITION_DEG = 0.0;
-  private static final double ALGAE_LOW_POSITION_DEG = 0.0;
-  public static final double ALGAE_STOW_POSITION_DEG = -16.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = -144.0;
+  private static final double ALGAE_LOW_POSITION_DEG = -34.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -5.0;
 
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;

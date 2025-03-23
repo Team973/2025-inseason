@@ -67,11 +67,11 @@ public class Elevator implements Subsystem {
     private static final double LEVEL_2 = 17.0;
     private static final double LEVEL_3 = 0.0;
     private static final double LEVEL_4 = 27.0;
-    public static final double CORAL_STOW = 0.0;
+    public static final double CORAL_STOW = 0.5;
 
-    private static final double ALGAE_HIGH = 19.0;
-    private static final double ALGAE_LOW = 22.5;
-    public static final double ALGAE_STOW = 6.0;
+    private static final double ALGAE_HIGH = 5.0;
+    private static final double ALGAE_LOW = 20.0;
+    public static final double ALGAE_STOW = 1.0;
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
