@@ -70,9 +70,12 @@ public class DriveController implements Subsystem {
 
   public void setControllerOption(ControllerOption controllerOption) {
     if (controllerOption != m_controllerOption) {
-      m_controllerOption = controllerOption;
       m_driveWithJoysticks.reset(m_drive.getPoseEstimator().getPoseMeters().getRotation());
+
+      getComposableFromControllerOption(m_controllerOption).exit();
       getComposableFromControllerOption(controllerOption).init();
+
+      m_controllerOption = controllerOption;
     }
   }
 
