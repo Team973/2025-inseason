@@ -23,9 +23,14 @@ public final class MotorDraw {
       System.exit(1);
       return;
     }
+    doSummaryForMotor(args[0], "/Robot/robot/claw/conveyorMotor/");
+    doSummaryForMotor(args[0], "/Robot/robot/claw/clawMotor");
+  }
+
+  private static final void doSummaryForMotor(String logPath, String conveyorMotor) {
     DataLogReader reader;
     try {
-      reader = new DataLogReader(args[0]);
+      reader = new DataLogReader(logPath);
     } catch (IOException ex) {
       System.err.println("could not open file: " + ex.getMessage());
       System.exit(1);
@@ -38,7 +43,6 @@ public final class MotorDraw {
     }
 
     Map<Integer, DataLogRecord.StartRecordData> entries = new HashMap<>();
-    String conveyorMotor = "/Robot/robot/claw/conveyorMotor/";
     double conveyorVoltageSum = 0;
     double conveyorStatorSum = 0;
     double conveyorWattageSum = 0;
@@ -48,18 +52,6 @@ public final class MotorDraw {
       if (record.isStart()) {
         try {
           DataLogRecord.StartRecordData data = record.getStartData();
-          System.out.println(
-              "Start("
-                  + data.entry
-                  + ", name='"
-                  + data.name
-                  + "', type='"
-                  + data.type
-                  + "', metadata='"
-                  + data.metadata
-                  + "') ["
-                  + (record.getTimestamp() / 1000000.0)
-                  + "]");
           if (entries.containsKey(data.entry)) {
             System.out.println("...DUPLICATE entry ID, overriding");
           }
@@ -80,16 +72,17 @@ public final class MotorDraw {
         if (entry.name.equals(conveyorMotor + "Stator Current")) {
           conveyorStatorSum = conveyorStatorSum + record.getDouble();
           conveyorPreviousStator = record.getDouble();
-          // **Recieves latest Stator and Voltage values, multiplies and adds them to overall wattage sum.**
+          // **Recieves latest Stator and Voltage values, multiplies and adds them to overall
+          // wattage sum.**
           conveyorWattageSum =
               conveyorPreviousVoltage * conveyorPreviousStator + conveyorWattageSum;
         }
       }
     }
     // **Printing out sums of all measurements**
-    System.out.printf(conveyorMotor + "stator current took %fa \n", conveyorStatorSum);
-    System.out.printf(conveyorMotor + "motor voltage took %fv \n", conveyorVoltageSum);
-    System.out.printf(conveyorMotor + "motor wattage took %fw \n", conveyorWattageSum);
+    System.out.printf(conveyorMotor + " stator current took %fa \n", conveyorStatorSum);
+    System.out.printf(conveyorMotor + " motor voltage took %fv \n", conveyorVoltageSum);
+    System.out.printf(conveyorMotor + " motor wattage took %fw \n", conveyorWattageSum);
   }
 
   private MotorDraw() {}
