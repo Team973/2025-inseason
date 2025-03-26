@@ -38,6 +38,12 @@ public final class MotorDraw {
     }
 
     Map<Integer, DataLogRecord.StartRecordData> entries = new HashMap<>();
+    String conveyorMotor = "/Robot/robot/claw/conveyorMotor/";
+    double conveyorVoltageSum = 0;
+    double conveyorStatorSum = 0;
+    double conveyorWattageSum = 0;
+    double conveyorPreviousVoltage = 0;
+    double conveyorPreviousStator = 0;
     for (DataLogRecord record : reader) {
       if (record.isStart()) {
         try {
@@ -66,12 +72,24 @@ public final class MotorDraw {
         if (entry == null) {
           continue;
         }
-        if (entry.name.equals("/Robot/robot/claw/conveyorMotor/Voltage")) {
-          System.out.printf(
-              "Conveyor took %fv at %fs\n", record.getDouble(), record.getTimestamp() / 1000000.0);
+        // **Conveyor motor measurements**
+        if (entry.name.equals(conveyorMotor + "Voltage")) {
+          conveyorVoltageSum = conveyorVoltageSum + record.getDouble();
+          conveyorPreviousVoltage = record.getDouble();
+        }
+        if (entry.name.equals(conveyorMotor + "Stator Current")) {
+          conveyorStatorSum = conveyorStatorSum + record.getDouble();
+          conveyorPreviousStator = record.getDouble();
+          // **Recieves latest Stator and Voltage values, multiplies and adds them to overall wattage sum.**
+          conveyorWattageSum =
+              conveyorPreviousVoltage * conveyorPreviousStator + conveyorWattageSum;
         }
       }
     }
+    // **Printing out sums of all measurements**
+    System.out.printf(conveyorMotor + "stator current took %fa \n", conveyorStatorSum);
+    System.out.printf(conveyorMotor + "motor voltage took %fv \n", conveyorVoltageSum);
+    System.out.printf(conveyorMotor + "motor wattage took %fw \n", conveyorWattageSum);
   }
 
   private MotorDraw() {}
