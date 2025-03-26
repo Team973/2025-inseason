@@ -33,13 +33,19 @@ public final class RobotInfo {
   public static class ArmInfo {
     public static final int HALL_SENSOR_ID = 1;
     public static final int ENCODER_CAN_ID = 32;
-    public static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
 
+    public static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
     public static final double ENCODER_OFFSET_ROTATIONS = -0.0027;
+
+    public static final double ARM_LENGTH_METERS = 0.451104;
+    public static final double ARM_MAX_ANGLE_DEG = 75.0;
+    public static final double ARM_MIN_ANGLE_DEG = -80.0;
   }
 
   public static class ElevatorInfo {
     public static final int HALL_SENSOR_ID = 0;
+    public static final double MAX_HEIGHT_METERS = 0.7112;
+    public static final double FLOOR_TO_ELEVATOR_ZERO_METERS = 0.8636;
   }
 
   public static class ClawInfo {
@@ -69,6 +75,7 @@ public final class RobotInfo {
     public static final int CRASH_SIGNALER_PRIORITY = 5;
     public static final int CLIMB_STOP_PRIORITY = 6;
     public static final int CLIMB_HORIZONTAL_PRIORITY = 7;
+    public static final int ARM_TARGET_OUT_OF_BOUNDS_PRIORITY = 8;
     public static final int ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY = 10;
     public static final int ARM_HALL_SENSOR_SIGNALER_PRIORTY = 11;
     public static final int PEICE_IN_CLAW_SIGNALER_PRIORTY = 50;

@@ -1,5 +1,9 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.shared.RobotInfo.ArmInfo;
+import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
+import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -10,6 +14,13 @@ public class Superstructure implements Subsystem {
   private final Arm m_arm;
   private final Wrist m_wrist;
   private final DriveController m_driveController;
+
+  private static final ArmivatorPose.Config ARMIVATOR_CONFIG =
+      new ArmivatorPose.Config(
+          ArmInfo.ARM_LENGTH_METERS,
+          ArmInfo.ARM_MAX_ANGLE_DEG,
+          ArmInfo.ARM_MIN_ANGLE_DEG,
+          ElevatorInfo.MAX_HEIGHT_METERS);
 
   private State m_state = State.Manual;
   private State m_lastState = State.Manual;
@@ -22,6 +33,10 @@ public class Superstructure implements Subsystem {
   private boolean m_manualIntake = true;
   private boolean m_manualArmivator = false;
 
+  private final SolidSignaler m_armTargetOutOfBoundsSignaler =
+      new SolidSignaler(
+          RobotInfo.Colors.PINK, 250, RobotInfo.SignalerInfo.ARM_TARGET_OUT_OF_BOUNDS_PRIORITY);
+
   public enum State {
     Manual,
     Score,
@@ -31,18 +46,127 @@ public class Superstructure implements Subsystem {
   }
 
   public enum ReefLevel {
-    L_1,
-    L_2,
-    L_3,
-    L_4,
-    AlgaeHigh,
-    AlgaeLow,
-    Horizontal
+    L_1(0.514),
+    L_2(0.81),
+    L_3(1.21),
+    L_4(1.83),
+    AlgaeHigh(0),
+    AlgaeLow(0),
+    Horizontal(0);
+
+    private final double height;
+
+    private ReefLevel(double height) {
+      this.height = height;
+    }
+
+    public double getHeight() {
+      return height;
+    }
   }
 
   public enum GamePiece {
     Coral,
     Algae
+  }
+
+  public static class ArmivatorPose {
+    private final double m_elevatorHeightMeters;
+    private final double m_armAngleDeg;
+    private final boolean m_targetIsOutOfBounds;
+
+    public static class Config {
+      public final double armLengthMeters;
+      public final double maxArmAngleDeg;
+      public final double minArmAngleDeg;
+      public final double maxElevatorHeightMeters;
+
+      public Config(
+          double armLengthMeters,
+          double maxArmAngleDeg,
+          double minArmAngleDeg,
+          double maxElevatorHeightMeters) {
+        this.armLengthMeters = armLengthMeters;
+        this.maxArmAngleDeg = maxArmAngleDeg;
+        this.minArmAngleDeg = minArmAngleDeg;
+        this.maxElevatorHeightMeters = maxElevatorHeightMeters;
+      }
+    }
+
+    public ArmivatorPose(
+        double elevatorHeightMeters, double armAngleDeg, boolean targetIsOutOfBounds) {
+      m_elevatorHeightMeters = elevatorHeightMeters;
+      m_armAngleDeg = armAngleDeg;
+      m_targetIsOutOfBounds = targetIsOutOfBounds;
+    }
+
+    public double getElevatorHeightMeters() {
+      return m_elevatorHeightMeters;
+    }
+
+    public double getArmAngleDeg() {
+      return m_armAngleDeg;
+    }
+
+    public boolean getTargetIsOutOfBounds() {
+      return m_targetIsOutOfBounds;
+    }
+
+    public static ArmivatorPose fromCoordinate(double x, double y, Config config) {
+      if (x > config.armLengthMeters) {
+        x = config.armLengthMeters;
+      } else if (x < 0) {
+        x = 0;
+      }
+
+      double maxTargetHeight =
+          config.maxElevatorHeightMeters
+              + Math.sin(Math.toRadians(config.maxArmAngleDeg)) * config.armLengthMeters;
+      double minTargetHeight =
+          Math.sin(Math.toRadians(config.minArmAngleDeg)) * config.armLengthMeters;
+
+      if (y > maxTargetHeight) {
+        y = maxTargetHeight;
+      } else if (y < minTargetHeight) {
+        y = minTargetHeight;
+      }
+
+      double armAngleDeg = Math.toDegrees(Math.acos(x / config.armLengthMeters));
+      double elevatorHeight;
+
+      double upperElevator = y + (Math.sin(Math.toRadians(armAngleDeg)) * config.armLengthMeters);
+      double lowerElevator = y - (Math.sin(Math.toRadians(armAngleDeg)) * config.armLengthMeters);
+
+      if (lowerElevator < 0) {
+        elevatorHeight = upperElevator;
+        armAngleDeg *= -1;
+      } else {
+        elevatorHeight = lowerElevator;
+      }
+
+      boolean targetIsOutOfBounds = true;
+
+      if (armAngleDeg > config.maxArmAngleDeg) {
+        armAngleDeg = config.maxArmAngleDeg;
+      } else if (armAngleDeg < config.minArmAngleDeg) {
+        armAngleDeg = config.minArmAngleDeg;
+      } else {
+        targetIsOutOfBounds = false;
+      }
+
+      if (elevatorHeight > config.maxElevatorHeightMeters) {
+        elevatorHeight = config.maxElevatorHeightMeters;
+      } else if (elevatorHeight < 0) {
+        elevatorHeight = 0;
+      }
+
+      return new ArmivatorPose(elevatorHeight, armAngleDeg, targetIsOutOfBounds);
+    }
+
+    public String toString() {
+      return String.format(
+          "ArmivatorPose(Arm=%fdeg,Elevator=%fm)", getArmAngleDeg(), getElevatorHeightMeters());
+    }
   }
 
   public Superstructure(
@@ -204,8 +328,8 @@ public class Superstructure implements Subsystem {
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
 
-  private void wristTargetReefLevel() {
-    m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel));
+  private void wristTargetReefLevel(boolean relativeToArm) {
+    m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel, relativeToArm));
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
 
@@ -267,6 +391,23 @@ public class Superstructure implements Subsystem {
     }
   }
 
+  public void armivatorTargetReef() {
+    double x = m_driveController.getDriveWithLimelight().getDistFromScoring();
+    double y = m_targetReefLevel.getHeight() - ElevatorInfo.FLOOR_TO_ELEVATOR_ZERO_METERS;
+
+    ArmivatorPose pose = ArmivatorPose.fromCoordinate(x, y, ARMIVATOR_CONFIG);
+
+    m_arm.setTargetDeg(pose.getArmAngleDeg());
+    m_elevator.setTargetPostion(
+        pose.getElevatorHeightMeters() * Conversions.Distance.INCHES_PER_METER);
+
+    if (pose.getTargetIsOutOfBounds()) {
+      m_armTargetOutOfBoundsSignaler.enable();
+    } else {
+      m_armTargetOutOfBoundsSignaler.disable();
+    }
+  }
+
   public void update() {
     switch (m_state) {
       case Manual:
@@ -286,7 +427,7 @@ public class Superstructure implements Subsystem {
         if (m_manualArmivator) {
           armTargetReefLevel();
           elevatorTargetReefLevel();
-          wristTargetReefLevel();
+          wristTargetReefLevel(true);
         } else {
           armStow();
           elevatorStow();
@@ -304,9 +445,8 @@ public class Superstructure implements Subsystem {
         switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
           case MoveToApproach:
             if (m_driveController.getDriveWithLimelight().isNearApproach()) {
-              armTargetReefLevel();
-              wristTargetReefLevel();
-              elevatorTargetReefLevel();
+              armivatorTargetReef();
+              wristTargetReefLevel(false);
 
               m_manualArmivator = true;
             } else {
@@ -318,32 +458,28 @@ public class Superstructure implements Subsystem {
             }
             break;
           case Approach:
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
-            wristTargetReefLevel();
+            armivatorTargetReef();
+            wristTargetReefLevel(false);
 
             m_manualArmivator = true;
             break;
           case MoveToScoring:
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
-            wristTargetReefLevel();
+            armivatorTargetReef();
+            wristTargetReefLevel(false);
             break;
           case Scoring:
             if (m_manualScore) {
               clawScore();
             }
 
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
-            wristTargetReefLevel();
+            armivatorTargetReef();
+            wristTargetReefLevel(false);
             break;
           case MoveToBackOff:
             m_claw.setControl(Claw.ControlStatus.Off);
 
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
-            wristTargetReefLevel();
+            armivatorTargetReef();
+            wristTargetReefLevel(false);
             break;
           case BackOff:
             armStow();
@@ -368,7 +504,7 @@ public class Superstructure implements Subsystem {
 
         armTargetReefLevel();
         elevatorTargetReefLevel();
-        wristTargetReefLevel();
+        wristTargetReefLevel(true);
 
         m_manualArmivator = true;
         break;
