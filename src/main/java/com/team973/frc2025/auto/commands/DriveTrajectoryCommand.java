@@ -48,7 +48,7 @@ public class DriveTrajectoryCommand extends AutoCommand {
 
     m_currentCommand = null;
   }
-
+//Unhandled exception instantiating robot com.team973.frc2025.auto.commands.DriveTrajectoryCommand java.lang.IllegalArgumentException: Could not load tajectory that is named 'Babybird-Left'
   private int compare(EventMarker a, EventMarker b) {
     return Double.compare(a.timestamp, b.timestamp);
   }

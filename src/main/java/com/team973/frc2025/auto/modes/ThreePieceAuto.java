@@ -24,7 +24,7 @@ public class ThreePieceAuto extends AutoMode {
         new BranchCommand(
             logger,
             doBabyBird,
-            new DriveTrajectoryCommand(drive, "Babybird-Left"),
+            new DriveTrajectoryCommand(drive, "Babybird-L"),
             new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "F-HPL"),
