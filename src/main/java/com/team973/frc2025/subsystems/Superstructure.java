@@ -328,8 +328,8 @@ public class Superstructure implements Subsystem {
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
 
-  private void wristTargetReefLevel() {
-    m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel));
+  private void wristTargetReefLevel(boolean relativeToArm) {
+    m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel, relativeToArm));
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
 
@@ -427,7 +427,7 @@ public class Superstructure implements Subsystem {
         if (m_manualArmivator) {
           armTargetReefLevel();
           elevatorTargetReefLevel();
-          wristTargetReefLevel();
+          wristTargetReefLevel(true);
         } else {
           armStow();
           elevatorStow();
@@ -446,7 +446,7 @@ public class Superstructure implements Subsystem {
           case MoveToApproach:
             if (m_driveController.getDriveWithLimelight().isNearApproach()) {
               armivatorTargetReef();
-              wristTargetReefLevel();
+              wristTargetReefLevel(false);
 
               m_manualArmivator = true;
             } else {
@@ -459,13 +459,13 @@ public class Superstructure implements Subsystem {
             break;
           case Approach:
             armivatorTargetReef();
-            wristTargetReefLevel();
+            wristTargetReefLevel(false);
 
             m_manualArmivator = true;
             break;
           case MoveToScoring:
             armivatorTargetReef();
-            wristTargetReefLevel();
+            wristTargetReefLevel(false);
             break;
           case Scoring:
             if (m_manualScore) {
@@ -473,13 +473,13 @@ public class Superstructure implements Subsystem {
             }
 
             armivatorTargetReef();
-            wristTargetReefLevel();
+            wristTargetReefLevel(false);
             break;
           case MoveToBackOff:
             m_claw.setControl(Claw.ControlStatus.Off);
 
             armivatorTargetReef();
-            wristTargetReefLevel();
+            wristTargetReefLevel(false);
             break;
           case BackOff:
             armStow();
@@ -504,7 +504,7 @@ public class Superstructure implements Subsystem {
 
         armTargetReefLevel();
         elevatorTargetReefLevel();
-        wristTargetReefLevel();
+        wristTargetReefLevel(true);
 
         m_manualArmivator = true;
         break;

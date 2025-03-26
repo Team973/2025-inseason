@@ -23,10 +23,17 @@ public class Wrist implements Subsystem {
 
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = -192.0;
-  private static final double LEVEL_THREE_POSITION_DEG = -191.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -54.0;
-  private static final double LEVEL_ONE_POSITION_DEG = 4.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = -253.0;
+  private static final double LEVEL_FOUR_POSITION_ARM_RELATIVE_DEG = -192.0;
+
+  private static final double LEVEL_THREE_POSITION_DEG = -256.0;
+  private static final double LEVEL_THREE_POSITION_ARM_RELATIVE_DEG = -191.0;
+
+  private static final double LEVEL_TWO_POSITION_DEG = 14.0;
+  private static final double LEVEL_TWO_POSITION_ARM_RELATIVE_DEG = -54.0;
+
+  private static final double LEVEL_ONE_POSITION_DEG = 73.0;
+  private static final double LEVEL_ONE_POSITION_ARM_RELATIVE_DEG = 4.0;
 
   public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -16.0;
   public static final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
@@ -104,16 +111,20 @@ public class Wrist implements Subsystem {
     m_controlStatus = targetpostion;
   }
 
-  public double getTargetDegFromLevel(ReefLevel level) {
+  public double getTargetDegFromLevel(ReefLevel level, boolean relativeToArm) {
     switch (level) {
       case L_1:
-        return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
+        return (relativeToArm ? LEVEL_ONE_POSITION_ARM_RELATIVE_DEG : LEVEL_ONE_POSITION_DEG)
+            + m_levelOneOffset;
       case L_2:
-        return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
+        return (relativeToArm ? LEVEL_TWO_POSITION_ARM_RELATIVE_DEG : LEVEL_TWO_POSITION_DEG)
+            + m_levelTwoOffset;
       case L_3:
-        return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
+        return (relativeToArm ? LEVEL_THREE_POSITION_ARM_RELATIVE_DEG : LEVEL_THREE_POSITION_DEG)
+            + m_levelThreeOffset;
       case L_4:
-        return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+        return (relativeToArm ? LEVEL_FOUR_POSITION_ARM_RELATIVE_DEG : LEVEL_FOUR_POSITION_DEG)
+            + m_levelFourOffset;
       case AlgaeHigh:
         return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
