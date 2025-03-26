@@ -58,7 +58,7 @@ public class DriveWithJoysticks extends DriveComposable {
     m_angularVelocity = angularVelocity;
   }
 
-  public void init() {}
+  public void init(ChassisSpeeds previousChassisSpeeds) {}
 
   @Override
   public ChassisSpeeds getOutput() {

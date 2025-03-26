@@ -72,9 +72,7 @@ public class DriveController implements Subsystem {
     if (controllerOption != m_controllerOption) {
       m_driveWithJoysticks.reset(m_drive.getPoseEstimator().getPoseMeters().getRotation());
       getComposableFromControllerOption(controllerOption)
-          .setStartingChassisSpeeds(
-              getComposableFromControllerOption(m_controllerOption).getOutput());
-      getComposableFromControllerOption(controllerOption).init();
+          .init(m_currentChassisSpeeds);
 
       m_controllerOption = controllerOption;
     }
