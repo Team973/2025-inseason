@@ -321,12 +321,6 @@ public class Superstructure implements Subsystem {
               elevatorTargetReefLevel();
 
               m_manualArmivator = true;
-            } else {
-              armStow();
-              elevatorStow();
-              wristStow();
-
-              m_manualArmivator = false;
             }
             break;
           case Approach:
