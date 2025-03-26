@@ -64,16 +64,22 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    private static final double LEVEL_1 = 4.5;
-    private static final double LEVEL_2 = 12.5;
-    private static final double LEVEL_3 = 4.0;
-    private static final double LEVEL_4 = 28.0;
-    public static final double CORAL_STOW = 0.0;
+    private static final double LEVEL_1 = 0.0;
+    private static final double LEVEL_2 = 18.5;
+    private static final double LEVEL_3 = 2.5;
+    private static final double LEVEL_4 = 27.0;
+    public static final double CORAL_STOW = 0.5;
 
+<<<<<<< HEAD
     private static final double ALGAE_HIGH = 19.0;
     private static final double ALGAE_LOW = 22.5;
     public static final double ALGAE_STOW = 6.0;
     private static final double ALGAE_NET = 28.0;
+=======
+    private static final double ALGAE_HIGH = 5.0;
+    private static final double ALGAE_LOW = 14.0;
+    public static final double ALGAE_STOW = 1.0;
+>>>>>>> 8b7c3565d46dd152cae795c13b13cf165d53dcbe
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
@@ -112,10 +118,8 @@ public class Elevator implements Subsystem {
     defaultElevatorMotorConfig.Slot1.kP = 125.0;
     defaultElevatorMotorConfig.Slot1.kI = 0.0;
     defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
-        32.0; // 32.0; // 64; // 32; // 16;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
-        300.0; // 40.0; // 500; // 40; // 20;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 65.0;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 400.0;
     defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 2000.0;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;

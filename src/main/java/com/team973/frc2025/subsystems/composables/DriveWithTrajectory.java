@@ -97,6 +97,7 @@ public class DriveWithTrajectory extends DriveComposable {
   }
 
   private boolean m_allianceInitialized = false;
+
   private Alliance m_alliance;
 
   private void maybeInitAlliance() {

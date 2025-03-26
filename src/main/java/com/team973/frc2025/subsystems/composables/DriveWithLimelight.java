@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DriveWithLimelight extends DriveComposable {
   private static final double SCORING_DISTANCE_TOLERANCE_METERS = 0.06;
   private static final double APPROACH_DISTANCE_TOLERANCE_METERS = 0.12;
-  private static final double NEAR_APPROACH_DISTANCE_TOLERANCE_METERS = 0.65;
+  private static final double NEAR_APPROACH_DISTANCE_TOLERANCE_METERS = 1.5;
 
   private static final double TARGET_ANGLE_TOLERANCE_DEG = 6.0;
 
@@ -76,10 +76,10 @@ public class DriveWithLimelight extends DriveComposable {
     private static final double REEF_WIDTH_METERS = 0.33;
 
     private static final Translation2d LEFT_REEF_APPROACH_TARGET =
-        new Translation2d(-REEF_WIDTH_METERS / 2.0, 0.9);
+        new Translation2d(-REEF_WIDTH_METERS / 2.0, 1.01);
     private static final Translation2d RIGHT_REEF_APPROACH_TARGET =
-        new Translation2d(REEF_WIDTH_METERS / 2.0, 0.9);
-    private static final double REEF_SCORING_DIST = 0.45;
+        new Translation2d(REEF_WIDTH_METERS / 2.0, 1.01);
+    private static final double REEF_SCORING_DIST = 0.56;
 
     private static final Translation2d ALGAE_APPROACH_TARGET = new Translation2d(0, 0.9);
     private static final double ALGAE_PICKUP_DIST = 0.45;
@@ -165,13 +165,13 @@ public class DriveWithLimelight extends DriveComposable {
     double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
     m_xController =
         new ProfiledPIDController(
-            5.0, 0, 0, new TrapezoidProfile.Constraints(0.8, 0.2), controlPeriodSeconds);
+            5.0, 0, 0, new TrapezoidProfile.Constraints(3.2, 0.8), controlPeriodSeconds);
     m_yController =
         new ProfiledPIDController(
-            5.0, 0, 0, new TrapezoidProfile.Constraints(0.8, 0.2), controlPeriodSeconds);
+            5.0, 0, 0, new TrapezoidProfile.Constraints(3.2, 0.8), controlPeriodSeconds);
     m_thetaController =
         new ProfiledPIDController(
-            8.0, 0, 0, new TrapezoidProfile.Constraints(1.0, 0.6), controlPeriodSeconds);
+            8.0, 0, 0, new TrapezoidProfile.Constraints(3.2, 0.8), controlPeriodSeconds);
 
     m_thetaController.enableContinuousInput(
         Units.degreesToRadians(0.0), Units.degreesToRadians(360.0));
