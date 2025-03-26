@@ -110,10 +110,8 @@ public class Elevator implements Subsystem {
     defaultElevatorMotorConfig.Slot1.kP = 125.0;
     defaultElevatorMotorConfig.Slot1.kI = 0.0;
     defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
-        32.0; // 32.0; // 64; // 32; // 16;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
-        300.0; // 40.0; // 500; // 40; // 20;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 65.0;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 400.0;
     defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 2000.0;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
