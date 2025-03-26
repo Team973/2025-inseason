@@ -156,8 +156,9 @@ public class Wrist implements Subsystem {
   }
 
   private double getCanCoderPostion() {
-    return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()) * 360.0
-        - WristInfo.ENCODER_OFFSET_DEG;
+    return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()
+            - WristInfo.ENCODER_OFFSET_ROTATIONS)
+        * 360.0;
   }
 
   public void setTargetDeg(double setPostionDeg) {
