@@ -32,6 +32,11 @@ public final class RobotInfo {
 
   public static class ArmInfo {
     public static final int HALL_SENSOR_ID = 1;
+    public static final int ENCODER_CAN_ID = 32;
+
+    public static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
+    public static final double ENCODER_OFFSET_ROTATIONS = -0.0027;
+
     public static final double ARM_LENGTH_METERS = 0.451104;
     public static final double ARM_MAX_ANGLE_DEG = 75.0;
     public static final double ARM_MIN_ANGLE_DEG = -80.0;
@@ -51,6 +56,14 @@ public final class RobotInfo {
     public static final int CONVEYOR_BACK_SENSOR_ID = 2;
     public static final int CONVEYOR_FRONT_SENSOR_ID = 3;
     public static final int CLAW_ALGAE_CAN_ID = 48;
+  }
+
+  public static class WristInfo {
+    public static final int MOTOR_CAN_ID = 31;
+    public static final int ENCODER_CAN_ID = 35;
+    public static final double ENCODER_OFFSET_ROTATIONS = 0.2524;
+    public static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
+        10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
   }
 
   public static final class ClimbInfo {

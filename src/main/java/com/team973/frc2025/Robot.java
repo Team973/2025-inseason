@@ -18,6 +18,7 @@ import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
+import com.team973.frc2025.subsystems.Wrist;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Conversions;
@@ -47,12 +48,16 @@ public class Robot extends TimedRobot {
   private final Logger m_logger = new Logger("robot");
   private final DriveController m_driveController =
       new DriveController(m_logger.subLogger("drive", 0.05), m_readyToScore, m_readyToBackOff);
+  private final Joystick m_driverStick =
+      new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
+  private final Joystick m_coDriverStick =
+      new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
   private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"), m_candleManger);
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm"), m_candleManger);
-
+  private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist"));
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(
           RobotInfo.Colors.ORANGE, 3000, RobotInfo.SignalerInfo.LOW_BATTER_SIGNALER_PRIORTY);
@@ -69,15 +74,10 @@ public class Robot extends TimedRobot {
           RobotInfo.SignalerInfo.CRASH_SIGNALER_PRIORITY);
 
   private final Superstructure m_superstructure =
-      new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_driveController);
+      new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_wrist, m_driveController);
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_superstructure);
-
-  private final Joystick m_driverStick =
-      new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
-  private final Joystick m_coDriverStick =
-      new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
 
   private PerfLogger m_syncSensorsLogger =
       new PerfLogger(m_logger.subLogger("perf/syncSensors", 0.25));
@@ -327,15 +327,15 @@ public class Robot extends TimedRobot {
       }
       double climbStick = m_coDriverStick.getLeftYAxis();
 
-      if (m_coDriverStick.getPOVTopPressed()) {
-        m_superstructure.incrementElevatorOffset(0.5);
-      } else if (m_coDriverStick.getPOVBottomPressed()) {
-        m_superstructure.incrementElevatorOffset(-0.5);
-      } else if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementArmOffset(1.0);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementArmOffset(-1.0);
-      }
+      // if (m_coDriverStick.getPOVTopPressed()) {
+      //   m_superstructure.incrementElevatorOffset(0.5);
+      // } else if (m_coDriverStick.getPOVBottomPressed()) {
+      //   m_superstructure.incrementElevatorOffset(-0.5);
+      // } else if (m_coDriverStick.getPOVRightPressed()) {
+      //   m_superstructure.incrementArmOffset(1.0);
+      // } else if (m_coDriverStick.getPOVLeftPressed()) {
+      //   m_superstructure.incrementArmOffset(-1.0);
+      // }
 
       if (m_coDriverStick.getAButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeLow);
@@ -358,10 +358,10 @@ public class Robot extends TimedRobot {
       }
 
       if (m_coDriverStick.getRightTriggerPressed()) {
-        m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
-        m_superstructure.setState(Superstructure.State.Climb);
+        // m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
+        // m_superstructure.setState(Superstructure.State.Climb);
       } else if (m_coDriverStick.getLeftTriggerPressed()) {
-        m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
+        // m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
       } else if (Math.abs(climbStick) > 0.25) {
         m_superstructure.incrementClimbTarget(climbStick);
       }
