@@ -74,7 +74,14 @@ public class Robot extends TimedRobot {
           RobotInfo.SignalerInfo.CRASH_SIGNALER_PRIORITY);
 
   private final Superstructure m_superstructure =
-      new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_wrist, m_driveController);
+      new Superstructure(
+          m_claw,
+          m_climb,
+          m_elevator,
+          m_arm,
+          m_wrist,
+          m_driveController,
+          m_logger.subLogger("superstructure"));
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_superstructure);

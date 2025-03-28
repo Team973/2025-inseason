@@ -4,6 +4,7 @@ import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.ArmInfo;
 import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
 import com.team973.lib.util.Conversions;
+import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -14,6 +15,8 @@ public class Superstructure implements Subsystem {
   private final Arm m_arm;
   private final Wrist m_wrist;
   private final DriveController m_driveController;
+
+  private final Logger m_logger;
 
   private static final ArmivatorPose.Config ARMIVATOR_CONFIG =
       new ArmivatorPose.Config(
@@ -104,6 +107,10 @@ public class Superstructure implements Subsystem {
       return m_elevatorHeightMeters;
     }
 
+    public double getElevatorHeightInches() {
+      return getElevatorHeightMeters() * Conversions.Distance.INCHES_PER_METER;
+    }
+
     public double getArmAngleDeg() {
       return m_armAngleDeg;
     }
@@ -165,8 +172,12 @@ public class Superstructure implements Subsystem {
 
     public String toString() {
       return String.format(
-          "ArmivatorPose(Arm=%fdeg,Elevator=%fm)", getArmAngleDeg(), getElevatorHeightMeters());
+          "ArmivatorPose(Arm=%fdeg,Elevator=%fm)", getArmAngleDeg(), getElevatorHeightInches());
     }
+  }
+
+  public static double getWristAngleRelativeToFloorDeg(double wristAngle, double armAngleDeg) {
+    return wristAngle + armAngleDeg + 90.0;
   }
 
   public Superstructure(
@@ -175,13 +186,15 @@ public class Superstructure implements Subsystem {
       Elevator elevator,
       Arm arm,
       Wrist wrist,
-      DriveController driveController) {
+      DriveController driveController,
+      Logger logger) {
     m_claw = claw;
     m_climb = climb;
     m_elevator = elevator;
     m_arm = arm;
     m_wrist = wrist;
     m_driveController = driveController;
+    m_logger = logger;
   }
 
   public void setState(State state) {
@@ -276,6 +289,19 @@ public class Superstructure implements Subsystem {
         "DB/String 2", "A: " + String.valueOf(m_arm.getTargetDegFromLevel(m_targetReefLevel)));
     SmartDashboard.putString("DB/String 8", m_gamePieceMode.toString());
 
+    m_logger.log("State", m_state.toString());
+    m_logger.log(
+        "Wrist Angle Relative To Floor",
+        getWristAngleRelativeToFloorDeg(m_wrist.getWristPostionDeg(), m_arm.getArmPostionDeg()));
+    m_logger.log("Target Arm Angle Deg", getTargetArmivatorPose().getArmAngleDeg());
+    m_logger.log(
+        "Target Elevator Height Inches", getTargetArmivatorPose().getElevatorHeightInches());
+    m_logger.log(
+        "Armivator X Target", m_driveController.getDriveWithLimelight().getDistFromAprilTag());
+    m_logger.log(
+        "Armivator Y Target",
+        m_targetReefLevel.getHeight() - ElevatorInfo.FLOOR_TO_ELEVATOR_ZERO_METERS);
+
     m_claw.log();
     m_climb.log();
     m_elevator.log();
@@ -329,7 +355,14 @@ public class Superstructure implements Subsystem {
   }
 
   private void wristTargetReefLevel(boolean relativeToArm) {
-    m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel, relativeToArm));
+    if (relativeToArm) {
+      m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel));
+    } else {
+      m_wrist.setTargetDeg(
+          getWristAngleRelativeToFloorDeg(
+              m_wrist.getTargetDegFromLevel(m_targetReefLevel), m_arm.getArmPostionDeg()));
+    }
+
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
 
@@ -391,17 +424,18 @@ public class Superstructure implements Subsystem {
     }
   }
 
-  public void armivatorTargetReef() {
-    double x = m_driveController.getDriveWithLimelight().getDistFromScoring();
+  public ArmivatorPose getTargetArmivatorPose() {
+    double x = m_driveController.getDriveWithLimelight().getDistFromAprilTag();
     double y = m_targetReefLevel.getHeight() - ElevatorInfo.FLOOR_TO_ELEVATOR_ZERO_METERS;
 
-    ArmivatorPose pose = ArmivatorPose.fromCoordinate(x, y, ARMIVATOR_CONFIG);
+    return ArmivatorPose.fromCoordinate(x, y, ARMIVATOR_CONFIG);
+  }
 
-    m_arm.setTargetDeg(pose.getArmAngleDeg());
-    m_elevator.setTargetPostion(
-        pose.getElevatorHeightMeters() * Conversions.Distance.INCHES_PER_METER);
+  public void armivatorTargetReef() {
+    m_arm.setTargetDeg(getTargetArmivatorPose().getArmAngleDeg());
+    m_elevator.setTargetPostion(getTargetArmivatorPose().getElevatorHeightInches());
 
-    if (pose.getTargetIsOutOfBounds()) {
+    if (getTargetArmivatorPose().getTargetIsOutOfBounds()) {
       m_armTargetOutOfBoundsSignaler.enable();
     } else {
       m_armTargetOutOfBoundsSignaler.disable();

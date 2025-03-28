@@ -22,7 +22,7 @@ public class TargetPositionRelativeToAprilTag {
     m_targetAngle = targetAngle;
   }
 
-  private Pose3d getAprilTagPose() {
+  public Pose3d getAprilTagPose() {
     Optional<Alliance> alliance = DriverStation.getAlliance();
 
     if (alliance.isPresent()) {

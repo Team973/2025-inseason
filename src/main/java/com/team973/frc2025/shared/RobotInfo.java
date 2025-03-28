@@ -61,9 +61,13 @@ public final class RobotInfo {
   public static class WristInfo {
     public static final int MOTOR_CAN_ID = 31;
     public static final int ENCODER_CAN_ID = 35;
+
     public static final double ENCODER_OFFSET_ROTATIONS = 0.2524;
     public static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
         10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
+
+    public static final double MAX_ANGLE_DEG = -13.0;
+    public static final double MIN_ANGLE_DEG = -195.0;
   }
 
   public static final class ClimbInfo {

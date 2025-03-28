@@ -23,16 +23,9 @@ public class Wrist implements Subsystem {
 
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = -253.0;
   private static final double LEVEL_FOUR_POSITION_ARM_RELATIVE_DEG = -192.0;
-
-  private static final double LEVEL_THREE_POSITION_DEG = -256.0;
   private static final double LEVEL_THREE_POSITION_ARM_RELATIVE_DEG = -191.0;
-
-  private static final double LEVEL_TWO_POSITION_DEG = 14.0;
   private static final double LEVEL_TWO_POSITION_ARM_RELATIVE_DEG = -54.0;
-
-  private static final double LEVEL_ONE_POSITION_DEG = 73.0;
   private static final double LEVEL_ONE_POSITION_ARM_RELATIVE_DEG = 4.0;
 
   public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -16.0;
@@ -111,20 +104,16 @@ public class Wrist implements Subsystem {
     m_controlStatus = targetpostion;
   }
 
-  public double getTargetDegFromLevel(ReefLevel level, boolean relativeToArm) {
+  public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return (relativeToArm ? LEVEL_ONE_POSITION_ARM_RELATIVE_DEG : LEVEL_ONE_POSITION_DEG)
-            + m_levelOneOffset;
+        return LEVEL_ONE_POSITION_ARM_RELATIVE_DEG + m_levelOneOffset;
       case L_2:
-        return (relativeToArm ? LEVEL_TWO_POSITION_ARM_RELATIVE_DEG : LEVEL_TWO_POSITION_DEG)
-            + m_levelTwoOffset;
+        return LEVEL_TWO_POSITION_ARM_RELATIVE_DEG + m_levelTwoOffset;
       case L_3:
-        return (relativeToArm ? LEVEL_THREE_POSITION_ARM_RELATIVE_DEG : LEVEL_THREE_POSITION_DEG)
-            + m_levelThreeOffset;
+        return LEVEL_THREE_POSITION_ARM_RELATIVE_DEG + m_levelThreeOffset;
       case L_4:
-        return (relativeToArm ? LEVEL_FOUR_POSITION_ARM_RELATIVE_DEG : LEVEL_FOUR_POSITION_DEG)
-            + m_levelFourOffset;
+        return LEVEL_FOUR_POSITION_ARM_RELATIVE_DEG + m_levelFourOffset;
       case AlgaeHigh:
         return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
@@ -177,6 +166,11 @@ public class Wrist implements Subsystem {
   }
 
   public void setTargetDeg(double setPostionDeg) {
+    if (setPostionDeg > WristInfo.MAX_ANGLE_DEG) {
+      m_wristTargetPostionDeg = WristInfo.MAX_ANGLE_DEG;
+    } else if (setPostionDeg < WristInfo.MIN_ANGLE_DEG) {
+      m_wristTargetPostionDeg = WristInfo.MIN_ANGLE_DEG;
+    }
     m_wristTargetPostionDeg = setPostionDeg;
     m_controlStatus = ControlStatus.TargetPostion;
   }

@@ -354,8 +354,12 @@ public class DriveWithLimelight extends DriveComposable {
         TARGET_ANGLE_TOLERANCE_DEG);
   }
 
-  public double getDistFromScoring() {
-    return m_poseEstimator.getPoseMeters().minus(m_scoringPose).getTranslation().getNorm();
+  public double getDistFromAprilTag() {
+    return m_poseEstimator
+        .getPoseMeters()
+        .minus(m_target.getAprilTagPose().toPose2d())
+        .getTranslation()
+        .getNorm();
   }
 
   public Pose2d getCurrentTargetPose2d() {
