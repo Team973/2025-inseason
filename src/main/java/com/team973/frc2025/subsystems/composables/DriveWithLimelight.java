@@ -263,7 +263,6 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void log() {
-    m_logger.log("initCalled", m_initCalledNum);
     m_logger.log("estimatorNull", m_poseEstimator == null);
     SmartDashboard.putString("DB/String 6", "Reef Face: " + m_targetReefFace);
     SmartDashboard.putString("DB/String 7", "Reef Side: " + m_targetReefSide);
@@ -393,13 +392,14 @@ public class DriveWithLimelight extends DriveComposable {
     }
   }
 
-  private int m_initCalledNum = 0;
-
-  public synchronized void init() {
-    m_initCalledNum++;
-    m_xController.reset(m_poseEstimator.getPoseMeters().getX(), 0.0);
-    m_yController.reset(m_poseEstimator.getPoseMeters().getY(), 0.0);
-    m_thetaController.reset(m_poseEstimator.getPoseMeters().getRotation().getRadians(), 0.0);
+  public synchronized void init(ChassisSpeeds previousChassisSpeeds) {
+    m_xController.reset(
+        m_poseEstimator.getPoseMeters().getX(), previousChassisSpeeds.vxMetersPerSecond);
+    m_yController.reset(
+        m_poseEstimator.getPoseMeters().getY(), previousChassisSpeeds.vyMetersPerSecond);
+    m_thetaController.reset(
+        m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+        previousChassisSpeeds.omegaRadiansPerSecond);
   }
 
   public void exit() {

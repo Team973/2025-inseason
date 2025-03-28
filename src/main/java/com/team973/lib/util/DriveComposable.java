@@ -6,9 +6,9 @@ public abstract class DriveComposable {
   public static DriveComposable compose(
       DriveComposable translationProvider, DriveComposable rotationProvider) {
     return new DriveComposable() {
-      public void init() {
-        translationProvider.init();
-        rotationProvider.init();
+      public void init(ChassisSpeeds previousChassisSpeeds) {
+        translationProvider.init(previousChassisSpeeds);
+        rotationProvider.init(previousChassisSpeeds);
       }
 
       public void exit() {
@@ -29,7 +29,7 @@ public abstract class DriveComposable {
     };
   }
 
-  public abstract void init();
+  public abstract void init(ChassisSpeeds previousChassisSpeeds);
 
   public abstract void exit();
 
