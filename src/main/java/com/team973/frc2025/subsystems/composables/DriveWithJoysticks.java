@@ -60,6 +60,8 @@ public class DriveWithJoysticks extends DriveComposable {
 
   public void init(ChassisSpeeds previousChassisSpeeds) {}
 
+  public void exit() {}
+
   @Override
   public ChassisSpeeds getOutput() {
     final double xSpeed =

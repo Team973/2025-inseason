@@ -39,7 +39,7 @@ public class Arm implements Subsystem {
   private static final double LEVEL_THREE_POSITION_DEG = 65.0;
   private static final double LEVEL_TWO_POSITION_DEG = -68.0;
   private static final double LEVEL_ONE_POSITION_DEG = -69.0;
-  public static final double CORAL_STOW_POSITION_DEG = -92.0;
+  public static final double CORAL_STOW_POSITION_DEG = -90.0;
 
   private static final double ALGAE_HIGH_POSITION_DEG = 52.5; // 34.0;
   private static final double ALGAE_LOW_POSITION_DEG = -58.0; // -47.0;
@@ -89,8 +89,8 @@ public class Arm implements Subsystem {
     armMotorConfig.Slot0.kP = 2.0;
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
-    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0; // 64.0;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 218.0; // 80.0;
+    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 120.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 218.0;
     armMotorConfig.MotionMagic.MotionMagicJerk = 0.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -233,8 +233,10 @@ public class Arm implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log("armDegPostion", getArmPostionDeg());
     m_armMotor.log();
+    m_armEncoder.log();
+
+    m_logger.log("armDegPostion", getArmPostionDeg());
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
     m_logger.log("armMode", m_controlStatus.toString());
     m_logger.log(
