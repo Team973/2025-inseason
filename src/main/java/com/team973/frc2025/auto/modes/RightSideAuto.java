@@ -16,16 +16,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class RightSideAuto extends AutoMode {
+  private boolean m_babybird;
+
   public RightSideAuto(
       Logger logger, Superstructure superstructure, DriveController drive, boolean doBabyBird) {
     super(
         logger,
         new Pose2d(7.3, 1.3, Rotation2d.fromDegrees(180)),
         new BranchCommand(
-            logger,
-            doBabyBird,
-            new DriveTrajectoryCommand(drive, "Babybird-L"),
-            new NoOpCommand()),
+            logger, doBabyBird, new DriveTrajectoryCommand(drive, "Babybird-L"), new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.C, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "C-HP"),
         new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0),
@@ -34,9 +33,14 @@ public class RightSideAuto extends AutoMode {
         new DriveTrajectoryCommand(drive, "B-HP"),
         new DriveTrajectoryCommand(drive, "HP-B"),
         new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Right));
+    m_babybird = doBabyBird;
   }
 
   public String getName() {
-    return "right Side Auto";
+    if (m_babybird) {
+      return "Right Side Babybird Auto";
+    } else {
+      return "Right Side Auto";
+    }
   }
 }

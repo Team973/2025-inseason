@@ -22,10 +22,7 @@ public class ThreePieceAuto extends AutoMode {
         logger,
         new Pose2d(7.18, 5.6, Rotation2d.fromDegrees(180)),
         new BranchCommand(
-            logger,
-            doBabyBird,
-            new DriveTrajectoryCommand(drive, "Babybird-L"),
-            new NoOpCommand()),
+            logger, doBabyBird, new DriveTrajectoryCommand(drive, "Babybird-L"), new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "F-HPL"),
         new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
