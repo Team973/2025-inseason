@@ -39,6 +39,8 @@ public class Claw implements Subsystem {
 
   private CANdleManger m_caNdle;
 
+  private double m_filteredAlgaeDistance;
+
   public static enum ControlStatus {
     IntakeCoral,
     IntakeAlgae,
@@ -137,7 +139,7 @@ public class Claw implements Subsystem {
 
   public boolean getHasAlgae() {
     if (getAlgaeDistance().isPresent()) {
-      return getAlgaeDistance().get() < 0.15;
+      return m_filteredAlgaeDistance < .15;
     }
 
     return false;
@@ -213,6 +215,8 @@ public class Claw implements Subsystem {
     m_clawMotor.log();
     m_conveyor.log();
 
+    m_logger.log("Filtered Algae Distance", m_filteredAlgaeDistance);
+    m_logger.log("Has Algae", getHasAlgae());
     m_logger.log("Claw Motor Voltage", m_clawMotor.getMotorVoltage().getValueAsDouble());
 
     m_logger.log("Conveyor Back Sensor", getClawBackSensor());
@@ -232,6 +236,11 @@ public class Claw implements Subsystem {
 
   @Override
   public void syncSensors() {
+    if (m_clawAlgaeSensor.getSignalStrength().getValueAsDouble()
+        > ALGAE_SENSOR_STRENGTH_THRESHOLD) {
+      m_filteredAlgaeDistance =
+          (m_filteredAlgaeDistance * 10 + m_clawAlgaeSensor.getDistance().getValueAsDouble()) / 11;
+    }
     coralScoredLED();
   }
 
