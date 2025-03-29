@@ -10,7 +10,7 @@ public class BranchCommand extends AutoCommand {
   private final AutoCommand m_trueCommand;
 
   public BranchCommand(
-      Logger logger, boolean condition, AutoCommand falseCommand, AutoCommand trueCommand) {
+      Logger logger, boolean condition, AutoCommand trueCommand, AutoCommand falseCommand) {
     m_condition = condition;
     m_falseCommand = falseCommand;
     m_trueCommand = trueCommand;

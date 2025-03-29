@@ -24,7 +24,7 @@ public class RightSideAuto extends AutoMode {
         logger,
         new Pose2d(7.3, 1.3, Rotation2d.fromDegrees(180)),
         new BranchCommand(
-            logger, doBabyBird, new DriveTrajectoryCommand(drive, "Babybird-L"), new NoOpCommand()),
+            logger, doBabyBird, new DriveTrajectoryCommand(drive, "Babybird-R"), new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.C, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "C-HP"),
         new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0),
