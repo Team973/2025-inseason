@@ -41,9 +41,10 @@ public class Arm implements Subsystem {
   private static final double LEVEL_ONE_POSITION_DEG = -69.0;
   public static final double CORAL_STOW_POSITION_DEG = -90.0;
 
-  private static final double NET_POSITION_DEG = 59.0;
+  private static final double NET_POSITION_DEG = 63.0; // 59.0;
   private static final double ALGAE_HIGH_POSITION_DEG = 52.5; // 34.0;
   private static final double ALGAE_LOW_POSITION_DEG = -58.0; // -47.0;
+  private static final double ALGAE_FLOOR_POSITION_DEG = -55.0;
   public static final double ALGAE_STOW_POSITION_DEG = -85.0; // -85.0;
 
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
@@ -57,6 +58,7 @@ public class Arm implements Subsystem {
   private double m_netOffset = 0.0;
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
+  private double m_algaeFloorOffset = 0.0;
 
   private CANdleManger m_candleManger;
 
@@ -168,6 +170,8 @@ public class Arm implements Subsystem {
         return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
         return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+      case AlgaeFloor:
+        return ALGAE_FLOOR_POSITION_DEG + m_algaeFloorOffset;
       case Horizontal:
         return HORIZONTAL_POSITION_DEG;
       default:
@@ -229,6 +233,9 @@ public class Arm implements Subsystem {
       case AlgaeLow:
         m_algaeLowOffset += increment;
         break;
+      case AlgaeFloor:
+        m_algaeFloorOffset += increment;
+        break;
       case Horizontal:
         break;
     }
@@ -258,6 +265,7 @@ public class Arm implements Subsystem {
     m_logger.log("Net Offset", m_netOffset);
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
+    m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
   }
 
   @Override
