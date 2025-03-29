@@ -28,11 +28,11 @@ public final class MotorDraw {
         "/Robot/robot/claw/conveyorMotor/",
         "/Robot/robot/claw/clawMotor/",
         "/Robot/robot/wrist/wristMotor/",
-        "/Robot/robot/Arm/armMotor/");
+        "/Robot/robot/Arm/armMotor/", "/Robot/robot/elevator/motorLeft/", "/Robot/robot/elevator/motorRight", "/Robot/robot/climb manager/climb motor/");
   }
 
   private static final void doSummaryForMotor(
-      String logPath, String conveyorMotor, String clawMotor, String wristMotor, String armMotor) {
+      String logPath, String conveyorMotor, String clawMotor, String wristMotor, String armMotor, String elevatorLeftMotor, String elevatorRightMotor, String climbMotor, String frontLeftDriveMotor, String frontLeftSteerMotor, String frontRightDriveMotor, String frontRightSteerMotor, String backLeftDriveMotor, String backLeftSteerMotor, String backRightDriveMotor, String backRightSteerMotor) {
     DataLogReader reader;
     try {
       reader = new DataLogReader(logPath);
