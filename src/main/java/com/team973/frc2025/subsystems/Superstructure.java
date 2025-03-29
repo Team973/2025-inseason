@@ -361,10 +361,10 @@ public class Superstructure implements Subsystem {
         }
         break;
       case Zero:
-        m_arm.setControlStatus(Arm.ControlStatus.Zero);
         m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
-        m_wrist.setControlStatus(Wrist.ControlStatus.Zero);
 
+        wristStow();
+        armStow();
         clawIntake();
         break;
       case Climb:

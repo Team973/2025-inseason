@@ -61,7 +61,6 @@ public class Arm implements Subsystem {
   public static enum ControlStatus {
     Manual,
     TargetPostion,
-    Zero,
     Off,
   }
 
@@ -188,9 +187,6 @@ public class Arm implements Subsystem {
             armDegToMotorRotations(m_armTargetPostionDeg),
             getFeedForwardTargetAngle(),
             0);
-        break;
-      case Zero:
-        m_armMotor.setControl(ControlMode.DutyCycleOut, -0.1);
         break;
       case Off:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);

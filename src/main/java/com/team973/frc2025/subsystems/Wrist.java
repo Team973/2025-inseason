@@ -76,7 +76,6 @@ public class Wrist implements Subsystem {
   public static enum ControlStatus {
     Manual,
     TargetPostion,
-    Zero,
     Off,
   }
 
@@ -156,9 +155,6 @@ public class Wrist implements Subsystem {
       case TargetPostion:
         m_wristMotor.setControl(
             ControlMode.MotionMagicVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
-        break;
-      case Zero:
-        m_wristMotor.setControl(ControlMode.DutyCycleOut, -0.1);
         break;
       case Off:
         m_wristMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
