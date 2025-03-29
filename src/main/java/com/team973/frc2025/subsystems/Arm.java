@@ -41,6 +41,7 @@ public class Arm implements Subsystem {
   private static final double LEVEL_ONE_POSITION_DEG = -69.0;
   public static final double CORAL_STOW_POSITION_DEG = -90.0;
 
+  private static final double NET_POSITION_DEG = 0.0; // TODO
   private static final double ALGAE_HIGH_POSITION_DEG = 52.5; // 34.0;
   private static final double ALGAE_LOW_POSITION_DEG = -58.0; // -47.0;
   public static final double ALGAE_STOW_POSITION_DEG = -85.0; // -85.0;
@@ -53,6 +54,7 @@ public class Arm implements Subsystem {
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
+  private double m_netOffset = 0.0;
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
 
@@ -160,6 +162,8 @@ public class Arm implements Subsystem {
         return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case L_4:
         return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+      case Net:
+        return NET_POSITION_DEG + m_netOffset;
       case AlgaeHigh:
         return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
@@ -216,6 +220,9 @@ public class Arm implements Subsystem {
       case L_4:
         m_levelFourOffset += increment;
         break;
+      case Net:
+        m_netOffset += increment;
+        break;
       case AlgaeHigh:
         m_algaeHighOffset += increment;
         break;
@@ -248,6 +255,7 @@ public class Arm implements Subsystem {
     m_logger.log("Level 2 Offset", m_levelTwoOffset);
     m_logger.log("Level 3 Offset", m_levelThreeOffset);
     m_logger.log("Level 4 Offset", m_levelFourOffset);
+    m_logger.log("Net Offset", m_netOffset);
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
   }
