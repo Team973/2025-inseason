@@ -39,6 +39,7 @@ public class Elevator implements Subsystem {
   private double m_netOffset = 0.0;
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
+  private double m_algaeFloorOffset = 0.0;
 
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
   private CANdleManger m_candleManger;
@@ -73,6 +74,7 @@ public class Elevator implements Subsystem {
     private static final double NET = 27.0;
     private static final double ALGAE_HIGH = 5.0;
     private static final double ALGAE_LOW = 14.0;
+    private static final double ALGAE_FLOOR = 0.0;
     public static final double ALGAE_STOW = 1.0;
   }
 
@@ -177,6 +179,9 @@ public class Elevator implements Subsystem {
       case AlgaeLow:
         m_algaeLowOffset += offset;
         break;
+      case AlgaeFloor:
+        m_algaeFloorOffset += offset;
+        break;
       case Horizontal:
         break;
     }
@@ -202,6 +207,8 @@ public class Elevator implements Subsystem {
         return Presets.ALGAE_HIGH + m_algaeHighOffset;
       case AlgaeLow:
         return Presets.ALGAE_LOW + m_algaeLowOffset;
+      case AlgaeFloor:
+        return Presets.ALGAE_FLOOR + m_algaeFloorOffset;
       case Horizontal:
         return Presets.CORAL_STOW;
       default:
@@ -253,6 +260,7 @@ public class Elevator implements Subsystem {
     m_logger.log("Level 4 Offset", m_levelFourOffset);
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
+    m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
   }
 
   @Override

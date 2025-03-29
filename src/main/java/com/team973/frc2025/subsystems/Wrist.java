@@ -31,9 +31,10 @@ public class Wrist implements Subsystem {
   public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -16.0;
   public static final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
 
-  private static final double NET_POSITION_DEG = -20.0;
+  private static final double NET_POSITION_DEG = -105.0; // -20.0;
   private static final double ALGAE_HIGH_POSITION_DEG = -144.0;
   private static final double ALGAE_LOW_POSITION_DEG = -34.0;
+  private static final double ALGAE_FLOOR_POSITION_DEG = -88.0;
   public static final double ALGAE_STOW_POSITION_DEG = -5.0;
 
   private double m_manualWristPower = 0.0;
@@ -110,6 +111,8 @@ public class Wrist implements Subsystem {
         return ALGAE_HIGH_POSITION_DEG;
       case AlgaeLow:
         return ALGAE_LOW_POSITION_DEG;
+      case AlgaeFloor:
+        return ALGAE_FLOOR_POSITION_DEG;
       case Net:
         return NET_POSITION_DEG;
       case Horizontal:
