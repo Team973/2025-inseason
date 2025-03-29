@@ -109,12 +109,6 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
       return;
     }
     Pose2d pose = getPoseMeters();
-    m_logger.log(
-        "pose",
-        new double[] {
-          pose.getTranslation().getX(),
-          pose.getTranslation().getY(),
-          pose.getRotation().getRadians()
-        });
+    m_logger.log("pose", pose);
   }
 }
