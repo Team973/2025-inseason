@@ -70,7 +70,7 @@ public class Elevator implements Subsystem {
     private static final double LEVEL_4 = 27.0;
     public static final double CORAL_STOW = 0.5;
 
-    private static final double NET = 0.0; // TODO
+    private static final double NET = 27.0;
     private static final double ALGAE_HIGH = 5.0;
     private static final double ALGAE_LOW = 14.0;
     public static final double ALGAE_STOW = 1.0;
