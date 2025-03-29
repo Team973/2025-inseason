@@ -31,6 +31,7 @@ public class LeftSideAuto extends AutoMode {
             () -> {
               superstructure.setGamePieceMode(GamePiece.Algae);
               superstructure.setTargetReefLevel(ReefLevel.AlgaeLow);
+              drive.getDriveWithLimelight().setTargetSide(ReefSide.Center);
             }));
   }
 
