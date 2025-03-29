@@ -41,11 +41,11 @@ public class Arm implements Subsystem {
   private static final double LEVEL_ONE_POSITION_DEG = -69.0;
   public static final double CORAL_STOW_POSITION_DEG = -90.0;
 
-  private static final double NET_POSITION_DEG = 63.0; // 59.0;
-  private static final double ALGAE_HIGH_POSITION_DEG = 52.5; // 34.0;
-  private static final double ALGAE_LOW_POSITION_DEG = -58.0; // -47.0;
+  private static final double NET_POSITION_DEG = 70.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = 52.5;
+  private static final double ALGAE_LOW_POSITION_DEG = -58.0;
   private static final double ALGAE_FLOOR_POSITION_DEG = -55.0;
-  public static final double ALGAE_STOW_POSITION_DEG = -85.0; // -85.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -85.0;
 
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.32;
