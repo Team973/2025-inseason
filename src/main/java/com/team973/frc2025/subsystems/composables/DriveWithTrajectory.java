@@ -91,12 +91,15 @@ public class DriveWithTrajectory extends DriveComposable {
     m_logger.log("Theta Velocity Error", m_controller.getThetaController().getVelocityError());
   }
 
-  public void init() {
+  public void init(ChassisSpeeds previousChassisSpeeds) {
     maybeInitAlliance();
     m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
   }
 
+  public void exit() {}
+
   private boolean m_allianceInitialized = false;
+
   private Alliance m_alliance;
 
   private void maybeInitAlliance() {
