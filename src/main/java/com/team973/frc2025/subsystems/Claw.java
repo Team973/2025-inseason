@@ -232,7 +232,7 @@ public class Claw implements Subsystem {
 
     if (getAlgaeDistance().isPresent()) {
       m_filteredAlgaeDistMeters =
-          (m_filteredAlgaeDistMeters * 0.9) + (getAlgaeDistance().get() * 0.1);
+          (m_filteredAlgaeDistMeters * 0.95) + (getAlgaeDistance().get() * 0.05);
     }
   }
 
