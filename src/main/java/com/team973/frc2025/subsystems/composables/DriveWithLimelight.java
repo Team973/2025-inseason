@@ -42,6 +42,7 @@ public class DriveWithLimelight extends DriveComposable {
 
   private ReefFace m_targetReefFace = ReefFace.A;
   private ReefSide m_targetReefSide = ReefSide.Left;
+  private ReefSide m_lastTargetReefSide = ReefSide.Left;
 
   private final AtomicBoolean m_readyToScore;
   private final AtomicBoolean m_readyToBackOff;
@@ -185,6 +186,7 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void setTargetSide(ReefSide side) {
+    m_lastTargetReefSide = m_targetReefSide;
     m_targetReefSide = side;
 
     m_approachPoseLog = getTargetReefPosition().getApproachPose();
@@ -386,10 +388,14 @@ public class DriveWithLimelight extends DriveComposable {
 
   public void toggleReefSide() {
     if (m_targetReefSide == ReefSide.Left) {
-      m_targetReefSide = ReefSide.Right;
+      setTargetSide(ReefSide.Right);
     } else if (m_targetReefSide == ReefSide.Right) {
-      m_targetReefSide = ReefSide.Left;
+      setTargetSide(ReefSide.Left);
     }
+  }
+
+  public ReefSide getLastTargetReefSide() {
+    return m_lastTargetReefSide;
   }
 
   public synchronized void init(ChassisSpeeds previousChassisSpeeds) {
@@ -400,12 +406,16 @@ public class DriveWithLimelight extends DriveComposable {
     m_thetaController.reset(
         m_poseEstimator.getPoseMeters().getRotation().getRadians(),
         previousChassisSpeeds.omegaRadiansPerSecond);
+
+    if (m_finishedScoring) {
+      m_targetStage = TargetStage.MoveToApproach;
+      m_finishedScoring = false;
+    }
   }
 
   public void exit() {
     if (m_finishedScoring) {
       toggleReefSide();
-      m_finishedScoring = false;
     }
   }
 

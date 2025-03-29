@@ -240,6 +240,9 @@ public class Superstructure implements Subsystem {
               m_driveController.getDriveWithLimelight().getTargetReefFace()));
     } else {
       setGamePieceMode(GamePiece.Coral);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetSide(m_driveController.getDriveWithLimelight().getLastTargetReefSide());
     }
   }
 
