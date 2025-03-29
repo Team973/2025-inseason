@@ -38,6 +38,7 @@ public class Superstructure implements Subsystem {
     L_4,
     AlgaeHigh,
     AlgaeLow,
+    AlgaeFloor,
     Net,
     Horizontal
   }
@@ -211,10 +212,6 @@ public class Superstructure implements Subsystem {
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
 
-  public void incrementWristOffset(double increment) {
-    m_wrist.incrementOffset(increment, m_targetReefLevel);
-  }
-
   public void incrementArmOffset(double increment) {
     m_arm.incrementOffset(increment, m_targetReefLevel);
   }
@@ -229,6 +226,10 @@ public class Superstructure implements Subsystem {
 
   public void setGamePieceMode(GamePiece gamePiece) {
     m_gamePieceMode = gamePiece;
+  }
+
+  public GamePiece getGamePieceMode() {
+    return m_gamePieceMode;
   }
 
   public void toggleGamePieceMode() {
@@ -362,10 +363,10 @@ public class Superstructure implements Subsystem {
         }
         break;
       case Zero:
-        m_arm.setControlStatus(Arm.ControlStatus.Zero);
         m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
-        m_wrist.setControlStatus(Wrist.ControlStatus.Zero);
 
+        wristStow();
+        armStow();
         clawIntake();
         break;
       case Climb:

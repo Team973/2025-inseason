@@ -327,24 +327,24 @@ public class Robot extends TimedRobot {
       }
       double climbStick = m_coDriverStick.getLeftYAxis();
 
-      // if (m_coDriverStick.getPOVTopPressed()) {
-      //   m_superstructure.incrementElevatorOffset(0.5);
-      // } else if (m_coDriverStick.getPOVBottomPressed()) {
-      //   m_superstructure.incrementElevatorOffset(-0.5);
-      // } else if (m_coDriverStick.getPOVRightPressed()) {
-      //   m_superstructure.incrementArmOffset(1.0);
-      // } else if (m_coDriverStick.getPOVLeftPressed()) {
-      //   m_superstructure.incrementArmOffset(-1.0);
-      // }
+      if (m_coDriverStick.getPOVTopPressed()) {
+        m_superstructure.incrementElevatorOffset(0.5);
+      } else if (m_coDriverStick.getPOVBottomPressed()) {
+        m_superstructure.incrementElevatorOffset(-0.5);
+      } else if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementArmOffset(1.0);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementArmOffset(-1.0);
+      }
 
       if (m_coDriverStick.getAButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeLow);
+        m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeFloor);
       } else if (m_coDriverStick.getXButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
       } else if (m_coDriverStick.getBButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
       } else if (m_coDriverStick.getYButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.AlgaeHigh);
+        m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.Net);
       }
 
       if (m_coDriverStick.getRightBumperButtonPressed()) {
@@ -405,7 +405,9 @@ public class Robot extends TimedRobot {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.F);
     }
 
-    if (m_driverStick.getRightTrigger()) {
+    if (m_superstructure.getGamePieceMode() == Superstructure.GamePiece.Algae) {
+      m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
+    } else if (m_driverStick.getRightTrigger()) {
       if (m_leftReefSide.isActive()) {
         m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
       } else if (m_rightReefSide.isActive()) {

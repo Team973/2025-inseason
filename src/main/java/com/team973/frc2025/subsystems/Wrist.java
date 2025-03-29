@@ -31,17 +31,11 @@ public class Wrist implements Subsystem {
   public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -16.0;
   public static final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
 
+  private static final double NET_POSITION_DEG = -105.0; // -20.0;
   private static final double ALGAE_HIGH_POSITION_DEG = -144.0;
   private static final double ALGAE_LOW_POSITION_DEG = -34.0;
+  private static final double ALGAE_FLOOR_POSITION_DEG = -88.0;
   public static final double ALGAE_STOW_POSITION_DEG = -5.0;
-
-  private double m_levelOneOffset = 0.0;
-  private double m_levelTwoOffset = 0.0;
-  private double m_levelThreeOffset = 0.0;
-  private double m_levelFourOffset = 0.0;
-
-  private double m_algaeHighOffset = 0.0;
-  private double m_algaeLowOffset = 0.0;
 
   private double m_manualWristPower = 0.0;
   private double m_wristTargetPostionDeg = 0.0;
@@ -84,7 +78,6 @@ public class Wrist implements Subsystem {
   public static enum ControlStatus {
     Manual,
     TargetPostion,
-    Zero,
     Off,
   }
 
@@ -107,46 +100,25 @@ public class Wrist implements Subsystem {
   public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
+        return LEVEL_ONE_POSITION_DEG;
       case L_2:
-        return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
+        return LEVEL_TWO_POSITION_DEG;
       case L_3:
-        return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
+        return LEVEL_THREE_POSITION_DEG;
       case L_4:
-        return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+        return LEVEL_FOUR_POSITION_DEG;
       case AlgaeHigh:
-        return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
+        return ALGAE_HIGH_POSITION_DEG;
       case AlgaeLow:
-        return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+        return ALGAE_LOW_POSITION_DEG;
+      case AlgaeFloor:
+        return ALGAE_FLOOR_POSITION_DEG;
+      case Net:
+        return NET_POSITION_DEG;
       case Horizontal:
         return HORIZONTAL_POSITION_DEG;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
-    }
-  }
-
-  public void incrementOffset(double increment, ReefLevel level) {
-    switch (level) {
-      case L_1:
-        m_levelOneOffset += increment;
-        break;
-      case L_2:
-        m_levelTwoOffset += increment;
-        break;
-      case L_3:
-        m_levelThreeOffset += increment;
-        break;
-      case L_4:
-        m_levelFourOffset += increment;
-        break;
-      case AlgaeHigh:
-        m_algaeHighOffset += increment;
-        break;
-      case AlgaeLow:
-        m_algaeLowOffset += increment;
-        break;
-      case Horizontal:
-        break;
     }
   }
 
@@ -189,9 +161,6 @@ public class Wrist implements Subsystem {
       case TargetPostion:
         m_wristMotor.setControl(
             ControlMode.MotionMagicVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
-        break;
-      case Zero:
-        m_wristMotor.setControl(ControlMode.DutyCycleOut, -0.1);
         break;
       case Off:
         m_wristMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
