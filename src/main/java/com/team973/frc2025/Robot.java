@@ -405,7 +405,9 @@ public class Robot extends TimedRobot {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.F);
     }
 
-    if (m_driverStick.getRightTrigger()) {
+    if (m_superstructure.getGamePieceMode() == Superstructure.GamePiece.Algae) {
+      m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
+    } else if (m_driverStick.getRightTrigger()) {
       if (m_leftReefSide.isActive()) {
         m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
       } else if (m_rightReefSide.isActive()) {

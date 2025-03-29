@@ -230,6 +230,10 @@ public class Superstructure implements Subsystem {
     m_gamePieceMode = gamePiece;
   }
 
+  public GamePiece getGamePieceMode() {
+    return m_gamePieceMode;
+  }
+
   public void toggleGamePieceMode() {
     if (m_gamePieceMode == GamePiece.Coral) {
       setGamePieceMode(GamePiece.Algae);
