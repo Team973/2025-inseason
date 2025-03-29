@@ -21,6 +21,7 @@ public class Superstructure implements Subsystem {
   private static final ArmivatorPose.Config ARMIVATOR_CONFIG =
       new ArmivatorPose.Config(
           ArmInfo.ARM_LENGTH_METERS,
+					ArmInfo.ROBOT_CENTER_TO_ARM_PIVOT_METERS,
           ArmInfo.ARM_MAX_ANGLE_DEG,
           ArmInfo.ARM_MIN_ANGLE_DEG,
           ElevatorInfo.MAX_HEIGHT_METERS);
@@ -80,16 +81,19 @@ public class Superstructure implements Subsystem {
 
     public static class Config {
       public final double armLengthMeters;
+			public final double robotCenterToArmPivot;
       public final double maxArmAngleDeg;
       public final double minArmAngleDeg;
       public final double maxElevatorHeightMeters;
 
       public Config(
           double armLengthMeters,
+					double robotCenterToArmPivot,
           double maxArmAngleDeg,
           double minArmAngleDeg,
           double maxElevatorHeightMeters) {
         this.armLengthMeters = armLengthMeters;
+				this.robotCenterToArmPivot = robotCenterToArmPivot;
         this.maxArmAngleDeg = maxArmAngleDeg;
         this.minArmAngleDeg = minArmAngleDeg;
         this.maxElevatorHeightMeters = maxElevatorHeightMeters;
@@ -120,8 +124,8 @@ public class Superstructure implements Subsystem {
     }
 
     public static ArmivatorPose fromCoordinate(double x, double y, Config config) {
-      if (x > config.armLengthMeters) {
-        x = config.armLengthMeters;
+      if (x > config.armLengthMeters + config.robotCenterToArmPivot) {
+        x = config.armLengthMeters + config.robotCenterToArmPivot;
       } else if (x < 0) {
         x = 0;
       }
@@ -301,6 +305,9 @@ public class Superstructure implements Subsystem {
     m_logger.log(
         "Armivator Y Target",
         m_targetReefLevel.getHeight() - ElevatorInfo.FLOOR_TO_ELEVATOR_ZERO_METERS);
+    m_logger.log(
+        "Target Wrist Angle Relative To Floor",
+        getWristAngleRelativeToFloorDeg(m_wrist.getTargetPosition(), m_arm.getArmPostionDeg()));
 
     m_claw.log();
     m_climb.log();
