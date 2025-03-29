@@ -2,6 +2,7 @@ package com.team973.lib.util;
 
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import edu.wpi.first.math.geometry.Pose2d;
 import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -108,6 +109,12 @@ public class Logger {
     }
   }
 
+  public void log(String key, Pose2d value) {
+    if (isLogAllowed(key)) {
+      DogLog.log(m_prefix + "/" + key, value);
+    }
+  }
+
   public void log(String key, double[] value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
@@ -127,6 +134,12 @@ public class Logger {
   }
 
   public void log(String key, boolean[] value) {
+    if (isLogAllowed(key)) {
+      DogLog.log(m_prefix + "/" + key, value);
+    }
+  }
+
+  public void log(String key, Pose2d[] value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
     }
