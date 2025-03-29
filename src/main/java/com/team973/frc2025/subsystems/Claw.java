@@ -34,8 +34,8 @@ public class Claw implements Subsystem {
           RobotInfo.Colors.GREEN, 0, RobotInfo.SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
 
   private double m_targetHoldPosition = 0;
-
   private double m_coralBackUpRot = 3.0;
+  private double m_filteredAlgaeDistMeters = 0.0;
 
   private CANdleManger m_caNdle;
 
@@ -136,11 +136,7 @@ public class Claw implements Subsystem {
   }
 
   public boolean getHasAlgae() {
-    if (getAlgaeDistance().isPresent()) {
-      return getAlgaeDistance().get() < 0.15;
-    }
-
-    return false;
+    return m_filteredAlgaeDistMeters < 0.15;
   }
 
   public void coralScoredLED() {
@@ -233,6 +229,11 @@ public class Claw implements Subsystem {
   @Override
   public void syncSensors() {
     coralScoredLED();
+
+    if (getAlgaeDistance().isPresent()) {
+      m_filteredAlgaeDistMeters =
+          (m_filteredAlgaeDistMeters * 0.9) + (getAlgaeDistance().get() * 0.1);
+    }
   }
 
   @Override
