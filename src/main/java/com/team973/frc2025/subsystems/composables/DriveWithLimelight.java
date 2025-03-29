@@ -186,7 +186,10 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void setTargetSide(ReefSide side) {
-    m_lastTargetReefSide = m_targetReefSide;
+    if (m_targetReefSide != ReefSide.Center) {
+      m_lastTargetReefSide = m_targetReefSide;
+    }
+
     m_targetReefSide = side;
 
     m_approachPoseLog = getTargetReefPosition().getApproachPose();
