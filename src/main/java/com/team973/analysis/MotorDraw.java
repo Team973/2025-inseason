@@ -82,7 +82,6 @@ public final class MotorDraw {
         // **Logged motor measurements**
         if (entry.name.equals(loggedMotor + "Voltage")) {
           double timeDelta = (record.getTimestamp() - PreviousVoltageTimestamp) / 1000000.0;
-          System.out.println(timeDelta);
           VoltageSum = VoltageSum + Math.abs(record.getDouble()) * timeDelta;
           PreviousVoltage = record.getDouble();
           PreviousVoltageTimestamp = record.getTimestamp();
