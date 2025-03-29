@@ -210,10 +210,6 @@ public class Superstructure implements Subsystem {
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
 
-  public void incrementWristOffset(double increment) {
-    m_wrist.incrementOffset(increment, m_targetReefLevel);
-  }
-
   public void incrementArmOffset(double increment) {
     m_arm.incrementOffset(increment, m_targetReefLevel);
   }
