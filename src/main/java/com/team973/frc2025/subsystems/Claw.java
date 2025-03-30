@@ -230,9 +230,10 @@ public class Claw implements Subsystem {
   public void syncSensors() {
     coralScoredLED();
 
-    if (getAlgaeDistance().isPresent()) {
-      m_filteredAlgaeDistMeters =
-          (m_filteredAlgaeDistMeters * 0.95) + (getAlgaeDistance().get() * 0.05);
+    Optional<Double> algaeDist = getAlgaeDistance();
+
+    if (algaeDist.isPresent()) {
+      m_filteredAlgaeDistMeters = (m_filteredAlgaeDistMeters * 0.95) + (algaeDist.get() * 0.05);
     }
   }
 
