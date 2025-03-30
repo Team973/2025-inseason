@@ -38,7 +38,7 @@ public final class RobotInfo {
     public static final double ENCODER_OFFSET_ROTATIONS = -0.0027;
 
     public static final double ARM_LENGTH_METERS = 0.451104;
-		public static final double ROBOT_CENTER_TO_ARM_PIVOT_METERS = 0.05;
+    public static final double ROBOT_CENTER_TO_ARM_PIVOT_METERS = 0.05;
     public static final double ARM_MAX_ANGLE_DEG = 75.0;
     public static final double ARM_MIN_ANGLE_DEG = -80.0;
   }

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 public class ArmivatorPoseTest {
   private static final ArmivatorPose.Config ARMIVATOR_TEST_CONFIG =
-      new ArmivatorPose.Config(0.451104, 0.05, 75.0, -80.0, 0.7112);
+      new ArmivatorPose.Config(0.451104, 75.0, -80.0, 0.7112);
 
   @Test
   void testArmAboveTarget() throws Exception {
