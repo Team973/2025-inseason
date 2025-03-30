@@ -139,12 +139,6 @@ public class Logger {
     }
   }
 
-  public void log(String key, Pose2d[] value) {
-    if (isLogAllowed(key)) {
-      DogLog.log(m_prefix + "/" + key, value);
-    }
-  }
-
   public void log(String key, DoubleSupplier valueSupplier) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, valueSupplier.getAsDouble());
