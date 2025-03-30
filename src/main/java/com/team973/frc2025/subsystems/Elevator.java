@@ -36,8 +36,10 @@ public class Elevator implements Subsystem {
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
+  private double m_netOffset = 0.0;
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
+  private double m_algaeFloorOffset = 0.0;
 
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
   private CANdleManger m_candleManger;
@@ -63,15 +65,17 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    private static final double LEVEL_1 = 4.5;
-    private static final double LEVEL_2 = 12.5;
-    private static final double LEVEL_3 = 4.0;
-    private static final double LEVEL_4 = 28.0;
-    public static final double CORAL_STOW = 0.0;
+    private static final double LEVEL_1 = 0.0;
+    private static final double LEVEL_2 = 17.0;
+    private static final double LEVEL_3 = 2.5;
+    private static final double LEVEL_4 = 27.0;
+    public static final double CORAL_STOW = 0.5;
 
-    private static final double ALGAE_HIGH = 19.0;
-    private static final double ALGAE_LOW = 22.5;
-    public static final double ALGAE_STOW = 6.0;
+    private static final double NET = 27.0;
+    private static final double ALGAE_HIGH = 5.0;
+    private static final double ALGAE_LOW = 19.0;
+    private static final double ALGAE_FLOOR = 0.0;
+    public static final double ALGAE_STOW = 1.0;
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
@@ -110,10 +114,8 @@ public class Elevator implements Subsystem {
     defaultElevatorMotorConfig.Slot1.kP = 125.0;
     defaultElevatorMotorConfig.Slot1.kI = 0.0;
     defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
-        32.0; // 32.0; // 64; // 32; // 16;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
-        300.0; // 40.0; // 500; // 40; // 20;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 65.0;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 400.0;
     defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 2000.0;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -168,11 +170,17 @@ public class Elevator implements Subsystem {
       case L_4:
         m_levelFourOffset += offset;
         break;
+      case Net:
+        m_netOffset += offset;
+        break;
       case AlgaeHigh:
         m_algaeHighOffset += offset;
         break;
       case AlgaeLow:
         m_algaeLowOffset += offset;
+        break;
+      case AlgaeFloor:
+        m_algaeFloorOffset += offset;
         break;
       case Horizontal:
         break;
@@ -193,10 +201,14 @@ public class Elevator implements Subsystem {
         return Presets.LEVEL_3 + m_levelThreeOffset;
       case L_4:
         return Presets.LEVEL_4 + m_levelFourOffset;
+      case Net:
+        return Presets.NET + m_netOffset;
       case AlgaeHigh:
         return Presets.ALGAE_HIGH + m_algaeHighOffset;
       case AlgaeLow:
         return Presets.ALGAE_LOW + m_algaeLowOffset;
+      case AlgaeFloor:
+        return Presets.ALGAE_FLOOR + m_algaeFloorOffset;
       case Horizontal:
         return Presets.CORAL_STOW;
       default:
@@ -248,6 +260,7 @@ public class Elevator implements Subsystem {
     m_logger.log("Level 4 Offset", m_levelFourOffset);
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
+    m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
   }
 
   @Override
