@@ -42,6 +42,7 @@ public class DriveWithLimelight extends DriveComposable {
 
   private ReefFace m_targetReefFace = ReefFace.A;
   private ReefSide m_targetReefSide = ReefSide.Left;
+  private ReefSide m_lastTargetReefSide = ReefSide.Left;
 
   private final AtomicBoolean m_readyToScore;
   private final AtomicBoolean m_readyToBackOff;
@@ -167,13 +168,13 @@ public class DriveWithLimelight extends DriveComposable {
     double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
     m_xController =
         new ProfiledPIDController(
-            5.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.4), controlPeriodSeconds);
+            4.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.3), controlPeriodSeconds);
     m_yController =
         new ProfiledPIDController(
-            5.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.4), controlPeriodSeconds);
+            4.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.3), controlPeriodSeconds);
     m_thetaController =
         new ProfiledPIDController(
-            8.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.4), controlPeriodSeconds);
+            8.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.35), controlPeriodSeconds);
 
     m_thetaController.enableContinuousInput(
         Units.degreesToRadians(0.0), Units.degreesToRadians(360.0));
@@ -185,6 +186,10 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void setTargetSide(ReefSide side) {
+    if (m_targetReefSide != ReefSide.Center) {
+      m_lastTargetReefSide = m_targetReefSide;
+    }
+
     m_targetReefSide = side;
 
     m_approachPoseLog = getTargetReefPosition().getApproachPose();
@@ -386,10 +391,14 @@ public class DriveWithLimelight extends DriveComposable {
 
   public void toggleReefSide() {
     if (m_targetReefSide == ReefSide.Left) {
-      m_targetReefSide = ReefSide.Right;
+      setTargetSide(ReefSide.Right);
     } else if (m_targetReefSide == ReefSide.Right) {
-      m_targetReefSide = ReefSide.Left;
+      setTargetSide(ReefSide.Left);
     }
+  }
+
+  public ReefSide getLastTargetReefSide() {
+    return m_lastTargetReefSide;
   }
 
   public synchronized void init(ChassisSpeeds previousChassisSpeeds) {
@@ -400,12 +409,16 @@ public class DriveWithLimelight extends DriveComposable {
     m_thetaController.reset(
         m_poseEstimator.getPoseMeters().getRotation().getRadians(),
         previousChassisSpeeds.omegaRadiansPerSecond);
+
+    if (m_finishedScoring) {
+      m_targetStage = TargetStage.MoveToApproach;
+      m_finishedScoring = false;
+    }
   }
 
   public void exit() {
     if (m_finishedScoring) {
       toggleReefSide();
-      m_finishedScoring = false;
     }
   }
 
