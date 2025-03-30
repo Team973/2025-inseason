@@ -4,9 +4,11 @@ import com.team973.frc2025.auto.commands.DriveTrajectoryCommand;
 import com.team973.frc2025.auto.commands.ScoreCoralCommand;
 import com.team973.frc2025.auto.commands.util.BlockingLambdaCommand;
 import com.team973.frc2025.auto.commands.util.BranchCommand;
+import com.team973.frc2025.auto.commands.util.LambdaCommand;
 import com.team973.frc2025.auto.commands.util.NoOpCommand;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.Superstructure.GamePiece;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefSide;
@@ -31,7 +33,13 @@ public class LeftSideAuto extends AutoMode {
         new DriveTrajectoryCommand(drive, "HP-F"),
         new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "F-HP"),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Left));
+        new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Left),
+        new LambdaCommand(
+            () -> {
+              superstructure.setGamePieceMode(GamePiece.Algae);
+              superstructure.setTargetReefLevel(ReefLevel.AlgaeLow);
+              drive.getDriveWithLimelight().setTargetSide(ReefSide.Center);
+            }));
     m_babybird = doBabyBird;
   }
 

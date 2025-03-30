@@ -34,8 +34,8 @@ public class Claw implements Subsystem {
           RobotInfo.Colors.GREEN, 0, RobotInfo.SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
 
   private double m_targetHoldPosition = 0;
-
   private double m_coralBackUpRot = 3.0;
+  private double m_filteredAlgaeDistMeters = 0.0;
 
   private CANdleManger m_caNdle;
 
@@ -138,16 +138,12 @@ public class Claw implements Subsystem {
   }
 
   public boolean getHasAlgae() {
-    if (getAlgaeDistance().isPresent()) {
-      return m_filteredAlgaeDistance < .15;
-    }
-
-    return false;
+    return m_filteredAlgaeDistMeters < 0.15;
   }
 
   public void coralScoredLED() {
     // TODO: Add back the algee sensor once tunned
-    if (getSeesCoral()) {
+    if (getSeesCoral() || getHasAlgae()) {
       m_clawHasPeiceSignaler.enable();
     } else {
       m_clawHasPeiceSignaler.disable();
@@ -236,12 +232,13 @@ public class Claw implements Subsystem {
 
   @Override
   public void syncSensors() {
-    if (m_clawAlgaeSensor.getSignalStrength().getValueAsDouble()
-        > ALGAE_SENSOR_STRENGTH_THRESHOLD) {
-      m_filteredAlgaeDistance =
-          (m_filteredAlgaeDistance * 10 + m_clawAlgaeSensor.getDistance().getValueAsDouble()) / 11;
-    }
     coralScoredLED();
+
+    Optional<Double> algaeDist = getAlgaeDistance();
+
+    if (algaeDist.isPresent()) {
+      m_filteredAlgaeDistMeters = (m_filteredAlgaeDistMeters * 0.95) + (algaeDist.get() * 0.05);
+    }
   }
 
   @Override
