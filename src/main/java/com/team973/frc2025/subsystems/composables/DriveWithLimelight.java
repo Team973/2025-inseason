@@ -357,9 +357,8 @@ public class DriveWithLimelight extends DriveComposable {
   public double getDistFromAprilTag() {
     return m_poseEstimator
         .getPoseMeters()
-        .minus(m_target.getAprilTagPose().toPose2d())
         .getTranslation()
-        .getNorm();
+        .getDistance(m_target.getAprilTagPose().toPose2d().getTranslation());
   }
 
   public Pose2d getCurrentTargetPose2d() {
