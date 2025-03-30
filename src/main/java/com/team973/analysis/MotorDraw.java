@@ -81,13 +81,13 @@ public final class MotorDraw {
         }
         // **Logged motor measurements**
         if (entry.name.equals(loggedMotor + "Voltage")) {
-          double timeDelta = (record.getTimestamp() - PreviousVoltageTimestamp) / 1000000.0;
+          double timeDelta = 0.02;
           VoltageSum = VoltageSum + Math.abs(record.getDouble()) * timeDelta;
           PreviousVoltage = record.getDouble();
           PreviousVoltageTimestamp = record.getTimestamp();
         }
         if (entry.name.equals(loggedMotor + "Stator Current")) {
-          double timeDelta = (record.getTimestamp() - PreviousStatorTimestamp) / 1000000.0;
+          double timeDelta = 0.02;
           StatorSum = StatorSum + record.getDouble() * timeDelta;
           PreviousStator = record.getDouble();
           PreviousStatorTimestamp = record.getTimestamp();
@@ -99,9 +99,9 @@ public final class MotorDraw {
       }
     }
     // **Printing out sums of all measurements**
-    System.out.printf(loggedMotor + " stator current took %fa \n", StatorSum);
-    System.out.printf(loggedMotor + " motor voltage took %fv \n", VoltageSum);
-    System.out.printf(loggedMotor + " motor wattage took %fw \n", WattageSum);
+    System.out.printf(loggedMotor + " stator current took %fa \n", StatorSum / 150);
+    System.out.printf(loggedMotor + " motor voltage took %fv \n", VoltageSum / 150);
+    System.out.printf(loggedMotor + " motor wattage took %fw \n", WattageSum / 150);
   }
 
   private MotorDraw() {}
