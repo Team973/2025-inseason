@@ -37,6 +37,7 @@ public class Arm implements Subsystem {
 
   private static final double LEVEL_FOUR_POSITION_DEG = 61.0;
   private static final double LEVEL_THREE_POSITION_DEG = 65.0;
+<<<<<<< HEAD
   private static final double LEVEL_TWO_POSITION_DEG = -68.0;
   private static final double LEVEL_ONE_POSITION_DEG = -69.0;
   public static final double CORAL_STOW_POSITION_DEG = -92.0;
@@ -44,6 +45,17 @@ public class Arm implements Subsystem {
   private static final double ALGAE_HIGH_POSITION_DEG = 52.5; // 34.0;
   private static final double ALGAE_LOW_POSITION_DEG = -58.0; // -47.0;
   public static final double ALGAE_STOW_POSITION_DEG = -85.0; // -85.0;
+=======
+  private static final double LEVEL_TWO_POSITION_DEG = -61.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -69.0;
+  public static final double CORAL_STOW_POSITION_DEG = -90.0;
+
+  private static final double NET_POSITION_DEG = 70.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = 52.5;
+  private static final double ALGAE_LOW_POSITION_DEG = -58.0;
+  private static final double ALGAE_FLOOR_POSITION_DEG = -55.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -85.0;
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
 
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.32;
@@ -53,15 +65,16 @@ public class Arm implements Subsystem {
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
+  private double m_netOffset = 0.0;
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
+  private double m_algaeFloorOffset = 0.0;
 
   private CANdleManger m_candleManger;
 
   public static enum ControlStatus {
     Manual,
     TargetPostion,
-    Zero,
     Off,
   }
 
@@ -89,8 +102,13 @@ public class Arm implements Subsystem {
     armMotorConfig.Slot0.kP = 2.0;
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
+<<<<<<< HEAD
     armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0; // 64.0;
     armMotorConfig.MotionMagic.MotionMagicAcceleration = 273.0; // 80.0;
+=======
+    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 120.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 218.0;
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
     armMotorConfig.MotionMagic.MotionMagicJerk = 0.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -161,10 +179,14 @@ public class Arm implements Subsystem {
         return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case L_4:
         return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+      case Net:
+        return NET_POSITION_DEG + m_netOffset;
       case AlgaeHigh:
         return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
         return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+      case AlgaeFloor:
+        return ALGAE_FLOOR_POSITION_DEG + m_algaeFloorOffset;
       case Horizontal:
         return HORIZONTAL_POSITION_DEG;
       default:
@@ -188,9 +210,6 @@ public class Arm implements Subsystem {
             armDegToMotorRotations(m_armTargetPostionDeg),
             getFeedForwardTargetAngle(),
             0);
-        break;
-      case Zero:
-        m_armMotor.setControl(ControlMode.DutyCycleOut, -0.1);
         break;
       case Off:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
@@ -220,11 +239,17 @@ public class Arm implements Subsystem {
       case L_4:
         m_levelFourOffset += increment;
         break;
+      case Net:
+        m_netOffset += increment;
+        break;
       case AlgaeHigh:
         m_algaeHighOffset += increment;
         break;
       case AlgaeLow:
         m_algaeLowOffset += increment;
+        break;
+      case AlgaeFloor:
+        m_algaeFloorOffset += increment;
         break;
       case Horizontal:
         break;
@@ -233,8 +258,10 @@ public class Arm implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log("armDegPostion", getArmPostionDeg());
     m_armMotor.log();
+    m_armEncoder.log();
+
+    m_logger.log("armDegPostion", getArmPostionDeg());
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
     m_logger.log("armMode", m_controlStatus.toString());
     m_logger.log(
@@ -250,8 +277,10 @@ public class Arm implements Subsystem {
     m_logger.log("Level 2 Offset", m_levelTwoOffset);
     m_logger.log("Level 3 Offset", m_levelThreeOffset);
     m_logger.log("Level 4 Offset", m_levelFourOffset);
+    m_logger.log("Net Offset", m_netOffset);
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
+    m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
   }
 
   @Override

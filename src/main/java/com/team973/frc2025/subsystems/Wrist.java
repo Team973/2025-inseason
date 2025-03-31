@@ -1,5 +1,9 @@
 package com.team973.frc2025.subsystems;
 
+<<<<<<< HEAD
+=======
+import com.ctre.phoenix6.BaseStatusSignal;
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -22,11 +26,16 @@ public class Wrist implements Subsystem {
 
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
+<<<<<<< HEAD
   private static final double LEVEL_FOUR_POSITION_DEG = -195.0;
+=======
+  private static final double LEVEL_FOUR_POSITION_DEG = -185.0;
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
   private static final double LEVEL_THREE_POSITION_DEG = -191.0;
   private static final double LEVEL_TWO_POSITION_DEG = -54.0;
   private static final double LEVEL_ONE_POSITION_DEG = 4.0;
 
+<<<<<<< HEAD
   public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -14.5;
   public static final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
 
@@ -42,6 +51,17 @@ public class Wrist implements Subsystem {
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
 
+=======
+  public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -16.0;
+  public static final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
+
+  private static final double NET_POSITION_DEG = -105.0; // -20.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = -149.0;
+  private static final double ALGAE_LOW_POSITION_DEG = -34.0;
+  private static final double ALGAE_FLOOR_POSITION_DEG = -88.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -5.0;
+
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
   private double m_manualWristPower = 0.0;
   private double m_wristTargetPostionDeg = 0.0;
 
@@ -74,13 +94,23 @@ public class Wrist implements Subsystem {
     wristMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     wristMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_wristMotor.setConfig(wristMotorConfig);
+<<<<<<< HEAD
     m_wristMotor.setPosition(0.0);
+=======
+
+    BaseStatusSignal.waitForAll(0.5, m_wristEncoder.getAbsolutePosition());
+
+    m_wristMotor.setPosition(wristDegToMotorRotations(getCanCoderPostion()));
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
   }
 
   public static enum ControlStatus {
     Manual,
     TargetPostion,
+<<<<<<< HEAD
     Zero,
+=======
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
     Off,
   }
 
@@ -103,6 +133,7 @@ public class Wrist implements Subsystem {
   public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
+<<<<<<< HEAD
         return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
       case L_2:
         return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
@@ -114,6 +145,23 @@ public class Wrist implements Subsystem {
         return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
         return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+=======
+        return LEVEL_ONE_POSITION_DEG;
+      case L_2:
+        return LEVEL_TWO_POSITION_DEG;
+      case L_3:
+        return LEVEL_THREE_POSITION_DEG;
+      case L_4:
+        return LEVEL_FOUR_POSITION_DEG;
+      case AlgaeHigh:
+        return ALGAE_HIGH_POSITION_DEG;
+      case AlgaeLow:
+        return ALGAE_LOW_POSITION_DEG;
+      case AlgaeFloor:
+        return ALGAE_FLOOR_POSITION_DEG;
+      case Net:
+        return NET_POSITION_DEG;
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
       case Horizontal:
         return HORIZONTAL_POSITION_DEG;
       default:
@@ -121,6 +169,7 @@ public class Wrist implements Subsystem {
     }
   }
 
+<<<<<<< HEAD
   public void incrementOffset(double increment, ReefLevel level) {
     switch (level) {
       case L_1:
@@ -146,6 +195,8 @@ public class Wrist implements Subsystem {
     }
   }
 
+=======
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
   public double getTargetPosition() {
     return m_wristTargetPostionDeg;
   }
@@ -156,8 +207,14 @@ public class Wrist implements Subsystem {
   }
 
   private double getCanCoderPostion() {
+<<<<<<< HEAD
     return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()) * 360.0
         - WristInfo.ENCODER_OFFSET_DEG;
+=======
+    return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()
+            - WristInfo.ENCODER_OFFSET_ROTATIONS)
+        * 360.0;
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
   }
 
   public void setTargetDeg(double setPostionDeg) {
@@ -185,9 +242,12 @@ public class Wrist implements Subsystem {
         m_wristMotor.setControl(
             ControlMode.MotionMagicVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
         break;
+<<<<<<< HEAD
       case Zero:
         m_wristMotor.setControl(ControlMode.DutyCycleOut, -0.1);
         break;
+=======
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
       case Off:
         m_wristMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
         break;

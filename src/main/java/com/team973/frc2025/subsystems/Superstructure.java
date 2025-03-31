@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -37,6 +38,8 @@ public class Superstructure implements Subsystem {
     L_4,
     AlgaeHigh,
     AlgaeLow,
+    AlgaeFloor,
+    Net,
     Horizontal
   }
 
@@ -209,10 +212,13 @@ public class Superstructure implements Subsystem {
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
 
+<<<<<<< HEAD
   public void incrementWristOffset(double increment) {
     m_wrist.incrementOffset(increment, m_targetReefLevel);
   }
 
+=======
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
   public void incrementArmOffset(double increment) {
     m_arm.incrementOffset(increment, m_targetReefLevel);
   }
@@ -229,11 +235,21 @@ public class Superstructure implements Subsystem {
     m_gamePieceMode = gamePiece;
   }
 
+  public GamePiece getGamePieceMode() {
+    return m_gamePieceMode;
+  }
+
   public void toggleGamePieceMode() {
     if (m_gamePieceMode == GamePiece.Coral) {
       setGamePieceMode(GamePiece.Algae);
+      setTargetReefLevel(
+          getAlgaePresetFromReefFace(
+              m_driveController.getDriveWithLimelight().getTargetReefFace()));
     } else {
       setGamePieceMode(GamePiece.Coral);
+      m_driveController
+          .getDriveWithLimelight()
+          .setTargetSide(m_driveController.getDriveWithLimelight().getLastTargetReefSide());
     }
   }
 
@@ -265,6 +281,14 @@ public class Superstructure implements Subsystem {
     } else {
       m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
     }
+  }
+
+  private ReefLevel getAlgaePresetFromReefFace(ReefFace face) {
+    return switch (face) {
+      case A, C, E -> ReefLevel.AlgaeHigh;
+      case B, D, F -> ReefLevel.AlgaeLow;
+      default -> throw new IllegalArgumentException(face.toString());
+    };
   }
 
   public void update() {
@@ -309,12 +333,15 @@ public class Superstructure implements Subsystem {
               elevatorTargetReefLevel();
 
               m_manualArmivator = true;
+<<<<<<< HEAD
             } else {
               armStow();
               elevatorStow();
               wristStow();
 
               m_manualArmivator = false;
+=======
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
             }
             break;
           case Approach:
@@ -355,10 +382,11 @@ public class Superstructure implements Subsystem {
         }
         break;
       case Zero:
-        m_arm.setControlStatus(Arm.ControlStatus.Zero);
         m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
         m_wrist.setControlStatus(Wrist.ControlStatus.Zero);
 
+        wristStow();
+        armStow();
         clawIntake();
         break;
       case Climb:

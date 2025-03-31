@@ -35,7 +35,11 @@ public final class RobotInfo {
     public static final int ENCODER_CAN_ID = 32;
     public static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
 
+<<<<<<< HEAD
     public static final double ENCODER_OFFSET_ROTATIONS = -0.01;
+=======
+    public static final double ENCODER_OFFSET_ROTATIONS = -0.0027;
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
   }
 
   public static class ElevatorInfo {
@@ -54,8 +58,13 @@ public final class RobotInfo {
 
   public static class WristInfo {
     public static final int MOTOR_CAN_ID = 31;
+<<<<<<< HEAD
     public static final int ENCODER_CAN_ID = 0;
     public static final double ENCODER_OFFSET_DEG = 0.0;
+=======
+    public static final int ENCODER_CAN_ID = 35;
+    public static final double ENCODER_OFFSET_ROTATIONS = 0.2524;
+>>>>>>> 613cbed40ad20f64784a9a51425cdbad90ec77b5
     public static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
         10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
   }
