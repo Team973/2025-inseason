@@ -163,8 +163,8 @@ public class Claw implements Subsystem {
           m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
         } else if (getClawBackSensor() && !getClawFrontSensor()) {
           // Perfect spot!
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 0);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
         } else {
           // Way too far back
           m_clawMotor.setControl(ControlMode.VelocityVoltage, 40);
