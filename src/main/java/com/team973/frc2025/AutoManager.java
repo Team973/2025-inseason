@@ -30,7 +30,7 @@ public class AutoManager {
   private final AutoMode m_leftSideAuto;
   private final AutoMode m_leftSideBabybirdAuto;
   private final AutoMode m_rightSideAuto;
-  private final AutoMode m_rightSideBabybirdAuto;
+  // private final AutoMode m_rightSideBabybirdAuto;
   private final AutoMode m_noAutoAllianceWallCenter;
   private final AutoMode m_centerAuto;
   private final AutoMode m_babyBirdAuto;
@@ -46,8 +46,9 @@ public class AutoManager {
         new LeftSideAuto(logger.subLogger("LeftSideBabybirdAuto"), superstructure, drive, true);
     m_rightSideAuto =
         new RightSideAuto(logger.subLogger("RightSideAuto"), superstructure, drive, false);
-    m_rightSideBabybirdAuto =
-        new RightSideAuto(logger.subLogger("RightSideBabybirdAuto"), superstructure, drive, true);
+    // m_rightSideBabybirdAuto =
+    //     new RightSideAuto(logger.subLogger("RightSideBabybirdAuto"), superstructure, drive,
+    // true);
     m_noAutoAllianceWallCenter = new NoAutoAllianceWallCenter(logger);
     m_centerAuto = new CenterAuto(logger.subLogger("CenterAuto"), superstructure, drive);
     m_babyBirdAuto = new BabyBird(logger, drive, superstructure);
@@ -62,7 +63,7 @@ public class AutoManager {
             m_leftSideAuto,
             m_leftSideBabybirdAuto,
             m_rightSideAuto,
-            m_rightSideBabybirdAuto,
+            // m_rightSideBabybirdAuto,
             m_centerAuto,
             m_babyBirdAuto);
   }
