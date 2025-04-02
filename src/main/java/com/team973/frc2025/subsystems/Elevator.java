@@ -69,7 +69,7 @@ public class Elevator implements Subsystem {
     private static final double LEVEL_2 = 17.0;
     private static final double LEVEL_3 = 2.5;
     private static final double LEVEL_4 = 27.0;
-    public static final double CORAL_STOW = 0.5;
+    public static final double CORAL_STOW = 0.25;
 
     private static final double NET = 27.0;
     private static final double ALGAE_HIGH = 5.0;
@@ -115,7 +115,7 @@ public class Elevator implements Subsystem {
     defaultElevatorMotorConfig.Slot1.kI = 0.0;
     defaultElevatorMotorConfig.Slot1.kD = 0.0;
     defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 65.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 400.0;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 390.0;
     defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 2000.0;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
     defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;

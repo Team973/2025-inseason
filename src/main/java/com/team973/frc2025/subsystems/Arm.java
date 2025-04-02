@@ -39,7 +39,7 @@ public class Arm implements Subsystem {
   private static final double LEVEL_THREE_POSITION_DEG = 65.0;
   private static final double LEVEL_TWO_POSITION_DEG = -61.0;
   private static final double LEVEL_ONE_POSITION_DEG = -69.0;
-  public static final double CORAL_STOW_POSITION_DEG = -90.0;
+  public static final double CORAL_STOW_POSITION_DEG = -87.0;
 
   private static final double NET_POSITION_DEG = 70.0;
   private static final double ALGAE_HIGH_POSITION_DEG = 52.5;
@@ -93,7 +93,7 @@ public class Arm implements Subsystem {
     armMotorConfig.Slot0.kI = 0.0;
     armMotorConfig.Slot0.kD = 0.0;
     armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 120.0;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration = 218.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 230.0;
     armMotorConfig.MotionMagic.MotionMagicJerk = 0.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
