@@ -272,13 +272,7 @@ public class DriveWithLimelight extends DriveComposable {
     SmartDashboard.putString("DB/String 6", "Reef Face: " + m_targetReefFace);
     SmartDashboard.putString("DB/String 7", "Reef Side: " + m_targetReefSide);
 
-    m_logger.log(
-        "providedPose",
-        new double[] {
-          m_poseEstimator.getPoseMeters().getX(),
-          m_poseEstimator.getPoseMeters().getY(),
-          m_poseEstimator.getPoseMeters().getRotation().getRadians()
-        });
+    m_logger.log("providedPose", m_poseEstimator.getPoseMeters());
 
     m_logger.log("Target Side", m_targetReefSide.toString());
     m_logger.log("Target Stage", m_targetStage.toString());
@@ -302,45 +296,24 @@ public class DriveWithLimelight extends DriveComposable {
         m_poseEstimator.getPoseMeters().getRotation().getDegrees()
             - m_scoringPose.getRotation().getDegrees());
 
-    m_logger.log(
-        "Target Initial Pose",
-        new double[] {
-          m_approachPose.getX(), m_approachPose.getY(), m_approachPose.getRotation().getRadians()
-        });
+    m_logger.log("Target Approach Pose", m_approachPose);
 
-    m_logger.log(
-        "Target Initial Pose Log",
-        new double[] {
-          m_approachPoseLog.getX(),
-          m_approachPoseLog.getY(),
-          m_approachPoseLog.getRotation().getRadians()
-        });
+    m_logger.log("Target Approach Pose Log", m_approachPoseLog);
 
-    m_logger.log(
-        "Target Final Pose",
-        new double[] {
-          m_scoringPose.getX(), m_scoringPose.getY(), m_scoringPose.getRotation().getRadians()
-        });
+    m_logger.log("Target Scoring Pose", m_scoringPose);
 
     m_logger.log(
         "Controller Target Position",
-        new double[] {
-          m_xController.getSetpoint().position,
-          m_yController.getSetpoint().position,
-          m_thetaController.getSetpoint().position
-        });
+        new Pose2d(
+            m_xController.getSetpoint().position,
+            m_yController.getSetpoint().position,
+            Rotation2d.fromDegrees(m_thetaController.getSetpoint().position)));
     m_logger.log("x-state/velocity", m_xController.getSetpoint().velocity);
     m_logger.log("x-state/position", m_xController.getSetpoint().position);
     m_logger.log("y-state/velocity", m_yController.getSetpoint().velocity);
     m_logger.log("y-state/position", m_yController.getSetpoint().position);
 
-    m_logger.log(
-        "Target Final Pose Log",
-        new double[] {
-          m_scoringPoseLog.getX(),
-          m_scoringPoseLog.getY(),
-          m_scoringPoseLog.getRotation().getRadians()
-        });
+    m_logger.log("Target Scoring Pose Log", m_scoringPoseLog);
     Pose2d currentTargetPose2d = getCurrentTargetPose2d();
     m_logger.log(
         "dist to target",
