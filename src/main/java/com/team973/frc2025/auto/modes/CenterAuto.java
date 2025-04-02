@@ -2,6 +2,7 @@ package com.team973.frc2025.auto.modes;
 
 import com.team973.frc2025.auto.commands.DriveTrajectoryCommand;
 import com.team973.frc2025.auto.commands.PickupAlgaeCommand;
+import com.team973.frc2025.auto.commands.ScoreAlgaeInNetCommand;
 import com.team973.frc2025.auto.commands.ScoreCoralCommand;
 import com.team973.frc2025.auto.commands.util.NoOpCommand;
 import com.team973.frc2025.subsystems.DriveController;
@@ -22,8 +23,8 @@ public class CenterAuto extends AutoMode {
         new ScoreCoralCommand(drive, superstructure, ReefFace.D, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "D-Backoff"),
         new PickupAlgaeCommand(drive, superstructure, ReefFace.D, ReefLevel.AlgaeLow),
-        new DriveTrajectoryCommand(drive, "D-NET"),
-        // new ScoreAlgaeInNetCommand(drive, superstructure, ReefLevel.Net),
+        //new DriveTrajectoryCommand(drive, "D-NET"),
+        //new ScoreAlgaeInNetCommand(superstructure),
         new NoOpCommand());
   }
 

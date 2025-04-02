@@ -35,7 +35,7 @@ public class Claw implements Subsystem {
 
   private double m_targetHoldPosition = 0;
   private double m_coralBackUpRot = 3.0;
-  private double m_filteredAlgaeDistMeters = 0.0;
+  private double m_filteredAlgaeDistMeters = 2.0;
 
   private CANdleManger m_caNdle;
 
@@ -138,6 +138,9 @@ public class Claw implements Subsystem {
   }
 
   public boolean getHasAlgae() {
+    if (getAlgaeDistance().isEmpty()) {
+      return false;
+    }
     return m_filteredAlgaeDistMeters < 0.15;
   }
 

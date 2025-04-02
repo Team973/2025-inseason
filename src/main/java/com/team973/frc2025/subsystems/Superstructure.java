@@ -138,6 +138,10 @@ public class Superstructure implements Subsystem {
     return m_claw.getSeesCoral();
   }
 
+  public boolean getHasAlgae() {
+    return m_claw.getHasAlgae();
+  }
+
   public boolean readyToBackOff() {
     if (m_gamePieceMode == GamePiece.Coral) {
       return !getSeesCoral();

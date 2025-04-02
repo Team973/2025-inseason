@@ -38,17 +38,14 @@ public class PickupAlgaeCommand extends AutoCommand {
 
     m_superstructure.setTargetReefLevel(m_targetReefLevel);
     m_superstructure.setGamePieceMode(GamePiece.Algae);
+    m_superstructure.setManualScore(false);
     m_superstructure.setState(Superstructure.State.Score);
 
     m_drive.getDriveWithLimelight().targetReefPosition();
   }
 
   @Override
-  public void run(Alliance alliance) {
-    if (m_drive.getDriveWithLimelight().getTargetStage() == TargetStage.Scoring) {
-      m_superstructure.setManualScore(true);
-    }
-  }
+  public void run(Alliance alliance) {}
 
   @Override
   public void log(Alliance alliance) {}
