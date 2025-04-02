@@ -105,7 +105,8 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG
+        && m_targetReefLevel != ReefLevel.Processor) {
       return false;
     }
 
@@ -113,7 +114,8 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW) {
+    if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW
+        && m_targetReefLevel != ReefLevel.Processor) {
       return false;
     }
 
@@ -122,7 +124,8 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG) {
+    if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG
+        && m_targetReefLevel != ReefLevel.Processor) {
       return false;
     }
 
@@ -149,10 +152,10 @@ public class Superstructure implements Subsystem {
     if (m_gamePieceMode == GamePiece.Coral) {
       return !getSeesCoral();
     } else if (m_algaeMode == AlgaeMode.Processor) {
-      return !m_claw.getHasAlgae();
+      return !getHasAlgae();
     }
 
-    return m_claw.getHasAlgae();
+    return getHasAlgae();
   }
 
   public void log() {
@@ -182,6 +185,7 @@ public class Superstructure implements Subsystem {
       m_algaeMode = AlgaeMode.Reef;
     } else if (m_finishedPickingUpAlgae && m_state != State.Score) {
       m_algaeMode = AlgaeMode.Processor;
+      m_targetReefLevel = ReefLevel.Processor;
     }
   }
 
