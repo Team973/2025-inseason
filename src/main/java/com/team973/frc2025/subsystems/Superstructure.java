@@ -284,6 +284,10 @@ public class Superstructure implements Subsystem {
     };
   }
 
+  public ReefLevel getTargetReefLevel() {
+    return m_targetReefLevel;
+  }
+
   public void update() {
     switch (m_state) {
       case Manual:
