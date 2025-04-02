@@ -345,7 +345,7 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case Scoring:
-            if (m_manualScore) {
+            if (m_manualScore && m_gamePieceMode == GamePiece.Coral) {
               clawScore();
             }
 
