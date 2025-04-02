@@ -27,10 +27,11 @@ public class RightSideAuto extends AutoMode {
             logger, doBabyBird, new DriveTrajectoryCommand(drive, "Babybird-R"), new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.C, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "C-HP"),
-        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0),
+        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
         new DriveTrajectoryCommand(drive, "HP-B"),
         new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Left),
         new DriveTrajectoryCommand(drive, "B-HP"),
+        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
         new DriveTrajectoryCommand(drive, "HP-B"),
         new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Right));
     m_babybird = doBabyBird;
