@@ -123,7 +123,8 @@ public class Robot extends TimedRobot {
     m_superstructure.syncSensors();
 
     m_readyToScore.set(m_superstructure.readyToScore());
-    m_readyToBackOff.set(m_superstructure.readyToBackOff());
+    m_readyToBackOff.set(true);
+    // m_readyToBackOff.set(m_superstructure.readyToBackOff());
 
     m_syncSensorsLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
