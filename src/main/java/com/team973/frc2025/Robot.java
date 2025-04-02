@@ -17,6 +17,7 @@ import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.Superstructure.AlgaeMode;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.Wrist;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
@@ -391,7 +392,9 @@ public class Robot extends TimedRobot {
       new PerfLogger(m_logger.subLogger("perf/disabledPeriodic", 0.25));
 
   private void maybeUpdateScoringSelection() {
-    if (m_frontFace.isActive()) {
+    if (m_superstructure.getAlgaeMode() == AlgaeMode.Processor) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Processor);
+    } else if (m_frontFace.isActive()) {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.A);
     } else if (m_frontRightFace.isActive()) {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.B);
