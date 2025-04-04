@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DriveWithTrajectory extends DriveComposable {
   private static final SwerveSample NULL_SAMPLE =
@@ -28,7 +29,7 @@ public class DriveWithTrajectory extends DriveComposable {
   private final Logger m_logger;
 
   private SwerveSample m_currentSample;
-  private Pose2d m_currentPose;
+  private AtomicReference<Pose2d> m_currentPose;
 
   private Trajectory<SwerveSample> m_trajectory;
 
@@ -58,8 +59,8 @@ public class DriveWithTrajectory extends DriveComposable {
     log();
   }
 
-  public synchronized void updatePose(Pose2d pose) {
-    m_currentPose = pose;
+  public void updatePose(Pose2d pose) {
+    m_currentPose.set(pose);
   }
 
   public synchronized void setTrajectory(Trajectory<SwerveSample> trajectory) {
@@ -104,7 +105,7 @@ public class DriveWithTrajectory extends DriveComposable {
   public void init(ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous) {
     double startTime = Timer.getFPGATimestamp();
 
-    m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
+    m_controller.getThetaController().reset(m_currentPose.get().getRotation().getRadians());
 
     m_initPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
@@ -130,17 +131,18 @@ public class DriveWithTrajectory extends DriveComposable {
     }
 
     m_currentSample = sample.get();
+    Pose2d currentPose = m_currentPose.get();
 
     speeds =
         new ChassisSpeeds(
             m_currentSample.vx
-                + m_controller.getXController().calculate(m_currentPose.getX(), m_currentSample.x),
+                + m_controller.getXController().calculate(currentPose.getX(), m_currentSample.x),
             m_currentSample.vy
-                + m_controller.getYController().calculate(m_currentPose.getY(), m_currentSample.y),
+                + m_controller.getYController().calculate(currentPose.getY(), m_currentSample.y),
             m_currentSample.omega
                 + m_controller
                     .getThetaController()
-                    .calculate(m_currentPose.getRotation().getRadians(), m_currentSample.heading));
+                    .calculate(currentPose.getRotation().getRadians(), m_currentSample.heading));
 
     m_getOutputPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
 
