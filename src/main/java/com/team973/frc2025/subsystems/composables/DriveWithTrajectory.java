@@ -9,6 +9,7 @@ import com.team973.lib.util.Conversions;
 import com.team973.lib.util.DriveComposable;
 import com.team973.lib.util.GreyHolonomicDriveController;
 import com.team973.lib.util.Logger;
+import com.team973.lib.util.PerfLogger;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.Optional;
 
 public class DriveWithTrajectory extends DriveComposable {
@@ -32,6 +34,9 @@ public class DriveWithTrajectory extends DriveComposable {
 
   private double m_trajectoryStartTime = Conversions.Time.getSecTime();
 
+  private final PerfLogger m_initPerfLogger;
+  private final PerfLogger m_getOutputPerfLogger;
+
   public DriveWithTrajectory(Logger logger, Drive drive) {
     m_controller =
         new GreyHolonomicDriveController(
@@ -44,6 +49,9 @@ public class DriveWithTrajectory extends DriveComposable {
                 new TrapezoidProfile.Constraints(
                     DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 7.0)));
     m_logger = logger;
+    m_initPerfLogger = new PerfLogger(logger.subLogger("init"));
+    m_getOutputPerfLogger = new PerfLogger(logger.subLogger("getOutput"));
+
     m_currentSample = null;
     m_currentPose = null;
 
@@ -94,33 +102,48 @@ public class DriveWithTrajectory extends DriveComposable {
   }
 
   public void init(ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous) {
+    double startTime = Timer.getFPGATimestamp();
+
     m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
+
+    m_initPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
   public void exit() {}
 
   @Override
   public synchronized ChassisSpeeds getOutput() {
+    double startTime = Timer.getFPGATimestamp();
+    ChassisSpeeds speeds = new ChassisSpeeds();
+
     if (m_trajectory == null) {
-      return new ChassisSpeeds();
+      m_getOutputPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
+      return speeds;
     }
+
     Optional<SwerveSample> sample =
         m_trajectory.sampleAt(getTimeSecFromStart(), AllianceCache.Get().get() == Alliance.Red);
 
     if (m_currentPose == null || sample.isEmpty()) {
-      return new ChassisSpeeds();
+      m_getOutputPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
+      return speeds;
     }
 
     m_currentSample = sample.get();
 
-    return new ChassisSpeeds(
-        m_currentSample.vx
-            + m_controller.getXController().calculate(m_currentPose.getX(), m_currentSample.x),
-        m_currentSample.vy
-            + m_controller.getYController().calculate(m_currentPose.getY(), m_currentSample.y),
-        m_currentSample.omega
-            + m_controller
-                .getThetaController()
-                .calculate(m_currentPose.getRotation().getRadians(), m_currentSample.heading));
+    speeds =
+        new ChassisSpeeds(
+            m_currentSample.vx
+                + m_controller.getXController().calculate(m_currentPose.getX(), m_currentSample.x),
+            m_currentSample.vy
+                + m_controller.getYController().calculate(m_currentPose.getY(), m_currentSample.y),
+            m_currentSample.omega
+                + m_controller
+                    .getThetaController()
+                    .calculate(m_currentPose.getRotation().getRadians(), m_currentSample.heading));
+
+    m_getOutputPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
+
+    return speeds;
   }
 }
