@@ -305,7 +305,7 @@ public class Superstructure implements Subsystem {
         } else if (m_manualIntake) {
           clawIntake();
         } else {
-          m_claw.setControl(Claw.ControlStatus.Off);
+          m_claw.setControl(Claw.ControlStatus.Reverse);
         }
 
         if (m_manualArmivator) {
@@ -358,7 +358,11 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case MoveToBackOff:
-            m_claw.setControl(Claw.ControlStatus.Off);
+            if (m_gamePieceMode == GamePiece.Coral) {
+              m_claw.setControl(Claw.ControlStatus.Off);
+            } else {
+              clawIntake();
+            }
 
             armTargetReefLevel();
             elevatorTargetReefLevel();
