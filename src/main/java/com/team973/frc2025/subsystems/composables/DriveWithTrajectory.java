@@ -42,6 +42,7 @@ public class DriveWithTrajectory extends DriveComposable {
   private final PerfLogger m_getAlliancePerfLogger;
   private final PerfLogger m_getSamplePerfLogger;
   private final PerfLogger m_getPosePerfLogger;
+  private final PerfLogger m_findChassisSpeedsPerfLogger;
 
   public DriveWithTrajectory(Logger logger, Drive drive) {
     m_controller =
@@ -62,6 +63,7 @@ public class DriveWithTrajectory extends DriveComposable {
     m_getAlliancePerfLogger = new PerfLogger(logger.subLogger("getAlliance"));
     m_getSamplePerfLogger = new PerfLogger(logger.subLogger("getSample"));
     m_getPosePerfLogger = new PerfLogger(logger.subLogger("getPose"));
+    m_findChassisSpeedsPerfLogger = new PerfLogger(logger.subLogger("findChassisSpeeds"));
 
     m_currentSample = null;
     m_currentPose = new AtomicReference<>(null);
@@ -158,6 +160,7 @@ public class DriveWithTrajectory extends DriveComposable {
     Pose2d currentPose = m_currentPose.get();
     m_getPosePerfLogger.observe(Timer.getFPGATimestamp() - getPoseStartTime);
 
+    double findChassisSpeedsStartTime = Timer.getFPGATimestamp();
     speeds =
         new ChassisSpeeds(
             m_currentSample.vx
@@ -168,6 +171,7 @@ public class DriveWithTrajectory extends DriveComposable {
                 + m_controller
                     .getThetaController()
                     .calculate(currentPose.getRotation().getRadians(), m_currentSample.heading));
+    m_findChassisSpeedsPerfLogger.observe(Timer.getFPGATimestamp() - findChassisSpeedsStartTime);
 
     m_getOutputPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
 
