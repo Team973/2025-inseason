@@ -71,7 +71,7 @@ public class Elevator implements Subsystem {
     private static final double LEVEL_4 = 27.0;
     public static final double CORAL_STOW = 0.5;
 
-    private static final double NET = 27.0;
+    private static final double NET = 30.0;
     private static final double ALGAE_HIGH = 2.0;
     private static final double ALGAE_LOW = 14.5;
     private static final double ALGAE_FLOOR = 0.0;
@@ -261,6 +261,7 @@ public class Elevator implements Subsystem {
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
     m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
+    m_logger.log("Net Offset", m_netOffset);
   }
 
   @Override
