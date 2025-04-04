@@ -37,6 +37,11 @@ public class DriveWithTrajectory extends DriveComposable {
 
   private final PerfLogger m_initPerfLogger;
   private final PerfLogger m_getOutputPerfLogger;
+  private final PerfLogger m_findSamplePerfLogger;
+  private final PerfLogger m_getAllianceCachePerfLogger;
+  private final PerfLogger m_getAlliancePerfLogger;
+  private final PerfLogger m_getSamplePerfLogger;
+  private final PerfLogger m_getPosePerfLogger;
 
   public DriveWithTrajectory(Logger logger, Drive drive) {
     m_controller =
@@ -52,6 +57,11 @@ public class DriveWithTrajectory extends DriveComposable {
     m_logger = logger;
     m_initPerfLogger = new PerfLogger(logger.subLogger("init"));
     m_getOutputPerfLogger = new PerfLogger(logger.subLogger("getOutput"));
+    m_findSamplePerfLogger = new PerfLogger(logger.subLogger("findSample"));
+    m_getAllianceCachePerfLogger = new PerfLogger(logger.subLogger("getAllianceCache"));
+    m_getAlliancePerfLogger = new PerfLogger(logger.subLogger("getAlliance"));
+    m_getSamplePerfLogger = new PerfLogger(logger.subLogger("getSample"));
+    m_getPosePerfLogger = new PerfLogger(logger.subLogger("getPose"));
 
     m_currentSample = null;
     m_currentPose = new AtomicReference<>(null);
@@ -122,16 +132,31 @@ public class DriveWithTrajectory extends DriveComposable {
       return speeds;
     }
 
+    double getAllianceCacheStartTime = Timer.getFPGATimestamp();
+    Optional<Alliance> allianceCache = AllianceCache.Get();
+    m_getAllianceCachePerfLogger.observe(Timer.getFPGATimestamp() - getAllianceCacheStartTime);
+
+    double getAllianceStartTime = Timer.getFPGATimestamp();
+    Alliance alliance = allianceCache.get();
+    m_getAlliancePerfLogger.observe(Timer.getFPGATimestamp() - getAllianceStartTime);
+
+    double findSampleStartTime = Timer.getFPGATimestamp();
     Optional<SwerveSample> sample =
-        m_trajectory.sampleAt(getTimeSecFromStart(), AllianceCache.Get().get() == Alliance.Red);
+        m_trajectory.sampleAt(getTimeSecFromStart(), alliance == Alliance.Red);
+    m_findSamplePerfLogger.observe(Timer.getFPGATimestamp() - findSampleStartTime);
 
     if (m_currentPose.get() == null || sample.isEmpty()) {
       m_getOutputPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
       return speeds;
     }
 
+    double getSampleStartTime = Timer.getFPGATimestamp();
     m_currentSample = sample.get();
+    m_getSamplePerfLogger.observe(Timer.getFPGATimestamp() - getSampleStartTime);
+
+    double getPoseStartTime = Timer.getFPGATimestamp();
     Pose2d currentPose = m_currentPose.get();
+    m_getPosePerfLogger.observe(Timer.getFPGATimestamp() - getPoseStartTime);
 
     speeds =
         new ChassisSpeeds(
