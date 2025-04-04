@@ -16,7 +16,7 @@ public class AprilTag {
           put(0, 0);
           put(1, 13);
           put(2, 12);
-          put(16, 3);
+          put(3, 16);
           put(4, 15);
           put(5, 14);
           put(6, 19);
