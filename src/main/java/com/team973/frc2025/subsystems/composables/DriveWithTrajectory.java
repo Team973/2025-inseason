@@ -54,7 +54,7 @@ public class DriveWithTrajectory extends DriveComposable {
     m_getOutputPerfLogger = new PerfLogger(logger.subLogger("getOutput"));
 
     m_currentSample = null;
-    m_currentPose = null;
+    m_currentPose = new AtomicReference<>(null);
 
     log();
   }
@@ -125,7 +125,7 @@ public class DriveWithTrajectory extends DriveComposable {
     Optional<SwerveSample> sample =
         m_trajectory.sampleAt(getTimeSecFromStart(), AllianceCache.Get().get() == Alliance.Red);
 
-    if (m_currentPose == null || sample.isEmpty()) {
+    if (m_currentPose.get() == null || sample.isEmpty()) {
       m_getOutputPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
       return speeds;
     }
