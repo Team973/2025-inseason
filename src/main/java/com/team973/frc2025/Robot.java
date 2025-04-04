@@ -169,6 +169,8 @@ public class Robot extends TimedRobot {
 
   private PerfLogger m_robotPeriodicLogger =
       new PerfLogger(m_logger.subLogger("perf/robotPeriodic", 0.25));
+  private PerfLogger m_autoPeriodicLogger =
+      new PerfLogger(m_logger.subLogger("perf/autoPeriodic", 0.25));
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -180,6 +182,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     try {
+      double startTime = Timer.getFPGATimestamp();
+
       m_ledOff.enable();
 
       if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
@@ -193,7 +197,7 @@ public class Robot extends TimedRobot {
         m_crashSignaler.enable();
         CrashTracker.resetExceptionHappened();
       }
-      double startTime = Timer.getFPGATimestamp();
+
       logSubsystems();
 
       updateJoysticks();
@@ -246,13 +250,18 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     try {
+      double startTime = Timer.getFPGATimestamp();
+
       syncSensors();
       // TODO: we're doing this badly to make it work
       m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
       // TODO: Figure out why autos don't work if updateSubsystems() comes before
       // automanager.run().
       m_autoManager.run(AllianceCache.Get().get());
+
       updateSubsystems();
+
+      m_autoPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
     } catch (Exception e) {
       CrashTracker.logException("Auto Periodic", e);
     }
