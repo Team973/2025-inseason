@@ -93,7 +93,7 @@ public class DriveWithTrajectory extends DriveComposable {
     m_logger.log("Theta Velocity Error", m_controller.getThetaController().getVelocityError());
   }
 
-  public void init(ChassisSpeeds previousChassisSpeeds) {
+  public void init(ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous) {
     m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
   }
 

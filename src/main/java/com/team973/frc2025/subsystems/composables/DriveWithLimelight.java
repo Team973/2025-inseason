@@ -387,14 +387,20 @@ public class DriveWithLimelight extends DriveComposable {
     return m_lastTargetReefSide;
   }
 
-  public synchronized void init(ChassisSpeeds previousChassisSpeeds) {
-    m_xController.reset(
-        m_poseEstimator.getPoseMeters().getX(), previousChassisSpeeds.vxMetersPerSecond);
-    m_yController.reset(
-        m_poseEstimator.getPoseMeters().getY(), previousChassisSpeeds.vyMetersPerSecond);
-    m_thetaController.reset(
-        m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-        previousChassisSpeeds.omegaRadiansPerSecond);
+  public synchronized void init(ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous) {
+    if (robotIsAutonomous) {
+      m_xController.reset(
+          m_poseEstimator.getPoseMeters().getX(), previousChassisSpeeds.vxMetersPerSecond);
+      m_yController.reset(
+          m_poseEstimator.getPoseMeters().getY(), previousChassisSpeeds.vyMetersPerSecond);
+      m_thetaController.reset(
+          m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+          previousChassisSpeeds.omegaRadiansPerSecond);
+    } else {
+      m_xController.reset(m_poseEstimator.getPoseMeters().getX());
+      m_yController.reset(m_poseEstimator.getPoseMeters().getY());
+      m_thetaController.reset(m_poseEstimator.getPoseMeters().getRotation().getRadians());
+    }
 
     if (m_finishedScoring) {
       m_targetStage = TargetStage.MoveToApproach;

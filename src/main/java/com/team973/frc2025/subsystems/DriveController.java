@@ -27,6 +27,8 @@ public class DriveController implements Subsystem {
 
   private ChassisSpeeds m_currentChassisSpeeds;
 
+  private boolean m_robotIsAutonomous = true;
+
   public enum RotationControl {
     OpenLoop,
     ClosedLoop,
@@ -74,7 +76,8 @@ public class DriveController implements Subsystem {
 
       getComposableFromControllerOption(m_controllerOption).exit();
 
-      getComposableFromControllerOption(controllerOption).init(m_currentChassisSpeeds);
+      getComposableFromControllerOption(controllerOption)
+          .init(m_currentChassisSpeeds, m_robotIsAutonomous);
 
       m_controllerOption = controllerOption;
     }
@@ -137,6 +140,10 @@ public class DriveController implements Subsystem {
       default:
         return m_driveWithJoysticks;
     }
+  }
+
+  public void setRobotIsAutonomous(boolean robotIsAutonomous) {
+    m_robotIsAutonomous = robotIsAutonomous;
   }
 
   public void syncSensors() {

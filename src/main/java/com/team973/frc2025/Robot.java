@@ -239,6 +239,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     try {
+      m_driveController.setRobotIsAutonomous(true);
       m_autoManager.init();
       m_driveController.resetOdometry(m_autoManager.getStartingPose(AllianceCache.Get().get()));
     } catch (Exception e) {
@@ -271,6 +272,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     try {
+      m_driveController.setRobotIsAutonomous(false);
       m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
     } catch (Exception e) {
       CrashTracker.logException("Teleop Init", e);

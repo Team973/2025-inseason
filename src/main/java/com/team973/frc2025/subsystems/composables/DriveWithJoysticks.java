@@ -58,7 +58,7 @@ public class DriveWithJoysticks extends DriveComposable {
     m_angularVelocity = angularVelocity;
   }
 
-  public void init(ChassisSpeeds previousChassisSpeeds) {}
+  public void init(ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous) {}
 
   public void exit() {}
 

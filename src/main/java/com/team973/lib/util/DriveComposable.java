@@ -6,9 +6,9 @@ public abstract class DriveComposable {
   public static DriveComposable compose(
       DriveComposable translationProvider, DriveComposable rotationProvider) {
     return new DriveComposable() {
-      public void init(ChassisSpeeds previousChassisSpeeds) {
-        translationProvider.init(previousChassisSpeeds);
-        rotationProvider.init(previousChassisSpeeds);
+      public void init(ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous) {
+        translationProvider.init(previousChassisSpeeds, robotIsAutonomous);
+        rotationProvider.init(previousChassisSpeeds, robotIsAutonomous);
       }
 
       public void exit() {
@@ -29,7 +29,7 @@ public abstract class DriveComposable {
     };
   }
 
-  public abstract void init(ChassisSpeeds previousChassisSpeeds);
+  public abstract void init(ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous);
 
   public abstract void exit();
 
