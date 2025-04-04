@@ -115,8 +115,6 @@ public class Wrist implements Subsystem {
         return ALGAE_FLOOR_POSITION_DEG;
       case Net:
         return NET_POSITION_DEG;
-      case Processor:
-        return ALGAE_STOW_POSITION_DEG;
       case Horizontal:
         return HORIZONTAL_POSITION_DEG;
       default:
