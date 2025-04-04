@@ -182,8 +182,6 @@ public class Elevator implements Subsystem {
       case AlgaeFloor:
         m_algaeFloorOffset += offset;
         break;
-      case Processor:
-        break;
       case Horizontal:
         break;
     }
@@ -211,8 +209,6 @@ public class Elevator implements Subsystem {
         return Presets.ALGAE_LOW + m_algaeLowOffset;
       case AlgaeFloor:
         return Presets.ALGAE_FLOOR + m_algaeFloorOffset;
-      case Processor:
-        return Presets.ALGAE_STOW;
       case Horizontal:
         return Presets.CORAL_STOW;
       default:

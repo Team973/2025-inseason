@@ -400,9 +400,6 @@ public class Robot extends TimedRobot {
       new PerfLogger(m_logger.subLogger("perf/disabledPeriodic", 0.25));
 
   private void maybeUpdateScoringSelection() {
-    // if (m_superstructure.getAlgaeMode() == AlgaeMode.Processor) {
-    //   m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Processor);
-    // } else
     if (m_frontFace.isActive()) {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.A);
     } else if (m_frontRightFace.isActive()) {
