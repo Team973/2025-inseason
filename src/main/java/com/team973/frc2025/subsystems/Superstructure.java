@@ -22,7 +22,7 @@ public class Superstructure implements Subsystem {
   private boolean m_manualScore = false;
   private boolean m_manualIntake = true;
   private boolean m_manualArmivator = false;
-  private boolean m_finishedPickingUpAlgae = true;
+  private boolean m_finishedPickingUpAlgae = false;
 
   public enum State {
     Manual,
@@ -182,6 +182,7 @@ public class Superstructure implements Subsystem {
       m_algaeMode = AlgaeMode.Reef;
     } else if (m_finishedPickingUpAlgae && m_state != State.Score) {
       m_algaeMode = AlgaeMode.Processor;
+      m_finishedPickingUpAlgae = false;
     }
   }
 
@@ -354,8 +355,6 @@ public class Superstructure implements Subsystem {
 
               m_manualArmivator = true;
             }
-
-            m_finishedPickingUpAlgae = false;
             break;
           case Approach:
             armTargetReefLevel();
