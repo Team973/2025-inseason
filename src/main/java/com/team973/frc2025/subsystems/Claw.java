@@ -46,6 +46,7 @@ public class Claw implements Subsystem {
     IntakeAlgae,
     ScoreCoral,
     ScoreAlgae,
+    Reverse,
     Off,
   }
 
@@ -193,6 +194,10 @@ public class Claw implements Subsystem {
       case ScoreAlgae:
         m_clawMotor.setControl(ControlMode.VelocityVoltage, 450);
         m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
+        break;
+      case Reverse:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, -20);
+        m_conveyor.setControl(ControlMode.VelocityVoltage, -40);
         break;
       case Off:
         m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
