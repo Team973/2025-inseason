@@ -191,7 +191,7 @@ public class Claw implements Subsystem {
         m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         break;
       case ScoreAlgae:
-        m_clawMotor.setControl(ControlMode.VelocityVoltage, 150);
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 450);
         m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
         break;
       case Off:
