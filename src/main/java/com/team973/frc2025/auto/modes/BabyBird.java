@@ -18,7 +18,7 @@ public class BabyBird extends AutoMode {
     super(
         logger,
         new Pose2d(8.487, 1.363, Rotation2d.fromDegrees(180)),
-        new DriveTrajectoryCommand(drive, "Babybird"),
+        new DriveTrajectoryCommand(drive, "Babybird", logger.subLogger("Babybird")),
         new ScoreCoralCommand(drive, superstructure, ReefFace.D, ReefLevel.L_4, ReefSide.Left),
         new PickupAlgaeCommand(drive, superstructure, ReefFace.D, ReefLevel.AlgaeLow));
   }
