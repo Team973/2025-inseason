@@ -14,15 +14,23 @@ import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator implements Subsystem {
+  private static final double MOTOR_GEAR_RATIO = 10.0 / 56.0;
+
   private final Logger m_logger;
+
   private final GreyTalonFX m_motorRight;
   private final GreyTalonFX m_motorLeft;
+
   private ControlStatus m_controlStatus = ControlStatus.Off;
+
   private double m_targetPostionHeightinches;
   private double m_targetpositionLeway = 0.1;
-  double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
+
+  private int m_elevatorHomedCount = 0;
+
   private boolean m_lastHallSensorMode = true;
+
   private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
 
   private final SolidSignaler m_elevatorHomedBlinker =
@@ -136,6 +144,7 @@ public class Elevator implements Subsystem {
     if (!m_lastHallSensorMode && hallsensor()) {
       m_motorRight.setPosition(heightInchesToMotorRotations(ELEVATOR_HOMING_POSTION_HEIGHT));
       m_elevatorHomedBlinker.enable();
+      m_elevatorHomedCount++;
     }
     m_lastHallSensorMode = hallsensor();
   }
@@ -262,6 +271,8 @@ public class Elevator implements Subsystem {
     m_logger.log("Algae High Offset", m_algaeHighOffset);
     m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
     m_logger.log("Net Offset", m_netOffset);
+
+    m_logger.log("Elevator Homed Count", m_elevatorHomedCount);
   }
 
   @Override
