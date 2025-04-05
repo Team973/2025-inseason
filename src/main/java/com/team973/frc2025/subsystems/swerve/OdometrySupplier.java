@@ -20,8 +20,13 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Watchdog;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class OdometrySupplier {
 
@@ -43,6 +48,7 @@ public class OdometrySupplier {
   private PerfLogger m_loopDurationTracker;
   private final Thread m_thread;
   private Pose2d m_lastPoseMeters;
+  private Watchdog m_watchdog;
 
   private boolean m_started = false;
 
@@ -52,6 +58,26 @@ public class OdometrySupplier {
     m_thread = new Thread(this::run);
     m_thread.setName("swerve.OdometryPoseSupplier");
     m_thread.setDaemon(false);
+
+    m_watchdog =
+        new Watchdog(
+            200.0,
+            () -> {
+              if (getSuccessfulCycles() < 10) {
+                // We expect the first few cycles to be very slow so don't bother screaming.
+                return;
+              }
+              System.out.println("Odometry watchdog expired");
+              try (PrintWriter writer =
+                  new PrintWriter(new FileWriter("/home/lvuser/watchdog_log.txt", true))) {
+                writer.print("Odometry watchdog expired\n");
+                for (StackTraceElement element : m_thread.getStackTrace()) {
+                  System.err.println("\tat " + element);
+                }
+                writer.println();
+              } catch (IOException ie) {
+              }
+            });
 
     m_pigeon = pigeon;
     m_swerveModules = swerveModules;
@@ -118,7 +144,7 @@ public class OdometrySupplier {
     log();
   }
 
-  private int m_successfulCycles = 0;
+  private AtomicInteger m_successfulCycles = new AtomicInteger(0);
   private int m_failedCycles = 0;
 
   public void run() {
@@ -140,6 +166,7 @@ public class OdometrySupplier {
     while (true) {
       // Since we've set the update frequency, we will never actually wait
       // this long for new signal. We expect to get a signal in at most 1/freq
+      m_watchdog.reset();
       StatusCode status =
           BaseStatusSignal.waitForAll(
               2.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY, m_allStatusSignals);
@@ -149,7 +176,7 @@ public class OdometrySupplier {
 
       synchronized (this) {
         if (status.isOK()) {
-          m_successfulCycles++;
+          m_successfulCycles.incrementAndGet();
         } else {
           m_failedCycles++;
         }
@@ -185,8 +212,8 @@ public class OdometrySupplier {
     return positions;
   }
 
-  public synchronized int getSuccessfulCycles() {
-    return m_successfulCycles;
+  public int getSuccessfulCycles() {
+    return m_successfulCycles.get();
   }
 
   public synchronized int getFailedCycles() {

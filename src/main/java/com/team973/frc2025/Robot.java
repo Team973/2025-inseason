@@ -32,7 +32,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -183,6 +187,10 @@ public class Robot extends TimedRobot {
     try {
       double startTime = Timer.getFPGATimestamp();
 
+      if (m_mainWatchdog != null) {
+        m_mainWatchdog.reset(); // feed the watchdog
+      }
+
       m_ledOff.enable();
 
       if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
@@ -204,6 +212,31 @@ public class Robot extends TimedRobot {
       m_robotPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
     } catch (Exception e) {
       CrashTracker.logException("Robot Periodic", e);
+    }
+  }
+
+  private Watchdog m_mainWatchdog;
+  private Thread m_mainThread;
+
+  @Override
+  public void driverStationConnected() {
+    if (m_mainWatchdog == null) {
+      m_mainThread = Thread.currentThread();
+      m_mainWatchdog =
+          new Watchdog(
+              200.0,
+              () -> {
+                System.out.println("Main watchdog expired");
+                try (PrintWriter writer =
+                    new PrintWriter(new FileWriter("/home/lvuser/watchdog_log.txt", true))) {
+                  writer.print("Main watchdog expired\n");
+                  for (StackTraceElement element : m_mainThread.getStackTrace()) {
+                    System.err.println("\tat " + element);
+                  }
+                  writer.println();
+                } catch (IOException ie) {
+                }
+              });
     }
   }
 
@@ -238,6 +271,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     try {
+      if (m_mainWatchdog != null) {
+        m_mainWatchdog.addEpoch("autoInit");
+        m_mainWatchdog.enable();
+      }
       m_driveController.setRobotIsAutonomous(true);
       m_autoManager.init();
       m_driveController.resetOdometry(m_autoManager.getStartingPose(AllianceCache.Get().get()));
@@ -271,6 +308,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     try {
+      if (m_mainWatchdog != null) {
+        m_mainWatchdog.disable();
+      }
       m_driveController.setRobotIsAutonomous(false);
       m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
     } catch (Exception e) {
