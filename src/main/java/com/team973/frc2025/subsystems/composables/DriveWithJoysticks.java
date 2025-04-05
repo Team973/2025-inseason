@@ -6,7 +6,6 @@ import com.team973.lib.util.DriveComposable;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
@@ -25,6 +24,9 @@ public class DriveWithJoysticks extends DriveComposable {
   private double m_xAxis = 0.0;
   private double m_yAxis = 0.0;
   private double m_rot = 0.0;
+
+  private Rotation2d m_currentYaw = new Rotation2d();
+  private Rotation2d m_angularVelocity = new Rotation2d();
 
   public DriveWithJoysticks() {}
 
@@ -51,18 +53,21 @@ public class DriveWithJoysticks extends DriveComposable {
     m_rot = rotAxis;
   }
 
-  public void init(
-      ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous, Pose2d currentPose) {}
+  public void updateAngle(Rotation2d currentYaw, Rotation2d angularVelocity) {
+    m_currentYaw = currentYaw;
+    m_angularVelocity = angularVelocity;
+  }
+
+  public void init(ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous) {}
 
   public void exit() {}
 
   @Override
-  public ChassisSpeeds getOutput(Pose2d currentPose, Rotation2d angularVelocity) {
+  public ChassisSpeeds getOutput() {
     final double xSpeed =
         -MathUtil.applyDeadband(m_xAxis, 0.1) * DriveInfo.MAX_VELOCITY_METERS_PER_SECOND;
     final double ySpeed =
         -MathUtil.applyDeadband(m_yAxis, 0.1) * DriveInfo.MAX_VELOCITY_METERS_PER_SECOND;
-    Rotation2d currentYaw = currentPose.getRotation();
 
     double rot =
         -m_rotLimiter.calculate(MathUtil.applyDeadband(m_rot, 0.09))
@@ -72,7 +77,7 @@ public class DriveWithJoysticks extends DriveComposable {
     if (m_lastRot != 0.0 && rot == 0.0 && !m_holdingAngle) {
       // m_targetRobotAngle = currentYaw;
       // Correct for latency in robot rotation and measurement.
-      m_targetRobotAngle = currentYaw.plus(angularVelocity.times(0.03));
+      m_targetRobotAngle = m_currentYaw.plus(m_angularVelocity.times(0.03));
       setRotationControl(RotationControl.ClosedLoop);
     } else if (rot != 0.0 && !m_holdingAngle) {
       setRotationControl(RotationControl.OpenLoop);
@@ -81,14 +86,16 @@ public class DriveWithJoysticks extends DriveComposable {
     m_lastRot = rot;
 
     if (m_rotationControl == RotationControl.ClosedLoop) {
-      double diff = m_targetRobotAngle.minus(currentYaw).getDegrees();
+      double diff = m_targetRobotAngle.minus(m_currentYaw).getDegrees();
       if (diff > 180) {
         diff -= 360;
       } else if (diff < -180) {
         diff += 360;
       }
 
-      rot = m_rotationController.calculate(currentYaw.getDegrees(), currentYaw.getDegrees() + diff);
+      rot =
+          m_rotationController.calculate(
+              m_currentYaw.getDegrees(), m_currentYaw.getDegrees() + diff);
     }
 
     return new ChassisSpeeds(xSpeed, ySpeed, rot);
