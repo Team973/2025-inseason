@@ -62,10 +62,7 @@ public class DriveController implements Subsystem {
 
     m_driveWithLimelight =
         new DriveWithLimelight(
-            m_drive.getPoseEstimator(),
-            m_logger.subLogger("driveWithLimelight"),
-            readyToScore,
-            readyToBackOff);
+            m_logger.subLogger("driveWithLimelight"), readyToScore, readyToBackOff);
 
     m_currentChassisSpeeds = new ChassisSpeeds();
   }
@@ -77,7 +74,7 @@ public class DriveController implements Subsystem {
       getComposableFromControllerOption(m_controllerOption).exit();
 
       getComposableFromControllerOption(controllerOption)
-          .init(m_currentChassisSpeeds, m_robotIsAutonomous);
+          .init(m_currentChassisSpeeds, m_robotIsAutonomous, getPose());
 
       m_controllerOption = controllerOption;
     }
@@ -93,6 +90,10 @@ public class DriveController implements Subsystem {
 
   public DriveWithLimelight getDriveWithLimelight() {
     return m_driveWithLimelight;
+  }
+
+  public boolean isNearApproach() {
+    return getDriveWithLimelight().isNearApproach(getPose());
   }
 
   public synchronized GreyPigeon getPigeon() {
@@ -159,15 +160,13 @@ public class DriveController implements Subsystem {
       return;
     }
     m_drive.syncSensorsHighFreq();
-    m_driveWithTrajectory.updatePose(getPose());
-    m_driveWithJoysticks.updateAngle(
-        m_drive.getPigeon().getNormalizedYaw(), m_drive.getPigeon().getAngularVelocity());
   }
 
   @Override
   public synchronized void update() {
     ChassisSpeeds currentChassisSpeeds =
-        getComposableFromControllerOption(m_controllerOption).getOutput();
+        getComposableFromControllerOption(m_controllerOption)
+            .getOutput(getPose(), m_drive.getPigeon().getAngularVelocity());
 
     if (currentChassisSpeeds != null) {
       m_drive.setChassisSpeeds(currentChassisSpeeds);
