@@ -16,7 +16,7 @@ public class ScoreTestAuto extends AutoMode {
   public ScoreTestAuto(Logger logger, DriveController drive, Superstructure superstructure) {
     super(
         logger,
-        new Pose2d(17.13, 3.95, Rotation2d.fromDegrees(0)),
+        new Pose2d(2, 4, Rotation2d.fromDegrees(0)),
         new ScoreCoralCommand(drive, superstructure, ReefFace.A, ReefLevel.L_4, ReefSide.Left),
         new DriveTrajectoryCommand(drive, "Score-Test", logger.subLogger("Score-Test")));
   }
