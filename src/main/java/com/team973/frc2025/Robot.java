@@ -5,6 +5,7 @@ package com.team973.frc2025;
 // the WPILib BSD license file in the root directory of this project.
 
 import choreo.util.ChoreoAllianceFlipUtil;
+import com.team973.frc2025.auto.modes.ScoreTestAuto;
 import com.team973.frc2025.shared.CrashTracker;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Arm;
@@ -164,6 +165,7 @@ public class Robot extends TimedRobot {
     m_candleManger.addSignaler(m_ledOff);
     m_candleManger.addSignaler(m_lowBatterySignaler);
     m_candleManger.addSignaler(m_crashSignaler);
+    m_candleManger.addSignaler(ScoreTestAuto.m_finishedDrivingSignaler);
     ChoreoAllianceFlipUtil.setYear(2025);
   }
 
