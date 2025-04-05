@@ -32,7 +32,7 @@ public class LeftSideAuto extends AutoMode {
             new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.E, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "E-HP", logger.subLogger("E-HP")),
-        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
+        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.5),
         new DriveTrajectoryCommand(drive, "HP-F", logger.subLogger("HP-F")),
         new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "F-HP", logger.subLogger("F-HP")),

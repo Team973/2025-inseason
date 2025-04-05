@@ -30,7 +30,7 @@ public class RightSideAuto extends AutoMode {
             new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.C, ReefLevel.L_4, ReefSide.Right),
         new DriveTrajectoryCommand(drive, "C-HP", logger.subLogger("C-HP")),
-        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
+        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.5),
         new DriveTrajectoryCommand(drive, "HP-B", logger.subLogger("HP-B")),
         new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Left),
         new DriveTrajectoryCommand(drive, "B-HP", logger.subLogger("B-HP")),
