@@ -52,6 +52,8 @@ public class Elevator implements Subsystem {
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
   private CANdleManger m_candleManger;
 
+  private boolean m_hallZeroingEnabled = true;
+
   public static enum ControlStatus {
     Manual,
     TargetPostion,
@@ -137,6 +139,10 @@ public class Elevator implements Subsystem {
     return defaultElevatorMotorConfig;
   }
 
+  public void setHallZeroingEnabled(boolean zeroingMode) {
+    m_hallZeroingEnabled = zeroingMode;
+  }
+
   private boolean hallsensor() {
     return !m_hallSensor.get();
   }
@@ -148,6 +154,12 @@ public class Elevator implements Subsystem {
       m_elevatorHomedCount++;
     }
     m_lastHallSensorMode = hallsensor();
+  }
+
+  public void home() {
+    m_motorRight.setPosition(0);
+    m_elevatorHomedBlinker.enable();
+    m_elevatorHomedCount++;
   }
 
   public void setControlStatus(ControlStatus status) {
@@ -278,7 +290,9 @@ public class Elevator implements Subsystem {
 
   @Override
   public void syncSensors() {
-    maybeHomeElevator();
+    if (m_hallZeroingEnabled) {
+      maybeHomeElevator();
+    }
   }
 
   @Override

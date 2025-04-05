@@ -403,6 +403,10 @@ public class Superstructure implements Subsystem {
         break;
     }
 
+    if (m_lastState == State.Zero && m_state != State.Zero) {
+      m_elevator.home();
+    }
+
     m_lastState = m_state;
 
     m_claw.update();
