@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DriveWithTrajectory extends DriveComposable {
   private static final SwerveSample NULL_SAMPLE =
@@ -28,6 +29,7 @@ public class DriveWithTrajectory extends DriveComposable {
   private final Logger m_logger;
 
   private SwerveSample m_currentSample;
+  private AtomicReference<Pose2d> m_currentPose;
 
   private Trajectory<SwerveSample> m_trajectory;
 
@@ -39,6 +41,7 @@ public class DriveWithTrajectory extends DriveComposable {
   private final PerfLogger m_getAllianceCachePerfLogger;
   private final PerfLogger m_getAlliancePerfLogger;
   private final PerfLogger m_getSamplePerfLogger;
+  private final PerfLogger m_getPosePerfLogger;
   private final PerfLogger m_findChassisSpeedsPerfLogger;
 
   public DriveWithTrajectory(Logger logger, Drive drive) {
@@ -59,11 +62,17 @@ public class DriveWithTrajectory extends DriveComposable {
     m_getAllianceCachePerfLogger = new PerfLogger(logger.subLogger("getAllianceCache"));
     m_getAlliancePerfLogger = new PerfLogger(logger.subLogger("getAlliance"));
     m_getSamplePerfLogger = new PerfLogger(logger.subLogger("getSample"));
+    m_getPosePerfLogger = new PerfLogger(logger.subLogger("getPose"));
     m_findChassisSpeedsPerfLogger = new PerfLogger(logger.subLogger("findChassisSpeeds"));
 
     m_currentSample = null;
+    m_currentPose = new AtomicReference<>(null);
 
     log();
+  }
+
+  public void updatePose(Pose2d pose) {
+    m_currentPose.set(pose);
   }
 
   public synchronized void setTrajectory(Trajectory<SwerveSample> trajectory) {
@@ -105,11 +114,10 @@ public class DriveWithTrajectory extends DriveComposable {
     m_logger.log("Theta Velocity Error", m_controller.getThetaController().getVelocityError());
   }
 
-  public void init(
-      ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous, Pose2d currentPose) {
+  public void init(ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous) {
     double startTime = Timer.getFPGATimestamp();
 
-    m_controller.getThetaController().reset(currentPose.getRotation().getRadians());
+    m_controller.getThetaController().reset(m_currentPose.get().getRotation().getRadians());
 
     m_initPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
@@ -117,7 +125,7 @@ public class DriveWithTrajectory extends DriveComposable {
   public void exit() {}
 
   @Override
-  public synchronized ChassisSpeeds getOutput(Pose2d currentPose, Rotation2d angularVelocity) {
+  public synchronized ChassisSpeeds getOutput() {
     double startTime = Timer.getFPGATimestamp();
     ChassisSpeeds speeds = new ChassisSpeeds();
 
@@ -139,7 +147,7 @@ public class DriveWithTrajectory extends DriveComposable {
         m_trajectory.sampleAt(getTimeSecFromStart(), alliance == Alliance.Red);
     m_findSamplePerfLogger.observe(Timer.getFPGATimestamp() - findSampleStartTime);
 
-    if (currentPose == null || sample.isEmpty()) {
+    if (m_currentPose.get() == null || sample.isEmpty()) {
       m_getOutputPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
       return speeds;
     }
@@ -147,6 +155,10 @@ public class DriveWithTrajectory extends DriveComposable {
     double getSampleStartTime = Timer.getFPGATimestamp();
     m_currentSample = sample.get();
     m_getSamplePerfLogger.observe(Timer.getFPGATimestamp() - getSampleStartTime);
+
+    double getPoseStartTime = Timer.getFPGATimestamp();
+    Pose2d currentPose = m_currentPose.get();
+    m_getPosePerfLogger.observe(Timer.getFPGATimestamp() - getPoseStartTime);
 
     double findChassisSpeedsStartTime = Timer.getFPGATimestamp();
     speeds =
