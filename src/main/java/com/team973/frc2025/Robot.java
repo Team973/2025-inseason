@@ -243,6 +243,8 @@ public class Robot extends TimedRobot {
       m_driveController.setRobotIsAutonomous(true);
       m_autoManager.init();
       m_driveController.resetOdometry(m_autoManager.getStartingPose(AllianceCache.Get().get()));
+
+      m_elevator.setHallZeroingEnabled(false);
     } catch (Exception e) {
       CrashTracker.logException("Auto Init", e);
     }
@@ -275,6 +277,8 @@ public class Robot extends TimedRobot {
     try {
       m_driveController.setRobotIsAutonomous(false);
       m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
+
+      m_elevator.setHallZeroingEnabled(false);
     } catch (Exception e) {
       CrashTracker.logException("Teleop Init", e);
     }
@@ -396,7 +400,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_elevator.setHallZeroingEnabled(true);
+  }
 
   private PerfLogger m_disabledPeriodicLogger =
       new PerfLogger(m_logger.subLogger("perf/disabledPeriodic", 0.25));
