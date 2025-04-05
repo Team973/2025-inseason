@@ -52,12 +52,13 @@ public class Robot extends TimedRobot {
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
-  private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
-  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"), m_candleManger);
+  private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger", 0.2));
+  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager", 0.2), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
-  private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"), m_candleManger);
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm"), m_candleManger);
-  private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist"));
+  private final Elevator m_elevator =
+      new Elevator(m_logger.subLogger("elevator", 0.2), m_candleManger);
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2), m_candleManger);
+  private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2));
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(
           RobotInfo.Colors.ORANGE, 3000, RobotInfo.SignalerInfo.LOW_BATTER_SIGNALER_PRIORTY);

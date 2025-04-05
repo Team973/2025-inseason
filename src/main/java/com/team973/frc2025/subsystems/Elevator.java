@@ -91,7 +91,8 @@ public class Elevator implements Subsystem {
     m_candleManger = candle;
     m_candleManger.addSignaler(m_elevatorHomedBlinker);
     m_motorRight = new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorRight"));
-    m_motorLeft = new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft"));
+    m_motorLeft =
+        new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft", 0.5));
 
     TalonFXConfiguration leftMotorConfig = defaultElevatorMotorConfig();
     // looking at it from the front left is clockwise and right is counter clockwise
