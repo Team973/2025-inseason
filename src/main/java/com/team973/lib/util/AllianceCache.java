@@ -14,12 +14,13 @@ public class AllianceCache {
   // GetCachedAlliance will keep asking the DriverStation for the
   // alliance until we get back a non-empty alliance.
   public static synchronized Optional<Alliance> Get() {
-    m_numberOfGetCalls.getAndIncrement();
-
     if (m_allianceInitialized) {
       return m_alliance;
     }
+
     m_alliance = DriverStation.getAlliance();
+    m_numberOfGetCalls.getAndIncrement();
+
     if (m_alliance.isPresent()) {
       m_allianceInitialized = true;
     }
