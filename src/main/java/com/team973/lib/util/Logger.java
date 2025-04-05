@@ -25,7 +25,7 @@ public class Logger {
     m_prefix = prefix;
     m_secondsPerLog = secondsPerLog;
 
-    DogLog.setOptions(new DogLogOptions());
+    DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
     // TODO: solve why this doesn't work
     // DogLog.setPdh(new PowerDistribution());
   }
