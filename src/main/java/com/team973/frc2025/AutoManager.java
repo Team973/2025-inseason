@@ -8,6 +8,7 @@ import com.team973.frc2025.auto.modes.LeftSideAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
 import com.team973.frc2025.auto.modes.NoAutoAllianceWallCenter;
 import com.team973.frc2025.auto.modes.RightSideAuto;
+import com.team973.frc2025.auto.modes.ScoreTestAuto;
 import com.team973.frc2025.auto.modes.TaxiAuto;
 import com.team973.frc2025.auto.modes.TestAuto;
 import com.team973.frc2025.subsystems.DriveController;
@@ -34,6 +35,7 @@ public class AutoManager {
   private final AutoMode m_noAutoAllianceWallCenter;
   private final AutoMode m_centerAuto;
   private final AutoMode m_babyBirdAuto;
+  private final AutoMode m_scoreTestAuto;
 
   public AutoManager(Logger logger, DriveController drive, Superstructure superstructure) {
     m_noAuto = new NoAuto(logger);
@@ -52,6 +54,7 @@ public class AutoManager {
     m_noAutoAllianceWallCenter = new NoAutoAllianceWallCenter(logger);
     m_centerAuto = new CenterAuto(logger.subLogger("CenterAuto"), superstructure, drive);
     m_babyBirdAuto = new BabyBird(logger, drive, superstructure);
+    m_scoreTestAuto = new ScoreTestAuto(logger.subLogger("ScoreTestAuto"), drive, superstructure);
 
     m_availableAutos =
         Arrays.asList(
@@ -65,7 +68,8 @@ public class AutoManager {
             m_rightSideAuto,
             // m_rightSideBabybirdAuto,
             m_centerAuto,
-            m_babyBirdAuto);
+            m_babyBirdAuto,
+            m_scoreTestAuto);
   }
 
   public void increment() {
