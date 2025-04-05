@@ -38,6 +38,7 @@ public class DriveWithTrajectory extends DriveComposable {
   private final PerfLogger m_findSamplePerfLogger;
   private final PerfLogger m_getAllianceCachePerfLogger;
   private final PerfLogger m_getAlliancePerfLogger;
+  private final PerfLogger m_findSecFromStartPerfLogger;
   private final PerfLogger m_getSamplePerfLogger;
   private final PerfLogger m_findChassisSpeedsPerfLogger;
 
@@ -58,6 +59,7 @@ public class DriveWithTrajectory extends DriveComposable {
     m_findSamplePerfLogger = new PerfLogger(logger.subLogger("findSample"));
     m_getAllianceCachePerfLogger = new PerfLogger(logger.subLogger("getAllianceCache"));
     m_getAlliancePerfLogger = new PerfLogger(logger.subLogger("getAlliance"));
+    m_findSecFromStartPerfLogger = new PerfLogger(logger.subLogger("findSecFromStart"));
     m_getSamplePerfLogger = new PerfLogger(logger.subLogger("getSample"));
     m_findChassisSpeedsPerfLogger = new PerfLogger(logger.subLogger("findChassisSpeeds"));
 
@@ -134,9 +136,12 @@ public class DriveWithTrajectory extends DriveComposable {
     Alliance alliance = allianceCache.get();
     m_getAlliancePerfLogger.observe(Timer.getFPGATimestamp() - getAllianceStartTime);
 
+    double findSecFromStartStartTime = Timer.getFPGATimestamp();
+    double secFromStart = getTimeSecFromStart();
+    m_findSecFromStartPerfLogger.observe(Timer.getFPGATimestamp() - findSecFromStartStartTime);
+
     double findSampleStartTime = Timer.getFPGATimestamp();
-    Optional<SwerveSample> sample =
-        m_trajectory.sampleAt(getTimeSecFromStart(), alliance == Alliance.Red);
+    Optional<SwerveSample> sample = m_trajectory.sampleAt(secFromStart, alliance == Alliance.Red);
     m_findSamplePerfLogger.observe(Timer.getFPGATimestamp() - findSampleStartTime);
 
     if (currentPose == null || sample.isEmpty()) {
