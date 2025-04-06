@@ -1,6 +1,7 @@
 package com.team973.frc2025.subsystems;
 
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
+import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -11,6 +12,8 @@ public class Superstructure implements Subsystem {
   private final Arm m_arm;
   private final Wrist m_wrist;
   private final DriveController m_driveController;
+
+  private final Logger m_logger;
 
   private State m_state = State.Manual;
   private State m_lastState = State.Manual;
@@ -54,13 +57,16 @@ public class Superstructure implements Subsystem {
       Elevator elevator,
       Arm arm,
       Wrist wrist,
-      DriveController driveController) {
+      DriveController driveController,
+      Logger logger) {
     m_claw = claw;
     m_climb = climb;
     m_elevator = elevator;
     m_arm = arm;
     m_wrist = wrist;
     m_driveController = driveController;
+
+    m_logger = logger;
   }
 
   public void setState(State state) {
@@ -154,6 +160,9 @@ public class Superstructure implements Subsystem {
     SmartDashboard.putString(
         "DB/String 2", "A: " + String.valueOf(m_arm.getTargetDegFromLevel(m_targetReefLevel)));
     SmartDashboard.putString("DB/String 8", m_gamePieceMode.toString());
+
+    m_logger.log("Game Piece Mode", m_gamePieceMode.toString());
+    m_logger.log("State", m_state.toString());
 
     m_claw.log();
     m_climb.log();
