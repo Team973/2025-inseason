@@ -35,15 +35,15 @@ public class Arm implements Subsystem {
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 61.0 - 10.0;
-  private static final double LEVEL_THREE_POSITION_DEG = 58.0 - 10.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -66.0 - 10.0;
-  private static final double LEVEL_ONE_POSITION_DEG = -69.0 - 10.0;
-  public static final double CORAL_STOW_POSITION_DEG = -93.0 - 5.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 61.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 58.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -61.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -59.0;
+  public static final double CORAL_STOW_POSITION_DEG = -90.0;
 
-  private static final double NET_POSITION_DEG = 70.0 - 7.0;
-  private static final double ALGAE_HIGH_POSITION_DEG = 52.5;
-  private static final double ALGAE_LOW_POSITION_DEG = -58.0;
+  private static final double NET_POSITION_DEG = 72.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = 57.5;
+  private static final double ALGAE_LOW_POSITION_DEG = -56.0;
   private static final double ALGAE_FLOOR_POSITION_DEG = -55.0;
   public static final double ALGAE_STOW_POSITION_DEG = -85.0;
 
