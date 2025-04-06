@@ -18,7 +18,7 @@ public class Superstructure implements Subsystem {
   private final Logger m_logger;
 
   private final SolidSignaler m_algaeSignaler =
-      new SolidSignaler(Colors.CYAN, 100, SignalerInfo.ALGE_MODE_SIGNALER_PRIORITY);
+      new SolidSignaler(Colors.CYAN, 100, SignalerInfo.ALGAE_MODE_SIGNALER_PRIORITY);
 
   private State m_state = State.Manual;
   private State m_lastState = State.Manual;
