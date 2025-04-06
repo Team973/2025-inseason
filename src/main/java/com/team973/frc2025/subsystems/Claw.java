@@ -144,7 +144,7 @@ public class Claw implements Subsystem {
   }
 
   public void coralScoredLED() {
-    // TODO: Add back the algee sensor once tunned
+    // TODO: Add back the algae sensor once tunned
     if (getSeesCoral() || getHasAlgae()) {
       m_clawHasPeiceSignaler.enable();
     } else {
@@ -231,7 +231,7 @@ public class Claw implements Subsystem {
     m_logger.log("target hold postion", m_targetHoldPosition);
     m_logger.log("target rotations hit", motorAtTarget());
     m_logger.log("mode", m_mode.toString());
-    m_logger.log("AlgeeCANdistance", m_clawAlgaeSensor.getDistance().getValueAsDouble());
+    m_logger.log("AlgaeCANdistance", m_clawAlgaeSensor.getDistance().getValueAsDouble());
 
     SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
   }
