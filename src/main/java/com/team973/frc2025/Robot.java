@@ -82,7 +82,8 @@ public class Robot extends TimedRobot {
           m_arm,
           m_wrist,
           m_driveController,
-          m_logger.subLogger("superstructure"));
+          m_logger.subLogger("superstructure"),
+          m_candleManger);
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_superstructure);

@@ -1,5 +1,7 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.shared.RobotInfo.Colors;
+import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
@@ -14,6 +16,9 @@ public class Superstructure implements Subsystem {
   private final DriveController m_driveController;
 
   private final Logger m_logger;
+
+  private final SolidSignaler m_algaeSignaler =
+      new SolidSignaler(Colors.CYAN, 100, SignalerInfo.ALGE_MODE_SIGNALER_PRIORITY);
 
   private State m_state = State.Manual;
   private State m_lastState = State.Manual;
@@ -58,7 +63,8 @@ public class Superstructure implements Subsystem {
       Arm arm,
       Wrist wrist,
       DriveController driveController,
-      Logger logger) {
+      Logger logger,
+      CANdleManger candle) {
     m_claw = claw;
     m_climb = climb;
     m_elevator = elevator;
@@ -67,6 +73,8 @@ public class Superstructure implements Subsystem {
     m_driveController = driveController;
 
     m_logger = logger;
+
+    candle.addSignaler(m_algaeSignaler);
   }
 
   public void setState(State state) {
@@ -177,6 +185,12 @@ public class Superstructure implements Subsystem {
     m_elevator.syncSensors();
     m_arm.syncSensors();
     m_wrist.syncSensors();
+
+    if (m_gamePieceMode == GamePiece.Algae) {
+      m_algaeSignaler.enable();
+    } else {
+      m_algaeSignaler.disable();
+    }
   }
 
   private void armTargetReefLevel() {
