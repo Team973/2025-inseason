@@ -155,6 +155,7 @@ public class Robot extends TimedRobot {
     m_logger.log("Ready To Score", m_readyToScore.get());
     m_logger.log("Ready To Back Off", m_readyToBackOff.get());
     m_logger.log("Get Alliance Cache Call Count", AllianceCache.m_numberOfGetCalls.get());
+    m_logger.log("Match Time", Timer.getMatchTime());
   }
 
   private void updateJoysticks() {
@@ -379,13 +380,15 @@ public class Robot extends TimedRobot {
         m_superstructure.setManualIntake(true);
       }
 
-      if (m_coDriverStick.getRightTriggerPressed()) {
-        m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
-        m_superstructure.setState(Superstructure.State.Climb);
-      } else if (m_coDriverStick.getLeftTriggerPressed()) {
-        m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
-      } else if (Math.abs(climbStick) > 0.25) {
-        m_superstructure.incrementClimbTarget(climbStick);
+      if (Timer.getMatchTime() < 45.0) {
+        if (m_coDriverStick.getRightTriggerPressed()) {
+          m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
+          m_superstructure.setState(Superstructure.State.Climb);
+        } else if (m_coDriverStick.getLeftTriggerPressed()) {
+          m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
+        } else if (Math.abs(climbStick) > 0.25) {
+          m_superstructure.incrementClimbTarget(climbStick);
+        }
       }
 
       if (m_coDriverStick.getStartButtonPressed()) {
