@@ -118,6 +118,8 @@ public class Robot extends TimedRobot {
   private final double m_lowBatteryTimeOutMs = 1000.0;
   private final double m_lowBatterMimiumVoltage = 12.1;
 
+  private boolean m_climbReachedHorizontal = false;
+
   public static enum ControlStatus {
     HighBattery,
     LowBattery,
@@ -384,7 +386,9 @@ public class Robot extends TimedRobot {
         if (m_coDriverStick.getRightTriggerPressed()) {
           m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
           m_superstructure.setState(Superstructure.State.Climb);
-        } else if (m_coDriverStick.getLeftTriggerPressed()) {
+
+          m_climbReachedHorizontal = true;
+        } else if (m_coDriverStick.getLeftTriggerPressed() && m_climbReachedHorizontal) {
           m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
         } else if (Math.abs(climbStick) > 0.25) {
           m_superstructure.incrementClimbTarget(climbStick);
