@@ -65,6 +65,7 @@ public class DriveWithLimelight extends DriveComposable {
     D,
     E,
     F,
+    Net,
     Processor
   }
 
