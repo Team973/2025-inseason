@@ -312,6 +312,8 @@ public class DriveWithLimelight extends DriveComposable {
             TargetPositions.F_L_1);
       case Processor:
         return TargetPositions.PROCESSOR;
+      case Net:
+        return TargetPositions.NET;
       default:
         throw new IllegalArgumentException("Invalid reef face: " + m_targetReefFace);
     }
