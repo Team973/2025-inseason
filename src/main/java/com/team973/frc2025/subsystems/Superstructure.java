@@ -24,7 +24,6 @@ public class Superstructure implements Subsystem {
   private State m_lastState = State.Manual;
 
   private GamePiece m_gamePieceMode = GamePiece.Coral;
-
   private ReefLevel m_targetReefLevel = ReefLevel.L_1;
 
   private boolean m_manualScore = false;
@@ -48,6 +47,7 @@ public class Superstructure implements Subsystem {
     AlgaeLow,
     AlgaeFloor,
     Net,
+    Processor,
     Horizontal
   }
 
@@ -157,7 +157,12 @@ public class Superstructure implements Subsystem {
       return !getSeesCoral();
     }
 
-    return getHasAlgae();
+    // TODO
+    // else if (m_algaeMode == AlgaeMode.Processor) {
+    //   return !m_claw.getHasAlgae();
+    // }
+
+    return m_claw.getHasAlgae();
   }
 
   public void log() {
@@ -299,6 +304,10 @@ public class Superstructure implements Subsystem {
     }
   }
 
+  public boolean getHasAlgae() {
+    return m_claw.getHasAlgae();
+  }
+
   private ReefLevel getAlgaePresetFromReefFace(ReefFace face) {
     return switch (face) {
       case A, C, E -> ReefLevel.AlgaeHigh;
@@ -309,10 +318,6 @@ public class Superstructure implements Subsystem {
 
   public ReefLevel getTargetReefLevel() {
     return m_targetReefLevel;
-  }
-
-  public boolean getHasAlgae() {
-    return m_claw.getHasAlgae();
   }
 
   public void update() {
@@ -372,7 +377,9 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case Scoring:
-            if (m_manualScore && m_gamePieceMode == GamePiece.Coral) {
+            if (m_manualScore
+                && (m_gamePieceMode
+                    == GamePiece.Coral /* || m_algaeMode == AlgaeMode.Processor*/)) {
               clawScore();
             }
 

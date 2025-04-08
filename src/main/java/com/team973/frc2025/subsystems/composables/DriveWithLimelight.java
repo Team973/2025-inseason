@@ -64,7 +64,8 @@ public class DriveWithLimelight extends DriveComposable {
     C,
     D,
     E,
-    F
+    F,
+    Processor
   }
 
   public enum TargetStage {
@@ -84,12 +85,15 @@ public class DriveWithLimelight extends DriveComposable {
     private static final Translation2d RIGHT_REEF_APPROACH_TARGET =
         new Translation2d(REEF_WIDTH_METERS / 2.0, 1.01);
     private static final Translation2d L_1_REEF_APPROACH_TARGET = new Translation2d(0.0, 1.01);
-    private static final double REEF_SCORING_DIST = 0.56;
 
     private static final Translation2d ALGAE_APPROACH_TARGET = new Translation2d(0, 0.9);
     private static final double ALGAE_PICKUP_DIST = 0.55;
 
     private static final Translation2d HP_APPROACH_TARGET = new Translation2d(0.0, 0.5);
+    private static final Translation2d PROCESSOR_APPROACH_TARGET = new Translation2d(0.0, 1.01);
+
+    private static final double REEF_SCORING_DIST = 0.56;
+    private static final double PROCESSOR_SCORING_DIST = 0.3175;
 
     public static final TargetPositionRelativeToAprilTag TEST_ONE =
         new TargetPositionRelativeToAprilTag(
@@ -104,6 +108,14 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag HPR =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(2), HP_APPROACH_TARGET, 0.0, Rotation2d.fromDegrees(180));
+
+    public static final TargetPositionRelativeToAprilTag PROCESSOR =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(16),
+            PROCESSOR_APPROACH_TARGET,
+            PROCESSOR_SCORING_DIST,
+            new Rotation2d());
+
     public static final TargetPositionRelativeToAprilTag A_L =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), LEFT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
@@ -288,6 +300,8 @@ public class DriveWithLimelight extends DriveComposable {
             TargetPositions.F_ALGAE,
             TargetPositions.F_R,
             TargetPositions.F_L_1);
+      case Processor:
+        return TargetPositions.PROCESSOR;
       default:
         throw new IllegalArgumentException("Invalid reef face: " + m_targetReefFace);
     }
