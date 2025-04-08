@@ -10,7 +10,7 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
-public abstract class DownloadLimelightLeftConfig extends DefaultTask {
+public abstract class DownloadLimelightRightConfig extends DefaultTask {
 	private String fileName = "config"
 
 	@Option(option = "file-name", description = "The name for the config file.")
@@ -21,7 +21,7 @@ public abstract class DownloadLimelightLeftConfig extends DefaultTask {
 	@TaskAction
   void downloadLimelightLeftConfig() {
 		try {
-			URL url = new URL("http://10.9.73.13:5807/pipeline-default")
+			URL url = new URL("http://10.9.73.12:5807/pipeline-default")
 			HttpURLConnection con = (HttpURLConnection) url.openConnection()
 			con.setRequestMethod("GET")
 			int responseCode = con.getResponseCode()
@@ -40,7 +40,7 @@ public abstract class DownloadLimelightLeftConfig extends DefaultTask {
 
 				reader.close()
 
-				File configFile = new File("config/limelight-left/" + fileName + ".txt")
+				File configFile = new File("config/limelight-right/" + fileName + ".txt")
 				configFile.createNewFile()
 
 				FileWriter writer = new FileWriter(configFile)

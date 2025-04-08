@@ -13,6 +13,10 @@ def ROBOT_MAIN_CLASS = "com.team973.frc2025.Main"
 
 tasks.register("downloadLog", DownloadLog)
 tasks.register("downloadLimelightLeftConfig", DownloadLimelightLeftConfig)
+tasks.register("uploadLimelightLeftConfig", UploadLimelightLeftConfig)
+
+tasks.register("downloadLimelightRightConfig", DownloadLimelightRightConfig)
+tasks.register("uploadLimelightRightConfig", UploadLimelightRightConfig)
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
