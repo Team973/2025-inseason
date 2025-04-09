@@ -65,7 +65,11 @@ public class Elevator implements Subsystem {
   }
 
   private double motorRotationsToHeightInches(double motorPostion) {
-    return motorPostion * ElevatorInfo.MOTOR_GEAR_RATIO * 5.0 * 36.0 * Conversions.Distance.INCH_PER_MM;
+    return motorPostion
+        * ElevatorInfo.MOTOR_GEAR_RATIO
+        * 5.0
+        * 36.0
+        * Conversions.Distance.INCH_PER_MM;
   }
 
   public static class Presets {

@@ -15,7 +15,6 @@ public class CANdleManger implements Subsystem {
 
   public List<ISignaler> m_priortyQue;
 
-
   public CANdleManger(Logger logger) {
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true;
