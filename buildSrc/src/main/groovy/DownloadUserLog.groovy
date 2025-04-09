@@ -5,7 +5,7 @@ public abstract class DownloadUserLog extends DefaultTask {
 	@TaskAction
 	public void downloadUserLog() {
     def robotHostName = "lvuser@roborio-${project.frc.getTeamNumber()}-frc.local"
-		def logPath = "/home/lvuser/FRCUserProgram.log"
+		def logPath = "/home/lvuser/FRC_UserProgram.log"
 
 		def fileSource = "${robotHostName}:${logPath}"
 
