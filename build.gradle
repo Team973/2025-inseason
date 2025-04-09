@@ -164,7 +164,7 @@ tasks.register('printLog') {
         def javaBin = "${System.getProperty("java.home")}/bin/java"
         def classpath = sourceSets.main.runtimeClasspath.asPath
         def mainClass = "com.team973.analysis.MotorDraw"
-        def logPath = "logs/FRC_20250301_013856_CAOC_Q53.wpilog"
+        def logPath = "logs/FRC_20250228_010348_CAOC_P28.wpilog"
         def process = new ProcessBuilder(javaBin, "-cp", classpath, mainClass, logPath)
             .redirectErrorStream(false)
             .start()

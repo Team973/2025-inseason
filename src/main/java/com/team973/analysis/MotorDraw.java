@@ -15,6 +15,7 @@ import java.util.Map;
 public final class MotorDraw {
   private static final DateTimeFormatter m_timeFormatter =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+  private static final double timeDelta = 0.02;
 
   /** Main function. */
   public static void main(String[] args) {
@@ -81,13 +82,11 @@ public final class MotorDraw {
         }
         // **Logged motor measurements**
         if (entry.name.equals(loggedMotor + "Voltage")) {
-          double timeDelta = 0.02;
           VoltageSum = VoltageSum + Math.abs(record.getDouble()) * timeDelta;
           PreviousVoltage = record.getDouble();
           PreviousVoltageTimestamp = record.getTimestamp();
         }
         if (entry.name.equals(loggedMotor + "Stator Current")) {
-          double timeDelta = 0.02;
           StatorSum = StatorSum + record.getDouble() * timeDelta;
           PreviousStator = record.getDouble();
           PreviousStatorTimestamp = record.getTimestamp();
