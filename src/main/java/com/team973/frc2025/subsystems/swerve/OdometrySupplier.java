@@ -46,7 +46,6 @@ public class OdometrySupplier {
 
   private boolean m_started = false;
 
-  private Logger m_logger;
   private Logger m_perfLogger;
 
   public OdometrySupplier(GreyPigeon pigeon, SwerveModule[] swerveModules, Logger logger) {
@@ -56,7 +55,6 @@ public class OdometrySupplier {
 
     m_pigeon = pigeon;
     m_swerveModules = swerveModules;
-    m_logger = logger;
     m_perfLogger = logger.subLogger("perf", 0.25);
     m_loopPeriodTracker = new PerfLogger(m_perfLogger.subLogger("period", 0.25));
     m_loopDurationTracker = new PerfLogger(m_perfLogger.subLogger("duration", 0.25));

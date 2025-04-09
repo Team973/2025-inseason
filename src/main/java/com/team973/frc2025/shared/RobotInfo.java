@@ -118,8 +118,8 @@ public final class RobotInfo {
     public static final int LEFT_MOTOR_ID = 35;
     public static final int CONVEYOR_MOTOR_ID = 34;
 
-    public static final int CONVEYOR_BACK_SENSOR_ID = 2;
-    public static final int CONVEYOR_FRONT_SENSOR_ID = 3;
+    public static final int CONVEYOR_BACK_SENSOR_ID = 3;
+    public static final int CONVEYOR_FRONT_SENSOR_ID = 2;
     public static final int CLAW_ALGAE_CAN_ID = 48;
 
     public static final double CLAW_KS = 0.0;
@@ -162,21 +162,24 @@ public final class RobotInfo {
   }
 
   public static class WristInfo {
-    public static final int MOTOR_ID = 31; // TODO
-    public static final int ENCODER_ID = 0; // TODO
+    public static final int MOTOR_CAN_ID = 31; // TODO
+    public static final int ENCODER_CAN_ID = 0; // TODO
     public static final double HORIZONTAL_POSITION_DEG = 0.0;
 
+    public static final double ENCODER_OFFSET_ROTATIONS = 0.0054;
     public static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
         10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
-    public static final double LEVEL_FOUR_POSITION_DEG = 0.0;
-    public static final double LEVEL_THREE_POSITION_DEG = 0.0;
-    public static final double LEVEL_TWO_POSITION_DEG = -65.0;
-    public static final double LEVEL_ONE_POSITION_DEG = 20.0;
-    public static final double CORAL_STOW_POSITION_DEG = 0.0;
-
-    public static final double ALGAE_HIGH_POSITION_DEG = 0.0;
-    public static final double ALGAE_LOW_POSITION_DEG = 0.0;
-    public static final double ALGAE_STOW_POSITION_DEG = 0.0;
+    public static final double LEVEL_FOUR_POSITION_DEG = -185.0;
+    public static final double LEVEL_THREE_POSITION_DEG = -191.0;
+    public static final double LEVEL_TWO_POSITION_DEG = -54.0;
+    public static final double LEVEL_ONE_POSITION_DEG = 4.0;
+    public static final double CORAL_STOW_POSITION_DEG = -18.0;
+    
+    public static final double NET_POSITION_DEG = -105.0; // -20.0;
+    public static final double ALGAE_HIGH_POSITION_DEG = -149.0;
+    public static final double ALGAE_LOW_POSITION_DEG = -34.0;
+    public static final double ALGAE_FLOOR_POSITION_DEG = -88.0;
+    public static final double ALGAE_STOW_POSITION_DEG = -5.0;
     public static final double WRIST_KS = 0.0;
     public static final double WRIST_KV = 0.0;
     public static final double WRIST_KA = 0.0;

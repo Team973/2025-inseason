@@ -3,6 +3,7 @@ package com.team973.frc2025.subsystems;
 import com.ctre.phoenix.led.*;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +15,8 @@ public class CANdleManger implements Subsystem {
 
   public List<ISignaler> m_priortyQue;
 
-  public CANdleManger() {
+
+  public CANdleManger(Logger logger) {
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true;
     configAll.disableWhenLOS = false;

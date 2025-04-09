@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
@@ -35,8 +36,10 @@ public class Elevator implements Subsystem {
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
+  private double m_netOffset = 0.0;
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
+  private double m_algaeFloorOffset = 0.0;
 
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
   private CANdleManger m_candleManger;
@@ -62,11 +65,21 @@ public class Elevator implements Subsystem {
   }
 
   private double motorRotationsToHeightInches(double motorPostion) {
-    return motorPostion
-        * RobotInfo.ElevatorInfo.MOTOR_GEAR_RATIO
-        * 5.0
-        * 36.0
-        * Conversions.Distance.INCH_PER_MM;
+    return motorPostion * ElevatorInfo.MOTOR_GEAR_RATIO * 5.0 * 36.0 * Conversions.Distance.INCH_PER_MM;
+  }
+
+  public static class Presets {
+    private static final double LEVEL_1 = 0.0;
+    private static final double LEVEL_2 = 17.0;
+    private static final double LEVEL_3 = 2.5;
+    private static final double LEVEL_4 = 27.0;
+    public static final double CORAL_STOW = 0.25;
+
+    private static final double NET = 27.0;
+    private static final double ALGAE_HIGH = 5.0;
+    private static final double ALGAE_LOW = 19.0;
+    private static final double ALGAE_FLOOR = 0.0;
+    public static final double ALGAE_STOW = 1.0;
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
@@ -171,11 +184,19 @@ public class Elevator implements Subsystem {
       case L_4:
         m_levelFourOffset += offset;
         break;
+      case Net:
+        m_netOffset += offset;
+        break;
       case AlgaeHigh:
         m_algaeHighOffset += offset;
         break;
       case AlgaeLow:
         m_algaeLowOffset += offset;
+        break;
+      case AlgaeFloor:
+        m_algaeFloorOffset += offset;
+        break;
+      case Processor:
         break;
       case Horizontal:
         break;
@@ -195,11 +216,19 @@ public class Elevator implements Subsystem {
       case L_3:
         return RobotInfo.ElevatorInfo.LEVEL_3 + m_levelThreeOffset;
       case L_4:
-        return RobotInfo.ElevatorInfo.LEVEL_4 + m_levelFourOffset;
+        return Presets.LEVEL_4 + m_levelFourOffset;
+      case Net:
+        return Presets.NET + m_netOffset;
       case AlgaeHigh:
         return RobotInfo.ElevatorInfo.ALGAE_HIGH + m_algaeHighOffset;
       case AlgaeLow:
-        return RobotInfo.ElevatorInfo.ALGAE_LOW + m_algaeLowOffset;
+        return Presets.ALGAE_LOW + m_algaeLowOffset;
+      case AlgaeFloor:
+        return Presets.ALGAE_FLOOR + m_algaeFloorOffset;
+      case Processor:
+        return Presets.ALGAE_STOW;
+      case Horizontal:
+        return Presets.CORAL_STOW;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
@@ -249,6 +278,7 @@ public class Elevator implements Subsystem {
     m_logger.log("Level 4 Offset", m_levelFourOffset);
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
+    m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
   }
 
   @Override

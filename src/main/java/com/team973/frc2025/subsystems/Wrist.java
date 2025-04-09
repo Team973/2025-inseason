@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -16,17 +17,25 @@ public class Wrist implements Subsystem {
   private final Logger m_logger;
 
   private final GreyTalonFX m_wristMotor;
-  private final GreyCANCoder m_encoder;
+  private final GreyCANCoder m_wristEncoder;
 
   private ControlStatus m_controlStatus = ControlStatus.Manual;
 
-  private double m_levelOneOffset = 0.0;
-  private double m_levelTwoOffset = 0.0;
-  private double m_levelThreeOffset = 0.0;
-  private double m_levelFourOffset = 0.0;
+  private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private double m_algaeHighOffset = 0.0;
-  private double m_algaeLowOffset = 0.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = -185.0;
+  private static final double LEVEL_THREE_POSITION_DEG = -191.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -54.0;
+  private static final double LEVEL_ONE_POSITION_DEG = 4.0;
+
+  public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -18.0;
+  public static final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
+
+  private static final double NET_POSITION_DEG = -105.0; // -20.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = -149.0;
+  private static final double ALGAE_LOW_POSITION_DEG = -34.0;
+  private static final double ALGAE_FLOOR_POSITION_DEG = -88.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -5.0;
 
   private double m_manualWristPower = 0.0;
   private double m_wristTargetPostionDeg = 0.0;
@@ -36,40 +45,39 @@ public class Wrist implements Subsystem {
 
     m_wristMotor =
         new GreyTalonFX(
-            WristInfo.MOTOR_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
-    m_encoder =
+            WristInfo.MOTOR_CAN_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
+    m_wristEncoder =
         new GreyCANCoder(
-            WristInfo.ENCODER_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+            WristInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
     TalonFXConfiguration wristMotorConfig = new TalonFXConfiguration();
-    wristMotorConfig.Slot0.kS = WristInfo.WRIST_KS;
-    wristMotorConfig.Slot0.kV = WristInfo.WRIST_KV;
-    wristMotorConfig.Slot0.kA = WristInfo.WRIST_KA;
-    wristMotorConfig.Slot0.kP = WristInfo.WRIST_KP;
-    wristMotorConfig.Slot0.kI = WristInfo.WRIST_KI;
-    wristMotorConfig.Slot0.kD = WristInfo.WRIST_KD;
-    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
-        WristInfo.WRIST_MOTION_MAGIC_CRUISE_VELOCITY;
-    wristMotorConfig.MotionMagic.MotionMagicAcceleration =
-        WristInfo.WRIST_MOTION_MAGIC_ACCELERATION;
-    wristMotorConfig.MotionMagic.MotionMagicJerk = WristInfo.WRIST_MOTION_MAGIC_JERK;
-    wristMotorConfig.CurrentLimits.StatorCurrentLimit = WristInfo.WRIST_SATOR_CURRENT_LIMIT;
-    wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
-        WristInfo.WRIST_SATOR_CURRENT_LIMIT_ENABLE;
-    wristMotorConfig.CurrentLimits.SupplyCurrentLimit = WristInfo.WRIST_SUPPLY_CURRENT_LIMIT;
-    wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
-        WristInfo.WRIST_SUPPLY_CURRENT_LIMIT_ENABLE;
-    wristMotorConfig.Voltage.PeakForwardVoltage = WristInfo.WRIST_PEAK_FORDWARD_VOLTAGE;
-    wristMotorConfig.Voltage.PeakReverseVoltage = WristInfo.WRIST_PEAK_REVERSE_VOLTAGE;
+    wristMotorConfig.Slot0.kS = 0.0;
+    wristMotorConfig.Slot0.kV = 0.0;
+    wristMotorConfig.Slot0.kA = 0.0;
+    wristMotorConfig.Slot0.kP = 10.0; // 10
+    wristMotorConfig.Slot0.kI = 0.0;
+    wristMotorConfig.Slot0.kD = 0.0;
+    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 51.0; // 51.0;
+    wristMotorConfig.MotionMagic.MotionMagicAcceleration = 590.0; // 80.0;
+    wristMotorConfig.MotionMagic.MotionMagicJerk = 5900.0;
+    wristMotorConfig.CurrentLimits.StatorCurrentLimit = 20.0;
+    wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimit = 15.0;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    wristMotorConfig.Voltage.PeakForwardVoltage = 12.0;
+    wristMotorConfig.Voltage.PeakReverseVoltage = -12.0;
     wristMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     wristMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_wristMotor.setConfig(wristMotorConfig);
+
+    BaseStatusSignal.waitForAll(0.5, m_wristEncoder.getAbsolutePosition());
+
+    m_wristMotor.setPosition(wristDegToMotorRotations(getCanCoderPostion()));
   }
 
   public static enum ControlStatus {
     Manual,
     TargetPostion,
-    Zero,
     Off,
   }
 
@@ -92,46 +100,27 @@ public class Wrist implements Subsystem {
   public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return WristInfo.LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
+        return LEVEL_ONE_POSITION_DEG;
       case L_2:
-        return WristInfo.LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
+        return LEVEL_TWO_POSITION_DEG;
       case L_3:
-        return WristInfo.LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
+        return LEVEL_THREE_POSITION_DEG;
       case L_4:
-        return WristInfo.LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+        return LEVEL_FOUR_POSITION_DEG;
       case AlgaeHigh:
-        return WristInfo.ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
+        return ALGAE_HIGH_POSITION_DEG;
       case AlgaeLow:
-        return WristInfo.ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
+        return ALGAE_LOW_POSITION_DEG;
+      case AlgaeFloor:
+        return ALGAE_FLOOR_POSITION_DEG;
+      case Net:
+        return NET_POSITION_DEG;
+      case Processor:
+        return ALGAE_STOW_POSITION_DEG;
       case Horizontal:
-        return WristInfo.HORIZONTAL_POSITION_DEG;
+        return HORIZONTAL_POSITION_DEG;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
-    }
-  }
-
-  public void incrementOffset(double increment, ReefLevel level) {
-    switch (level) {
-      case L_1:
-        m_levelOneOffset += increment;
-        break;
-      case L_2:
-        m_levelTwoOffset += increment;
-        break;
-      case L_3:
-        m_levelThreeOffset += increment;
-        break;
-      case L_4:
-        m_levelFourOffset += increment;
-        break;
-      case AlgaeHigh:
-        m_algaeHighOffset += increment;
-        break;
-      case AlgaeLow:
-        m_algaeLowOffset += increment;
-        break;
-      case Horizontal:
-        break;
     }
   }
 
@@ -142,6 +131,12 @@ public class Wrist implements Subsystem {
   public void setMotorManualOutput(double joystick) {
     m_controlStatus = ControlStatus.Manual;
     m_manualWristPower = joystick;
+  }
+
+  private double getCanCoderPostion() {
+    return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()
+            - WristInfo.ENCODER_OFFSET_ROTATIONS)
+        * 360.0;
   }
 
   public void setTargetDeg(double setPostionDeg) {
@@ -169,9 +164,6 @@ public class Wrist implements Subsystem {
         m_wristMotor.setControl(
             ControlMode.MotionMagicVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
         break;
-      case Zero:
-        m_wristMotor.setControl(ControlMode.DutyCycleOut, -0.1);
-        break;
       case Off:
         m_wristMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
         break;
@@ -181,7 +173,7 @@ public class Wrist implements Subsystem {
   @Override
   public void log() {
     m_wristMotor.log();
-    m_encoder.log();
+    m_wristEncoder.log();
 
     m_logger.log("wristDegPostion", getWristPostionDeg());
     m_logger.log("wristTargetPostionDeg", m_wristTargetPostionDeg);
@@ -190,6 +182,7 @@ public class Wrist implements Subsystem {
         "motorwristErrorDeg",
         motorRotationsToWristDeg(m_wristMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("manualPower", m_manualWristPower);
+    m_logger.log("getCanCoderPostion", getCanCoderPostion());
   }
 
   @Override

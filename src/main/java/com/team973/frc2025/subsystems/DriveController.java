@@ -68,11 +68,15 @@ public class DriveController implements Subsystem {
     m_currentChassisSpeeds = new ChassisSpeeds();
   }
 
-  public void setControllerOption(ControllerOption controllerOption) {
+  public synchronized void setControllerOption(ControllerOption controllerOption) {
     if (controllerOption != m_controllerOption) {
-      m_controllerOption = controllerOption;
       m_driveWithJoysticks.reset(m_drive.getPoseEstimator().getPoseMeters().getRotation());
-      getComposableFromControllerOption(controllerOption).init();
+
+      getComposableFromControllerOption(m_controllerOption).exit();
+
+      getComposableFromControllerOption(controllerOption).init(m_currentChassisSpeeds);
+
+      m_controllerOption = controllerOption;
     }
   }
 
@@ -123,7 +127,7 @@ public class DriveController implements Subsystem {
   }
 
   private DriveComposable getComposableFromControllerOption(ControllerOption option) {
-    switch (m_controllerOption) {
+    switch (option) {
       case DriveWithJoysticks:
         return m_driveWithJoysticks;
       case DriveWithTrajectory:
@@ -155,16 +159,14 @@ public class DriveController implements Subsystem {
 
   @Override
   public synchronized void update() {
-    ChassisSpeeds currentChassisSpeeds = new ChassisSpeeds();
-
-    DriveComposable currentComposable = getComposableFromControllerOption(m_controllerOption);
-
-    currentChassisSpeeds = currentComposable.getOutput();
+    ChassisSpeeds currentChassisSpeeds =
+        getComposableFromControllerOption(m_controllerOption).getOutput();
 
     if (currentChassisSpeeds != null) {
       m_drive.setChassisSpeeds(currentChassisSpeeds);
       m_currentChassisSpeeds = currentChassisSpeeds;
     }
+
     m_drive.update();
   }
 

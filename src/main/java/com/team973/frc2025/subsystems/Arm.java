@@ -1,10 +1,13 @@
 package com.team973.frc2025.subsystems;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.shared.RobotInfo.ArmInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
+import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
@@ -17,6 +20,8 @@ public class Arm implements Subsystem {
   private ControlStatus m_controlStatus = ControlStatus.Off;
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
+
+  private final GreyCANCoder m_armEncoder;
   // We want to track the transition from hall=false to hall=true; when the robot
   // first boots up, we don't really know what the previous hall state was, so we
   // assume it was true to avoid false positive.
@@ -26,63 +31,84 @@ public class Arm implements Subsystem {
   private final SolidSignaler m_armHomedSigaler =
       new SolidSignaler(
           RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
+  private static final double ARM_HOMING_POSTION_DEG = -90.0;
+  private static final double HORIZONTAL_POSITION_DEG = 0.0;
+
+  private static final double LEVEL_FOUR_POSITION_DEG = 61.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 65.0;
+  private static final double LEVEL_TWO_POSITION_DEG = -61.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -69.0;
+  public static final double CORAL_STOW_POSITION_DEG = -87.0;
+
+  private static final double NET_POSITION_DEG = 70.0;
+  private static final double ALGAE_HIGH_POSITION_DEG = 52.5;
+  private static final double ALGAE_LOW_POSITION_DEG = -58.0;
+  private static final double ALGAE_FLOOR_POSITION_DEG = -55.0;
+  public static final double ALGAE_STOW_POSITION_DEG = -85.0;
+
+  private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
+  private static final double FEED_FORWARD_MAX_VOLT = 0.32;
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
   private double m_levelFourOffset = 0.0;
 
+  private double m_netOffset = 0.0;
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
+  private double m_algaeFloorOffset = 0.0;
 
   private CANdleManger m_candleManger;
 
   public static enum ControlStatus {
     Manual,
     TargetPostion,
-    Zero,
     Off,
   }
 
   private double armDegToMotorRotations(double armPostionDeg) {
-    return armPostionDeg / 360.0 / RobotInfo.ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
+    return armPostionDeg / 360.0 / ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
 
   private double motorRotationsToArmDeg(double motorPostion) {
-    return motorPostion * RobotInfo.ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
+    return motorPostion * ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
   public Arm(Logger logger, CANdleManger candle) {
     m_logger = logger;
     m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
     m_candleManger = candle;
+    m_armEncoder =
+        new GreyCANCoder(
+            ArmInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+
     m_candleManger.addSignaler(m_armHomedSigaler);
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
-    armMotorConfig.Slot0.kS = RobotInfo.ArmInfo.ARM_KS;
-    armMotorConfig.Slot0.kV = RobotInfo.ArmInfo.ARM_KV;
-    armMotorConfig.Slot0.kA = RobotInfo.ArmInfo.ARM_KA;
-    armMotorConfig.Slot0.kP = RobotInfo.ArmInfo.ARM_KP;
-    armMotorConfig.Slot0.kI = RobotInfo.ArmInfo.ARM_KI;
-    armMotorConfig.Slot0.kD = RobotInfo.ArmInfo.ARM_KD;
-    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
-        RobotInfo.ArmInfo.ARM_MOTION_MAGIC_CRUISE_VELOCITY;
-    armMotorConfig.MotionMagic.MotionMagicAcceleration =
-        RobotInfo.ArmInfo.ARM_MOTION_MAGIC_ACCELERATION;
-    armMotorConfig.MotionMagic.MotionMagicJerk = RobotInfo.ArmInfo.ARM_MOTION_MAGIC_JERK;
-    armMotorConfig.CurrentLimits.StatorCurrentLimit = RobotInfo.ArmInfo.ARM_SATOR_CURRENT_LIMIT;
-    armMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
-        RobotInfo.ArmInfo.ARM_SATOR_CURRENT_LIMIT_ENABLE;
-    armMotorConfig.CurrentLimits.SupplyCurrentLimit = RobotInfo.ArmInfo.ARM_SUPPLY_CURRENT_LIMIT;
-    armMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
-        RobotInfo.ArmInfo.ARM_SUPPLY_CURRENT_LIMIT_ENABLE;
-    armMotorConfig.Voltage.PeakForwardVoltage = RobotInfo.ArmInfo.ARM_PEAK_FORDWARD_VOLTAGE;
-    armMotorConfig.Voltage.PeakReverseVoltage = RobotInfo.ArmInfo.ARM_PEAK_REVERSE_VOLTAGE;
+    armMotorConfig.Slot0.kS = 0.0;
+    armMotorConfig.Slot0.kV = 0.0;
+    armMotorConfig.Slot0.kA = 0.0;
+    armMotorConfig.Slot0.kP = 2.0;
+    armMotorConfig.Slot0.kI = 0.0;
+    armMotorConfig.Slot0.kD = 0.0;
+    armMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 120.0;
+    armMotorConfig.MotionMagic.MotionMagicAcceleration = 230.0;
+    armMotorConfig.MotionMagic.MotionMagicJerk = 0.0;
+    armMotorConfig.CurrentLimits.StatorCurrentLimit = 60.0;
+    armMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    armMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
+    armMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    armMotorConfig.Voltage.PeakForwardVoltage = 12.0;
+    armMotorConfig.Voltage.PeakReverseVoltage = -12.0;
     // clockwise postive when looking at it from the shaft, is on inside of the left
     // point so that
     // the shaft is pointing left, up is positve, gear ratio is odd
     armMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     armMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_armMotor.setConfig(armMotorConfig);
-    m_armMotor.setPosition(armDegToMotorRotations(RobotInfo.ArmInfo.ARM_HOMING_POSTION_DEG));
+
+    BaseStatusSignal.waitForAll(0.5, m_armEncoder.getAbsolutePosition());
+
+    m_armMotor.setPosition(armDegToMotorRotations(getCanCoderPostionDeg()));
   }
 
   private boolean hallSensor() {
@@ -100,6 +126,12 @@ public class Arm implements Subsystem {
   public void setMotorManualOutput(double joystick) {
     m_controlStatus = ControlStatus.Manual;
     m_manualArmPower = joystick * 0.1;
+  }
+
+  private double getCanCoderPostionDeg() {
+    return (m_armEncoder.getAbsolutePosition().getValueAsDouble()
+            - ArmInfo.ENCODER_OFFSET_ROTATIONS)
+        * 360.0;
   }
 
   public void setTargetDeg(double setPostionDeg) {
@@ -129,12 +161,15 @@ public class Arm implements Subsystem {
       case L_3:
         return RobotInfo.ArmInfo.LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case L_4:
-        return RobotInfo.ArmInfo.LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+        return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+      case Net:
+        return NET_POSITION_DEG + m_netOffset;
       case AlgaeHigh:
         return RobotInfo.ArmInfo.ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
-        return RobotInfo.ArmInfo.ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
-
+        return ALGAE_STOW_POSITION_DEG;
+      case Horizontal:
+        return HORIZONTAL_POSITION_DEG;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
@@ -148,8 +183,7 @@ public class Arm implements Subsystem {
   public void update() {
     switch (m_controlStatus) {
       case Manual:
-        m_armMotor.setControl(
-            ControlMode.VoltageOut, (m_manualArmPower * 12.0) + getFeedForwardTargetAngle(), 0);
+        m_armMotor.setControl(ControlMode.VoltageOut, (m_manualArmPower * 12.0), 0);
         break;
       case TargetPostion:
         m_armMotor.setControl(
@@ -157,9 +191,6 @@ public class Arm implements Subsystem {
             armDegToMotorRotations(m_armTargetPostionDeg),
             getFeedForwardTargetAngle(),
             0);
-        break;
-      case Zero:
-        m_armMotor.setControl(ControlMode.DutyCycleOut, -0.1);
         break;
       case Off:
         m_armMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
@@ -189,11 +220,19 @@ public class Arm implements Subsystem {
       case L_4:
         m_levelFourOffset += increment;
         break;
+      case Net:
+        m_netOffset += increment;
+        break;
       case AlgaeHigh:
         m_algaeHighOffset += increment;
         break;
       case AlgaeLow:
         m_algaeLowOffset += increment;
+        break;
+      case AlgaeFloor:
+        m_algaeFloorOffset += increment;
+        break;
+      case Processor:
         break;
       case Horizontal:
         break;
@@ -202,8 +241,10 @@ public class Arm implements Subsystem {
 
   @Override
   public void log() {
-    m_logger.log("armDegPostion", getArmPostionDeg());
     m_armMotor.log();
+    m_armEncoder.log();
+
+    m_logger.log("armDegPostion", getArmPostionDeg());
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
     m_logger.log("armMode", m_controlStatus.toString());
     m_logger.log(
@@ -213,12 +254,16 @@ public class Arm implements Subsystem {
     m_logger.log("manualPower", m_manualArmPower);
     m_logger.log("HallsensorArm", hallSensor());
 
+    m_logger.log("getCanCoderPostion", getCanCoderPostionDeg());
+
     m_logger.log("Level 1 Offset", m_levelOneOffset);
     m_logger.log("Level 2 Offset", m_levelTwoOffset);
     m_logger.log("Level 3 Offset", m_levelThreeOffset);
     m_logger.log("Level 4 Offset", m_levelFourOffset);
+    m_logger.log("Net Offset", m_netOffset);
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
+    m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
   }
 
   @Override
