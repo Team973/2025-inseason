@@ -33,6 +33,10 @@ public final class RobotInfo {
   public static class ArmInfo {
     public static final int HALL_SENSOR_ID = 1;
 
+    public static final int ENCODER_CAN_ID = 32;
+
+    public static final double ENCODER_OFFSET_ROTATIONS = -0.02588;
+
     public static final double ARM_HOMING_POSTION_DEG = -90.0;
 
     public static final double LEVEL_FOUR_POSITION_DEG = 64.0; // 79
@@ -98,9 +102,9 @@ public final class RobotInfo {
     public static final double ELEVATOR_V_KD = 0.0;
 
     public static final double ELEVATOR_MOTION_MAGIC_CRUISE_VELOCITY =
-        32.0; // 32.0; // 64; // 32; // 16;
+        65.0; // 32.0; // 64; // 32; // 16;
     public static final double ELEVATOR_MOTION_MAGIC_ACCELERATION =
-        300.0; // 40.0; // 500; // 40; // 20;
+        390.0; // 40.0; // 500; // 40; // 20;
     public static final double ELEVATOR_MOTION_MAGIC_JERK = 2000.0;
 
     public static final double ELEVATOR_SATOR_CURRENT_LIMIT = 60.0;
