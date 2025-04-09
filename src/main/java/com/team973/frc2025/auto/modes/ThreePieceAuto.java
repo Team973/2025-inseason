@@ -15,33 +15,26 @@ import com.team973.lib.util.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class RightSideAuto extends AutoMode {
-  private boolean m_babybird;
-
-  public RightSideAuto(
+public class ThreePieceAuto extends AutoMode {
+  public ThreePieceAuto(
       Logger logger, Superstructure superstructure, DriveController drive, boolean doBabyBird) {
     super(
         logger,
-        new Pose2d(7.3, 1.3, Rotation2d.fromDegrees(180)),
+        new Pose2d(7.18, 5.6, Rotation2d.fromDegrees(180)),
         new BranchCommand(
-            logger, doBabyBird, new DriveTrajectoryCommand(drive, "Babybird-R"), new NoOpCommand()),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.C, ReefLevel.L_4, ReefSide.Right),
-        new DriveTrajectoryCommand(drive, "C-HP"),
+            logger, doBabyBird, new DriveTrajectoryCommand(drive, "Babybird-L"), new NoOpCommand()),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.F, ReefLevel.L_4, ReefSide.Right),
+        new DriveTrajectoryCommand(drive, "F-HPL"),
         new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
-        new DriveTrajectoryCommand(drive, "HP-B"),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Left),
-        new DriveTrajectoryCommand(drive, "B-HP"),
+        new DriveTrajectoryCommand(drive, "HPL-A"),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.A, ReefLevel.L_4, ReefSide.Right),
+        new DriveTrajectoryCommand(drive, "A-HPL"),
         new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
-        new DriveTrajectoryCommand(drive, "HP-B"),
-        new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Right));
-    m_babybird = doBabyBird;
+        new DriveTrajectoryCommand(drive, "HPL-A"),
+        new ScoreCoralCommand(drive, superstructure, ReefFace.A, ReefLevel.L_4, ReefSide.Left));
   }
 
   public String getName() {
-    if (m_babybird) {
-      return "Right Side Babybird Auto";
-    } else {
-      return "Right Side Auto";
-    }
+    return "Three Piece Auto";
   }
 }
