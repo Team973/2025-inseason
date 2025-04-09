@@ -4,6 +4,7 @@ import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.Drive;
+import com.team973.lib.util.AllianceCache;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.DriveComposable;
 import com.team973.lib.util.GreyHolonomicDriveController;
@@ -14,7 +15,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Optional;
 
@@ -75,7 +75,9 @@ public class DriveWithTrajectory extends DriveComposable {
     } else {
       logSample = m_currentSample;
     }
-    m_logger.log("samplePose", new double[] {logSample.x, logSample.y, logSample.heading});
+    m_logger.log(
+        "samplePose",
+        new Pose2d(logSample.x, logSample.y, Rotation2d.fromRadians(logSample.heading)));
     m_logger.log("sample/X", logSample.x);
     m_logger.log("sample/y", logSample.y);
     m_logger.log("sample/vx", logSample.vx);
@@ -91,36 +93,19 @@ public class DriveWithTrajectory extends DriveComposable {
     m_logger.log("Theta Velocity Error", m_controller.getThetaController().getVelocityError());
   }
 
-  public void init() {
-    maybeInitAlliance();
+  public void init(ChassisSpeeds previousChassisSpeeds) {
     m_controller.getThetaController().reset(m_currentPose.getRotation().getRadians());
   }
 
-  private boolean m_allianceInitialized = false;
-
-  private Alliance m_alliance;
-
-  private void maybeInitAlliance() {
-    if (m_allianceInitialized) {
-      return;
-    }
-    Optional<Alliance> alliance = DriverStation.getAlliance();
-    if (!alliance.isPresent()) {
-      return;
-    }
-    m_allianceInitialized = true;
-    m_alliance = alliance.get();
-  }
+  public void exit() {}
 
   @Override
   public synchronized ChassisSpeeds getOutput() {
-    maybeInitAlliance();
-
     if (m_trajectory == null) {
       return new ChassisSpeeds();
     }
     Optional<SwerveSample> sample =
-        m_trajectory.sampleAt(getTimeSecFromStart(), m_alliance == Alliance.Red);
+        m_trajectory.sampleAt(getTimeSecFromStart(), AllianceCache.Get().get() == Alliance.Red);
 
     if (m_currentPose == null || sample.isEmpty()) {
       return new ChassisSpeeds();
