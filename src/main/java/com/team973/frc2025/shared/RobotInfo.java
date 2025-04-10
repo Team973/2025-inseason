@@ -204,6 +204,11 @@ public final class RobotInfo {
                 MAX_VELOCITY_METERS_PER_SECOND * 0.65, MAX_ACCELERATION_METERS_PER_SECOND * 0.65)
             .setKinematics(SWERVE_KINEMATICS)
             .setReversed(true);
+}
+
+  public static class StowState {
+    public static final boolean HIGH = true;
+    public static final boolean LOW = false;
   }
 
   public static class Colors {

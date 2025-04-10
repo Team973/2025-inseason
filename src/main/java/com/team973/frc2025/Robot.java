@@ -346,6 +346,22 @@ public class Robot extends TimedRobot {
         m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.Net);
       }
 
+      if (m_coDriverStick.getRightStickButtonPressed()){
+        if (!m_superstructure.getRightStickButtonPressed()){
+          m_superstructure.setRightStickButtonPressed(true);
+          if (m_superstructure.getStowPosition() == RobotInfo.StowState.LOW && m_claw.getSeesCoral()){
+            m_superstructure.setStowPosition(RobotInfo.StowState.HIGH);
+          } else {
+            m_superstructure.setStowPosition(RobotInfo.StowState.LOW);
+          }
+        }
+      } else {
+        m_superstructure.setRightStickButtonPressed(false);
+      }
+
+      
+
+
       if (m_coDriverStick.getRightBumperButtonPressed()) {
         m_superstructure.toggleGamePieceMode();
       }
