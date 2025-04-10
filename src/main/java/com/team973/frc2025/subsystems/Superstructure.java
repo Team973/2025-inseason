@@ -220,13 +220,14 @@ public class Superstructure implements Subsystem {
   }
 
   private void wristStow() {
-    if (m_gamePieceMode == GamePiece.Coral) {
-      m_wrist.setTargetDeg(Wrist.WITHOUT_CORAL_STOW_POSITION_DEG);
+    if (m_claw.getSeesCoral()) {
+      m_wrist.setTargetDeg(Wrist.WITH_CORAL_STOW_POSTION_DEG);
     } else {
-      m_wrist.setTargetDeg(Wrist.ALGAE_STOW_POSITION_DEG);
+      m_wrist.setTargetDeg(Wrist.WITHOUT_CORAL_STOW_POSITION_DEG);
     }
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
+
 
   private void wristTargetReefLevel() {
     m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel));
