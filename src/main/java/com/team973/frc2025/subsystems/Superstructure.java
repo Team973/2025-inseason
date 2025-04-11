@@ -122,7 +122,8 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG
+        && m_targetReefLevelSupplier.get() != ReefLevel.Processor) {
       return false;
     }
 
@@ -130,7 +131,8 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW) {
+    if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW
+        && m_targetReefLevelSupplier.get() != ReefLevel.Processor) {
       return false;
     }
 
@@ -139,7 +141,8 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG) {
+    if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG
+        && m_targetReefLevelSupplier.get() != ReefLevel.Processor) {
       return false;
     }
 
