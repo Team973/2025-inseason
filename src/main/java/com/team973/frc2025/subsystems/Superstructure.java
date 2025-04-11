@@ -275,9 +275,12 @@ public class Superstructure implements Subsystem {
   public void toggleGamePieceMode() {
     if (m_gamePieceMode == GamePiece.Coral) {
       setGamePieceMode(GamePiece.Algae);
-      setTargetReefLevel(
-          getAlgaePresetFromReefFace(
-              m_driveController.getDriveWithLimelight().getTargetReefFace()));
+      if (m_driveController.getDriveWithLimelight().getTargetReefFace() != ReefFace.Net
+          && m_driveController.getDriveWithLimelight().getTargetReefFace() != ReefFace.Processor) {
+        setTargetReefLevel(
+            getAlgaePresetFromReefFace(
+                m_driveController.getDriveWithLimelight().getTargetReefFace()));
+      }
     } else {
       setGamePieceMode(GamePiece.Coral);
       m_driveController
