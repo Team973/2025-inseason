@@ -39,8 +39,8 @@ public class Arm implements Subsystem {
   private static final double LEVEL_THREE_POSITION_DEG = 65.0;
   private static final double LEVEL_TWO_POSITION_DEG = -61.0;
   private static final double LEVEL_ONE_POSITION_DEG = -69.0;
-  public static final double WITH_CORAL_STOW_POSITION_DEG = -87.0;
-  public static final double WITHOUT_CORAL_STOW_POSITION_DEG = 0.0;
+  public static final double HIGH_CORAL_STOW_POSITION_DEG = -87.0;
+  public static final double INTAKE_CORAL_STOW_POSITION_DEG = 0.0;
 
   private static final double NET_POSITION_DEG = 70.0;
   private static final double ALGAE_HIGH_POSITION_DEG = 52.5;
@@ -60,6 +60,7 @@ public class Arm implements Subsystem {
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
   private double m_algaeFloorOffset = 0.0;
+  private double m_stowHighOffset;
 
   private CANdleManger m_candleManger;
 
@@ -164,6 +165,8 @@ public class Arm implements Subsystem {
         return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case L_4:
         return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
+      case StowHigh:
+        return HIGH_CORAL_STOW_POSITION_DEG + m_stowHighOffset;
       case Net:
         return NET_POSITION_DEG + m_netOffset;
       case AlgaeHigh:
@@ -226,6 +229,9 @@ public class Arm implements Subsystem {
       case L_4:
         m_levelFourOffset += increment;
         break;
+      case StowHigh:
+        m_stowHighOffset += increment;
+        break;
       case Net:
         m_netOffset += increment;
         break;
@@ -269,6 +275,7 @@ public class Arm implements Subsystem {
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
     m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
+    m_logger.log("High Stow Offset", m_stowHighOffset);
   }
 
   @Override

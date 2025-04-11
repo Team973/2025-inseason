@@ -28,236 +28,232 @@ public class Superstructure implements Subsystem {
 
   private boolean m_stowState = StowState.LOW;
 
-    public enum State {
-      Manual,
-      Score,
-      Zero,
-      Climb,
-      Off
-    }
-  
-    public enum ReefLevel {
-      L_1,
-      L_2,
-      L_3,
-      L_4,
-      AlgaeHigh,
-      AlgaeLow,
-      AlgaeFloor,
-      Net,
-      Processor,
-      Horizontal
-    }
-  
-    public enum GamePiece {
-      Coral,
-      Algae
-    }
-  
-    public enum AlgaeMode {
-      Reef,
-      Processor
-    }
-  
-    public Superstructure(
-        Claw claw,
-        Climb climb,
-        Elevator elevator,
-        Arm arm,
-        Wrist wrist,
-        DriveController driveController) {
-      m_claw = claw;
-      m_climb = climb;
-      m_elevator = elevator;
-      m_arm = arm;
-      m_wrist = wrist;
-      m_driveController = driveController;
-    }
-  
-    public void setState(State state) {
-      m_state = state;
-    }
-  
-    // public double setStowMode() {
-    //   if (m_claw.getSeesCoral()){
-    //     return
-    //   }
-    // }
-  
-    public void setManualScore(boolean score) {
-      m_manualScore = score;
-    }
-  
-    public void setManualIntake(boolean intake) {
-      m_manualIntake = intake;
-    }
-  
-    public void setTargetReefLevel(ReefLevel coralLevel, ReefLevel algaeLevel) {
-      if (m_gamePieceMode == GamePiece.Coral) {
-        m_targetReefLevel = coralLevel;
-      } else {
-        m_targetReefLevel = algaeLevel;
-      }
-    }
-  
-    public void setTargetReefLevel(ReefLevel level) {
-      m_targetReefLevel = level;
-    }
-  
-    public boolean readyToScore() {
-      if (m_arm.getTargetPosition() == Arm.WITH_CORAL_STOW_POSITION_DEG
-          || m_arm.getTargetPosition() == Arm.WITHOUT_CORAL_STOW_POSITION_DEG) {
-        return false;
-      }
-  
-      if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG) {
-        return false;
-      }
-  
-      if (m_elevator.getTargetPosition() == Elevator.Presets.CORAL_STOW) {
-        return false;
-      }
-  
-      if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW) {
-        return false;
-      }
-  
-      if (m_wrist.getTargetPosition() == Wrist.WITH_CORAL_STOW_POSTION_DEG
-          || m_wrist.getTargetPosition() == Wrist.WITHOUT_CORAL_STOW_POSITION_DEG) {
-        return false;
-      }
-  
-      if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG) {
-        return false;
-      }
-  
-      if (!m_arm.motorAtTargetRotation()) {
-        return false;
-      }
-  
-      if (!m_elevator.motorAtTarget()) {
-        return false;
-      }
-  
-      if (!m_wrist.motorAtTargetRotation()) {
-        return false;
-      }
-  
-      return true;
-    }
-  
-    public boolean getSeesCoral() {
-      return m_claw.getSeesCoral();
-    }
-  
-    public boolean readyToBackOff() {
-      if (m_gamePieceMode == GamePiece.Coral) {
-        return !getSeesCoral();
-      } else if (m_algaeMode == AlgaeMode.Processor) {
-        return !m_claw.getHasAlgae();
-      }
-  
-      return m_claw.getHasAlgae();
-    }
-  
-    public void log() {
-      SmartDashboard.putString("DB/String 0", "Reef Level: " + m_targetReefLevel);
-      SmartDashboard.putString(
-          "DB/String 1",
-          "E: " + String.valueOf(m_elevator.getTargetPositionFromLevel(m_targetReefLevel)));
-      SmartDashboard.putString(
-          "DB/String 2", "A: " + String.valueOf(m_arm.getTargetDegFromLevel(m_targetReefLevel)));
-      SmartDashboard.putString("DB/String 8", m_gamePieceMode.toString());
-  
-      m_claw.log();
-      m_climb.log();
-      m_elevator.log();
-      m_arm.log();
-      m_wrist.log();
-    }
-  
-    public void syncSensors() {
-      m_claw.syncSensors();
-      m_climb.syncSensors();
-      m_elevator.syncSensors();
-      m_arm.syncSensors();
-      m_wrist.syncSensors();
-  
-      if (!getHasAlgae()) {
-        m_algaeMode = AlgaeMode.Reef;
-      } else if (m_finishedPickingUpAlgae && m_state != State.Score) {
-        m_algaeMode = AlgaeMode.Processor;
-      }
-    }
-  
-    private void armTargetReefLevel() {
-      m_arm.setTargetDeg(m_arm.getTargetDegFromLevel(m_targetReefLevel));
-      m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
-    }
-  
-    private void armStow() {
-      if (m_gamePieceMode == GamePiece.Coral) {
-        if (m_stowState == StowState.HIGH) {
-          m_arm.setTargetDeg(Arm.WITH_CORAL_STOW_POSITION_DEG);
-        } else {
-          m_arm.setTargetDeg(Arm.WITHOUT_CORAL_STOW_POSITION_DEG);
-        } 
-      }
-      if (m_gamePieceMode == GamePiece.Algae) {
-        m_arm.setTargetDeg(Arm.ALGAE_STOW_POSITION_DEG);
-       }
-       m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
-  
-      m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
-    }
-  
-    private void elevatorTargetReefLevel() {
-      m_elevator.setTargetPostion(m_elevator.getTargetPositionFromLevel(m_targetReefLevel));
-      m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
-    }
-  
-    private void elevatorStow() {
-      if (m_gamePieceMode == GamePiece.Coral) {
-        m_elevator.setTargetPostion(Elevator.Presets.CORAL_STOW);
-      } else {
-        m_elevator.setTargetPostion(Elevator.Presets.ALGAE_STOW);
-      }
-      m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
-    }
-  
-    private void wristStow() {
-      if (m_stowState == StowState.HIGH) {
-        m_wrist.setTargetDeg(Wrist.WITH_CORAL_STOW_POSTION_DEG);
-      } else {
-        m_wrist.setTargetDeg(Wrist.WITHOUT_CORAL_STOW_POSITION_DEG);
-      }
-      if (m_gamePieceMode == GamePiece.Algae) {
-          m_wrist.setTargetDeg(Wrist.ALGAE_STOW_POSITION_DEG);
-      }
-      m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
-    }
-  
-  
-    private void wristTargetReefLevel() {
-      m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel));
-      m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
-    }
-  
-    public void setRightStickButtonPressed(boolean lastCycleRightStickPressed) {
-      m_lastRightBumperMode = lastCycleRightStickPressed;
+  public enum State {
+    Manual,
+    Score,
+    Zero,
+    Climb,
+    Off
   }
 
-public void setStowPosition(boolean stowPostion ) {
-  m_stowState = stowPostion;
-}
+  public enum ReefLevel {
+    L_1,
+    L_2,
+    L_3,
+    L_4,
+    StowHigh,
+    AlgaeHigh,
+    AlgaeLow,
+    AlgaeFloor,
+    Net,
+    Processor,
+    Horizontal
+  }
 
-public boolean getStowPosition() {
-  return m_stowState;
-}
+  public enum GamePiece {
+    Coral,
+    Algae
+  }
 
-public boolean getRightStickButtonPressed() {
+  public enum AlgaeMode {
+    Reef,
+    Processor
+  }
+
+  public Superstructure(
+      Claw claw,
+      Climb climb,
+      Elevator elevator,
+      Arm arm,
+      Wrist wrist,
+      DriveController driveController) {
+    m_claw = claw;
+    m_climb = climb;
+    m_elevator = elevator;
+    m_arm = arm;
+    m_wrist = wrist;
+    m_driveController = driveController;
+  }
+
+  public void setState(State state) {
+    m_state = state;
+  }
+
+  // public double setStowMode() {
+  //   if (m_claw.getSeesCoral()){
+  //     return
+  //   }
+  // }
+
+  public void setManualScore(boolean score) {
+    m_manualScore = score;
+  }
+
+  public void setManualIntake(boolean intake) {
+    m_manualIntake = intake;
+  }
+
+  public void setTargetReefLevel(ReefLevel coralLevel, ReefLevel algaeLevel) {
+    if (m_gamePieceMode == GamePiece.Coral) {
+      m_targetReefLevel = coralLevel;
+    } else {
+      m_targetReefLevel = algaeLevel;
+    }
+  }
+
+  public void setTargetReefLevel(ReefLevel level) {
+    m_targetReefLevel = level;
+  }
+
+  public boolean readyToScore() {
+    if (m_arm.getTargetPosition() == Arm.HIGH_CORAL_STOW_POSITION_DEG
+        || m_arm.getTargetPosition() == Arm.INTAKE_CORAL_STOW_POSITION_DEG) {
+      return false;
+    }
+
+    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG) {
+      return false;
+    }
+
+    if (m_elevator.getTargetPosition() == Elevator.Presets.CORAL_STOW) {
+      return false;
+    }
+
+    if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW) {
+      return false;
+    }
+
+    if (m_wrist.getTargetPosition() == Wrist.HIGH_CORAL_STOW_POSTION_DEG
+        || m_wrist.getTargetPosition() == Wrist.INTAKE_CORAL_STOW_POSITION_DEG) {
+      return false;
+    }
+
+    if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG) {
+      return false;
+    }
+
+    if (!m_arm.motorAtTargetRotation()) {
+      return false;
+    }
+
+    if (!m_elevator.motorAtTarget()) {
+      return false;
+    }
+
+    if (!m_wrist.motorAtTargetRotation()) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public boolean getSeesCoral() {
+    return m_claw.getSeesCoral();
+  }
+
+  public boolean readyToBackOff() {
+    if (m_gamePieceMode == GamePiece.Coral) {
+      return !getSeesCoral();
+    } else if (m_algaeMode == AlgaeMode.Processor) {
+      return !m_claw.getHasAlgae();
+    }
+
+    return m_claw.getHasAlgae();
+  }
+
+  public void log() {
+    SmartDashboard.putString("DB/String 0", "Reef Level: " + m_targetReefLevel);
+    SmartDashboard.putString(
+        "DB/String 1",
+        "E: " + String.valueOf(m_elevator.getTargetPositionFromLevel(m_targetReefLevel)));
+    SmartDashboard.putString(
+        "DB/String 2", "A: " + String.valueOf(m_arm.getTargetDegFromLevel(m_targetReefLevel)));
+    SmartDashboard.putString("DB/String 8", m_gamePieceMode.toString());
+
+    m_claw.log();
+    m_climb.log();
+    m_elevator.log();
+    m_arm.log();
+    m_wrist.log();
+  }
+
+  public void syncSensors() {
+    m_claw.syncSensors();
+    m_climb.syncSensors();
+    m_elevator.syncSensors();
+    m_arm.syncSensors();
+    m_wrist.syncSensors();
+
+    if (!getHasAlgae()) {
+      m_algaeMode = AlgaeMode.Reef;
+    } else if (m_finishedPickingUpAlgae && m_state != State.Score) {
+      m_algaeMode = AlgaeMode.Processor;
+    }
+  }
+
+  private void armTargetReefLevel() {
+    m_arm.setTargetDeg(m_arm.getTargetDegFromLevel(m_targetReefLevel));
+    m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
+  }
+
+  private void armStow() {
+    if (m_gamePieceMode == GamePiece.Coral) {
+      m_arm.setTargetDeg(Arm.INTAKE_CORAL_STOW_POSITION_DEG);
+    }
+    if (m_gamePieceMode == GamePiece.Algae) {
+      m_arm.setTargetDeg(Arm.ALGAE_STOW_POSITION_DEG);
+    }
+    m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
+
+    m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
+  }
+
+  private void elevatorTargetReefLevel() {
+    m_elevator.setTargetPostion(m_elevator.getTargetPositionFromLevel(m_targetReefLevel));
+    m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
+  }
+
+  private void elevatorStow() {
+    if (m_gamePieceMode == GamePiece.Coral) {
+      m_elevator.setTargetPostion(Elevator.Presets.CORAL_STOW);
+    } else {
+      m_elevator.setTargetPostion(Elevator.Presets.ALGAE_STOW);
+    }
+    m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
+  }
+
+  private void wristStow() {
+    if (m_stowState == StowState.HIGH) {
+      m_wrist.setTargetDeg(Wrist.HIGH_CORAL_STOW_POSTION_DEG);
+    } else {
+      m_wrist.setTargetDeg(Wrist.INTAKE_CORAL_STOW_POSITION_DEG);
+    }
+    if (m_gamePieceMode == GamePiece.Algae) {
+      m_wrist.setTargetDeg(Wrist.ALGAE_STOW_POSITION_DEG);
+    }
+    m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
+  }
+
+  private void wristTargetReefLevel() {
+    m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel));
+    m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
+  }
+
+  public void setRightStickButtonPressed(boolean lastCycleRightStickPressed) {
+    m_lastRightBumperMode = lastCycleRightStickPressed;
+  }
+
+  public void setStowPosition(boolean stowPostion) {
+    m_stowState = stowPostion;
+  }
+
+  public boolean getStowPosition() {
+    return m_stowState;
+  }
+
+  public boolean getRightStickButtonPressed() {
     return m_lastRightBumperMode;
-}
+  }
 
   public void incrementArmOffset(double increment) {
     m_arm.incrementOffset(increment, m_targetReefLevel);
@@ -473,6 +469,4 @@ public boolean getRightStickButtonPressed() {
     m_arm.reset();
     m_wrist.reset();
   }
-
-  
 }

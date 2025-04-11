@@ -115,6 +115,7 @@ public class Claw implements Subsystem {
   public boolean motorAtTarget() {
     return (Math.abs(m_targetHoldPosition - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
   }
+
   private boolean getClawBackSensor() {
     return m_backClawSensor.get();
   }
