@@ -43,7 +43,7 @@ public abstract class DownloadLog extends DefaultTask {
         } else {
           //TODO: test for mac
           downloadLogCmds = ["scp", sshOps, fileSource + log, log]
-          deleteLog = ["ssh", sshOps, robotHostName, "rm", logPath + log]
+          deleteLogCmds = ["ssh", sshOps, robotHostName, "rm", logPath + log]
         }
 
         ProcessBuilder downloadLog = new ProcessBuilder(downloadLogCmds)
