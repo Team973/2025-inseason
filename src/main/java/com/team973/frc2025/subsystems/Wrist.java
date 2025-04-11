@@ -57,7 +57,7 @@ public class Wrist implements Subsystem {
     wristMotorConfig.Slot0.kP = 10.0; // 10
     wristMotorConfig.Slot0.kI = 0.0;
     wristMotorConfig.Slot0.kD = 0.0;
-    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 17.0;
+    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 51.0;
     wristMotorConfig.MotionMagic.MotionMagicAcceleration = 590.0;
     wristMotorConfig.MotionMagic.MotionMagicJerk = 5900.0;
     wristMotorConfig.CurrentLimits.StatorCurrentLimit = 20.0;
