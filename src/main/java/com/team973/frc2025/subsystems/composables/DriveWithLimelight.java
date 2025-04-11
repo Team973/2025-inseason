@@ -114,7 +114,7 @@ public class DriveWithLimelight extends DriveComposable {
 
     public static final TargetPositionRelativeToAprilTag PROCESSOR =
         new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(16),
+            AprilTag.fromRed(3),
             PROCESSOR_APPROACH_TARGET,
             PROCESSOR_SCORING_DIST,
             new Rotation2d());
