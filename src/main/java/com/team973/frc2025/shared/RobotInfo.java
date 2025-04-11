@@ -207,6 +207,11 @@ public final class RobotInfo {
             .setReversed(true);
   }
 
+  public static class StowState {
+    public static final boolean HIGH = true;
+    public static final boolean LOW = false;
+  }
+
   public static class Colors {
     public static final Color RED = new Color(255, 0, 0);
     public static final Color GREEN = new Color(0, 255, 0);

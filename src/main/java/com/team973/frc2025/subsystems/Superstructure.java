@@ -2,6 +2,7 @@ package com.team973.frc2025.subsystems;
 
 import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
+import com.team973.frc2025.shared.RobotInfo.StowState;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
@@ -30,6 +31,10 @@ public class Superstructure implements Subsystem {
   private boolean m_manualScore = false;
   private boolean m_manualIntake = true;
   private boolean m_manualArmivator = false;
+  private boolean m_finishedPickingUpAlgae = true;
+  private boolean m_lastRightBumperMode = false;
+
+  private boolean m_stowState = StowState.LOW;
 
   public enum State {
     Manual,
@@ -44,6 +49,7 @@ public class Superstructure implements Subsystem {
     L_2,
     L_3,
     L_4,
+    StowHigh,
     AlgaeHigh,
     AlgaeLow,
     AlgaeFloor,
@@ -108,7 +114,8 @@ public class Superstructure implements Subsystem {
   }
 
   public boolean readyToScore() {
-    if (m_arm.getTargetPosition() == Arm.CORAL_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == Arm.HIGH_CORAL_STOW_POSITION_DEG
+        || m_arm.getTargetPosition() == Arm.INTAKE_CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
@@ -124,8 +131,8 @@ public class Superstructure implements Subsystem {
       return false;
     }
 
-    if (m_wrist.getTargetPosition() == Wrist.WITH_CORAL_STOW_POSTION_DEG
-        || m_wrist.getTargetPosition() == Wrist.WITHOUT_CORAL_STOW_POSITION_DEG) {
+    if (m_wrist.getTargetPosition() == Wrist.HIGH_CORAL_STOW_POSTION_DEG
+        || m_wrist.getTargetPosition() == Wrist.INTAKE_CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
@@ -200,10 +207,13 @@ public class Superstructure implements Subsystem {
 
   private void armStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_arm.setTargetDeg(Arm.CORAL_STOW_POSITION_DEG);
-    } else {
+      m_arm.setTargetDeg(Arm.INTAKE_CORAL_STOW_POSITION_DEG);
+    }
+    if (m_gamePieceMode == GamePiece.Algae) {
       m_arm.setTargetDeg(Arm.ALGAE_STOW_POSITION_DEG);
     }
+    m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
+
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }
 
@@ -222,9 +232,12 @@ public class Superstructure implements Subsystem {
   }
 
   private void wristStow() {
-    if (m_gamePieceMode == GamePiece.Coral) {
-      m_wrist.setTargetDeg(Wrist.WITHOUT_CORAL_STOW_POSITION_DEG);
+    if (m_stowState == StowState.HIGH) {
+      m_wrist.setTargetDeg(Wrist.HIGH_CORAL_STOW_POSTION_DEG);
     } else {
+      m_wrist.setTargetDeg(Wrist.INTAKE_CORAL_STOW_POSITION_DEG);
+    }
+    if (m_gamePieceMode == GamePiece.Algae) {
       m_wrist.setTargetDeg(Wrist.ALGAE_STOW_POSITION_DEG);
     }
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
@@ -233,6 +246,22 @@ public class Superstructure implements Subsystem {
   private void wristTargetReefLevel() {
     m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevel));
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
+  }
+
+  public void setRightStickButtonPressed(boolean lastCycleRightStickPressed) {
+    m_lastRightBumperMode = lastCycleRightStickPressed;
+  }
+
+  public void setStowPosition(boolean stowPostion) {
+    m_stowState = stowPostion;
+  }
+
+  public boolean getStowPosition() {
+    return m_stowState;
+  }
+
+  public boolean getRightStickButtonPressed() {
+    return m_lastRightBumperMode;
   }
 
   public void incrementArmOffset(double increment) {
