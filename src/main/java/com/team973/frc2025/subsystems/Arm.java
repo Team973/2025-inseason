@@ -172,6 +172,8 @@ public class Arm implements Subsystem {
         return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
       case AlgaeFloor:
         return ALGAE_FLOOR_POSITION_DEG + m_algaeFloorOffset;
+      case Processor:
+        return ALGAE_STOW_POSITION_DEG;
       case Horizontal:
         return HORIZONTAL_POSITION_DEG;
       default:
@@ -235,6 +237,8 @@ public class Arm implements Subsystem {
         break;
       case AlgaeFloor:
         m_algaeFloorOffset += increment;
+        break;
+      case Processor:
         break;
       case Horizontal:
         break;
