@@ -91,11 +91,11 @@ public class DriveWithLimelight extends DriveComposable {
     private static final double ALGAE_PICKUP_DIST = 0.55;
 
     private static final Translation2d HP_APPROACH_TARGET = new Translation2d(0.0, 0.5);
-    private static final Translation2d PROCESSOR_APPROACH_TARGET = new Translation2d(0.0, 1.01);
+    private static final Translation2d PROCESSOR_APPROACH_TARGET = new Translation2d(0.0, 1);
     private static final Translation2d NET_APPROACH_TARGET = new Translation2d(0.5, 1.5);
 
     private static final double REEF_SCORING_DIST = 0.56;
-    private static final double PROCESSOR_SCORING_DIST = 0.3175;
+    private static final double PROCESSOR_SCORING_DIST = 0.5; // 0.3175;
     private static final double NET_SCORING_DIST = 0.35;
 
     public static final TargetPositionRelativeToAprilTag TEST_ONE =
