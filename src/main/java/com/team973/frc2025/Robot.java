@@ -373,12 +373,9 @@ public class Robot extends TimedRobot {
         m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.Net);
       }
 
-      if (m_coDriverStick.getRightStickButtonPressed()){
-      m_superstructure.setTargetReefLevel(ReefLevel.StowHigh);
-     }
-
-      
-
+      if (m_coDriverStick.getRightStickButtonPressed()) {
+        m_superstructure.setTargetReefLevel(ReefLevel.StowHigh);
+      }
 
       if (m_coDriverStick.getRightBumperButtonPressed()) {
         m_superstructure.toggleGamePieceMode();
