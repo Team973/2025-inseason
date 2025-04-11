@@ -2,7 +2,6 @@ package com.team973.frc2025.subsystems.composables;
 
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Drive;
-import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.lib.util.AprilTag;
 import com.team973.lib.util.DriveComposable;
 import com.team973.lib.util.Logger;
@@ -16,6 +15,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DriveWithLimelight extends DriveComposable {
   private static final double SCORING_DISTANCE_TOLERANCE_METERS = 0.06;
@@ -23,8 +23,6 @@ public class DriveWithLimelight extends DriveComposable {
   private static final double NEAR_APPROACH_DISTANCE_TOLERANCE_METERS = 1.5;
 
   private static final double TARGET_ANGLE_TOLERANCE_DEG = 6.0;
-
-  private final GreyPoseEstimator m_poseEstimator;
 
   private final ProfiledPIDController m_xController;
   private final ProfiledPIDController m_yController;
@@ -51,10 +49,13 @@ public class DriveWithLimelight extends DriveComposable {
 
   private TargetStage m_targetStage = TargetStage.MoveToApproach;
 
+  private final AtomicReference<Pose2d> m_providedPose;
+
   public enum ReefSide {
     Left,
     Right,
-    Center
+    Center,
+    LevelOne
   }
 
   public enum ReefFace {
@@ -63,8 +64,7 @@ public class DriveWithLimelight extends DriveComposable {
     C,
     D,
     E,
-    F,
-    Processor
+    F
   }
 
   public enum TargetStage {
@@ -83,14 +83,13 @@ public class DriveWithLimelight extends DriveComposable {
         new Translation2d(-REEF_WIDTH_METERS / 2.0, 1.01);
     private static final Translation2d RIGHT_REEF_APPROACH_TARGET =
         new Translation2d(REEF_WIDTH_METERS / 2.0, 1.01);
+    private static final Translation2d L_1_REEF_APPROACH_TARGET = new Translation2d(0.0, 1.01);
+    private static final double REEF_SCORING_DIST = 0.56;
 
     private static final Translation2d ALGAE_APPROACH_TARGET = new Translation2d(0, 0.9);
-    private static final Translation2d HP_APPROACH_TARGET = new Translation2d(0.0, 0.5);
-    private static final Translation2d PROCESSOR_APPROACH_TARGET = new Translation2d(0.0, 1.01);
+    private static final double ALGAE_PICKUP_DIST = 0.55;
 
-    private static final double REEF_SCORING_DIST = 0.56;
-    private static final double ALGAE_PICKUP_DIST = 0.45;
-    private static final double PROCESSOR_SCORING_DIST = 0.3175;
+    private static final Translation2d HP_APPROACH_TARGET = new Translation2d(0.0, 0.5);
 
     public static final TargetPositionRelativeToAprilTag TEST_ONE =
         new TargetPositionRelativeToAprilTag(
@@ -105,20 +104,15 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag HPR =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(2), HP_APPROACH_TARGET, 0.0, Rotation2d.fromDegrees(180));
-
-    public static final TargetPositionRelativeToAprilTag PROCESSOR =
-        new TargetPositionRelativeToAprilTag(
-            AprilTag.fromRed(16),
-            PROCESSOR_APPROACH_TARGET,
-            PROCESSOR_SCORING_DIST,
-            new Rotation2d());
-
     public static final TargetPositionRelativeToAprilTag A_L =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), LEFT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag A_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
+    public static final TargetPositionRelativeToAprilTag A_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(7), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag A_ALGAE =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), ALGAE_APPROACH_TARGET, ALGAE_PICKUP_DIST, new Rotation2d());
@@ -128,6 +122,9 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag B_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(8), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
+    public static final TargetPositionRelativeToAprilTag B_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(8), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag B_ALGAE =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(8), ALGAE_APPROACH_TARGET, ALGAE_PICKUP_DIST, new Rotation2d());
@@ -137,6 +134,9 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag C_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(9), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
+    public static final TargetPositionRelativeToAprilTag C_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(9), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag C_ALGAE =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(9), ALGAE_APPROACH_TARGET, ALGAE_PICKUP_DIST, new Rotation2d());
@@ -146,6 +146,9 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag D_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(10), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
+    public static final TargetPositionRelativeToAprilTag D_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(10), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag D_ALGAE =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(10), ALGAE_APPROACH_TARGET, ALGAE_PICKUP_DIST, new Rotation2d());
@@ -155,6 +158,9 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag E_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(11), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
+    public static final TargetPositionRelativeToAprilTag E_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(11), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag E_ALGAE =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(11), ALGAE_APPROACH_TARGET, ALGAE_PICKUP_DIST, new Rotation2d());
@@ -164,18 +170,16 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag F_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(6), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
+    public static final TargetPositionRelativeToAprilTag F_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(6), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag F_ALGAE =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(6), ALGAE_APPROACH_TARGET, ALGAE_PICKUP_DIST, new Rotation2d());
   }
 
   public DriveWithLimelight(
-      GreyPoseEstimator poseEstimator,
-      Logger logger,
-      AtomicBoolean readyToScore,
-      AtomicBoolean readyToBackOff) {
-    m_poseEstimator = poseEstimator;
-
+      Logger logger, AtomicBoolean readyToScore, AtomicBoolean readyToBackOff) {
     double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
     m_xController =
         new ProfiledPIDController(
@@ -194,6 +198,8 @@ public class DriveWithLimelight extends DriveComposable {
 
     m_readyToScore = readyToScore;
     m_readyToBackOff = readyToBackOff;
+
+    m_providedPose = new AtomicReference<>(new Pose2d());
   }
 
   public void setTargetSide(ReefSide side) {
@@ -222,7 +228,8 @@ public class DriveWithLimelight extends DriveComposable {
       ReefSide side,
       TargetPositionRelativeToAprilTag leftTarget,
       TargetPositionRelativeToAprilTag centerTarget,
-      TargetPositionRelativeToAprilTag rightTarget) {
+      TargetPositionRelativeToAprilTag rightTarget,
+      TargetPositionRelativeToAprilTag levelOneTarget) {
     switch (side) {
       case Left:
         return leftTarget;
@@ -230,6 +237,8 @@ public class DriveWithLimelight extends DriveComposable {
         return centerTarget;
       case Right:
         return rightTarget;
+      case LevelOne:
+        return levelOneTarget;
       default:
         throw new IllegalArgumentException(side.toString());
     }
@@ -239,24 +248,46 @@ public class DriveWithLimelight extends DriveComposable {
     switch (m_targetReefFace) {
       case A:
         return getPositionFromReefSide(
-            m_targetReefSide, TargetPositions.A_L, TargetPositions.A_ALGAE, TargetPositions.A_R);
+            m_targetReefSide,
+            TargetPositions.A_L,
+            TargetPositions.A_ALGAE,
+            TargetPositions.A_R,
+            TargetPositions.A_L_1);
       case B:
         return getPositionFromReefSide(
-            m_targetReefSide, TargetPositions.B_L, TargetPositions.B_ALGAE, TargetPositions.B_R);
+            m_targetReefSide,
+            TargetPositions.B_L,
+            TargetPositions.B_ALGAE,
+            TargetPositions.B_R,
+            TargetPositions.B_L_1);
       case C:
         return getPositionFromReefSide(
-            m_targetReefSide, TargetPositions.C_L, TargetPositions.C_ALGAE, TargetPositions.C_R);
+            m_targetReefSide,
+            TargetPositions.C_L,
+            TargetPositions.C_ALGAE,
+            TargetPositions.C_R,
+            TargetPositions.C_L_1);
       case D:
         return getPositionFromReefSide(
-            m_targetReefSide, TargetPositions.D_L, TargetPositions.D_ALGAE, TargetPositions.D_R);
+            m_targetReefSide,
+            TargetPositions.D_L,
+            TargetPositions.D_ALGAE,
+            TargetPositions.D_R,
+            TargetPositions.D_L_1);
       case E:
         return getPositionFromReefSide(
-            m_targetReefSide, TargetPositions.E_L, TargetPositions.E_ALGAE, TargetPositions.E_R);
+            m_targetReefSide,
+            TargetPositions.E_L,
+            TargetPositions.E_ALGAE,
+            TargetPositions.E_R,
+            TargetPositions.E_L_1);
       case F:
         return getPositionFromReefSide(
-            m_targetReefSide, TargetPositions.F_L, TargetPositions.F_ALGAE, TargetPositions.F_R);
-      case Processor:
-        return TargetPositions.PROCESSOR;
+            m_targetReefSide,
+            TargetPositions.F_L,
+            TargetPositions.F_ALGAE,
+            TargetPositions.F_R,
+            TargetPositions.F_L_1);
       default:
         throw new IllegalArgumentException("Invalid reef face: " + m_targetReefFace);
     }
@@ -281,33 +312,27 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void log() {
-    m_logger.log("estimatorNull", m_poseEstimator == null);
     SmartDashboard.putString("DB/String 6", "Reef Face: " + m_targetReefFace);
     SmartDashboard.putString("DB/String 7", "Reef Side: " + m_targetReefSide);
-
-    m_logger.log("providedPose", m_poseEstimator.getPoseMeters());
 
     m_logger.log("Target Side", m_targetReefSide.toString());
     m_logger.log("Target Stage", m_targetStage.toString());
 
-    m_logger.log("Is At Approach", isAtApproach());
-    m_logger.log("Is At Scoring", isAtScoring());
+    m_logger.log("Is At Approach", isAtApproach(m_providedPose.get()));
+    m_logger.log("Is At Scoring", isAtScoring(m_providedPose.get()));
 
-    m_logger.log(
-        "Approach Error/X", m_poseEstimator.getPoseMeters().getX() - m_approachPose.getX());
-    m_logger.log(
-        "Approach Error/Y", m_poseEstimator.getPoseMeters().getY() - m_approachPose.getY());
+    m_logger.log("Approach Error/X", m_providedPose.get().getX() - m_approachPose.getX());
+    m_logger.log("Approach Error/Y", m_providedPose.get().getY() - m_approachPose.getY());
     m_logger.log(
         "Approach Error/Deg",
-        m_poseEstimator.getPoseMeters().getRotation().getDegrees()
+        m_providedPose.get().getRotation().getDegrees()
             - m_approachPose.getRotation().getDegrees());
 
-    m_logger.log("Scoring Error/X", m_poseEstimator.getPoseMeters().getX() - m_scoringPose.getX());
-    m_logger.log("Scoring Error/Y", m_poseEstimator.getPoseMeters().getY() - m_scoringPose.getY());
+    m_logger.log("Scoring Error/X", m_providedPose.get().getX() - m_scoringPose.getX());
+    m_logger.log("Scoring Error/Y", m_providedPose.get().getY() - m_scoringPose.getY());
     m_logger.log(
         "Scoring Error/Deg",
-        m_poseEstimator.getPoseMeters().getRotation().getDegrees()
-            - m_scoringPose.getRotation().getDegrees());
+        m_providedPose.get().getRotation().getDegrees() - m_scoringPose.getRotation().getDegrees());
 
     m_logger.log("Target Approach Pose", m_approachPose);
 
@@ -330,34 +355,28 @@ public class DriveWithLimelight extends DriveComposable {
     Pose2d currentTargetPose2d = getCurrentTargetPose2d();
     m_logger.log(
         "dist to target",
-        m_poseEstimator
-            .getPoseMeters()
-            .getTranslation()
-            .getDistance(currentTargetPose2d.getTranslation()));
+        m_providedPose.get().getTranslation().getDistance(currentTargetPose2d.getTranslation()));
   }
 
-  public boolean isNearApproach() {
+  public boolean isNearApproach(Pose2d currentPose) {
     return Drive.comparePoses(
-        m_poseEstimator.getPoseMeters(),
+        currentPose,
         m_approachPose,
         NEAR_APPROACH_DISTANCE_TOLERANCE_METERS,
         TARGET_ANGLE_TOLERANCE_DEG);
   }
 
-  private boolean isAtApproach() {
+  private boolean isAtApproach(Pose2d currentPose) {
     return Drive.comparePoses(
-        m_poseEstimator.getPoseMeters(),
+        currentPose,
         m_approachPose,
         APPROACH_DISTANCE_TOLERANCE_METERS,
         TARGET_ANGLE_TOLERANCE_DEG);
   }
 
-  private boolean isAtScoring() {
+  private boolean isAtScoring(Pose2d currentPose) {
     return Drive.comparePoses(
-        m_poseEstimator.getPoseMeters(),
-        m_scoringPose,
-        SCORING_DISTANCE_TOLERANCE_METERS,
-        TARGET_ANGLE_TOLERANCE_DEG);
+        currentPose, m_scoringPose, SCORING_DISTANCE_TOLERANCE_METERS, TARGET_ANGLE_TOLERANCE_DEG);
   }
 
   public Pose2d getCurrentTargetPose2d() {
@@ -387,14 +406,18 @@ public class DriveWithLimelight extends DriveComposable {
     return m_lastTargetReefSide;
   }
 
-  public synchronized void init(ChassisSpeeds previousChassisSpeeds) {
-    m_xController.reset(
-        m_poseEstimator.getPoseMeters().getX(), previousChassisSpeeds.vxMetersPerSecond);
-    m_yController.reset(
-        m_poseEstimator.getPoseMeters().getY(), previousChassisSpeeds.vyMetersPerSecond);
-    m_thetaController.reset(
-        m_poseEstimator.getPoseMeters().getRotation().getRadians(),
-        previousChassisSpeeds.omegaRadiansPerSecond);
+  public synchronized void init(
+      ChassisSpeeds previousChassisSpeeds, boolean robotIsAutonomous, Pose2d currentPose) {
+    if (robotIsAutonomous) {
+      m_xController.reset(currentPose.getX(), previousChassisSpeeds.vxMetersPerSecond);
+      m_yController.reset(currentPose.getY(), previousChassisSpeeds.vyMetersPerSecond);
+      m_thetaController.reset(
+          currentPose.getRotation().getRadians(), previousChassisSpeeds.omegaRadiansPerSecond);
+    } else {
+      m_xController.reset(currentPose.getX());
+      m_yController.reset(currentPose.getY());
+      m_thetaController.reset(currentPose.getRotation().getRadians());
+    }
 
     if (m_finishedScoring) {
       m_targetStage = TargetStage.MoveToApproach;
@@ -408,14 +431,14 @@ public class DriveWithLimelight extends DriveComposable {
     }
   }
 
-  public synchronized ChassisSpeeds getOutput() {
+  public synchronized ChassisSpeeds getOutput(Pose2d currentPose, Rotation2d angularVelocity) {
     if (m_target == null) {
       return new ChassisSpeeds(0, 0, 0);
     }
 
     switch (m_targetStage) {
       case MoveToApproach:
-        if (isAtApproach()) {
+        if (isAtApproach(currentPose)) {
           m_targetStage = TargetStage.Approach;
         }
         break;
@@ -425,7 +448,7 @@ public class DriveWithLimelight extends DriveComposable {
         }
         break;
       case MoveToScoring:
-        if (isAtScoring()) {
+        if (isAtScoring(currentPose)) {
           m_targetStage = TargetStage.Scoring;
         }
         break;
@@ -436,7 +459,7 @@ public class DriveWithLimelight extends DriveComposable {
         }
         break;
       case MoveToBackOff:
-        if (isAtApproach()) {
+        if (isAtApproach(currentPose)) {
           m_targetStage = TargetStage.BackOff;
         }
         break;
@@ -444,15 +467,15 @@ public class DriveWithLimelight extends DriveComposable {
         break;
     }
 
+    m_providedPose.set(currentPose);
+
     return new ChassisSpeeds(
-        m_xController.calculate(
-                m_poseEstimator.getPoseMeters().getX(), getCurrentTargetPose2d().getX())
+        m_xController.calculate(currentPose.getX(), getCurrentTargetPose2d().getX())
             + m_xController.getSetpoint().velocity,
-        m_yController.calculate(
-                m_poseEstimator.getPoseMeters().getY(), getCurrentTargetPose2d().getY())
+        m_yController.calculate(currentPose.getY(), getCurrentTargetPose2d().getY())
             + m_yController.getSetpoint().velocity,
         m_thetaController.calculate(
-                m_poseEstimator.getPoseMeters().getRotation().getRadians(),
+                currentPose.getRotation().getRadians(),
                 getCurrentTargetPose2d().getRotation().getRadians())
             + m_thetaController.getSetpoint().velocity);
   }

@@ -15,9 +15,9 @@ public class Climb implements Subsystem {
   private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
 
   public static final double HORIZONTAL_POSITION_DEG = 100.0;
-  public static final double CLIMB_POSITION_DEG = 220.0;
+  public static final double CLIMB_POSITION_DEG = 248.0;
 
-  private static final double STOP_POSITION_DEG = 233.0;
+  private static final double STOP_POSITION_DEG = 248.0;
 
   private final Logger m_logger;
 

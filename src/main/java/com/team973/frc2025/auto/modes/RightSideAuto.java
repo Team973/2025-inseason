@@ -24,15 +24,20 @@ public class RightSideAuto extends AutoMode {
         logger,
         new Pose2d(7.3, 1.3, Rotation2d.fromDegrees(180)),
         new BranchCommand(
-            logger, doBabyBird, new DriveTrajectoryCommand(drive, "Babybird-R"), new NoOpCommand()),
+            logger,
+            doBabyBird,
+            new DriveTrajectoryCommand(drive, "Babybird-R", logger.subLogger("Babybird-R")),
+            new NoOpCommand()),
         new ScoreCoralCommand(drive, superstructure, ReefFace.C, ReefLevel.L_4, ReefSide.Right),
-        new DriveTrajectoryCommand(drive, "C-HP"),
-        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
-        new DriveTrajectoryCommand(drive, "HP-B"),
+        new DriveTrajectoryCommand(drive, "C-HP", logger.subLogger("C-HP")),
+        new BlockingLambdaCommand(
+            () -> superstructure.getSeesCoral(), 0.5, logger.subLogger("Intake 1")),
+        new DriveTrajectoryCommand(drive, "HP-B", logger.subLogger("HP-B")),
         new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Left),
-        new DriveTrajectoryCommand(drive, "B-HP"),
-        new BlockingLambdaCommand(() -> superstructure.getSeesCoral(), 0.35),
-        new DriveTrajectoryCommand(drive, "HP-B"),
+        new DriveTrajectoryCommand(drive, "B-HP", logger.subLogger("B-HP")),
+        new BlockingLambdaCommand(
+            () -> superstructure.getSeesCoral(), 0.35, logger.subLogger("Intake 2")),
+        new DriveTrajectoryCommand(drive, "HP-B", logger.subLogger("HP-B 2")),
         new ScoreCoralCommand(drive, superstructure, ReefFace.B, ReefLevel.L_4, ReefSide.Right));
     m_babybird = doBabyBird;
   }

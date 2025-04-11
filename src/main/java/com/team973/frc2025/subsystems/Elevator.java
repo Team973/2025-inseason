@@ -14,15 +14,23 @@ import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator implements Subsystem {
+  private static final double MOTOR_GEAR_RATIO = 10.0 / 56.0;
+
   private final Logger m_logger;
+
   private final GreyTalonFX m_motorRight;
   private final GreyTalonFX m_motorLeft;
+
   private ControlStatus m_controlStatus = ControlStatus.Off;
+
   private double m_targetPostionHeightinches;
   private double m_targetpositionLeway = 0.1;
-  double MOTOR_GEAR_RATIO = 10.0 / 56.0;
   private double m_manualPower;
+
+  private int m_elevatorHomedCount = 0;
+
   private boolean m_lastHallSensorMode = true;
+
   private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
 
   private final SolidSignaler m_elevatorHomedBlinker =
@@ -43,6 +51,8 @@ public class Elevator implements Subsystem {
 
   private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
   private CANdleManger m_candleManger;
+
+  private boolean m_hallZeroingEnabled = true;
 
   public static enum ControlStatus {
     Manual,
@@ -65,15 +75,15 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    private static final double LEVEL_1 = 0.0;
-    private static final double LEVEL_2 = 17.0;
+    private static final double LEVEL_1 = 3.5;
+    private static final double LEVEL_2 = 16.0;
     private static final double LEVEL_3 = 2.5;
     private static final double LEVEL_4 = 27.0;
-    public static final double CORAL_STOW = 0.25;
+    public static final double CORAL_STOW = 0.0;
 
-    private static final double NET = 27.0;
-    private static final double ALGAE_HIGH = 5.0;
-    private static final double ALGAE_LOW = 19.0;
+    private static final double NET = 30.0;
+    private static final double ALGAE_HIGH = 2.0;
+    private static final double ALGAE_LOW = 14.5;
     private static final double ALGAE_FLOOR = 0.0;
     public static final double ALGAE_STOW = 1.0;
   }
@@ -83,7 +93,8 @@ public class Elevator implements Subsystem {
     m_candleManger = candle;
     m_candleManger.addSignaler(m_elevatorHomedBlinker);
     m_motorRight = new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorRight"));
-    m_motorLeft = new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft"));
+    m_motorLeft =
+        new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft", 0.5));
 
     TalonFXConfiguration leftMotorConfig = defaultElevatorMotorConfig();
     // looking at it from the front left is clockwise and right is counter clockwise
@@ -128,6 +139,10 @@ public class Elevator implements Subsystem {
     return defaultElevatorMotorConfig;
   }
 
+  public void setHallZeroingEnabled(boolean zeroingMode) {
+    m_hallZeroingEnabled = zeroingMode;
+  }
+
   private boolean hallsensor() {
     return !m_hallSensor.get();
   }
@@ -136,8 +151,15 @@ public class Elevator implements Subsystem {
     if (!m_lastHallSensorMode && hallsensor()) {
       m_motorRight.setPosition(heightInchesToMotorRotations(ELEVATOR_HOMING_POSTION_HEIGHT));
       m_elevatorHomedBlinker.enable();
+      m_elevatorHomedCount++;
     }
     m_lastHallSensorMode = hallsensor();
+  }
+
+  public void home() {
+    m_motorRight.setPosition(0);
+    m_elevatorHomedBlinker.enable();
+    m_elevatorHomedCount++;
   }
 
   public void setControlStatus(ControlStatus status) {
@@ -182,8 +204,6 @@ public class Elevator implements Subsystem {
       case AlgaeFloor:
         m_algaeFloorOffset += offset;
         break;
-      case Processor:
-        break;
       case Horizontal:
         break;
     }
@@ -211,8 +231,6 @@ public class Elevator implements Subsystem {
         return Presets.ALGAE_LOW + m_algaeLowOffset;
       case AlgaeFloor:
         return Presets.ALGAE_FLOOR + m_algaeFloorOffset;
-      case Processor:
-        return Presets.ALGAE_STOW;
       case Horizontal:
         return Presets.CORAL_STOW;
       default:
@@ -265,11 +283,16 @@ public class Elevator implements Subsystem {
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
     m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
+    m_logger.log("Net Offset", m_netOffset);
+
+    m_logger.log("Elevator Homed Count", m_elevatorHomedCount);
   }
 
   @Override
   public void syncSensors() {
-    maybeHomeElevator();
+    if (m_hallZeroingEnabled) {
+      maybeHomeElevator();
+    }
   }
 
   @Override

@@ -35,7 +35,7 @@ public final class RobotInfo {
     public static final int ENCODER_CAN_ID = 32;
     public static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
 
-    public static final double ENCODER_OFFSET_ROTATIONS = 0.0054;
+    public static final double ENCODER_OFFSET_ROTATIONS = -0.02588;
   }
 
   public static class ElevatorInfo {
@@ -72,6 +72,7 @@ public final class RobotInfo {
     public static final int ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY = 10;
     public static final int ARM_HALL_SENSOR_SIGNALER_PRIORTY = 11;
     public static final int PEICE_IN_CLAW_SIGNALER_PRIORTY = 50;
+    public static final int ALGAE_MODE_SIGNALER_PRIORITY = 60;
     public static final int LOW_BATTER_SIGNALER_PRIORTY = 99;
     public static final int OFF_SIGNALER_PRIORTY = 100;
   }
