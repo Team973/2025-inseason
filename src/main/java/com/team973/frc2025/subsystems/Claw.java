@@ -69,7 +69,7 @@ public class Claw implements Subsystem {
     m_clawAlgaeSensor = new CANrange(ClawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
-    rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_clawMotor.setConfig(rightMotorConfig);
 
     TalonFXConfiguration conveyorConfig = defaultClawMotorConfig();
@@ -177,8 +177,8 @@ public class Claw implements Subsystem {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
         } else if (algaeDistance.get() > 0.3) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-          // } else if (algaeDistance.get() < 0.13) {
-          //   m_clawMotor.setControl(ControlMode.VelocityVoltage, -4.0);
+        } else if (algaeDistance.get() < 0.13) {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -20.0);
         } else {
           m_clawMotor.setControl(ControlMode.VelocityVoltage, -100.0);
         }
