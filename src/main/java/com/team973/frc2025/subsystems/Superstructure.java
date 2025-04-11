@@ -165,12 +165,10 @@ public class Superstructure implements Subsystem {
   public boolean readyToBackOff() {
     if (m_gamePieceMode == GamePiece.Coral) {
       return !getSeesCoral();
+    } else if (m_targetReefLevelSupplier.get() == ReefLevel.Processor
+        || m_targetReefLevelSupplier.get() == ReefLevel.Net) {
+      return !m_claw.getHasAlgae();
     }
-
-    // TODO
-    // else if (m_algaeMode == AlgaeMode.Processor) {
-    //   return !m_claw.getHasAlgae();
-    // }
 
     return m_claw.getHasAlgae();
   }
@@ -392,8 +390,9 @@ public class Superstructure implements Subsystem {
             break;
           case Scoring:
             if (m_manualScore
-                && (m_gamePieceMode
-                    == GamePiece.Coral /* || m_algaeMode == AlgaeMode.Processor*/)) {
+                && (m_gamePieceMode == GamePiece.Coral
+                    || m_targetReefLevelSupplier.get() == ReefLevel.Processor
+                    || m_targetReefLevelSupplier.get() == ReefLevel.Net)) {
               clawScore();
             }
 

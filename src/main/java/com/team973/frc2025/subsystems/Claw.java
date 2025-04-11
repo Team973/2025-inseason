@@ -178,7 +178,7 @@ public class Claw implements Subsystem {
         } else if (algaeDistance.get() > 0.3) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
         } else if (algaeDistance.get() < 0.13) {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, -20.0);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10.0);
         } else {
           m_clawMotor.setControl(ControlMode.VelocityVoltage, -100.0);
         }
