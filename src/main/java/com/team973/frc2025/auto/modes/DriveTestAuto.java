@@ -12,7 +12,7 @@ public class DriveTestAuto extends AutoMode {
     super(
         logger,
         new Pose2d(5, 5, Rotation2d.fromDegrees(180)),
-        new DriveTrajectoryCommand(drive, "Test"));
+        new DriveTrajectoryCommand(drive, "Test", logger.subLogger("Test")));
   }
 
   public String getName() {

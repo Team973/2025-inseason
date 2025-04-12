@@ -1,7 +1,11 @@
 package com.team973.frc2025.subsystems;
 
-import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.shared.RobotInfo.ArmInfo;
+import com.team973.frc2025.shared.RobotInfo.Colors;
+import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
+import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
+import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -13,17 +17,21 @@ public class Superstructure implements Subsystem {
   private final Wrist m_wrist;
   private final DriveController m_driveController;
 
+  private final Logger m_logger;
+
+  private final SolidSignaler m_algaeSignaler =
+      new SolidSignaler(Colors.CYAN, 100, SignalerInfo.ALGAE_MODE_SIGNALER_PRIORITY);
+
   private State m_state = State.Manual;
   private State m_lastState = State.Manual;
 
   private GamePiece m_gamePieceMode = GamePiece.Coral;
+
   private ReefLevel m_targetReefLevel = ReefLevel.L_1;
-  private AlgaeMode m_algaeMode = AlgaeMode.Reef;
 
   private boolean m_manualScore = false;
   private boolean m_manualIntake = true;
   private boolean m_manualArmivator = false;
-  private boolean m_finishedPickingUpAlgae = true;
 
   public enum State {
     Manual,
@@ -42,7 +50,6 @@ public class Superstructure implements Subsystem {
     AlgaeLow,
     AlgaeFloor,
     Net,
-    Processor,
     Horizontal
   }
 
@@ -51,24 +58,25 @@ public class Superstructure implements Subsystem {
     Algae
   }
 
-  public enum AlgaeMode {
-    Reef,
-    Processor
-  }
-
   public Superstructure(
       Claw claw,
       Climb climb,
       Elevator elevator,
       Arm arm,
       Wrist wrist,
-      DriveController driveController) {
+      DriveController driveController,
+      Logger logger,
+      CANdleManger candle) {
     m_claw = claw;
     m_climb = climb;
     m_elevator = elevator;
     m_arm = arm;
     m_wrist = wrist;
     m_driveController = driveController;
+
+    m_logger = logger;
+
+    candle.addSignaler(m_algaeSignaler);
   }
 
   public void setState(State state) {
@@ -102,19 +110,19 @@ public class Superstructure implements Subsystem {
   }
 
   public boolean readyToScore() {
-    if (m_arm.getTargetPosition() == RobotInfo.ArmInfo.CORAL_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == ArmInfo.CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
-    if (m_arm.getTargetPosition() == RobotInfo.ArmInfo.ALGAE_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == ArmInfo.ALGAE_STOW_POSITION_DEG) {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == RobotInfo.ElevatorInfo.CORAL_STOW) {
+    if (m_elevator.getTargetPosition() == ElevatorInfo.CORAL_STOW) {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == RobotInfo.ElevatorInfo.ALGAE_STOW) {
+    if (m_elevator.getTargetPosition() == ElevatorInfo.ALGAE_STOW) {
       return false;
     }
 
@@ -149,11 +157,9 @@ public class Superstructure implements Subsystem {
   public boolean readyToBackOff() {
     if (m_gamePieceMode == GamePiece.Coral) {
       return !getSeesCoral();
-    } else if (m_algaeMode == AlgaeMode.Processor) {
-      return !m_claw.getHasAlgae();
     }
 
-    return m_claw.getHasAlgae();
+    return getHasAlgae();
   }
 
   public void log() {
@@ -164,6 +170,9 @@ public class Superstructure implements Subsystem {
     SmartDashboard.putString(
         "DB/String 2", "A: " + String.valueOf(m_arm.getTargetDegFromLevel(m_targetReefLevel)));
     SmartDashboard.putString("DB/String 8", m_gamePieceMode.toString());
+
+    m_logger.log("Game Piece Mode", m_gamePieceMode.toString());
+    m_logger.log("State", m_state.toString());
 
     m_claw.log();
     m_climb.log();
@@ -179,10 +188,10 @@ public class Superstructure implements Subsystem {
     m_arm.syncSensors();
     m_wrist.syncSensors();
 
-    if (!getHasAlgae()) {
-      m_algaeMode = AlgaeMode.Reef;
-    } else if (m_finishedPickingUpAlgae && m_state != State.Score) {
-      m_algaeMode = AlgaeMode.Processor;
+    if (m_gamePieceMode == GamePiece.Algae) {
+      m_algaeSignaler.enable();
+    } else {
+      m_algaeSignaler.disable();
     }
   }
 
@@ -193,9 +202,9 @@ public class Superstructure implements Subsystem {
 
   private void armStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_arm.setTargetDeg(RobotInfo.ArmInfo.CORAL_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(ArmInfo.CORAL_STOW_POSITION_DEG);
     } else {
-      m_arm.setTargetDeg(RobotInfo.ArmInfo.ALGAE_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(ArmInfo.ALGAE_STOW_POSITION_DEG);
     }
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }
@@ -207,9 +216,9 @@ public class Superstructure implements Subsystem {
 
   private void elevatorStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_elevator.setTargetPostion(RobotInfo.ElevatorInfo.CORAL_STOW);
+      m_elevator.setTargetPostion(ElevatorInfo.CORAL_STOW);
     } else {
-      m_elevator.setTargetPostion(RobotInfo.ElevatorInfo.ALGAE_STOW);
+      m_elevator.setTargetPostion(ElevatorInfo.ALGAE_STOW);
     }
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }
@@ -292,14 +301,6 @@ public class Superstructure implements Subsystem {
     }
   }
 
-  public boolean getHasAlgae() {
-    return m_claw.getHasAlgae();
-  }
-
-  public AlgaeMode getAlgaeMode() {
-    return m_algaeMode;
-  }
-
   private ReefLevel getAlgaePresetFromReefFace(ReefFace face) {
     return switch (face) {
       case A, C, E -> ReefLevel.AlgaeHigh;
@@ -310,6 +311,10 @@ public class Superstructure implements Subsystem {
 
   public ReefLevel getTargetReefLevel() {
     return m_targetReefLevel;
+  }
+
+  public boolean getHasAlgae() {
+    return m_claw.getHasAlgae();
   }
 
   public void update() {
@@ -325,7 +330,7 @@ public class Superstructure implements Subsystem {
         } else if (m_manualIntake) {
           clawIntake();
         } else {
-          m_claw.setControl(Claw.ControlStatus.Off);
+          m_claw.setControl(Claw.ControlStatus.Reverse);
         }
 
         if (m_manualArmivator) {
@@ -348,15 +353,13 @@ public class Superstructure implements Subsystem {
 
         switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
           case MoveToApproach:
-            if (m_driveController.getDriveWithLimelight().isNearApproach()) {
+            if (m_driveController.isNearApproach()) {
               armTargetReefLevel();
               wristTargetReefLevel();
               elevatorTargetReefLevel();
 
               m_manualArmivator = true;
             }
-
-            m_finishedPickingUpAlgae = false;
             break;
           case Approach:
             armTargetReefLevel();
@@ -371,8 +374,7 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case Scoring:
-            if (m_manualScore
-                && (m_gamePieceMode == GamePiece.Coral || m_algaeMode == AlgaeMode.Processor)) {
+            if (m_manualScore && m_gamePieceMode == GamePiece.Coral) {
               clawScore();
             }
 
@@ -381,10 +383,10 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case MoveToBackOff:
-            m_claw.setControl(Claw.ControlStatus.Off);
-
-            if (getHasAlgae()) {
-              m_finishedPickingUpAlgae = true;
+            if (m_gamePieceMode == GamePiece.Coral) {
+              m_claw.setControl(Claw.ControlStatus.Off);
+            } else {
+              clawIntake();
             }
 
             armTargetReefLevel();
@@ -424,6 +426,10 @@ public class Superstructure implements Subsystem {
         m_elevator.setControlStatus(Elevator.ControlStatus.Off);
         m_wrist.setControlStatus(Wrist.ControlStatus.Off);
         break;
+    }
+
+    if (m_lastState == State.Zero && m_state != State.Zero) {
+      m_elevator.home();
     }
 
     m_lastState = m_state;
