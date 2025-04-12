@@ -81,7 +81,7 @@ public class Elevator implements Subsystem {
     private static final double LEVEL_4 = 27.0;
     public static final double CORAL_STOW = 0.0;
 
-    private static final double NET = 30.0;
+    private static final double NET = 29.0;
     private static final double ALGAE_HIGH = 2.0;
     private static final double ALGAE_LOW = 14.5;
     private static final double ALGAE_FLOOR = 0.0;
@@ -204,6 +204,8 @@ public class Elevator implements Subsystem {
       case AlgaeFloor:
         m_algaeFloorOffset += offset;
         break;
+      case Processor:
+        break;
       case Horizontal:
         break;
     }
@@ -231,6 +233,8 @@ public class Elevator implements Subsystem {
         return Presets.ALGAE_LOW + m_algaeLowOffset;
       case AlgaeFloor:
         return Presets.ALGAE_FLOOR + m_algaeFloorOffset;
+      case Processor:
+        return Presets.ALGAE_STOW;
       case Horizontal:
         return Presets.CORAL_STOW;
       default:

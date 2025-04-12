@@ -39,12 +39,12 @@ public class Arm implements Subsystem {
   private static final double LEVEL_THREE_POSITION_DEG = 58.0;
   private static final double LEVEL_TWO_POSITION_DEG = -61.0;
   private static final double LEVEL_ONE_POSITION_DEG = -59.0;
-  public static final double CORAL_STOW_POSITION_DEG = -90.0;
+  public static final double CORAL_STOW_POSITION_DEG = -88.0;
 
-  private static final double NET_POSITION_DEG = 72.0;
+  private static final double NET_POSITION_DEG = 74.0;
   private static final double ALGAE_HIGH_POSITION_DEG = 57.5;
   private static final double ALGAE_LOW_POSITION_DEG = -56.0;
-  private static final double ALGAE_FLOOR_POSITION_DEG = -55.0;
+  private static final double ALGAE_FLOOR_POSITION_DEG = -53.0;
   public static final double ALGAE_STOW_POSITION_DEG = -85.0;
 
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
@@ -172,6 +172,8 @@ public class Arm implements Subsystem {
         return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
       case AlgaeFloor:
         return ALGAE_FLOOR_POSITION_DEG + m_algaeFloorOffset;
+      case Processor:
+        return ALGAE_STOW_POSITION_DEG;
       case Horizontal:
         return HORIZONTAL_POSITION_DEG;
       default:
@@ -235,6 +237,8 @@ public class Arm implements Subsystem {
         break;
       case AlgaeFloor:
         m_algaeFloorOffset += increment;
+        break;
+      case Processor:
         break;
       case Horizontal:
         break;

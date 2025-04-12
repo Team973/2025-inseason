@@ -364,7 +364,8 @@ public class Robot extends TimedRobot {
       }
 
       if (m_coDriverStick.getAButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeFloor);
+        m_superstructure.setTargetReefLevel(
+            ReefLevel.L_1, ReefLevel.AlgaeFloor, ReefLevel.Processor);
       } else if (m_coDriverStick.getXButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
       } else if (m_coDriverStick.getBButtonPressed()) {
@@ -423,7 +424,11 @@ public class Robot extends TimedRobot {
       new PerfLogger(m_logger.subLogger("perf/disabledPeriodic", 0.25));
 
   private void maybeUpdateScoringSelection() {
-    if (m_frontFace.isActive()) {
+    if (m_superstructure.getTargetReefLevel() == ReefLevel.Net) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Net);
+    } else if (m_superstructure.getTargetReefLevel() == ReefLevel.Processor) {
+      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Processor);
+    } else if (m_frontFace.isActive()) {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.A);
     } else if (m_frontRightFace.isActive()) {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.B);
