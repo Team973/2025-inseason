@@ -32,14 +32,89 @@ public final class RobotInfo {
 
   public static class ArmInfo {
     public static final int HALL_SENSOR_ID = 1;
+
     public static final int ENCODER_CAN_ID = 32;
-    public static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
 
     public static final double ENCODER_OFFSET_ROTATIONS = -0.02588;
+
+    public static final double ARM_HOMING_POSTION_DEG = -90.0;
+
+    public static final double LEVEL_FOUR_POSITION_DEG = 64.0; // 79
+    public static final double LEVEL_THREE_POSITION_DEG = 64.0;
+    public static final double LEVEL_TWO_POSITION_DEG = -58.0; // -70.0;
+    public static final double LEVEL_ONE_POSITION_DEG = -59.0; // -70.0;
+    public static final double CORAL_STOW_POSITION_DEG = -92.0;
+
+    public static final double ALGAE_HIGH_POSITION_DEG = 38.0;
+    public static final double ALGAE_LOW_POSITION_DEG = -61.0;
+    public static final double ALGAE_STOW_POSITION_DEG = -80.0;
+
+    public static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 74.0) * (18.0 / 84.0);
+    public static final double CENTER_GRAVITY_OFFSET_DEG = 3;
+    public static final double FEED_FORWARD_MAX_VOLT = 0.6; // 0.5;
+
+    public static final double ARM_KS = 0.0;
+    public static final double ARM_KV = 0.0;
+    public static final double ARM_KA = 0.0;
+    public static final double ARM_KP = 50.0;
+    public static final double ARM_KI = 0.0;
+    public static final double ARM_KD = 0.0;
+
+    public static final double ARM_MOTION_MAGIC_CRUISE_VELOCITY = 110.0; // 64.0;
+    public static final double ARM_MOTION_MAGIC_ACCELERATION = 80.0; // 80.0;
+    public static final double ARM_MOTION_MAGIC_JERK = 1000.0;
+
+    public static final double ARM_SATOR_CURRENT_LIMIT = 60.0;
+    public static final boolean ARM_SATOR_CURRENT_LIMIT_ENABLE = true;
+    public static final double ARM_SUPPLY_CURRENT_LIMIT = 30.0;
+    public static final boolean ARM_SUPPLY_CURRENT_LIMIT_ENABLE = true;
+
+    public static final double ARM_PEAK_FORDWARD_VOLTAGE = 12.0;
+    public static final double ARM_PEAK_REVERSE_VOLTAGE = -12.0;
   }
 
   public static class ElevatorInfo {
     public static final int HALL_SENSOR_ID = 0;
+    public static final double MOTOR_GEAR_RATIO = 10.0 / 56.0;
+
+    public static final double LEVEL_1 = 2.0;
+    public static final double LEVEL_2 = 12.0;
+    public static final double LEVEL_3 = 2.5;
+    public static final double LEVEL_4 = 27.5;
+    public static final double CORAL_STOW = 0.0;
+
+    public static final double ALGAE_HIGH = 21.0;
+    public static final double ALGAE_LOW = 25.5;
+    public static final double ALGAE_STOW = 5.0;
+
+    public static final double ELEVATOR_MM_KS = 0.0;
+    public static final double ELEVATOR_MM_KV = 0.15;
+    public static final double ELEVATOR_MM_KA = 0.01;
+    public static final double ELEVATOR_MM_KP = 4.0;
+    public static final double ELEVATOR_MM_KI = 0.0;
+    public static final double ELEVATOR_MM_KD = 0.0;
+
+    public static final double ELEVATOR_V_KS = 0.0;
+    public static final double ELEVATOR_V_KV = 0.0;
+    public static final double ELEVATOR_V_KA = 0.0;
+    public static final double ELEVATOR_V_KP = 125.0;
+    public static final double ELEVATOR_V_KI = 0.0;
+    public static final double ELEVATOR_V_KD = 0.0;
+
+    public static final double ELEVATOR_MOTION_MAGIC_CRUISE_VELOCITY =
+        65.0; // 32.0; // 64; // 32; // 16;
+    public static final double ELEVATOR_MOTION_MAGIC_ACCELERATION =
+        390.0; // 40.0; // 500; // 40; // 20;
+    public static final double ELEVATOR_MOTION_MAGIC_JERK = 2000.0;
+
+    public static final double ELEVATOR_SATOR_CURRENT_LIMIT = 60.0;
+    public static final boolean ELEVATOR_SATOR_CURRENT_LIMIT_ENABLE = true;
+    public static final double ELEVATOR_SUPPLY_CURRENT_LIMIT = 40.0;
+    public static final boolean ELEVATOR_SUPPLY_CURRENT_LIMIT_ENABLE = true;
+
+    public static final double ELEVATOR_PEAK_FORDWARD_VOLTAGE = 12.0;
+    public static final double ELEVATOR_PEAK_REVERSE_VOLTAGE = -12.0;
+    public static final double ELEVATOR_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD = 0.02;
   }
 
   public static class ClawInfo {
@@ -50,19 +125,83 @@ public final class RobotInfo {
     public static final int CONVEYOR_BACK_SENSOR_ID = 3;
     public static final int CONVEYOR_FRONT_SENSOR_ID = 2;
     public static final int CLAW_ALGAE_CAN_ID = 48;
+
+    public static final double CLAW_KS = 0.0;
+    public static final double CLAW_KV = 0.125 * 10.0 / 10.5;
+    public static final double CLAW_KA = 0.0;
+    public static final double CLAW_KP = 0.3;
+    public static final double CLAW_KI = 0.0;
+    public static final double CLAW_KD = 0.0;
+
+    public static final double CLAW_SATOR_CURRENT_LIMIT = 30.0;
+    public static final boolean CLAW_SATOR_CURRENT_LIMIT_ENABLE = true;
+    public static final double CLAW_SUPPLY_CURRENT_LIMIT = 20.0;
+    public static final boolean CLAW_SUPPLY_CURRENT_LIMIT_ENABLE = true;
+
+    public static final double CLAW_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD = 0.02;
+  }
+
+  public static class ClimbInfo {
+    public static final double MOTOR_ROT_PER_CLIMB_ROT =
+        1.0 / ((10.0 / 64.0) * (20.0 / 72.0) * (20.0 / 84.0) * (9.0 / 30.0));
+    public static final double CLIMB_KS = 0.0;
+    public static final double CLIMB_KV = 0.0;
+    public static final double CLIMB_KA = 0.0;
+    public static final double CLIMB_KP = 6.4;
+    public static final double CLIMB_KI = 0.0;
+    public static final double CLIMB_KD = 0.04;
+
+    public static final double CLIMB_MOTION_MAGIC_CRUISE_VELOCITY = 32.0;
+    public static final double CLIMB_MOTION_MAGIC_ACCELERATION = 32.0;
+    public static final double CLIMB_MOTION_MAGIC_JERK = 160.0;
+
+    public static final double CLIMB_SATOR_CURRENT_LIMIT = 30.0;
+    public static final boolean CLIMB_SATOR_CURRENT_LIMIT_ENABLE = true;
+    public static final double CLIMB_SUPPLY_CURRENT_LIMIT = 20.0;
+    public static final boolean CLIMB_SUPPLY_CURRENT_LIMIT_ENABLE = true;
+    public static final double CLIMB_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD = 0.02;
+
+    public static final double CLIMB_PEAK_FORDWARD_VOLTAGE = 2.0;
+    public static final double CLIMB_PEAK_REVERSE_VOLTAGE = -2.0;
   }
 
   public static class WristInfo {
-    public static final int MOTOR_CAN_ID = 31;
-    public static final int ENCODER_CAN_ID = 35;
-    public static final double ENCODER_OFFSET_ROTATIONS = 0.300;
+    public static final int MOTOR_CAN_ID = 31; // TODO
+    public static final int ENCODER_CAN_ID = 0; // TODO
+    public static final double HORIZONTAL_POSITION_DEG = 0.0;
+
+    public static final double ENCODER_OFFSET_ROTATIONS = 0.0054;
     public static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
         10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
-  }
+    public static final double LEVEL_FOUR_POSITION_DEG = -185.0;
+    public static final double LEVEL_THREE_POSITION_DEG = -191.0;
+    public static final double LEVEL_TWO_POSITION_DEG = -54.0;
+    public static final double LEVEL_ONE_POSITION_DEG = 4.0;
+    public static final double CORAL_STOW_POSITION_DEG = -18.0;
 
-  public static final class ClimbInfo {
-    public static final double MOTOR_ROT_PER_CLIMB_ROT =
-        1.0 / ((10.0 / 64.0) * (20.0 / 72.0) * (20.0 / 84.0) * (9.0 / 30.0));
+    public static final double NET_POSITION_DEG = -105.0; // -20.0;
+    public static final double ALGAE_HIGH_POSITION_DEG = -149.0;
+    public static final double ALGAE_LOW_POSITION_DEG = -34.0;
+    public static final double ALGAE_FLOOR_POSITION_DEG = -88.0;
+    public static final double ALGAE_STOW_POSITION_DEG = -5.0;
+    public static final double WRIST_KS = 0.0;
+    public static final double WRIST_KV = 0.0;
+    public static final double WRIST_KA = 0.0;
+    public static final double WRIST_KP = 10.0;
+    public static final double WRIST_KI = 0.0;
+    public static final double WRIST_KD = 0.0;
+
+    public static final double WRIST_MOTION_MAGIC_CRUISE_VELOCITY = 51.0;
+    public static final double WRIST_MOTION_MAGIC_ACCELERATION = 590.0;
+    public static final double WRIST_MOTION_MAGIC_JERK = 5900.0;
+
+    public static final double WRIST_SATOR_CURRENT_LIMIT = 20.0;
+    public static final boolean WRIST_SATOR_CURRENT_LIMIT_ENABLE = true;
+    public static final double WRIST_SUPPLY_CURRENT_LIMIT = 15.0;
+    public static final boolean WRIST_SUPPLY_CURRENT_LIMIT_ENABLE = true;
+
+    public static final double WRIST_PEAK_FORDWARD_VOLTAGE = 12.0;
+    public static final double WRIST_PEAK_REVERSE_VOLTAGE = -12.0;
   }
 
   public static class SignalerInfo {

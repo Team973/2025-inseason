@@ -89,22 +89,24 @@ public class Claw implements Subsystem {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
 
     // Slot 0 PID constants are for velocity voltage
-    defaultMotorConfig.Slot0.kS = 0.0;
-    defaultMotorConfig.Slot0.kV = 0.125 * 10.0 / 10.5;
-    defaultMotorConfig.Slot0.kA = 0.0;
-    defaultMotorConfig.Slot0.kP = 0.3;
-    defaultMotorConfig.Slot0.kI = 0.0;
-    defaultMotorConfig.Slot0.kD = 0.0;
+    defaultMotorConfig.Slot0.kS = RobotInfo.ClawInfo.CLAW_KS;
+    defaultMotorConfig.Slot0.kV = RobotInfo.ClawInfo.CLAW_KV;
+    defaultMotorConfig.Slot0.kA = RobotInfo.ClawInfo.CLAW_KA;
+    defaultMotorConfig.Slot0.kP = RobotInfo.ClawInfo.CLAW_KP;
+    defaultMotorConfig.Slot0.kI = RobotInfo.ClawInfo.CLAW_KI;
+    defaultMotorConfig.Slot0.kD = RobotInfo.ClawInfo.CLAW_KD;
 
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimit =
+        RobotInfo.ClawInfo.CLAW_SATOR_CURRENT_LIMIT;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
+        RobotInfo.ClawInfo.CLAW_SATOR_CURRENT_LIMIT_ENABLE;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit =
+        RobotInfo.ClawInfo.CLAW_SUPPLY_CURRENT_LIMIT;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
+        RobotInfo.ClawInfo.CLAW_SUPPLY_CURRENT_LIMIT_ENABLE;
 
-    defaultMotorConfig.Voltage.PeakForwardVoltage = 12.0;
-    defaultMotorConfig.Voltage.PeakReverseVoltage = -12.0;
-
-    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
+    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
+        RobotInfo.ClawInfo.CLAW_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD;
 
     defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 

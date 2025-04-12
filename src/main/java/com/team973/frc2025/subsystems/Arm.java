@@ -31,7 +31,6 @@ public class Arm implements Subsystem {
   private final SolidSignaler m_armHomedSigaler =
       new SolidSignaler(
           RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
-
   private static final double ARM_HOMING_POSTION_DEG = -90.0;
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
@@ -49,7 +48,6 @@ public class Arm implements Subsystem {
 
   private static final double CENTER_GRAVITY_OFFSET_DEG = 3;
   private static final double FEED_FORWARD_MAX_VOLT = 0.32;
-
   private double m_levelOneOffset = 0.0;
   private double m_levelTwoOffset = 0.0;
   private double m_levelThreeOffset = 0.0;
@@ -119,7 +117,7 @@ public class Arm implements Subsystem {
 
   private void maybeHomeArm() {
     if (m_lastHallSensorMode == false && hallSensor() == true) {
-      m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
+      m_armMotor.setPosition(armDegToMotorRotations(RobotInfo.ArmInfo.ARM_HOMING_POSTION_DEG));
       m_armHomedSigaler.enable();
     }
     m_lastHallSensorMode = hallSensor();
@@ -150,24 +148,24 @@ public class Arm implements Subsystem {
 
   private double getFeedForwardTargetAngle() {
     double armAngleDeg = motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble());
-    return FEED_FORWARD_MAX_VOLT
-        * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
+    return RobotInfo.ArmInfo.FEED_FORWARD_MAX_VOLT
+        * Math.cos((armAngleDeg - RobotInfo.ArmInfo.CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
 
   public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
+        return RobotInfo.ArmInfo.LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
       case L_2:
-        return LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
+        return RobotInfo.ArmInfo.LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
       case L_3:
-        return LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
+        return RobotInfo.ArmInfo.LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case L_4:
         return LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
       case Net:
         return NET_POSITION_DEG + m_netOffset;
       case AlgaeHigh:
-        return ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
+        return RobotInfo.ArmInfo.ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
         return ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
       case AlgaeFloor:

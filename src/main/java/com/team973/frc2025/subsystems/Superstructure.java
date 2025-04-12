@@ -1,6 +1,8 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.shared.RobotInfo.ArmInfo;
 import com.team973.frc2025.shared.RobotInfo.Colors;
+import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Logger;
@@ -108,19 +110,19 @@ public class Superstructure implements Subsystem {
   }
 
   public boolean readyToScore() {
-    if (m_arm.getTargetPosition() == Arm.CORAL_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == ArmInfo.CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
-    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == ArmInfo.ALGAE_STOW_POSITION_DEG) {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == Elevator.Presets.CORAL_STOW) {
+    if (m_elevator.getTargetPosition() == ElevatorInfo.CORAL_STOW) {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW) {
+    if (m_elevator.getTargetPosition() == ElevatorInfo.ALGAE_STOW) {
       return false;
     }
 
@@ -200,9 +202,9 @@ public class Superstructure implements Subsystem {
 
   private void armStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_arm.setTargetDeg(Arm.CORAL_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(ArmInfo.CORAL_STOW_POSITION_DEG);
     } else {
-      m_arm.setTargetDeg(Arm.ALGAE_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(ArmInfo.ALGAE_STOW_POSITION_DEG);
     }
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }
@@ -214,9 +216,9 @@ public class Superstructure implements Subsystem {
 
   private void elevatorStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_elevator.setTargetPostion(Elevator.Presets.CORAL_STOW);
+      m_elevator.setTargetPostion(ElevatorInfo.CORAL_STOW);
     } else {
-      m_elevator.setTargetPostion(Elevator.Presets.ALGAE_STOW);
+      m_elevator.setTargetPostion(ElevatorInfo.ALGAE_STOW);
     }
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }

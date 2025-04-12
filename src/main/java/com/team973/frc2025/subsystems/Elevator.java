@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.shared.RobotInfo.ElevatorInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
@@ -67,11 +68,19 @@ public class Elevator implements Subsystem {
   }
 
   private double heightInchesToMotorRotations(double postionHeight) {
-    return postionHeight / MOTOR_GEAR_RATIO / 5.0 / 36.0 / Conversions.Distance.INCH_PER_MM;
+    return postionHeight
+        / RobotInfo.ElevatorInfo.MOTOR_GEAR_RATIO
+        / 5.0
+        / 36.0
+        / Conversions.Distance.INCH_PER_MM;
   }
 
   private double motorRotationsToHeightInches(double motorPostion) {
-    return motorPostion * MOTOR_GEAR_RATIO * 5.0 * 36.0 * Conversions.Distance.INCH_PER_MM;
+    return motorPostion
+        * ElevatorInfo.MOTOR_GEAR_RATIO
+        * 5.0
+        * 36.0
+        * Conversions.Distance.INCH_PER_MM;
   }
 
   public static class Presets {
@@ -112,29 +121,39 @@ public class Elevator implements Subsystem {
   private static TalonFXConfiguration defaultElevatorMotorConfig() {
     TalonFXConfiguration defaultElevatorMotorConfig = new TalonFXConfiguration();
     // slot zero is for motion maginc
-    defaultElevatorMotorConfig.Slot0.kS = 0.0;
-    defaultElevatorMotorConfig.Slot0.kV = 0.15;
-    defaultElevatorMotorConfig.Slot0.kA = 0.01;
-    defaultElevatorMotorConfig.Slot0.kP = 4.0;
-    defaultElevatorMotorConfig.Slot0.kI = 0.0;
-    defaultElevatorMotorConfig.Slot0.kD = 0.0;
+    defaultElevatorMotorConfig.Slot0.kS = RobotInfo.ElevatorInfo.ELEVATOR_MM_KS;
+    defaultElevatorMotorConfig.Slot0.kV = RobotInfo.ElevatorInfo.ELEVATOR_MM_KV;
+    defaultElevatorMotorConfig.Slot0.kA = RobotInfo.ElevatorInfo.ELEVATOR_MM_KA;
+    defaultElevatorMotorConfig.Slot0.kP = RobotInfo.ElevatorInfo.ELEVATOR_MM_KP;
+    defaultElevatorMotorConfig.Slot0.kI = RobotInfo.ElevatorInfo.ELEVATOR_MM_KI;
+    defaultElevatorMotorConfig.Slot0.kD = RobotInfo.ElevatorInfo.ELEVATOR_MM_KD;
     // slot one is velocity
-    defaultElevatorMotorConfig.Slot1.kS = 0.0;
-    defaultElevatorMotorConfig.Slot1.kV = 0.0;
-    defaultElevatorMotorConfig.Slot1.kA = 0.0;
-    defaultElevatorMotorConfig.Slot1.kP = 125.0;
-    defaultElevatorMotorConfig.Slot1.kI = 0.0;
-    defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 65.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 390.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 2000.0;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage = 12;
-    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = -12;
-    defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.00;
+    defaultElevatorMotorConfig.Slot1.kS = RobotInfo.ElevatorInfo.ELEVATOR_V_KS;
+    defaultElevatorMotorConfig.Slot1.kV = RobotInfo.ElevatorInfo.ELEVATOR_V_KV;
+    defaultElevatorMotorConfig.Slot1.kA = RobotInfo.ElevatorInfo.ELEVATOR_V_KA;
+    defaultElevatorMotorConfig.Slot1.kP = RobotInfo.ElevatorInfo.ELEVATOR_V_KP;
+    defaultElevatorMotorConfig.Slot1.kI = RobotInfo.ElevatorInfo.ELEVATOR_V_KI;
+    defaultElevatorMotorConfig.Slot1.kD = RobotInfo.ElevatorInfo.ELEVATOR_V_KD;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        RobotInfo.ElevatorInfo.ELEVATOR_MOTION_MAGIC_CRUISE_VELOCITY;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
+        RobotInfo.ElevatorInfo.ELEVATOR_MOTION_MAGIC_ACCELERATION;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk =
+        RobotInfo.ElevatorInfo.ELEVATOR_MOTION_MAGIC_JERK;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit =
+        RobotInfo.ElevatorInfo.ELEVATOR_SATOR_CURRENT_LIMIT;
+    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
+        RobotInfo.ElevatorInfo.ELEVATOR_SATOR_CURRENT_LIMIT_ENABLE;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit =
+        RobotInfo.ElevatorInfo.ELEVATOR_SUPPLY_CURRENT_LIMIT;
+    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
+        RobotInfo.ElevatorInfo.ELEVATOR_SUPPLY_CURRENT_LIMIT_ENABLE;
+    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage =
+        RobotInfo.ElevatorInfo.ELEVATOR_PEAK_FORDWARD_VOLTAGE;
+    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage =
+        RobotInfo.ElevatorInfo.ELEVATOR_PEAK_REVERSE_VOLTAGE;
+    defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
+        RobotInfo.ElevatorInfo.ELEVATOR_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD;
     defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     return defaultElevatorMotorConfig;
   }
@@ -216,17 +235,17 @@ public class Elevator implements Subsystem {
   public double getTargetPositionFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return Presets.LEVEL_1 + m_levelOneOffset;
+        return RobotInfo.ElevatorInfo.LEVEL_1 + m_levelOneOffset;
       case L_2:
-        return Presets.LEVEL_2 + m_levelTwoOffset;
+        return RobotInfo.ElevatorInfo.LEVEL_2 + m_levelTwoOffset;
       case L_3:
-        return Presets.LEVEL_3 + m_levelThreeOffset;
+        return RobotInfo.ElevatorInfo.LEVEL_3 + m_levelThreeOffset;
       case L_4:
         return Presets.LEVEL_4 + m_levelFourOffset;
       case Net:
         return Presets.NET + m_netOffset;
       case AlgaeHigh:
-        return Presets.ALGAE_HIGH + m_algaeHighOffset;
+        return RobotInfo.ElevatorInfo.ALGAE_HIGH + m_algaeHighOffset;
       case AlgaeLow:
         return Presets.ALGAE_LOW + m_algaeLowOffset;
       case AlgaeFloor:

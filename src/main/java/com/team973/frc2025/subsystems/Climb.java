@@ -4,7 +4,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.ClimbInfo;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.util.Logger;
@@ -51,31 +50,39 @@ public class Climb implements Subsystem {
 
   private static TalonFXConfiguration defaultMotorConfig() {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
-    defaultMotorConfig.Slot0.kS = 0.0;
-    defaultMotorConfig.Slot0.kV = 0.15;
-    defaultMotorConfig.Slot0.kA = 0.01;
-    defaultMotorConfig.Slot0.kP = 6.4;
-    defaultMotorConfig.Slot0.kI = 0.0;
-    defaultMotorConfig.Slot0.kD = 0.04;
-    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = MOTION_MAGIC_CRUISE_VELOCITY * 0.5;
-    defaultMotorConfig.MotionMagic.MotionMagicAcceleration = MOTION_MAGIC_CRUISE_VELOCITY * 10.0;
-    defaultMotorConfig.MotionMagic.MotionMagicJerk = MOTION_MAGIC_CRUISE_VELOCITY * 100.0;
+
+    defaultMotorConfig.Slot0.kS = RobotInfo.ClimbInfo.CLIMB_KS;
+    defaultMotorConfig.Slot0.kV = RobotInfo.ClimbInfo.CLIMB_KV;
+    defaultMotorConfig.Slot0.kA = RobotInfo.ClimbInfo.CLIMB_KA;
+    defaultMotorConfig.Slot0.kP = RobotInfo.ClimbInfo.CLIMB_KP;
+    defaultMotorConfig.Slot0.kI = RobotInfo.ClimbInfo.CLIMB_KI;
+    defaultMotorConfig.Slot0.kD = RobotInfo.ClimbInfo.CLIMB_KD;
+    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        RobotInfo.ClimbInfo.CLIMB_MOTION_MAGIC_CRUISE_VELOCITY;
+    defaultMotorConfig.MotionMagic.MotionMagicAcceleration =
+        RobotInfo.ClimbInfo.CLIMB_MOTION_MAGIC_ACCELERATION;
+    defaultMotorConfig.MotionMagic.MotionMagicJerk = RobotInfo.ClimbInfo.CLIMB_MOTION_MAGIC_JERK;
     // slot 1 is for velocity
-    defaultMotorConfig.Slot1.kS = 0.0;
-    defaultMotorConfig.Slot1.kV = 0;
-    defaultMotorConfig.Slot1.kA = 0.0;
-    defaultMotorConfig.Slot1.kP = 6.4;
-    defaultMotorConfig.Slot1.kI = 0.0;
-    defaultMotorConfig.Slot1.kD = 0.04;
+    defaultMotorConfig.Slot1.kS = RobotInfo.ClimbInfo.CLIMB_KS;
+    defaultMotorConfig.Slot1.kV = RobotInfo.ClimbInfo.CLIMB_KV;
+    defaultMotorConfig.Slot1.kA = RobotInfo.ClimbInfo.CLIMB_KA;
+    defaultMotorConfig.Slot1.kP = RobotInfo.ClimbInfo.CLIMB_KP;
+    defaultMotorConfig.Slot1.kI = RobotInfo.ClimbInfo.CLIMB_KI;
+    defaultMotorConfig.Slot1.kD = RobotInfo.ClimbInfo.CLIMB_KD;
 
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimit =
+        RobotInfo.ClimbInfo.CLIMB_SATOR_CURRENT_LIMIT;
+    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
+        RobotInfo.ClimbInfo.CLIMB_SATOR_CURRENT_LIMIT_ENABLE;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit =
+        RobotInfo.ClimbInfo.CLIMB_SUPPLY_CURRENT_LIMIT;
+    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
+        RobotInfo.ClimbInfo.CLIMB_SUPPLY_CURRENT_LIMIT_ENABLE;
+    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
+        RobotInfo.ClimbInfo.CLIMB_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD;
 
-    defaultMotorConfig.Voltage.PeakForwardVoltage = 12.0;
-    defaultMotorConfig.Voltage.PeakReverseVoltage = 0.0;
+    defaultMotorConfig.Voltage.PeakForwardVoltage = RobotInfo.ClimbInfo.CLIMB_PEAK_FORDWARD_VOLTAGE;
+    defaultMotorConfig.Voltage.PeakReverseVoltage = RobotInfo.ClimbInfo.CLIMB_PEAK_REVERSE_VOLTAGE;
 
     defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     defaultMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -88,11 +95,12 @@ public class Climb implements Subsystem {
   }
 
   public double getClimbAngle() {
-    return (m_climb.getPosition().getValueAsDouble() / ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT) * 360.0;
+    return (m_climb.getPosition().getValueAsDouble() / RobotInfo.ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT)
+        * 360.0;
   }
 
   public void setTarget(double target) {
-    m_targetPosition = (target / 360.0) * ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT;
+    m_targetPosition = (target / 360.0) * RobotInfo.ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT;
   }
 
   @Override
