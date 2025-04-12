@@ -21,7 +21,7 @@ public abstract class DownloadLimelightLeftConfig extends DefaultTask {
 	@TaskAction
   void downloadLimelightLeftConfig() {
 		try {
-			URL url = new URL("http://10.9.73.13:5807/pipeline-default")
+			URL url = new URL("http://10.9.73.13:5807/pipeline-atindex?index=0")
 			HttpURLConnection con = (HttpURLConnection) url.openConnection()
 			con.setRequestMethod("GET")
 			int responseCode = con.getResponseCode()
