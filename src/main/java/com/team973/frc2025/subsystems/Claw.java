@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 
 public class Claw implements Subsystem {
-  private static final double ALGAE_SENSOR_STRENGTH_THRESHOLD = 1000.0;
+  private static final double ALGAE_SENSOR_STRENGTH_THRESHOLD = 2500.0;
 
   private final Logger m_logger;
 
