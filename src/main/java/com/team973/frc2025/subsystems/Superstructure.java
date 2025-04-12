@@ -425,6 +425,10 @@ public class Superstructure implements Subsystem {
             m_manualArmivator = false;
             break;
         }
+
+        if (m_manualScore && m_targetReefLevelSupplier.get() == ReefLevel.Net) {
+          clawScore();
+        }
         break;
       case Zero:
         m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
