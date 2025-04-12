@@ -2,11 +2,13 @@ package com.team973.frc2025;
 
 import choreo.util.ChoreoAllianceFlipUtil;
 import com.team973.frc2025.auto.modes.BabyBird;
+import com.team973.frc2025.auto.modes.CenterAuto;
 import com.team973.frc2025.auto.modes.DriveTestAuto;
 import com.team973.frc2025.auto.modes.LeftSideAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
 import com.team973.frc2025.auto.modes.NoAutoAllianceWallCenter;
 import com.team973.frc2025.auto.modes.RightSideAuto;
+import com.team973.frc2025.auto.modes.ScoreTestAuto;
 import com.team973.frc2025.auto.modes.TaxiAuto;
 import com.team973.frc2025.auto.modes.TestAuto;
 import com.team973.frc2025.subsystems.DriveController;
@@ -19,7 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AutoManager {
-  private AutoMode m_currentMode;
   private final List<AutoMode> m_availableAutos;
   private int m_selectedMode = 0;
 
@@ -28,19 +29,32 @@ public class AutoManager {
   private final AutoMode m_testAuto;
   private final AutoMode m_driveTestAuto;
   private final AutoMode m_leftSideAuto;
+  private final AutoMode m_leftSideBabybirdAuto;
   private final AutoMode m_rightSideAuto;
+  // private final AutoMode m_rightSideBabybirdAuto;
   private final AutoMode m_noAutoAllianceWallCenter;
+  private final AutoMode m_centerAuto;
   private final AutoMode m_babyBirdAuto;
+  private final AutoMode m_scoreTestAuto;
 
   public AutoManager(Logger logger, DriveController drive, Superstructure superstructure) {
     m_noAuto = new NoAuto(logger);
     m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive);
     m_testAuto = new TestAuto(logger.subLogger("test"), drive, superstructure);
     m_driveTestAuto = new DriveTestAuto(logger.subLogger("driveTest"), drive);
-    m_leftSideAuto = new LeftSideAuto(logger.subLogger("LeftSideAuto"), superstructure, drive);
-    m_rightSideAuto = new RightSideAuto(logger.subLogger("RightSideAuto"), superstructure, drive);
+    m_leftSideAuto =
+        new LeftSideAuto(logger.subLogger("LeftSideAuto"), superstructure, drive, false);
+    m_leftSideBabybirdAuto =
+        new LeftSideAuto(logger.subLogger("LeftSideBabybirdAuto"), superstructure, drive, true);
+    m_rightSideAuto =
+        new RightSideAuto(logger.subLogger("RightSideAuto"), superstructure, drive, false);
+    // m_rightSideBabybirdAuto =
+    //     new RightSideAuto(logger.subLogger("RightSideBabybirdAuto"), superstructure, drive,
+    // true);
     m_noAutoAllianceWallCenter = new NoAutoAllianceWallCenter(logger);
+    m_centerAuto = new CenterAuto(logger.subLogger("CenterAuto"), superstructure, drive);
     m_babyBirdAuto = new BabyBird(logger, drive, superstructure);
+    m_scoreTestAuto = new ScoreTestAuto(logger.subLogger("ScoreTestAuto"), drive, superstructure);
 
     m_availableAutos =
         Arrays.asList(
@@ -50,10 +64,12 @@ public class AutoManager {
             m_driveTestAuto,
             m_noAutoAllianceWallCenter,
             m_leftSideAuto,
+            m_leftSideBabybirdAuto,
             m_rightSideAuto,
-            m_babyBirdAuto);
-
-    selectAuto(getSelectedMode());
+            // m_rightSideBabybirdAuto,
+            m_centerAuto,
+            m_babyBirdAuto,
+            m_scoreTestAuto);
   }
 
   public void increment() {
@@ -61,7 +77,6 @@ public class AutoManager {
     if (m_selectedMode >= m_availableAutos.size()) {
       m_selectedMode = 0;
     }
-    selectAuto(getSelectedMode());
   }
 
   public void decrement() {
@@ -69,7 +84,6 @@ public class AutoManager {
     if (m_selectedMode < 0) {
       m_selectedMode = m_availableAutos.size() - 1;
     }
-    selectAuto(getSelectedMode());
   }
 
   public AutoMode getSelectedMode() {
@@ -78,23 +92,18 @@ public class AutoManager {
 
   public Pose2d getStartingPose(Alliance alliance) {
     if (alliance == Alliance.Red) {
-      return ChoreoAllianceFlipUtil.flip(m_currentMode.getStartingPose());
+      return ChoreoAllianceFlipUtil.flip(getSelectedMode().getStartingPose());
     } else {
-      return m_currentMode.getStartingPose();
+      return getSelectedMode().getStartingPose();
     }
   }
 
   public void run(Alliance alliance) {
-    m_currentMode.run(alliance);
-    m_currentMode.log(alliance);
+    getSelectedMode().run(alliance);
+    getSelectedMode().log(alliance);
   }
 
   public void init() {
-    selectAuto(m_availableAutos.get(m_selectedMode));
-    m_currentMode.init();
-  }
-
-  private void selectAuto(AutoMode mode) {
-    m_currentMode = mode;
+    getSelectedMode().init();
   }
 }

@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Drive implements Subsystem {
   private static final Translation2d[] MODULE_LOCATIONS = {
@@ -31,8 +32,10 @@ public class Drive implements Subsystem {
 
   private final SwerveModule[] m_swerveModules;
   private ChassisSpeeds m_currentChassisSpeeds;
-  private Pose2d m_estimatedPose = new Pose2d();
-  private Translation2d m_estimatedVelocity = new Translation2d();
+
+  private AtomicReference<Pose2d> m_estimatedPose = new AtomicReference<>(new Pose2d());
+  private AtomicReference<Translation2d> m_estimatedVelocity =
+      new AtomicReference<>(new Translation2d());
 
   private GreyPoseEstimator m_poseEstimator;
   private GreyPoseEstimator m_fusedEstimator;
@@ -44,7 +47,6 @@ public class Drive implements Subsystem {
 
   private final GreyPigeon m_pigeon;
 
-  private Rotation2d m_targetRobotAngle = new Rotation2d();
   private final OdometrySupplier m_odometrySupplier;
   private final MegaTagSupplier m_leftLLSupplier;
   private final MegaTagSupplier m_rightLLSupplier;
@@ -176,11 +178,11 @@ public class Drive implements Subsystem {
   }
 
   public Pose2d getPose() {
-    return m_estimatedPose;
+    return m_estimatedPose.get();
   }
 
   public Translation2d getVelocity() {
-    return m_estimatedVelocity;
+    return m_estimatedVelocity.get();
   }
 
   public static boolean comparePoses(
@@ -254,8 +256,8 @@ public class Drive implements Subsystem {
   public synchronized void syncSensorsHighFreq() {
     // Use the fused estimator for our position but the odometry-only estimator
     // for our velocity.
-    m_estimatedPose = m_fusedEstimator.getPoseMeters();
-    m_estimatedVelocity = m_poseEstimator.getVelocityMetersPerSeconds();
+    m_estimatedPose.set(m_fusedEstimator.getPoseMeters());
+    m_estimatedVelocity.set(m_poseEstimator.getVelocityMetersPerSeconds());
   }
 
   @Override

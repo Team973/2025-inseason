@@ -27,6 +27,8 @@ public class DriveController implements Subsystem {
 
   private ChassisSpeeds m_currentChassisSpeeds;
 
+  private boolean m_robotIsAutonomous = true;
+
   public enum RotationControl {
     OpenLoop,
     ClosedLoop,
@@ -60,19 +62,21 @@ public class DriveController implements Subsystem {
 
     m_driveWithLimelight =
         new DriveWithLimelight(
-            m_drive.getPoseEstimator(),
-            m_logger.subLogger("driveWithLimelight"),
-            readyToScore,
-            readyToBackOff);
+            m_logger.subLogger("driveWithLimelight"), readyToScore, readyToBackOff);
 
     m_currentChassisSpeeds = new ChassisSpeeds();
   }
 
-  public void setControllerOption(ControllerOption controllerOption) {
+  public synchronized void setControllerOption(ControllerOption controllerOption) {
     if (controllerOption != m_controllerOption) {
-      m_controllerOption = controllerOption;
       m_driveWithJoysticks.reset(m_drive.getPoseEstimator().getPoseMeters().getRotation());
-      getComposableFromControllerOption(controllerOption).init();
+
+      getComposableFromControllerOption(m_controllerOption).exit();
+
+      getComposableFromControllerOption(controllerOption)
+          .init(m_currentChassisSpeeds, m_robotIsAutonomous, getPose());
+
+      m_controllerOption = controllerOption;
     }
   }
 
@@ -86,6 +90,10 @@ public class DriveController implements Subsystem {
 
   public DriveWithLimelight getDriveWithLimelight() {
     return m_driveWithLimelight;
+  }
+
+  public boolean isNearApproach() {
+    return getDriveWithLimelight().isNearApproach(getPose());
   }
 
   public synchronized GreyPigeon getPigeon() {
@@ -123,7 +131,7 @@ public class DriveController implements Subsystem {
   }
 
   private DriveComposable getComposableFromControllerOption(ControllerOption option) {
-    switch (m_controllerOption) {
+    switch (option) {
       case DriveWithJoysticks:
         return m_driveWithJoysticks;
       case DriveWithTrajectory:
@@ -133,6 +141,10 @@ public class DriveController implements Subsystem {
       default:
         return m_driveWithJoysticks;
     }
+  }
+
+  public void setRobotIsAutonomous(boolean robotIsAutonomous) {
+    m_robotIsAutonomous = robotIsAutonomous;
   }
 
   public void syncSensors() {
@@ -148,23 +160,19 @@ public class DriveController implements Subsystem {
       return;
     }
     m_drive.syncSensorsHighFreq();
-    m_driveWithTrajectory.updatePose(getPose());
-    m_driveWithJoysticks.updateAngle(
-        m_drive.getPigeon().getNormalizedYaw(), m_drive.getPigeon().getAngularVelocity());
   }
 
   @Override
   public synchronized void update() {
-    ChassisSpeeds currentChassisSpeeds = new ChassisSpeeds();
-
-    DriveComposable currentComposable = getComposableFromControllerOption(m_controllerOption);
-
-    currentChassisSpeeds = currentComposable.getOutput();
+    ChassisSpeeds currentChassisSpeeds =
+        getComposableFromControllerOption(m_controllerOption)
+            .getOutput(getPose(), m_drive.getPigeon().getAngularVelocity());
 
     if (currentChassisSpeeds != null) {
       m_drive.setChassisSpeeds(currentChassisSpeeds);
       m_currentChassisSpeeds = currentChassisSpeeds;
     }
+
     m_drive.update();
   }
 
