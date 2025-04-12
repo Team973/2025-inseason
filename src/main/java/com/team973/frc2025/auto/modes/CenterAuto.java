@@ -1,6 +1,5 @@
 package com.team973.frc2025.auto.modes;
 
-import com.team973.frc2025.auto.commands.DriveTrajectoryCommand;
 import com.team973.frc2025.auto.commands.PickupAlgaeCommand;
 import com.team973.frc2025.auto.commands.ScoreAlgaeInNetCommand;
 import com.team973.frc2025.auto.commands.ScoreCoralCommand;
@@ -20,7 +19,7 @@ public class CenterAuto extends AutoMode {
         logger,
         new Pose2d(7.18, 4, Rotation2d.fromDegrees(180)),
         new ScoreCoralCommand(drive, superstructure, ReefFace.D, ReefLevel.L_4, ReefSide.Right),
-        new DriveTrajectoryCommand(drive, "D-Backoff", logger.subLogger("D-Backoff")),
+        // new DriveTrajectoryCommand(drive, "D-Backoff", logger.subLogger("D-Backoff")),
         new PickupAlgaeCommand(drive, superstructure, ReefFace.D, ReefLevel.AlgaeLow),
         new ScoreAlgaeInNetCommand(drive, superstructure));
   }
