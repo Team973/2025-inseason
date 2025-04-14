@@ -18,10 +18,5 @@ public class GreyCANCoder extends CANcoder {
   public void log() {
     m_logger.log(
         "Absoltue Position in Rotations", () -> this.getAbsolutePosition().getValue().magnitude());
-    m_logger.log(
-        "Absoltue Position in Degrees",
-        () -> this.getAbsolutePosition().getValue().magnitude() * 360.0);
-    // m_logger.log("Supply Voltage", () -> this.getSupplyVoltage().getValue().magnitude());
-    // m_logger.log("Velocity", () -> this.getVelocity().getValue().magnitude());
   }
 }

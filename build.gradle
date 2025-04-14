@@ -11,7 +11,10 @@ java {
 
 def ROBOT_MAIN_CLASS = "com.team973.frc2025.Main"
 
-tasks.register("downloadLog", DownloadLog)
+tasks.register("downloadDogLogs", DownloadDogLogs)
+tasks.register("downloadUserLog", DownloadUserLog)
+tasks.register("downloadExceptionLog", DownloadExceptionLog)
+
 tasks.register("downloadLimelightLeftConfig", DownloadLimelightLeftConfig)
 tasks.register("uploadLimelightLeftConfig", UploadLimelightLeftConfig)
 
@@ -36,12 +39,13 @@ deploy {
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
                   // Enable VisualVM connection
-                  jvmArgs.add("-Dcom.sun.management.jmxremote=true")
-                  jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
-                  jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
-                  jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
-                  jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
-                  jvmArgs.add("-Djava.rmi.server.hostname=10.9.73.2")
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote=true")
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
+                  // jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
+                  // jvmArgs.add("-Djava.rmi.server.hostname=10.9.73.2")
+									jvmArgs.add("-Xlog:Safepoint")
                 }
 
                 // Static files artifact

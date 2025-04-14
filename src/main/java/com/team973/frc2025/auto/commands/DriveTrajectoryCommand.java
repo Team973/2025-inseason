@@ -7,7 +7,10 @@ import choreo.trajectory.Trajectory;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.lib.util.AutoCommand;
 import com.team973.lib.util.CommandOnEvent;
+import com.team973.lib.util.Logger;
+import com.team973.lib.util.PerfLogger;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,19 +23,25 @@ public class DriveTrajectoryCommand extends AutoCommand {
 
   private final HashMap<String, AutoCommand> m_events;
 
+  private final PerfLogger m_runPerfLogger;
+  private final PerfLogger m_initPerfLogger;
+
   private final List<EventMarker> m_commandList = new ArrayList<>();
   private int m_pendingEventIndex = 0;
 
   private AutoCommand m_currentCommand;
 
   public DriveTrajectoryCommand(
-      DriveController drive, String trajectoryName, CommandOnEvent... events) {
+      DriveController drive, String trajectoryName, Logger logger, CommandOnEvent... events) {
     m_drive = drive;
     m_trajectory = Choreo.loadTrajectory(trajectoryName);
     if (m_trajectory.isEmpty()) {
       throw new IllegalArgumentException(
           "Could not load tajectory that is named '" + trajectoryName + "'");
     }
+
+    m_runPerfLogger = new PerfLogger(logger.subLogger("run"));
+    m_initPerfLogger = new PerfLogger(logger.subLogger("init"));
 
     m_events = new HashMap<>();
 
@@ -56,14 +65,20 @@ public class DriveTrajectoryCommand extends AutoCommand {
   public void log(Alliance alliance) {}
 
   public void init() {
+    double startTime = Timer.getFPGATimestamp();
+
     if (m_trajectory.isPresent()) {
       m_drive.getDriveWithTrajectory().setTrajectory(m_trajectory.get());
     }
 
     m_drive.setControllerOption(DriveController.ControllerOption.DriveWithTrajectory);
+
+    m_initPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
   public void run(Alliance alliance) {
+    double startTime = Timer.getFPGATimestamp();
+
     if (m_commandList.size() > m_pendingEventIndex) {
       if (m_commandList.get(m_pendingEventIndex).timestamp
           <= m_drive.getDriveWithTrajectory().getTimeSecFromStart()) {
@@ -86,6 +101,8 @@ public class DriveTrajectoryCommand extends AutoCommand {
         m_currentCommand.run(alliance);
       }
     }
+
+    m_runPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
   public boolean isCompleted() {

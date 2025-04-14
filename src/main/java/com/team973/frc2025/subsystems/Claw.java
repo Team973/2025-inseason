@@ -35,7 +35,7 @@ public class Claw implements Subsystem {
 
   private double m_targetHoldPosition = 0;
   private double m_coralBackUpRot = 3.0;
-  private double m_filteredAlgaeDistMeters = 0.0;
+  private double m_filteredAlgaeDistMeters = 2.0;
 
   private CANdleManger m_caNdle;
 
@@ -44,6 +44,7 @@ public class Claw implements Subsystem {
     IntakeAlgae,
     ScoreCoral,
     ScoreAlgae,
+    Reverse,
     Off,
   }
 
@@ -68,7 +69,7 @@ public class Claw implements Subsystem {
     m_clawAlgaeSensor = new CANrange(ClawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
-    rightMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_clawMotor.setConfig(rightMotorConfig);
 
     TalonFXConfiguration conveyorConfig = defaultClawMotorConfig();
@@ -136,11 +137,14 @@ public class Claw implements Subsystem {
   }
 
   public boolean getHasAlgae() {
+    if (getAlgaeDistance().isEmpty()) {
+      return false;
+    }
     return m_filteredAlgaeDistMeters < 0.15;
   }
 
   public void coralScoredLED() {
-    // TODO: Add back the algee sensor once tunned
+    // TODO: Add back the algae sensor once tunned
     if (getSeesCoral() || getHasAlgae()) {
       m_clawHasPeiceSignaler.enable();
     } else {
@@ -158,8 +162,8 @@ public class Claw implements Subsystem {
           m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
         } else if (getClawBackSensor() && !getClawFrontSensor()) {
           // Perfect spot!
-          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 0);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
         } else {
           // Way too far back
           m_clawMotor.setControl(ControlMode.VelocityVoltage, 40);
@@ -173,21 +177,25 @@ public class Claw implements Subsystem {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
         } else if (algaeDistance.get() > 0.3) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-          // } else if (algaeDistance.get() < 0.13) {
-          //   m_clawMotor.setControl(ControlMode.VelocityVoltage, -4.0);
+        } else if (algaeDistance.get() < 0.13) {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10.0);
         } else {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, -60.0);
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -100.0);
         }
 
         m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         break;
       case ScoreCoral:
-        m_clawMotor.setControl(ControlMode.VelocityVoltage, 50);
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 100);
         m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
         break;
       case ScoreAlgae:
-        m_clawMotor.setControl(ControlMode.VelocityVoltage, 100);
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 450);
         m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
+        break;
+      case Reverse:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, -20);
+        m_conveyor.setControl(ControlMode.VelocityVoltage, -40);
         break;
       case Off:
         m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
@@ -209,6 +217,8 @@ public class Claw implements Subsystem {
     m_clawMotor.log();
     m_conveyor.log();
 
+    m_logger.log("Filtered Algae Distance Meters", m_filteredAlgaeDistMeters);
+    m_logger.log("Has Algae", getHasAlgae());
     m_logger.log("Claw Motor Voltage", m_clawMotor.getMotorVoltage().getValueAsDouble());
 
     m_logger.log("Conveyor Back Sensor", getClawBackSensor());
@@ -221,7 +231,7 @@ public class Claw implements Subsystem {
     m_logger.log("target hold postion", m_targetHoldPosition);
     m_logger.log("target rotations hit", motorAtTarget());
     m_logger.log("mode", m_mode.toString());
-    m_logger.log("AlgeeCANdistance", m_clawAlgaeSensor.getDistance().getValueAsDouble());
+    m_logger.log("AlgaeCANdistance", m_clawAlgaeSensor.getDistance().getValueAsDouble());
 
     SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
   }
@@ -233,7 +243,7 @@ public class Claw implements Subsystem {
     Optional<Double> algaeDist = getAlgaeDistance();
 
     if (algaeDist.isPresent()) {
-      m_filteredAlgaeDistMeters = (m_filteredAlgaeDistMeters * 0.95) + (algaeDist.get() * 0.05);
+      m_filteredAlgaeDistMeters = (m_filteredAlgaeDistMeters * 0.9) + (algaeDist.get() * 0.1);
     }
   }
 

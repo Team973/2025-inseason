@@ -1,12 +1,10 @@
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.options.Option
 import java.io.File
 
-public abstract class DownloadLog extends DefaultTask {
+public abstract class DownloadDogLogs extends DefaultTask {
   @TaskAction
-  void downloadLog() {
+  public void downloadDogLogs() {
     def logPath = "/home/lvuser/logs/"
     def robotHostName = "lvuser@roborio-${project.frc.getTeamNumber()}-frc.local"
     def sshOps = "-o StrictHostKeyChecking=no"
@@ -43,7 +41,7 @@ public abstract class DownloadLog extends DefaultTask {
         } else {
           //TODO: test for mac
           downloadLogCmds = ["scp", sshOps, fileSource + log, log]
-          deleteLog = ["ssh", sshOps, robotHostName, "rm", logPath + log]
+          deleteLogCmds = ["ssh", sshOps, robotHostName, "rm", logPath + log]
         }
 
         ProcessBuilder downloadLog = new ProcessBuilder(downloadLogCmds)
