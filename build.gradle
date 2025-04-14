@@ -15,11 +15,8 @@ tasks.register("downloadDogLogs", DownloadDogLogs)
 tasks.register("downloadUserLog", DownloadUserLog)
 tasks.register("downloadExceptionLog", DownloadExceptionLog)
 
-tasks.register("downloadLimelightLeftConfig", DownloadLimelightLeftConfig)
-tasks.register("uploadLimelightLeftConfig", UploadLimelightLeftConfig)
-
-tasks.register("downloadLimelightRightConfig", DownloadLimelightRightConfig)
-tasks.register("uploadLimelightRightConfig", UploadLimelightRightConfig)
+tasks.register("downloadLimelightConfig", DownloadLimelightConfig)
+tasks.register("uploadLimelightConfig", UploadLimelightConfig)
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.

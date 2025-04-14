@@ -10,18 +10,24 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
-public abstract class UploadLimelightLeftConfig extends DefaultTask {
+public abstract class UploadLimelightConfig extends DefaultTask {
 	private String fileName = "config"
+	private String limelight = "right"
 
 	@Option(option = "file-name", description = "The name for the config file.")
 	void setFileName(String fileName) {
 			this.fileName = fileName
 	}
 
+	@Option(option = "limelight", description = "Which limelight to upload the config to; either 'left' or 'right'.")
+	void setLimelight(String limelight) {
+		this.limelight = limelight
+	}
+
 	@TaskAction
   void downloadLimelightLeftConfig() {
 		try {
-			File configFile = new File("config/limelight-left/" + fileName + ".txt")
+			File configFile = new File("config/limelight-${limelight}/" + fileName + ".txt")
 			Scanner reader = new Scanner(configFile);
 			String data = ""
 
@@ -31,7 +37,7 @@ public abstract class UploadLimelightLeftConfig extends DefaultTask {
 
      	reader.close();
 
-			URL url = new URL("http://10.9.73.13:5807/upload-pipeline")
+			URL url = new URL("http://limelight-${limelight}:5807/upload-pipeline")
 			HttpURLConnection con = (HttpURLConnection) url.openConnection()
 			con.setRequestMethod("POST")
 
