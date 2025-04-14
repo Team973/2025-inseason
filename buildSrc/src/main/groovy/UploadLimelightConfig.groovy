@@ -27,7 +27,7 @@ public abstract class UploadLimelightConfig extends DefaultTask {
 	@TaskAction
   void downloadLimelightLeftConfig() {
 		try {
-			File configFile = new File("config/limelight-${limelight}/" + fileName + ".txt")
+			File configFile = new File("config/limelight-${limelight}/" + fileName + ".json")
 			Scanner reader = new Scanner(configFile);
 			String data = ""
 

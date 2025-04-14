@@ -46,7 +46,7 @@ public abstract class DownloadLimelightConfig extends DefaultTask {
 
 				reader.close()
 
-				File configFile = new File("config/limelight-${limelight}/" + fileName + ".txt")
+				File configFile = new File("config/limelight-${limelight}/" + fileName + ".json")
 				configFile.createNewFile()
 
 				FileWriter writer = new FileWriter(configFile)
