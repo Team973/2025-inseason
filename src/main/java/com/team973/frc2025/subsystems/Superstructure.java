@@ -309,6 +309,8 @@ public class Superstructure implements Subsystem {
       m_claw.setControl(Claw.ControlStatus.Off);
     } else if (m_gamePieceMode == GamePiece.Coral) {
       m_claw.setControl(Claw.ControlStatus.IntakeCoral);
+    } else if (m_targetReefLevelSupplier.get() == ReefLevel.AlgaeFloor) {
+      m_claw.setControl(Claw.ControlStatus.IntakeAlgaeFromFloor);
     } else {
       m_claw.setControl(Claw.ControlStatus.IntakeAlgae);
     }
