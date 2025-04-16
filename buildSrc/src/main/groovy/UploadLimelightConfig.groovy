@@ -11,50 +11,50 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 public abstract class UploadLimelightConfig extends DefaultTask {
-	private String fileName = "config"
-	private String limelight = "right"
+  private String fileName = "config"
+  private String limelight = "right"
 
-	@Option(option = "file-name", description = "The name for the config file.")
-	void setFileName(String fileName) {
-			this.fileName = fileName
-	}
+  @Option(option = "file-name", description = "The name for the config file.")
+  void setFileName(String fileName) {
+      this.fileName = fileName
+  }
 
-	@Option(option = "limelight", description = "Which limelight to upload the config to; either 'left' or 'right'.")
-	void setLimelight(String limelight) {
-		this.limelight = limelight
-	}
+  @Option(option = "limelight", description = "Which limelight to upload the config to; either 'left' or 'right'.")
+  void setLimelight(String limelight) {
+    this.limelight = limelight
+  }
 
-	@TaskAction
+  @TaskAction
   void uploadLimelightConfig() {
-		try {
-			File configFile = new File("config/limelight-${limelight}/" + fileName + ".json")
-			Scanner reader = new Scanner(configFile)
-			String data = ""
+    try {
+      File configFile = new File("config/limelight-${limelight}/" + fileName + ".json")
+      Scanner reader = new Scanner(configFile)
+      String data = ""
 
-			while (reader.hasNextLine()) {
-				data += reader.nextLine()
-			}
+      while (reader.hasNextLine()) {
+        data += reader.nextLine()
+      }
 
-     	reader.close()
+       reader.close()
 
-			URL url = new URL("http://limelight-${limelight}:5807/upload-pipeline")
-			HttpURLConnection con = (HttpURLConnection) url.openConnection()
-			con.setRequestMethod("POST")
+      URL url = new URL("http://limelight-${limelight}:5807/upload-pipeline")
+      HttpURLConnection con = (HttpURLConnection) url.openConnection()
+      con.setRequestMethod("POST")
 
-			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+      con.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
 
-			con.setDoInput(true)
-			con.setDoOutput(true)
+      con.setDoInput(true)
+      con.setDoOutput(true)
 
-			OutputStream os = con.getOutputStream()
+      OutputStream os = con.getOutputStream()
 
-			os.write(data.getBytes())
-			os.flush()
+      os.write(data.getBytes())
+      os.flush()
 
-			int responseCode = con.getResponseCode();
-			System.out.println("Response Code: " + responseCode)
-		} catch (Exception e) {
-			e.printStackTrace()
-		}
+      int responseCode = con.getResponseCode();
+      System.out.println("Response Code: " + responseCode)
+    } catch (Exception e) {
+      e.printStackTrace()
+    }
   }
 }
