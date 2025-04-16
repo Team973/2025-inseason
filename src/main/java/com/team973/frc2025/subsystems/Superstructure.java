@@ -191,6 +191,10 @@ public class Superstructure implements Subsystem {
     m_logger.log("Game Piece Mode", m_gamePieceMode.toString());
     m_logger.log("State", m_state.toString());
 
+    m_logger.log("Manual Score", m_manualScore);
+    m_logger.log("Manual Intake", m_manualIntake);
+    m_logger.log("Manual Armivator", m_manualArmivator);
+
     m_claw.log();
     m_climb.log();
     m_elevator.log();
