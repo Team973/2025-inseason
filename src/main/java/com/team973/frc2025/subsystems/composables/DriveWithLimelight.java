@@ -134,18 +134,19 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag A_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
+    public static final double L1_OFFSET_ANGLE = 18.0;
     public static final TargetPositionRelativeToAprilTag A_L_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7),
             LEFT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(15));
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag A_R_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7),
             RIGHT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(-15));
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag A_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
@@ -163,13 +164,13 @@ public class DriveWithLimelight extends DriveComposable {
             AprilTag.fromRed(8),
             LEFT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(15));
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag B_R_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(8),
             RIGHT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(-15));
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag B_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(8), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
@@ -187,13 +188,13 @@ public class DriveWithLimelight extends DriveComposable {
             AprilTag.fromRed(9),
             LEFT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(15));
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag C_R_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(9),
             RIGHT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(-15));
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag C_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(9), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
@@ -211,13 +212,13 @@ public class DriveWithLimelight extends DriveComposable {
             AprilTag.fromRed(10),
             LEFT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(15));
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag D_R_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(10),
             RIGHT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(-15));
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag D_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(10), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
@@ -235,13 +236,13 @@ public class DriveWithLimelight extends DriveComposable {
             AprilTag.fromRed(11),
             LEFT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(15));
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag E_R_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(11),
             RIGHT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(-15));
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag E_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(11), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
@@ -259,13 +260,13 @@ public class DriveWithLimelight extends DriveComposable {
             AprilTag.fromRed(6),
             LEFT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(15));
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag F_R_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(6),
             RIGHT_REEF_APPROACH_TARGET,
             REEF_SCORING_DIST,
-            Rotation2d.fromDegrees(-15));
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
     public static final TargetPositionRelativeToAprilTag F_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(6), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
