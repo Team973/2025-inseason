@@ -37,21 +37,18 @@ public abstract class DownloadLimelightConfig extends DefaultTask {
 			if (responseCode == 200) {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()))
 
-				String inputLine
-				StringBuffer response = new StringBuffer()
-
-				while ((inputLine = reader.readLine()) != null) {
-					response.append(inputLine)
-				}
-
-				reader.close()
-
 				File configFile = new File("config/limelight-${limelight}/" + fileName + ".json")
 				configFile.createNewFile()
 
-				FileWriter writer = new FileWriter(configFile)
+				FileWriter writer = new FileWriter(configFile, true)
 
-      	writer.write(response.toString())
+				String inputLine
+
+				while ((inputLine = reader.readLine()) != null) {
+					writer.write(inputLine)
+				}
+
+				reader.close()
       	writer.close();
 			}
 		} catch (Exception e) {
