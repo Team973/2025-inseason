@@ -17,6 +17,7 @@ import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.Superstructure.GamePiece;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.Wrist;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
@@ -366,6 +367,11 @@ public class Robot extends TimedRobot {
       if (m_coDriverStick.getAButtonPressed()) {
         m_superstructure.setTargetReefLevel(
             ReefLevel.L_1, ReefLevel.AlgaeFloor, ReefLevel.Processor);
+        if (m_superstructure.getGamePieceMode() == GamePiece.Coral) {
+          m_driveController
+              .getDriveWithLimelight()
+              .setTargetSide(DriveWithLimelight.ReefSide.LevelOne);
+        }
       } else if (m_coDriverStick.getXButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
       } else if (m_coDriverStick.getBButtonPressed()) {
@@ -444,8 +450,6 @@ public class Robot extends TimedRobot {
 
     if (m_superstructure.getGamePieceMode() == Superstructure.GamePiece.Algae) {
       m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
-    } else if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
-      m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.LevelOne);
     } else if (m_driverStick.getRightTrigger()) {
       if (m_leftReefSide.isActive()) {
         m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
