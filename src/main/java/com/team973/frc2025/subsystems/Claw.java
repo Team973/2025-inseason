@@ -168,8 +168,8 @@ public class Claw implements Subsystem {
             m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
           } else {
             // Way too far back
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, 40);
-            m_conveyor.setControl(ControlMode.VelocityVoltage, 80);
+            m_clawMotor.setControl(ControlMode.VelocityVoltage, 60);
+            m_conveyor.setControl(ControlMode.VelocityVoltage, 120);
           }
           break;
         }
