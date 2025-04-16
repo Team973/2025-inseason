@@ -299,7 +299,7 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void setTargetSide(ReefSide side) {
-    if (m_targetReefSide != ReefSide.Center) {
+    if (m_targetReefSide == ReefSide.Left || m_targetReefSide == ReefSide.Right) {
       m_lastTargetReefSide = m_targetReefSide;
     }
 
