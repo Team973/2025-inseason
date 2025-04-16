@@ -25,31 +25,31 @@ public abstract class UploadLimelightConfig extends DefaultTask {
 	}
 
 	@TaskAction
-  void downloadLimelightConfig() {
+  void uploadLimelightConfig() {
 		try {
 			File configFile = new File("config/limelight-${limelight}/" + fileName + ".json")
-			Scanner reader = new Scanner(configFile);
+			Scanner reader = new Scanner(configFile)
 			String data = ""
 
 			while (reader.hasNextLine()) {
 				data += reader.nextLine()
 			}
 
-     	reader.close();
+     	reader.close()
 
 			URL url = new URL("http://limelight-${limelight}:5807/upload-pipeline")
 			HttpURLConnection con = (HttpURLConnection) url.openConnection()
 			con.setRequestMethod("POST")
 
-			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
 
-			con.setDoInput(true);
+			con.setDoInput(true)
 			con.setDoOutput(true)
 
-			OutputStream os = con.getOutputStream();
+			OutputStream os = con.getOutputStream()
 
-			os.write(data.getBytes());
-			os.flush();
+			os.write(data.getBytes())
+			os.flush()
 
 			int responseCode = con.getResponseCode();
 			System.out.println("Response Code: " + responseCode)
