@@ -40,7 +40,7 @@ public abstract class DownloadLimelightConfig extends DefaultTask {
 				File configFile = new File("config/limelight-${limelight}/" + fileName + ".json")
 				configFile.createNewFile()
 
-				FileWriter writer = new FileWriter(configFile, true)
+				FileWriter writer = new FileWriter(configFile)
 
 				String inputLine
 
