@@ -395,6 +395,13 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case Scoring:
+            if (m_manualScore
+                && (m_gamePieceMode == GamePiece.Coral
+                    || m_targetReefLevelSupplier.get() == ReefLevel.Processor
+                    || m_targetReefLevelSupplier.get() == ReefLevel.Net)) {
+              clawScore();
+            }
+
             armTargetReefLevel();
             elevatorTargetReefLevel();
             wristTargetReefLevel();
@@ -417,13 +424,6 @@ public class Superstructure implements Subsystem {
 
             m_manualArmivator = false;
             break;
-        }
-
-        if (m_manualScore
-            && (m_gamePieceMode == GamePiece.Coral
-                || m_targetReefLevelSupplier.get() == ReefLevel.Processor
-                || m_targetReefLevelSupplier.get() == ReefLevel.Net)) {
-          clawScore();
         }
         break;
       case Zero:
