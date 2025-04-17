@@ -134,7 +134,9 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag A_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
-    public static final double L1_OFFSET_ANGLE = 22.0;
+
+    public static final double L1_OFFSET_ANGLE = 11.0;
+
     public static final TargetPositionRelativeToAprilTag A_L_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7),
@@ -280,10 +282,10 @@ public class DriveWithLimelight extends DriveComposable {
     double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
     m_xController =
         new ProfiledPIDController(
-            4.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.4), controlPeriodSeconds);
+            4.0, 0, 0, new TrapezoidProfile.Constraints(1.76, 0.44), controlPeriodSeconds);
     m_yController =
         new ProfiledPIDController(
-            4.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.4), controlPeriodSeconds);
+            4.0, 0, 0, new TrapezoidProfile.Constraints(1.76, 0.44), controlPeriodSeconds);
     m_thetaController =
         new ProfiledPIDController(
             8.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.35), controlPeriodSeconds);
