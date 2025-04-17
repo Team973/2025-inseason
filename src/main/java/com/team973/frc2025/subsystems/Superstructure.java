@@ -30,6 +30,7 @@ public class Superstructure implements Subsystem {
   private boolean m_manualScore = false;
   private boolean m_manualIntake = true;
   private boolean m_manualArmivator = false;
+  private boolean m_pickedUpAlgaeFromFloor = false;
 
   public enum State {
     Manual,
@@ -96,24 +97,33 @@ public class Superstructure implements Subsystem {
     m_manualIntake = intake;
   }
 
+  private void setTargetReefLevelSupplier(Supplier<ReefLevel> reefLevelSupplier) {
+    m_targetReefLevelSupplier = reefLevelSupplier;
+
+    if (!getHasAlgae()) {
+      m_pickedUpAlgaeFromFloor = false;
+    }
+  }
+
   public void setTargetReefLevel(ReefLevel level) {
-    m_targetReefLevelSupplier = () -> level;
+    setTargetReefLevelSupplier(() -> level);
   }
 
   public void setTargetReefLevel(ReefLevel coralLevel, ReefLevel algaeLevel) {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_targetReefLevelSupplier = () -> coralLevel;
+      setTargetReefLevel(coralLevel);
     } else {
-      m_targetReefLevelSupplier = () -> algaeLevel;
+      setTargetReefLevel(algaeLevel);
     }
   }
 
   public void setTargetReefLevel(
       ReefLevel coralLevel, ReefLevel waitingForAlgaeLevel, ReefLevel hasAlgaeLevel) {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_targetReefLevelSupplier = () -> coralLevel;
+      setTargetReefLevel(coralLevel);
     } else {
-      m_targetReefLevelSupplier = () -> getHasAlgae() ? hasAlgaeLevel : waitingForAlgaeLevel;
+      setTargetReefLevelSupplier(
+          () -> m_pickedUpAlgaeFromFloor ? hasAlgaeLevel : waitingForAlgaeLevel);
     }
   }
 
@@ -194,6 +204,7 @@ public class Superstructure implements Subsystem {
     m_logger.log("Manual Score", m_manualScore);
     m_logger.log("Manual Intake", m_manualIntake);
     m_logger.log("Manual Armivator", m_manualArmivator);
+    m_logger.log("Picked Up Algae From Floor", m_pickedUpAlgaeFromFloor);
 
     m_claw.log();
     m_climb.log();
@@ -213,6 +224,10 @@ public class Superstructure implements Subsystem {
       m_algaeSignaler.enable();
     } else {
       m_algaeSignaler.disable();
+    }
+
+    if (m_targetReefLevelSupplier.get() == ReefLevel.AlgaeFloor && getHasAlgae()) {
+      m_pickedUpAlgaeFromFloor = true;
     }
   }
 
