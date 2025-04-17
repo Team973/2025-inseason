@@ -328,7 +328,11 @@ public class Superstructure implements Subsystem {
         m_claw.setControl(Claw.ControlStatus.ScoreCoral);
       }
     } else {
-      m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
+      if (m_targetReefLevelSupplier.get() == ReefLevel.Processor) {
+        m_claw.setControl(Claw.ControlStatus.ScoreAlgaeProcessor);
+      } else {
+        m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
+      }
     }
   }
 

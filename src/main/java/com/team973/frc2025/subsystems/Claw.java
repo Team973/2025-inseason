@@ -46,6 +46,7 @@ public class Claw implements Subsystem {
     ScoreCoral,
     ScoreCoralLevelOne,
     ScoreAlgae,
+    ScoreAlgaeProcessor,
     Reverse,
     Off,
   }
@@ -223,6 +224,12 @@ public class Claw implements Subsystem {
       case ScoreAlgae:
         {
           m_clawMotor.setControl(ControlMode.VelocityVoltage, 450);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
+          break;
+        }
+      case ScoreAlgaeProcessor:
+        {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 50);
           m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
           break;
         }
