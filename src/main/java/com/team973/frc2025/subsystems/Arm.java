@@ -29,7 +29,7 @@ public class Arm implements Subsystem {
 
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 61.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 65.0;
   private static final double LEVEL_THREE_POSITION_DEG = 59.0;
   private static final double LEVEL_TWO_POSITION_DEG = -61.0;
   private static final double LEVEL_ONE_POSITION_DEG = -59.0;
