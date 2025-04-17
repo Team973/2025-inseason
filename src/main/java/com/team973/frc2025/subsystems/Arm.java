@@ -12,27 +12,21 @@ import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Arm implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_armMotor;
+  private final GreyCANCoder m_armEncoder;
+
   private ControlStatus m_controlStatus = ControlStatus.Off;
+
   private double m_armTargetPostionDeg;
   private double m_manualArmPower;
 
-  private final GreyCANCoder m_armEncoder;
-  // We want to track the transition from hall=false to hall=true; when the robot
-  // first boots up, we don't really know what the previous hall state was, so we
-  // assume it was true to avoid false positive.
-  private boolean m_lastHallSensorMode = true;
-  private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
-
-  private final SolidSignaler m_armHomedSigaler =
+  private final SolidSignaler m_armHorizontalSigaler =
       new SolidSignaler(
-          RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
+          RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HORIZONTAL_SIGNALER_PRIORTY);
 
-  private static final double ARM_HOMING_POSTION_DEG = -90.0;
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
   private static final double LEVEL_FOUR_POSITION_DEG = 61.0;
@@ -84,7 +78,7 @@ public class Arm implements Subsystem {
         new GreyCANCoder(
             ArmInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
-    m_candleManger.addSignaler(m_armHomedSigaler);
+    m_candleManger.addSignaler(m_armHorizontalSigaler);
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.0;
@@ -111,18 +105,6 @@ public class Arm implements Subsystem {
     BaseStatusSignal.waitForAll(0.5, m_armEncoder.getAbsolutePosition());
 
     m_armMotor.setPosition(armDegToMotorRotations(getCanCoderPostionDeg()));
-  }
-
-  private boolean hallSensor() {
-    return !m_hallSesnsor.get();
-  }
-
-  private void maybeHomeArm() {
-    if (m_lastHallSensorMode == false && hallSensor() == true) {
-      m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
-      m_armHomedSigaler.enable();
-    }
-    m_lastHallSensorMode = hallSensor();
   }
 
   public void setMotorManualOutput(double joystick) {
@@ -258,7 +240,6 @@ public class Arm implements Subsystem {
         motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
     m_logger.log("manualPower", m_manualArmPower);
-    m_logger.log("HallsensorArm", hallSensor());
 
     m_logger.log("getCanCoderPostion", getCanCoderPostionDeg());
 
@@ -274,7 +255,11 @@ public class Arm implements Subsystem {
 
   @Override
   public void syncSensors() {
-    maybeHomeArm();
+    if (Math.abs(getArmPostionDeg()) < 0.1) {
+      m_armHorizontalSigaler.enable();
+    } else {
+      m_armHorizontalSigaler.disable();
+    }
   }
 
   @Override
