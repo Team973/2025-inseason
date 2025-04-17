@@ -305,7 +305,7 @@ public class Superstructure implements Subsystem {
   }
 
   public void setClimbTarget(double target) {
-    m_climb.setTarget(target);
+    m_climb.setTargetAngleDeg(target);
   }
 
   public void clawIntake() {
