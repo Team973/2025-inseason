@@ -1,5 +1,7 @@
 # Upload Limelight Config All
 
+`.\gradlew uploadLimelightConfigAll`
+
 Runs the [UploadLimelightConfig](UploadLimelightConfig.md) task for the `left` and `right` limelights.
 
 ## Options

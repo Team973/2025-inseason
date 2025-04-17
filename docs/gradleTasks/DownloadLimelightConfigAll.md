@@ -1,5 +1,7 @@
 # Download Limelight Config All
 
+`.\gradlew downloadLimelightConfigAll`
+
 Runs the [DownloadLimelightConfig](DownloadLimelightConfig.md) task for the `left` and `right` limelights.
 
 ## Options

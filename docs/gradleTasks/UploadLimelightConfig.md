@@ -1,5 +1,7 @@
 # Upload Limelight Config
 
+`.\gradlew uploadLimelightConfig`
+
 Uploads the specified JSON configuration file to the on-disk pipeline of a limelight.
 
 ## Options

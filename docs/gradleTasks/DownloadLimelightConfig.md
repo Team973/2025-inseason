@@ -1,5 +1,7 @@
 # Download Limelight Config
 
+`.\gradlew downloadLimelightConfig`
+
 Downloads the configuration from a limelight for pipeling 0 as a JSON file.
 
 ## Options
