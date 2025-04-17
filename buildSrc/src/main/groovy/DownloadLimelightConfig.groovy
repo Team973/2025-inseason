@@ -10,23 +10,9 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
-public abstract class DownloadLimelightConfig extends DefaultTask {
-  private String fileName = "config"
-  private String limelight = "right"
-
-  @Option(option = "file-name", description = "The name for the config file.")
-  void setFileName(String fileName) {
-      this.fileName = fileName
-  }
-
-  @Option(option = "limelight", description = "Which limelight to download the config from; either 'left' or 'right'.")
-  void setLimelight(String limelight) {
-    this.limelight = limelight
-  }
-
-  @TaskAction
-  void downloadLimelightConfig() {
-    try {
+public class DownloadLimelightConfig extends DefaultTask {
+	public static void doDownloadLimelightConfig(String fileName, String limelight) {
+		try {
       URL url = new URL("http://limelight-${limelight}:5807/pipeline-atindex?index=0")
       HttpURLConnection con = (HttpURLConnection) url.openConnection()
       con.setRequestMethod("GET")
@@ -54,5 +40,23 @@ public abstract class DownloadLimelightConfig extends DefaultTask {
     } catch (Exception e) {
       e.printStackTrace()
     }
+	}
+
+  private String fileName = "config"
+  private String limelight = "right"
+
+  @Option(option = "file-name", description = "The name for the config file.")
+  void setFileName(String fileName) {
+      this.fileName = fileName
+  }
+
+  @Option(option = "limelight", description = "Which limelight to download the config from; either 'left' or 'right'.")
+  void setLimelight(String limelight) {
+    this.limelight = limelight
+  }
+
+  @TaskAction
+  void downloadLimelightConfig() {
+    DownloadLimelightConfig.doDownloadLimelightConfig(fileName, limelight)
   }
 }

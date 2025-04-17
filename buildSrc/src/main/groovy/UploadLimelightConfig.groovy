@@ -11,22 +11,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 public abstract class UploadLimelightConfig extends DefaultTask {
-  private String fileName = "config"
-  private String limelight = "right"
-
-  @Option(option = "file-name", description = "The name for the config file.")
-  void setFileName(String fileName) {
-      this.fileName = fileName
-  }
-
-  @Option(option = "limelight", description = "Which limelight to upload the config to; either 'left' or 'right'.")
-  void setLimelight(String limelight) {
-    this.limelight = limelight
-  }
-
-  @TaskAction
-  void uploadLimelightConfig() {
-    try {
+	public static void doUploadLimelightConfig(String fileName, String limelight) {
+		try {
       File configFile = new File("config/limelight-${limelight}/" + fileName + ".json")
       Scanner reader = new Scanner(configFile)
       String data = ""
@@ -56,5 +42,23 @@ public abstract class UploadLimelightConfig extends DefaultTask {
     } catch (Exception e) {
       e.printStackTrace()
     }
+	}
+
+  private String fileName = "config"
+  private String limelight = "right"
+
+  @Option(option = "file-name", description = "The name for the config file.")
+  void setFileName(String fileName) {
+      this.fileName = fileName
+  }
+
+  @Option(option = "limelight", description = "Which limelight to upload the config to; either 'left' or 'right'.")
+  void setLimelight(String limelight) {
+    this.limelight = limelight
+  }
+
+  @TaskAction
+  void uploadLimelightConfig() {
+    UploadLimelightConfig.doUploadLimelightConfig(fileName, limelight)
   }
 }
