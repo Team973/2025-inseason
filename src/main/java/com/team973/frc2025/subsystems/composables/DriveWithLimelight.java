@@ -134,7 +134,7 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag A_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
-    public static final double L1_OFFSET_ANGLE = 18.0;
+    public static final double L1_OFFSET_ANGLE = 22.0;
     public static final TargetPositionRelativeToAprilTag A_L_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7),
