@@ -1,6 +1,6 @@
 # Pit Programming Checklist
 ## Pre-match
-- Upload correct limelight configs
+- Upload limelight config for corresponding playing field (ex. practice field, division, Einstein)
 - Deploy code
 - Make an empty commit or amend the previous commit with the match number (ex. practice 1, qual 2, elim 3)
 
