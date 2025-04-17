@@ -6,5 +6,5 @@
 
 ## Post-match
 - [Download limelight configs](./gradleTasks/DownloadLimelightConfigAll.md) (if they were changed by drivers)
-- Download DogLogs
+- [Download DogLogs](./gradleTasks/DownloadDogLogs.md)
 - Download exception log
