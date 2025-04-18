@@ -269,15 +269,15 @@ public class Elevator implements Subsystem {
 
   @Override
   public void log() {
+    m_motorLeft.log();
+    m_motorRight.log();
+
     m_logger.log("currentPostionHeightInches", getHeightInches());
     m_logger.log("targetPostionReached", motorAtTarget());
     m_logger.log("targetPostionHeightInches", m_targetPostionHeightinches);
-    m_motorLeft.log();
-    m_motorRight.log();
+
     m_logger.log("elevatorMode", m_controlStatus.toString());
-    m_logger.log(
-        "motorErrorInches",
-        motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
+
     m_logger.log("hallSesnsorReturnElevator", hallsensor());
 
     m_logger.log("Level 1 Offset", m_levelOneOffset);

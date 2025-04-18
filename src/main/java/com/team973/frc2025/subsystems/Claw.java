@@ -263,14 +263,11 @@ public class Claw implements Subsystem {
 
     m_logger.log("Filtered Algae Distance Meters", m_filteredAlgaeDistMeters);
     m_logger.log("Has Algae", getHasAlgae());
-    m_logger.log("Claw Motor Voltage", m_clawMotor.getMotorVoltage().getValueAsDouble());
 
     m_logger.log("Conveyor Back Sensor", getClawBackSensor());
     m_logger.log("Conveyor Front Sensor", getClawFrontSensor());
 
     m_logger.log("Algae Sensor Strength", m_clawAlgaeSensor.getSignalStrength().getValueAsDouble());
-    m_logger.log(
-        "Algae Sensor Health", m_clawAlgaeSensor.getMeasurementHealth().getValueAsDouble());
 
     m_logger.log("target hold postion", m_targetHoldPosition);
     m_logger.log("target rotations hit", motorAtTarget());

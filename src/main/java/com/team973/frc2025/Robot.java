@@ -158,7 +158,6 @@ public class Robot extends TimedRobot {
 
     m_logger.log("Ready To Score", m_readyToScore.get());
     m_logger.log("Ready To Back Off", m_readyToBackOff.get());
-    m_logger.log("Get Alliance Cache Call Count", AllianceCache.m_numberOfGetCalls.get());
     m_logger.log("Match Time", Timer.getMatchTime());
   }
 

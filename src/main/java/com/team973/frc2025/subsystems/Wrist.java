@@ -19,7 +19,7 @@ public class Wrist implements Subsystem {
   private final GreyTalonFX m_wristMotor;
   private final GreyCANCoder m_wristEncoder;
 
-  private ControlStatus m_controlStatus = ControlStatus.Manual;
+  private ControlStatus m_controlStatus = ControlStatus.Off;
 
   private static final double HORIZONTAL_POSITION_DEG = -90.0;
 
@@ -37,7 +37,6 @@ public class Wrist implements Subsystem {
   private static final double ALGAE_FLOOR_POSITION_DEG = -88.0;
   public static final double ALGAE_STOW_POSITION_DEG = -5.0;
 
-  private double m_manualWristPower = 0.0;
   private double m_wristTargetPostionDeg = 0.0;
 
   public Wrist(Logger logger) {
@@ -76,7 +75,6 @@ public class Wrist implements Subsystem {
   }
 
   public static enum ControlStatus {
-    Manual,
     TargetPostion,
     Off,
   }
@@ -128,11 +126,6 @@ public class Wrist implements Subsystem {
     return m_wristTargetPostionDeg;
   }
 
-  public void setMotorManualOutput(double joystick) {
-    m_controlStatus = ControlStatus.Manual;
-    m_manualWristPower = joystick;
-  }
-
   private double getCanCoderPostion() {
     return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()
             - WristInfo.ENCODER_OFFSET_ROTATIONS)
@@ -157,9 +150,6 @@ public class Wrist implements Subsystem {
   @Override
   public void update() {
     switch (m_controlStatus) {
-      case Manual:
-        m_wristMotor.setControl(ControlMode.DutyCycleOut, m_manualWristPower, 0);
-        break;
       case TargetPostion:
         m_wristMotor.setControl(
             ControlMode.MotionMagicVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
@@ -178,10 +168,6 @@ public class Wrist implements Subsystem {
     m_logger.log("wristDegPostion", getWristPostionDeg());
     m_logger.log("wristTargetPostionDeg", m_wristTargetPostionDeg);
     m_logger.log("wristMode", m_controlStatus.toString());
-    m_logger.log(
-        "motorwristErrorDeg",
-        motorRotationsToWristDeg(m_wristMotor.getClosedLoopError().getValueAsDouble()));
-    m_logger.log("manualPower", m_manualWristPower);
     m_logger.log("getCanCoderPostion", getCanCoderPostion());
   }
 

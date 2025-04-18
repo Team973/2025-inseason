@@ -21,7 +21,6 @@ public class Arm implements Subsystem {
   private ControlStatus m_controlStatus = ControlStatus.Off;
 
   private double m_armTargetPostionDeg;
-  private double m_manualArmPower;
 
   private final SolidSignaler m_armHorizontalSigaler =
       new SolidSignaler(
@@ -57,7 +56,6 @@ public class Arm implements Subsystem {
   private CANdleManger m_candleManger;
 
   public static enum ControlStatus {
-    Manual,
     TargetPostion,
     Off,
   }
@@ -105,11 +103,6 @@ public class Arm implements Subsystem {
     BaseStatusSignal.waitForAll(0.5, m_armEncoder.getAbsolutePosition());
 
     m_armMotor.setPosition(armDegToMotorRotations(getCanCoderPostionDeg()));
-  }
-
-  public void setMotorManualOutput(double joystick) {
-    m_controlStatus = ControlStatus.Manual;
-    m_manualArmPower = joystick * 0.1;
   }
 
   private double getCanCoderPostionDeg() {
@@ -170,9 +163,6 @@ public class Arm implements Subsystem {
   @Override
   public void update() {
     switch (m_controlStatus) {
-      case Manual:
-        m_armMotor.setControl(ControlMode.VoltageOut, (m_manualArmPower * 12.0), 0);
-        break;
       case TargetPostion:
         m_armMotor.setControl(
             ControlMode.MotionMagicVoltage,
@@ -235,11 +225,7 @@ public class Arm implements Subsystem {
     m_logger.log("armDegPostion", getArmPostionDeg());
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
     m_logger.log("armMode", m_controlStatus.toString());
-    m_logger.log(
-        "motorArmErrorDeg",
-        motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
-    m_logger.log("manualPower", m_manualArmPower);
 
     m_logger.log("getCanCoderPostion", getCanCoderPostionDeg());
 

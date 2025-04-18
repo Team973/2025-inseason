@@ -34,7 +34,6 @@ public class Climb implements Subsystem {
           100.0,
           SignalerInfo.CLIMB_STOP_PRIORITY);
 
-  private double m_manualPower = 0;
   private double m_targetPosition;
 
   public Climb(Logger logger, CANdleManger candle) {
@@ -104,7 +103,6 @@ public class Climb implements Subsystem {
     double climbPosition = m_climb.getPosition().getValueAsDouble();
     m_climb.log();
     m_logger.log("CurrentPositionRotations", climbPosition);
-    m_logger.log("CurrentManualPower", m_manualPower);
     m_logger.log("Target Position Motor Rotations", m_targetPosition);
     m_logger.log("Target Position Deg", getClimbDegFromMotorRot(m_targetPosition));
     m_logger.log("Angle Deg", getClimbAngleDeg());
