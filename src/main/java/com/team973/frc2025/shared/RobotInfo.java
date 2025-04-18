@@ -72,7 +72,8 @@ public final class RobotInfo {
     public static final int ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY = 10;
     public static final int PEICE_IN_CLAW_SIGNALER_PRIORTY = 50;
     public static final int ALGAE_MODE_SIGNALER_PRIORITY = 60;
-    public static final int ARM_HORIZONTAL_SIGNALER_PRIORTY = 98;
+    public static final int ARM_HORIZONTAL_SIGNALER_PRIORTY = 97;
+    public static final int WRIST_HORIZONTAL_SIGNLAER_PRIORITY = 98;
     public static final int LOW_BATTER_SIGNALER_PRIORTY = 99;
     public static final int OFF_SIGNALER_PRIORTY = 100;
   }
@@ -210,6 +211,7 @@ public final class RobotInfo {
   public static class Colors {
     public static final Color RED = new Color(255, 0, 0);
     public static final Color GREEN = new Color(0, 255, 0);
+    public static final Color YELLOW = new Color(255, 255, 0);
     public static final Color BLUE = new Color(0, 0, 255);
     public static final Color OFF = new Color(0, 0, 0);
     public static final Color ORANGE = new Color(255, 100, 25);

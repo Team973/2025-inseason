@@ -53,8 +53,6 @@ public class Arm implements Subsystem {
   private double m_algaeLowOffset = 0.0;
   private double m_algaeFloorOffset = 0.0;
 
-  private CANdleManger m_candleManger;
-
   public static enum ControlStatus {
     TargetPostion,
     Off,
@@ -71,12 +69,12 @@ public class Arm implements Subsystem {
   public Arm(Logger logger, CANdleManger candle) {
     m_logger = logger;
     m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
-    m_candleManger = candle;
     m_armEncoder =
         new GreyCANCoder(
             ArmInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
-    m_candleManger.addSignaler(m_armHorizontalSigaler);
+    candle.addSignaler(m_armHorizontalSigaler);
+
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.0;
@@ -239,11 +237,18 @@ public class Arm implements Subsystem {
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
     m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
+
+    m_logger.log("Is Horizontal", isHorizontal());
+  }
+
+  public boolean isHorizontal() {
+    return Math.abs(getArmPostionDegFromMotorRot(m_armMotor.getPosition().getValueAsDouble()))
+        < 0.1;
   }
 
   @Override
   public void syncSensors() {
-    if (Math.abs(getArmPostionDegFromMotorRot(m_armMotor.getPosition().getValueAsDouble())) < 0.1) {
+    if (isHorizontal()) {
       m_armHorizontalSigaler.enable();
     } else {
       m_armHorizontalSigaler.disable();

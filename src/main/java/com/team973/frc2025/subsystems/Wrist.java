@@ -23,7 +23,7 @@ public class Wrist implements Subsystem {
 
   private static final double HORIZONTAL_POSITION_DEG = -90.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = -197.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = -198.0;
   private static final double LEVEL_THREE_POSITION_DEG = -191.0;
   private static final double LEVEL_TWO_POSITION_DEG = -56.0;
   private static final double LEVEL_ONE_POSITION_DEG = -4.0;
@@ -145,6 +145,12 @@ public class Wrist implements Subsystem {
     return motorAtTargetRotation(m_wristMotor.getPosition().getValueAsDouble());
   }
 
+  public boolean isHorizontal() {
+    return Math.abs(
+            getWristPostionDegFromMotorRot(m_wristMotor.getPosition().getValueAsDouble()) + 90.0)
+        < 0.1;
+  }
+
   @Override
   public void syncSensors() {}
 
@@ -173,6 +179,7 @@ public class Wrist implements Subsystem {
     m_logger.log("wristTargetPostionDeg", m_wristTargetPostionDeg);
     m_logger.log("wristMode", m_controlStatus.toString());
     m_logger.log("getCanCoderPostion", getCanCoderPostion());
+    m_logger.log("Is Horizontal", isHorizontal());
   }
 
   @Override

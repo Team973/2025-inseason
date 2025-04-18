@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
@@ -20,6 +21,9 @@ public class Superstructure implements Subsystem {
 
   private final SolidSignaler m_algaeSignaler =
       new SolidSignaler(Colors.CYAN, 100, SignalerInfo.ALGAE_MODE_SIGNALER_PRIORITY);
+  private final SolidSignaler m_wristAndArmHorizontalSignaler =
+      new SolidSignaler(
+          RobotInfo.Colors.YELLOW, 250, RobotInfo.SignalerInfo.WRIST_HORIZONTAL_SIGNLAER_PRIORITY);
 
   private State m_state = State.Manual;
   private State m_lastState = State.Manual;
@@ -224,6 +228,12 @@ public class Superstructure implements Subsystem {
       m_algaeSignaler.enable();
     } else {
       m_algaeSignaler.disable();
+    }
+
+    if (m_wrist.isHorizontal() && m_arm.isHorizontal()) {
+      m_wristAndArmHorizontalSignaler.enable();
+    } else {
+      m_wristAndArmHorizontalSignaler.disable();
     }
 
     if (m_targetReefLevelSupplier.get() == ReefLevel.AlgaeFloor && getHasAlgae()) {
