@@ -87,8 +87,8 @@ public class Wrist implements Subsystem {
     return motorPostion * WristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
-  public double getWristPostionDeg() {
-    return motorRotationsToWristDeg(m_wristMotor.getPosition().getValueAsDouble());
+  public double getWristPostionDegFromMotorRot(double motorRot) {
+    return motorRotationsToWristDeg(motorRot);
   }
 
   public void setControlStatus(ControlStatus targetpostion) {
@@ -137,11 +137,12 @@ public class Wrist implements Subsystem {
     m_controlStatus = ControlStatus.TargetPostion;
   }
 
+  private boolean motorAtTargetRotation(double motorRot) {
+    return (Math.abs(wristDegToMotorRotations(m_wristTargetPostionDeg) - motorRot) < 0.1);
+  }
+
   public boolean motorAtTargetRotation() {
-    return (Math.abs(
-            wristDegToMotorRotations(m_wristTargetPostionDeg)
-                - m_wristMotor.getPosition().getValueAsDouble())
-        < 0.1);
+    return motorAtTargetRotation(m_wristMotor.getPosition().getValueAsDouble());
   }
 
   @Override
@@ -162,10 +163,13 @@ public class Wrist implements Subsystem {
 
   @Override
   public void log() {
+    double motorRot = m_wristMotor.getPosition().getValueAsDouble();
+
     m_wristMotor.log();
     m_wristEncoder.log();
 
-    m_logger.log("wristDegPostion", getWristPostionDeg());
+    m_logger.log("Motor At Target Rot", motorAtTargetRotation(motorRot));
+    m_logger.log("wristDegPostion", getWristPostionDegFromMotorRot(motorRot));
     m_logger.log("wristTargetPostionDeg", m_wristTargetPostionDeg);
     m_logger.log("wristMode", m_controlStatus.toString());
     m_logger.log("getCanCoderPostion", getCanCoderPostion());

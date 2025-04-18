@@ -157,94 +157,74 @@ public class Claw implements Subsystem {
 
   @Override
   public void update() {
+    Optional<Double> algaeDistance = getAlgaeDistance();
+
     switch (m_mode) {
       case IntakeCoral:
-        {
-          if (getClawFrontSensor()) {
-            // Too far forward --- back up!
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, -10);
-            m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
-          } else if (getClawBackSensor() && !getClawFrontSensor()) {
-            // Perfect spot!
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, 0);
-            m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
-          } else {
-            // Way too far back
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, 90);
-            m_conveyor.setControl(ControlMode.VelocityVoltage, 180);
-          }
-          break;
+        if (getClawFrontSensor()) {
+          // Too far forward --- back up!
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, -10);
+        } else if (getClawBackSensor() && !getClawFrontSensor()) {
+          // Perfect spot!
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 0);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
+        } else {
+          // Way too far back
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, 90);
+          m_conveyor.setControl(ControlMode.VelocityVoltage, 180);
         }
+        break;
       case IntakeAlgae:
-        {
-          Optional<Double> algaeDistance = getAlgaeDistance();
-
-          if (algaeDistance.isEmpty()) {
-            m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-          } else if (algaeDistance.get() > 0.3) {
-            m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-          } else if (algaeDistance.get() < 0.13) {
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, -10.0);
-          } else {
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, -100.0);
-          }
-
-          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-          break;
-        }
-      case IntakeAlgaeFromFloor:
-        {
-          Optional<Double> algaeDistance = getAlgaeDistance();
-
-          if (algaeDistance.isEmpty()) {
-            m_clawMotor.setControl(ControlMode.DutyCycleOut, -100.0);
-          } else if (algaeDistance.get() > 0.3) {
-            m_clawMotor.setControl(ControlMode.DutyCycleOut, -100.0);
-          } else if (algaeDistance.get() < 0.13) {
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, -10.0);
-          } else {
-            m_clawMotor.setControl(ControlMode.VelocityVoltage, -100.0);
-          }
-
-          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-          break;
-        }
-      case ScoreCoral:
-        {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 100);
-          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-          break;
-        }
-      case ScoreCoralLevelOne:
-        {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 50);
-          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-          break;
-        }
-      case ScoreAlgae:
-        {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 450);
-          m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
-          break;
-        }
-      case ScoreAlgaeProcessor:
-        {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, 50);
-          m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
-          break;
-        }
-      case Reverse:
-        {
-          m_clawMotor.setControl(ControlMode.VelocityVoltage, -20);
-          m_conveyor.setControl(ControlMode.VelocityVoltage, -40);
-          break;
-        }
-      case Off:
-        {
+        if (algaeDistance.isEmpty()) {
           m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
-          m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
-          break;
+        } else if (algaeDistance.get() > 0.3) {
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
+        } else if (algaeDistance.get() < 0.13) {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10.0);
+        } else {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -100.0);
         }
+
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        break;
+      case IntakeAlgaeFromFloor:
+        if (algaeDistance.isEmpty()) {
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, -100.0);
+        } else if (algaeDistance.get() > 0.3) {
+          m_clawMotor.setControl(ControlMode.DutyCycleOut, -100.0);
+        } else if (algaeDistance.get() < 0.13) {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -10.0);
+        } else {
+          m_clawMotor.setControl(ControlMode.VelocityVoltage, -100.0);
+        }
+
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        break;
+      case ScoreCoral:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 100);
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        break;
+      case ScoreCoralLevelOne:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 50);
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        break;
+      case ScoreAlgae:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 450);
+        m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
+        break;
+      case ScoreAlgaeProcessor:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, 50);
+        m_conveyor.setControl(ControlMode.VelocityVoltage, 0);
+        break;
+      case Reverse:
+        m_clawMotor.setControl(ControlMode.VelocityVoltage, -20);
+        m_conveyor.setControl(ControlMode.VelocityVoltage, -40);
+        break;
+      case Off:
+        m_clawMotor.setControl(ControlMode.DutyCycleOut, 0);
+        m_conveyor.setControl(ControlMode.DutyCycleOut, 0);
+        break;
     }
   }
 

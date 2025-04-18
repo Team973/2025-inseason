@@ -90,8 +90,8 @@ public class Climb implements Subsystem {
     return (rot / ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT) * 360.0;
   }
 
-  public double getClimbAngleDeg() {
-    return getClimbDegFromMotorRot(m_climb.getPosition().getValueAsDouble());
+  public double getClimbAngleDegFromMotorRot(double motorRot) {
+    return getClimbDegFromMotorRot(motorRot);
   }
 
   public void setTargetAngleDeg(double target) {
@@ -105,14 +105,16 @@ public class Climb implements Subsystem {
     m_logger.log("CurrentPositionRotations", climbPosition);
     m_logger.log("Target Position Motor Rotations", m_targetPosition);
     m_logger.log("Target Position Deg", getClimbDegFromMotorRot(m_targetPosition));
-    m_logger.log("Angle Deg", getClimbAngleDeg());
+    m_logger.log("Angle Deg", getClimbAngleDegFromMotorRot(climbPosition));
   }
 
   @Override
   public void syncSensors() {
-    if (getClimbAngleDeg() >= STOP_POSITION_DEG) {
+    double climbPosition = m_climb.getPosition().getValueAsDouble();
+
+    if (getClimbAngleDegFromMotorRot(climbPosition) >= STOP_POSITION_DEG) {
       m_climbStopSignaler.enable();
-    } else if (getClimbAngleDeg() >= HORIZONTAL_POSITION_DEG) {
+    } else if (getClimbAngleDegFromMotorRot(climbPosition) >= HORIZONTAL_POSITION_DEG) {
       m_climbHorizontalSignaler.enable();
     }
   }

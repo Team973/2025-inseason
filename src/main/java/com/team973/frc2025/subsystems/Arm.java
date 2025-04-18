@@ -123,8 +123,8 @@ public class Arm implements Subsystem {
         < 0.1);
   }
 
-  private double getFeedForwardTargetAngle() {
-    double armAngleDeg = motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble());
+  private double getFeedForwardTargetAngleFromMotorRot(double motorRot) {
+    double armAngleDeg = motorRotationsToArmDeg(motorRot);
     return FEED_FORWARD_MAX_VOLT
         * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
@@ -167,7 +167,7 @@ public class Arm implements Subsystem {
         m_armMotor.setControl(
             ControlMode.MotionMagicVoltage,
             armDegToMotorRotations(m_armTargetPostionDeg),
-            getFeedForwardTargetAngle(),
+            getFeedForwardTargetAngleFromMotorRot(m_armMotor.getPosition().getValueAsDouble()),
             0);
         break;
       case Off:
@@ -176,8 +176,8 @@ public class Arm implements Subsystem {
     }
   }
 
-  public double getArmPostionDeg() {
-    return motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble());
+  public double getArmPostionDegFromMotorRot(double motorRot) {
+    return motorRotationsToArmDeg(motorRot);
   }
 
   public void setControlStatus(ControlStatus status) {
@@ -219,13 +219,15 @@ public class Arm implements Subsystem {
 
   @Override
   public void log() {
+    double motorRot = m_armMotor.getPosition().getValueAsDouble();
+
     m_armMotor.log();
     m_armEncoder.log();
 
-    m_logger.log("armDegPostion", getArmPostionDeg());
+    m_logger.log("armDegPostion", getArmPostionDegFromMotorRot(motorRot));
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
     m_logger.log("armMode", m_controlStatus.toString());
-    m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
+    m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngleFromMotorRot(motorRot));
 
     m_logger.log("getCanCoderPostion", getCanCoderPostionDeg());
 
@@ -241,7 +243,7 @@ public class Arm implements Subsystem {
 
   @Override
   public void syncSensors() {
-    if (Math.abs(getArmPostionDeg()) < 0.1) {
+    if (Math.abs(getArmPostionDegFromMotorRot(m_armMotor.getPosition().getValueAsDouble())) < 0.1) {
       m_armHorizontalSigaler.enable();
     } else {
       m_armHorizontalSigaler.disable();
