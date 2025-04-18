@@ -282,10 +282,10 @@ public class DriveWithLimelight extends DriveComposable {
     double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
     m_xController =
         new ProfiledPIDController(
-            4.0, 0, 0, new TrapezoidProfile.Constraints(1.76, 0.44), controlPeriodSeconds);
+            4.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.4), controlPeriodSeconds);
     m_yController =
         new ProfiledPIDController(
-            4.0, 0, 0, new TrapezoidProfile.Constraints(1.76, 0.44), controlPeriodSeconds);
+            4.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.4), controlPeriodSeconds);
     m_thetaController =
         new ProfiledPIDController(
             8.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.35), controlPeriodSeconds);
