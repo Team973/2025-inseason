@@ -39,6 +39,8 @@ deploy {
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
                   // Enable VisualVM connection
+									// To run: ./visualvm --jdkhome "C:\Users\Public\wpilib\2025\jdk"
+
                   // jvmArgs.add("-Dcom.sun.management.jmxremote=true")
                   // jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
                   // jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
