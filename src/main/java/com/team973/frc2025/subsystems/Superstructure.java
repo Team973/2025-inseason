@@ -355,7 +355,7 @@ public class Superstructure implements Subsystem {
     return m_claw.getHasAlgae();
   }
 
-  private ReefLevel getAlgaePresetFromReefFace(ReefFace face) {
+  public ReefLevel getAlgaePresetFromReefFace(ReefFace face) {
     return switch (face) {
       case A, C, E -> ReefLevel.AlgaeHigh;
       case B, D, F -> ReefLevel.AlgaeLow;
