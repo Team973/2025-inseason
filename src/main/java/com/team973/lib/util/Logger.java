@@ -11,6 +11,7 @@ public class Logger {
   private final String m_prefix;
   private final double m_secondsPerLog;
   private HashMap<String, Double> m_keyLastLoggedAt = new HashMap<String, Double>();
+  private static int m_count;
 
   /**
    * Creates an instance of the logger.
@@ -59,6 +60,10 @@ public class Logger {
     return false;
   }
 
+  public int getCount() {
+    return m_count;
+  }
+
   /**
    * Creates a new logger instance. The seconds per log parameter is the same as the parent logger.
    *
@@ -87,66 +92,77 @@ public class Logger {
   public void log(String key, double value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
+      m_count++;
     }
   }
 
   public void log(String key, String value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
+      m_count++;
     }
   }
 
   public void log(String key, int value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
+      m_count++;
     }
   }
 
   public void log(String key, boolean value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
+      m_count++;
     }
   }
 
   public void log(String key, double[] value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
+      m_count++;
     }
   }
 
   public void log(String key, String[] value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
+      m_count++;
     }
   }
 
   public void log(String key, int[] value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
+      m_count++;
     }
   }
 
   public void log(String key, boolean[] value) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, value);
+      m_count++;
     }
   }
 
   public void log(String key, DoubleSupplier valueSupplier) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, valueSupplier.getAsDouble());
+      m_count++;
     }
   }
 
   public void log(String key, IntSupplier valueSupplier) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, valueSupplier.getAsInt());
+      m_count++;
     }
   }
 
   public void log(String key, BooleanSupplier valueSupplier) {
     if (isLogAllowed(key)) {
       DogLog.log(m_prefix + "/" + key, valueSupplier.getAsBoolean());
+      m_count++;
     }
   }
 }
