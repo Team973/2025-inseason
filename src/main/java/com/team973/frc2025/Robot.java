@@ -65,6 +65,8 @@ public class Robot extends TimedRobot {
   private final SolidSignaler m_ledOff =
       new SolidSignaler(RobotInfo.Colors.OFF, 0, RobotInfo.SignalerInfo.OFF_SIGNALER_PRIORTY);
 
+  private Logger testLogger = new Logger("test");
+
   private final BlinkingSignaler m_crashSignaler =
       new BlinkingSignaler(
           RobotInfo.Colors.RED,
@@ -180,6 +182,8 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     try {
       m_ledOff.enable();
+
+      m_logger.log("logCount", m_logger.getCount());
 
       if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
         m_lastBatteryVoltageHighMSTimestamp = Conversions.Time.getMsecTime();
