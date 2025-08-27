@@ -5,7 +5,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.ArmInfo;
+import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
@@ -14,6 +14,8 @@ import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 
 public class Arm implements Subsystem {
+  private final RobotInfo m_robotInfo;
+  private final RobotInfo.ArmInfo m_ArmInfo;
   private final Logger m_logger;
   private final GreyTalonFX m_armMotor;
   private final GreyCANCoder m_armEncoder;
@@ -22,9 +24,7 @@ public class Arm implements Subsystem {
 
   private double m_armTargetPostionDeg;
 
-  private final SolidSignaler m_armHorizontalSigaler =
-      new SolidSignaler(
-          RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HORIZONTAL_SIGNALER_PRIORTY);
+  private final SolidSignaler m_armHorizontalSigaler;
 
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
@@ -58,20 +58,17 @@ public class Arm implements Subsystem {
     Off,
   }
 
-  private double armDegToMotorRotations(double armPostionDeg) {
-    return armPostionDeg / 360.0 / ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
-  }
 
-  private double motorRotationsToArmDeg(double motorPostion) {
-    return motorPostion * ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
-  }
-
-  public Arm(Logger logger, CANdleManger candle) {
+  public Arm(Logger logger, CANdleManger candle, RobotInfo robotInfo) {
+    m_robotInfo = robotInfo;
+    m_ArmInfo = robotInfo.new ArmInfo();
     m_logger = logger;
-    m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
+    m_armMotor = new GreyTalonFX(30, m_robotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
     m_armEncoder =
         new GreyCANCoder(
-            ArmInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+            m_ArmInfo.ENCODER_CAN_ID, m_robotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+    m_armHorizontalSigaler = new SolidSignaler(
+      RobotInfo.Colors.BLUE, 250, SignalerInfo.ARM_HORIZONTAL_SIGNALER_PRIORTY);
 
     candle.addSignaler(m_armHorizontalSigaler);
 
@@ -103,9 +100,17 @@ public class Arm implements Subsystem {
     m_armMotor.setPosition(armDegToMotorRotations(getCanCoderPostionDeg()));
   }
 
+  private double armDegToMotorRotations(double armPostionDeg) {
+    return armPostionDeg / 360.0 / m_ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
+  }
+
+  private double motorRotationsToArmDeg(double motorPostion) {
+    return motorPostion * m_ArmInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
+  }
+
   private double getCanCoderPostionDeg() {
     return (m_armEncoder.getAbsolutePosition().getValueAsDouble()
-            - ArmInfo.ENCODER_OFFSET_ROTATIONS)
+            - m_ArmInfo.ENCODER_OFFSET_ROTATIONS)
         * 360.0;
   }
 

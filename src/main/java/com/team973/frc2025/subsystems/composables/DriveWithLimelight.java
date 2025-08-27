@@ -49,6 +49,8 @@ public class DriveWithLimelight extends DriveComposable {
 
   private TargetStage m_targetStage = TargetStage.MoveToApproach;
 
+  private final RobotInfo m_robotInfo;
+
   private final AtomicReference<Pose2d> m_providedPose;
 
   public enum ReefSide {
@@ -78,6 +80,10 @@ public class DriveWithLimelight extends DriveComposable {
     Scoring,
     MoveToBackOff,
     BackOff
+  }
+
+  public static void getRobotInfo(RobotInfo robotInfo) {
+    
   }
 
   public static class TargetPositions {

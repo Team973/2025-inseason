@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.frc2025.subsystems.swerve.MegaTagSupplier;
@@ -21,6 +22,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Drive implements Subsystem {
+  private RobotInfo m_robotInfo;
+  private RobotInfo.DriveInfo m_driveInfo;
+
   private static final Translation2d[] MODULE_LOCATIONS = {
     new Translation2d(DriveInfo.TRACKWIDTH_METERS / 2.0, DriveInfo.WHEELBASE_METERS / 2.0),
     new Translation2d(DriveInfo.TRACKWIDTH_METERS / 2.0, -DriveInfo.WHEELBASE_METERS / 2.0),
@@ -52,16 +56,20 @@ public class Drive implements Subsystem {
   private final MegaTagSupplier m_rightLLSupplier;
   private final MegaTagSupplier m_backLLSupplier;
 
+
+
   public Drive(GreyPigeon pigeon, DriveController driveController, Logger logger) {
     m_pigeon = pigeon;
     m_driveController = driveController;
     m_logger = logger;
+    
+    
     m_swerveModules =
         new SwerveModule[] {
-          new SwerveModule(0, DriveInfo.FRONT_LEFT_CONSTANTS, logger.subLogger("swerve/mod0")),
-          new SwerveModule(1, DriveInfo.FRONT_RIGHT_CONSTANTS, logger.subLogger("swerve/mod1")),
-          new SwerveModule(2, DriveInfo.BACK_LEFT_CONSTANTS, logger.subLogger("swerve/mod2")),
-          new SwerveModule(3, DriveInfo.BACK_RIGHT_CONSTANTS, logger.subLogger("swerve/mod3"))
+          new SwerveModule(0, m_driveInfo.FRONT_LEFT_CONSTANTS, logger.subLogger("swerve/mod0")),
+          new SwerveModule(1, m_driveInfo.FRONT_RIGHT_CONSTANTS, logger.subLogger("swerve/mod1")),
+          new SwerveModule(2, m_driveInfo.BACK_LEFT_CONSTANTS, logger.subLogger("swerve/mod2")),
+          new SwerveModule(3, m_driveInfo.BACK_RIGHT_CONSTANTS, logger.subLogger("swerve/mod3"))
         };
     m_odometrySupplier =
         new OdometrySupplier(m_pigeon, m_swerveModules, logger.subLogger("providers/odometry"));
@@ -163,7 +171,7 @@ public class Drive implements Subsystem {
   /* Used by Auto */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, DriveInfo.MAX_VELOCITY_METERS_PER_SECOND);
+        desiredStates, m_driveInfo.MAX_VELOCITY_METERS_PER_SECOND);
 
     double states[] = new double[8];
     int index = 0;
@@ -273,7 +281,7 @@ public class Drive implements Subsystem {
         new ChassisSpeeds(twist_vel.dx / 0.03, twist_vel.dy / 0.03, twist_vel.dtheta / 0.03);
 
     SwerveModuleState[] swerveModuleStates =
-        DriveInfo.SWERVE_KINEMATICS.toSwerveModuleStates(updated_chassis_speeds);
+        m_driveInfo.SWERVE_KINEMATICS.toSwerveModuleStates(updated_chassis_speeds);
 
     setModuleStates(swerveModuleStates);
   }

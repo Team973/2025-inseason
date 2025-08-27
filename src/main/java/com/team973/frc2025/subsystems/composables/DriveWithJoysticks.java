@@ -1,6 +1,6 @@
 package com.team973.frc2025.subsystems.composables;
 
-import com.team973.frc2025.shared.RobotInfo.DriveInfo;
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.DriveController.RotationControl;
 import com.team973.lib.util.DriveComposable;
 import edu.wpi.first.math.MathUtil;
@@ -11,20 +11,25 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class DriveWithJoysticks extends DriveComposable {
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(10);
-
-  private RotationControl m_rotationControl = RotationControl.OpenLoop;
-  private final PIDController m_rotationController = new PIDController(0.1, 0.0, 0.002);
-
-  private double m_lastRot = 0.0;
-
-  private Rotation2d m_targetRobotAngle = new Rotation2d();
-
-  private boolean m_holdingAngle = false;
-
-  private double m_xAxis = 0.0;
-  private double m_yAxis = 0.0;
-  private double m_rot = 0.0;
+    private static RobotInfo.DriveInfo m_driveInfo;
+    private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(10);
+  
+    private RotationControl m_rotationControl = RotationControl.OpenLoop;
+    private final PIDController m_rotationController = new PIDController(0.1, 0.0, 0.002);
+  
+    private double m_lastRot = 0.0;
+  
+    private Rotation2d m_targetRobotAngle = new Rotation2d();
+  
+    private boolean m_holdingAngle = false;
+  
+    private double m_xAxis = 0.0;
+    private double m_yAxis = 0.0;
+    private double m_rot = 0.0;
+  
+    public void getDriveInfo(RobotInfo.DriveInfo driveInfo){
+      m_driveInfo = driveInfo;
+  }
 
   public DriveWithJoysticks() {}
 

@@ -4,13 +4,15 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.ClimbInfo;
+import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 
 public class Climb implements Subsystem {
+  private final RobotInfo m_robotInfo;
+  private final RobotInfo.ClimbInfo m_climbInfo;
   private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 5.0;
   private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
 
@@ -23,22 +25,22 @@ public class Climb implements Subsystem {
 
   private final GreyTalonFX m_climb;
 
-  private final SolidSignaler m_climbHorizontalSignaler =
-      new SolidSignaler(RobotInfo.Colors.HOT_PINK, 100.0, SignalerInfo.CLIMB_HORIZONTAL_PRIORITY);
+  private final SolidSignaler m_climbHorizontalSignaler = new SolidSignaler(RobotInfo.Colors.HOT_PINK, 100.0, SignalerInfo.CLIMB_HORIZONTAL_PRIORITY);
 
-  private final BlinkingSignaler m_climbStopSignaler =
-      new BlinkingSignaler(
-          RobotInfo.Colors.GREEN,
-          RobotInfo.Colors.OFF,
-          500.0,
-          100.0,
-          SignalerInfo.CLIMB_STOP_PRIORITY);
+  private final BlinkingSignaler m_climbStopSignaler = new BlinkingSignaler(
+    Colors.GREEN,
+    Colors.OFF,
+    500.0,
+    100.0,
+    SignalerInfo.CLIMB_STOP_PRIORITY);
 
   private double m_targetPosition;
 
-  public Climb(Logger logger, CANdleManger candle) {
+  public Climb(Logger logger, CANdleManger candle, RobotInfo robotInfo) {
+    m_robotInfo = robotInfo;
+    m_climbInfo = robotInfo.new ClimbInfo();
     m_logger = logger;
-    m_climb = new GreyTalonFX(23, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("climb motor"));
+    m_climb = new GreyTalonFX(23, m_robotInfo.CANIVORE_CANBUS, m_logger.subLogger("climb motor"));
     m_climb.setConfig(defaultMotorConfig());
 
     m_climb.setPosition(0);
@@ -87,7 +89,7 @@ public class Climb implements Subsystem {
   }
 
   public double getClimbDegFromMotorRot(double rot) {
-    return (rot / ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT) * 360.0;
+    return (rot / m_climbInfo.MOTOR_ROT_PER_CLIMB_ROT) * 360.0;
   }
 
   public double getClimbAngleDegFromMotorRot(double motorRot) {
@@ -95,7 +97,7 @@ public class Climb implements Subsystem {
   }
 
   public void setTargetAngleDeg(double target) {
-    m_targetPosition = (target / 360.0) * ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT;
+    m_targetPosition = (target / 360.0) * m_climbInfo.MOTOR_ROT_PER_CLIMB_ROT;
   }
 
   @Override

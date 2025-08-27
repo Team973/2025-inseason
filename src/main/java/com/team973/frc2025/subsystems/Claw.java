@@ -6,7 +6,7 @@ import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.ClawInfo;
+import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 
 public class Claw implements Subsystem {
+  private final RobotInfo m_robotInfo;
+  private final RobotInfo.ClawInfo m_clawInfo;
   private static final double ALGAE_SENSOR_STRENGTH_THRESHOLD = 2500.0;
 
   private final Logger m_logger;
@@ -29,9 +31,7 @@ public class Claw implements Subsystem {
 
   private ControlStatus m_mode = ControlStatus.Off;
 
-  private final SolidSignaler m_clawHasPeiceSignaler =
-      new SolidSignaler(
-          RobotInfo.Colors.GREEN, 0, RobotInfo.SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
+  private final SolidSignaler m_clawHasPeiceSignaler;
 
   private double m_targetHoldPosition = 0;
   private double m_coralBackUpRot = 3.0;
@@ -51,25 +51,30 @@ public class Claw implements Subsystem {
     Off,
   }
 
-  public Claw(Logger logger, CANdleManger candle) {
+  public Claw(Logger logger, CANdleManger candle, RobotInfo robotInfo) {
     m_logger = logger;
     m_caNdle = candle;
+    m_robotInfo = robotInfo;
+    m_clawInfo = robotInfo.new ClawInfo();
+
+    m_clawHasPeiceSignaler = new SolidSignaler(
+      RobotInfo.Colors.GREEN, 0, SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
 
     m_caNdle.addSignaler(m_clawHasPeiceSignaler);
     m_clawMotor =
         new GreyTalonFX(
-            ClawInfo.RIGHT_MOTOR_ID,
-            RobotInfo.CANIVORE_CANBUS,
+            m_clawInfo.RIGHT_MOTOR_ID,
+            m_robotInfo.CANIVORE_CANBUS,
             m_logger.subLogger("clawMotor", 0.2));
     m_conveyor =
         new GreyTalonFX(
-            ClawInfo.CONVEYOR_MOTOR_ID,
-            RobotInfo.CANIVORE_CANBUS,
+            m_clawInfo.CONVEYOR_MOTOR_ID,
+            m_robotInfo.CANIVORE_CANBUS,
             m_logger.subLogger("conveyorMotor", 0.2));
 
-    m_backClawSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
-    m_frontClawSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
-    m_clawAlgaeSensor = new CANrange(ClawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
+    m_backClawSensor = new DigitalInput(m_clawInfo.CONVEYOR_BACK_SENSOR_ID);
+    m_frontClawSensor = new DigitalInput(m_clawInfo.CONVEYOR_FRONT_SENSOR_ID);
+    m_clawAlgaeSensor = new CANrange(m_clawInfo.CLAW_ALGAE_CAN_ID, m_robotInfo.CANIVORE_CANBUS);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

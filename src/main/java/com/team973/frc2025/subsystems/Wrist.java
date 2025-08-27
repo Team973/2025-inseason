@@ -14,6 +14,8 @@ import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 
 public class Wrist implements Subsystem {
+  private final RobotInfo m_robotInfo;
+  private final RobotInfo.WristInfo m_wristInfo;
   private final Logger m_logger;
 
   private final GreyTalonFX m_wristMotor;
@@ -39,15 +41,17 @@ public class Wrist implements Subsystem {
 
   private double m_wristTargetPostionDeg = 0.0;
 
-  public Wrist(Logger logger) {
+  public Wrist(Logger logger, RobotInfo robotInfo) {
     m_logger = logger;
+    m_robotInfo = robotInfo;
+    m_wristInfo = robotInfo.new WristInfo();
 
     m_wristMotor =
         new GreyTalonFX(
-            WristInfo.MOTOR_CAN_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
+            m_wristInfo.MOTOR_CAN_ID, m_robotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
     m_wristEncoder =
         new GreyCANCoder(
-            WristInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+            m_wristInfo.ENCODER_CAN_ID, m_robotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
     TalonFXConfiguration wristMotorConfig = new TalonFXConfiguration();
     wristMotorConfig.Slot0.kS = 0.0;
@@ -80,11 +84,11 @@ public class Wrist implements Subsystem {
   }
 
   private double wristDegToMotorRotations(double wristPostionDeg) {
-    return wristPostionDeg / 360.0 / WristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
+    return wristPostionDeg / 360.0 / m_wristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
 
   private double motorRotationsToWristDeg(double motorPostion) {
-    return motorPostion * WristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
+    return motorPostion * m_wristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
   public double getWristPostionDegFromMotorRot(double motorRot) {
@@ -128,7 +132,7 @@ public class Wrist implements Subsystem {
 
   private double getCanCoderPostion() {
     return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()
-            - WristInfo.ENCODER_OFFSET_ROTATIONS)
+            - m_wristInfo.ENCODER_OFFSET_ROTATIONS)
         * 360.0;
   }
 
