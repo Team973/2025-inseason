@@ -12,33 +12,26 @@ import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
-import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Arm implements Subsystem {
   private final Logger m_logger;
   private final GreyTalonFX m_armMotor;
-  private ControlStatus m_controlStatus = ControlStatus.Off;
-  private double m_armTargetPostionDeg;
-  private double m_manualArmPower;
-
   private final GreyCANCoder m_armEncoder;
-  // We want to track the transition from hall=false to hall=true; when the robot
-  // first boots up, we don't really know what the previous hall state was, so we
-  // assume it was true to avoid false positive.
-  private boolean m_lastHallSensorMode = true;
-  private final DigitalInput m_hallSesnsor = new DigitalInput(RobotInfo.ArmInfo.HALL_SENSOR_ID);
 
-  private final SolidSignaler m_armHomedSigaler =
+  private ControlStatus m_controlStatus = ControlStatus.Off;
+
+  private double m_armTargetPostionDeg;
+
+  private final SolidSignaler m_armHorizontalSigaler =
       new SolidSignaler(
-          RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HALL_SENSOR_SIGNALER_PRIORTY);
+          RobotInfo.Colors.BLUE, 250, RobotInfo.SignalerInfo.ARM_HORIZONTAL_SIGNALER_PRIORTY);
 
-  private static final double ARM_HOMING_POSTION_DEG = -90.0;
   private static final double HORIZONTAL_POSITION_DEG = 0.0;
 
-  private static final double LEVEL_FOUR_POSITION_DEG = 61.0;
-  private static final double LEVEL_THREE_POSITION_DEG = 58.0;
+  private static final double LEVEL_FOUR_POSITION_DEG = 65.0;
+  private static final double LEVEL_THREE_POSITION_DEG = 59.0;
   private static final double LEVEL_TWO_POSITION_DEG = -61.0;
-  private static final double LEVEL_ONE_POSITION_DEG = -59.0;
+  private static final double LEVEL_ONE_POSITION_DEG = -64.0;
   public static final double CORAL_STOW_POSITION_DEG = -88.0;
 
   private static final double NET_POSITION_DEG = 74.0;
@@ -60,10 +53,7 @@ public class Arm implements Subsystem {
   private double m_algaeLowOffset = 0.0;
   private double m_algaeFloorOffset = 0.0;
 
-  private CANdleManger m_candleManger;
-
   public static enum ControlStatus {
-    Manual,
     TargetPostion,
     Off,
   }
@@ -79,12 +69,12 @@ public class Arm implements Subsystem {
   public Arm(Logger logger, CANdleManger candle) {
     m_logger = logger;
     m_armMotor = new GreyTalonFX(30, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("armMotor"));
-    m_candleManger = candle;
     m_armEncoder =
         new GreyCANCoder(
             ArmInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
-    m_candleManger.addSignaler(m_armHomedSigaler);
+    candle.addSignaler(m_armHorizontalSigaler);
+
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();
     armMotorConfig.Slot0.kS = 0.0;
     armMotorConfig.Slot0.kV = 0.0;
@@ -113,23 +103,6 @@ public class Arm implements Subsystem {
     m_armMotor.setPosition(armDegToMotorRotations(getCanCoderPostionDeg()));
   }
 
-  private boolean hallSensor() {
-    return !m_hallSesnsor.get();
-  }
-
-  private void maybeHomeArm() {
-    if (m_lastHallSensorMode == false && hallSensor() == true) {
-      m_armMotor.setPosition(armDegToMotorRotations(ARM_HOMING_POSTION_DEG));
-      m_armHomedSigaler.enable();
-    }
-    m_lastHallSensorMode = hallSensor();
-  }
-
-  public void setMotorManualOutput(double joystick) {
-    m_controlStatus = ControlStatus.Manual;
-    m_manualArmPower = joystick * 0.1;
-  }
-
   private double getCanCoderPostionDeg() {
     return (m_armEncoder.getAbsolutePosition().getValueAsDouble()
             - ArmInfo.ENCODER_OFFSET_ROTATIONS)
@@ -148,8 +121,8 @@ public class Arm implements Subsystem {
         < 0.1);
   }
 
-  private double getFeedForwardTargetAngle() {
-    double armAngleDeg = motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble());
+  private double getFeedForwardTargetAngleFromMotorRot(double motorRot) {
+    double armAngleDeg = motorRotationsToArmDeg(motorRot);
     return FEED_FORWARD_MAX_VOLT
         * Math.cos((armAngleDeg - CENTER_GRAVITY_OFFSET_DEG) * (Math.PI / 180));
   }
@@ -188,14 +161,11 @@ public class Arm implements Subsystem {
   @Override
   public void update() {
     switch (m_controlStatus) {
-      case Manual:
-        m_armMotor.setControl(ControlMode.VoltageOut, (m_manualArmPower * 12.0), 0);
-        break;
       case TargetPostion:
         m_armMotor.setControl(
             ControlMode.MotionMagicVoltage,
             armDegToMotorRotations(m_armTargetPostionDeg),
-            getFeedForwardTargetAngle(),
+            getFeedForwardTargetAngleFromMotorRot(m_armMotor.getPosition().getValueAsDouble()),
             0);
         break;
       case Off:
@@ -204,8 +174,8 @@ public class Arm implements Subsystem {
     }
   }
 
-  public double getArmPostionDeg() {
-    return motorRotationsToArmDeg(m_armMotor.getPosition().getValueAsDouble());
+  public double getArmPostionDegFromMotorRot(double motorRot) {
+    return motorRotationsToArmDeg(motorRot);
   }
 
   public void setControlStatus(ControlStatus status) {
@@ -247,18 +217,15 @@ public class Arm implements Subsystem {
 
   @Override
   public void log() {
+    double motorRot = m_armMotor.getPosition().getValueAsDouble();
+
     m_armMotor.log();
     m_armEncoder.log();
 
-    m_logger.log("armDegPostion", getArmPostionDeg());
+    m_logger.log("armDegPostion", getArmPostionDegFromMotorRot(motorRot));
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
     m_logger.log("armMode", m_controlStatus.toString());
-    m_logger.log(
-        "motorArmErrorDeg",
-        motorRotationsToArmDeg(m_armMotor.getClosedLoopError().getValueAsDouble()));
-    m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngle());
-    m_logger.log("manualPower", m_manualArmPower);
-    m_logger.log("HallsensorArm", hallSensor());
+    m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngleFromMotorRot(motorRot));
 
     m_logger.log("getCanCoderPostion", getCanCoderPostionDeg());
 
@@ -270,11 +237,22 @@ public class Arm implements Subsystem {
     m_logger.log("Algae Low Offset", m_algaeLowOffset);
     m_logger.log("Algae High Offset", m_algaeHighOffset);
     m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
+
+    m_logger.log("Is Horizontal", isHorizontal());
+  }
+
+  public boolean isHorizontal() {
+    return Math.abs(getArmPostionDegFromMotorRot(m_armMotor.getPosition().getValueAsDouble()))
+        < 0.1;
   }
 
   @Override
   public void syncSensors() {
-    maybeHomeArm();
+    if (isHorizontal()) {
+      m_armHorizontalSigaler.enable();
+    } else {
+      m_armHorizontalSigaler.disable();
+    }
   }
 
   @Override

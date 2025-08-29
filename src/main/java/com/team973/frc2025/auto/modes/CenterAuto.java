@@ -19,7 +19,9 @@ public class CenterAuto extends AutoMode {
         logger,
         new Pose2d(7.18, 4, Rotation2d.fromDegrees(180)),
         new ScoreCoralCommand(drive, superstructure, ReefFace.D, ReefLevel.L_4, ReefSide.Right),
-        new PickupAlgaeCommand(drive, superstructure, ReefFace.D, ReefLevel.AlgaeLow),
+        new PickupAlgaeCommand(drive, superstructure, ReefFace.D),
+        new ScoreAlgaeInNetCommand(drive, superstructure),
+        new PickupAlgaeCommand(drive, superstructure, ReefFace.E),
         new ScoreAlgaeInNetCommand(drive, superstructure));
   }
 

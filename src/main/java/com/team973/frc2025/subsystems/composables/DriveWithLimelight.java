@@ -55,7 +55,9 @@ public class DriveWithLimelight extends DriveComposable {
     Left,
     Right,
     Center,
-    LevelOne
+    LevelOneLeft,
+    LevelOneRight,
+    LevelOneCenter
   }
 
   public enum ReefFace {
@@ -95,8 +97,8 @@ public class DriveWithLimelight extends DriveComposable {
     private static final Translation2d NET_APPROACH_TARGET = new Translation2d(0.5, 1.5);
 
     private static final double REEF_SCORING_DIST = 0.56;
-    private static final double PROCESSOR_SCORING_DIST = 0.5; // 0.3175;
-    private static final double NET_SCORING_DIST = 0.35;
+    private static final double PROCESSOR_SCORING_DIST = 0.3175;
+    private static final double NET_SCORING_DIST = 0.1;
 
     public static final TargetPositionRelativeToAprilTag TEST_ONE =
         new TargetPositionRelativeToAprilTag(
@@ -132,7 +134,22 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag A_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag A_L_1 =
+
+    public static final double L1_OFFSET_ANGLE = 11.0;
+
+    public static final TargetPositionRelativeToAprilTag A_L_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(7),
+            LEFT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag A_R_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(7),
+            RIGHT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag A_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(7), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag A_ALGAE =
@@ -144,7 +161,19 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag B_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(8), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag B_L_1 =
+    public static final TargetPositionRelativeToAprilTag B_L_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(8),
+            LEFT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag B_R_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(8),
+            RIGHT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag B_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(8), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag B_ALGAE =
@@ -156,7 +185,19 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag C_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(9), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag C_L_1 =
+    public static final TargetPositionRelativeToAprilTag C_L_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(9),
+            LEFT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag C_R_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(9),
+            RIGHT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag C_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(9), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag C_ALGAE =
@@ -168,7 +209,19 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag D_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(10), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag D_L_1 =
+    public static final TargetPositionRelativeToAprilTag D_L_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(10),
+            LEFT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag D_R_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(10),
+            RIGHT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag D_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(10), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag D_ALGAE =
@@ -180,7 +233,19 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag E_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(11), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag E_L_1 =
+    public static final TargetPositionRelativeToAprilTag E_L_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(11),
+            LEFT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag E_R_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(11),
+            RIGHT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag E_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(11), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag E_ALGAE =
@@ -192,7 +257,19 @@ public class DriveWithLimelight extends DriveComposable {
     public static final TargetPositionRelativeToAprilTag F_R =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(6), RIGHT_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
-    public static final TargetPositionRelativeToAprilTag F_L_1 =
+    public static final TargetPositionRelativeToAprilTag F_L_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(6),
+            LEFT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag F_R_L_1 =
+        new TargetPositionRelativeToAprilTag(
+            AprilTag.fromRed(6),
+            RIGHT_REEF_APPROACH_TARGET,
+            REEF_SCORING_DIST,
+            Rotation2d.fromDegrees(-L1_OFFSET_ANGLE));
+    public static final TargetPositionRelativeToAprilTag F_C_L_1 =
         new TargetPositionRelativeToAprilTag(
             AprilTag.fromRed(6), L_1_REEF_APPROACH_TARGET, REEF_SCORING_DIST, new Rotation2d());
     public static final TargetPositionRelativeToAprilTag F_ALGAE =
@@ -225,7 +302,7 @@ public class DriveWithLimelight extends DriveComposable {
   }
 
   public void setTargetSide(ReefSide side) {
-    if (m_targetReefSide != ReefSide.Center) {
+    if (m_targetReefSide == ReefSide.Left || m_targetReefSide == ReefSide.Right) {
       m_lastTargetReefSide = m_targetReefSide;
     }
 
@@ -251,7 +328,9 @@ public class DriveWithLimelight extends DriveComposable {
       TargetPositionRelativeToAprilTag leftTarget,
       TargetPositionRelativeToAprilTag centerTarget,
       TargetPositionRelativeToAprilTag rightTarget,
-      TargetPositionRelativeToAprilTag levelOneTarget) {
+      TargetPositionRelativeToAprilTag levelOneLeftTarget,
+      TargetPositionRelativeToAprilTag levelOneRightTarget,
+      TargetPositionRelativeToAprilTag levelOneCenterTarget) {
     switch (side) {
       case Left:
         return leftTarget;
@@ -259,8 +338,12 @@ public class DriveWithLimelight extends DriveComposable {
         return centerTarget;
       case Right:
         return rightTarget;
-      case LevelOne:
-        return levelOneTarget;
+      case LevelOneLeft:
+        return levelOneLeftTarget;
+      case LevelOneRight:
+        return levelOneRightTarget;
+      case LevelOneCenter:
+        return levelOneCenterTarget;
       default:
         throw new IllegalArgumentException(side.toString());
     }
@@ -274,42 +357,54 @@ public class DriveWithLimelight extends DriveComposable {
             TargetPositions.A_L,
             TargetPositions.A_ALGAE,
             TargetPositions.A_R,
-            TargetPositions.A_L_1);
+            TargetPositions.A_L_L_1,
+            TargetPositions.A_R_L_1,
+            TargetPositions.A_C_L_1);
       case B:
         return getPositionFromReefSide(
             m_targetReefSide,
             TargetPositions.B_L,
             TargetPositions.B_ALGAE,
             TargetPositions.B_R,
-            TargetPositions.B_L_1);
+            TargetPositions.B_L_L_1,
+            TargetPositions.B_R_L_1,
+            TargetPositions.B_C_L_1);
       case C:
         return getPositionFromReefSide(
             m_targetReefSide,
             TargetPositions.C_L,
             TargetPositions.C_ALGAE,
             TargetPositions.C_R,
-            TargetPositions.C_L_1);
+            TargetPositions.C_L_L_1,
+            TargetPositions.C_R_L_1,
+            TargetPositions.C_C_L_1);
       case D:
         return getPositionFromReefSide(
             m_targetReefSide,
             TargetPositions.D_L,
             TargetPositions.D_ALGAE,
             TargetPositions.D_R,
-            TargetPositions.D_L_1);
+            TargetPositions.D_L_L_1,
+            TargetPositions.D_R_L_1,
+            TargetPositions.D_C_L_1);
       case E:
         return getPositionFromReefSide(
             m_targetReefSide,
             TargetPositions.E_L,
             TargetPositions.E_ALGAE,
             TargetPositions.E_R,
-            TargetPositions.E_L_1);
+            TargetPositions.E_L_L_1,
+            TargetPositions.E_R_L_1,
+            TargetPositions.E_C_L_1);
       case F:
         return getPositionFromReefSide(
             m_targetReefSide,
             TargetPositions.F_L,
             TargetPositions.F_ALGAE,
             TargetPositions.F_R,
-            TargetPositions.F_L_1);
+            TargetPositions.F_L_L_1,
+            TargetPositions.F_R_L_1,
+            TargetPositions.F_C_L_1);
       case Processor:
         return TargetPositions.PROCESSOR;
       case Net:

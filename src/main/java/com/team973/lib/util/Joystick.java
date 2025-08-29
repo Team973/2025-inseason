@@ -303,7 +303,7 @@ public class Joystick extends XboxController {
     m_logger.log("POV Down Pressed", this.getPOVBottomPressed());
 
     m_logger.log("Right X", getRightXAxis());
-    m_logger.log("Right Y", getRightY());
+    m_logger.log("Right Y", getRightYAxis());
 
     m_logger.log("Left X", getLeftXAxis());
     m_logger.log("Left Y", getLeftYAxis());

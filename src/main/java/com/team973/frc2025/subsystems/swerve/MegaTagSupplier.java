@@ -86,6 +86,7 @@ public class MegaTagSupplier {
     m_perfLogger.log("rejected needs init", () -> getRejectedNeedsInit());
     m_perfLogger.log("rejected too spinny", () -> getRejectedTooSpinny());
     m_perfLogger.log("rejected no tags", () -> getRejectedNoTags());
+    m_perfLogger.log("rejected no data", () -> getRejectedNoData());
     m_perfLogger.log("data received", () -> getDataReceived());
   }
 
@@ -97,6 +98,10 @@ public class MegaTagSupplier {
     return m_rejectedTooSpinny;
   }
 
+  private synchronized double getRejectedNoData() {
+    return m_rejectedNoData;
+  }
+
   private synchronized double getRejectedNoTags() {
     return m_rejectedNoTags;
   }
@@ -105,7 +110,11 @@ public class MegaTagSupplier {
     return m_dataReceived;
   }
 
-  private double m_rejectedNeedsInit, m_rejectedTooSpinny, m_rejectedNoTags, m_dataReceived;
+  private double m_rejectedNeedsInit,
+      m_rejectedTooSpinny,
+      m_rejectedNoData,
+      m_rejectedNoTags,
+      m_dataReceived;
 
   private void maybeInitAlliance() {
     if (m_allianceInitialized) {
@@ -145,7 +154,7 @@ public class MegaTagSupplier {
     }
 
     if (mt2 == null) {
-      m_rejectedNoTags++;
+      m_rejectedNoData++;
       return;
     }
 

@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
@@ -20,6 +21,9 @@ public class Superstructure implements Subsystem {
 
   private final SolidSignaler m_algaeSignaler =
       new SolidSignaler(Colors.CYAN, 100, SignalerInfo.ALGAE_MODE_SIGNALER_PRIORITY);
+  private final SolidSignaler m_wristAndArmHorizontalSignaler =
+      new SolidSignaler(
+          RobotInfo.Colors.YELLOW, 250, RobotInfo.SignalerInfo.WRIST_HORIZONTAL_SIGNLAER_PRIORITY);
 
   private State m_state = State.Manual;
   private State m_lastState = State.Manual;
@@ -30,6 +34,7 @@ public class Superstructure implements Subsystem {
   private boolean m_manualScore = false;
   private boolean m_manualIntake = true;
   private boolean m_manualArmivator = false;
+  private boolean m_pickedUpAlgaeFromFloor = false;
 
   public enum State {
     Manual,
@@ -96,24 +101,33 @@ public class Superstructure implements Subsystem {
     m_manualIntake = intake;
   }
 
+  private void setTargetReefLevelSupplier(Supplier<ReefLevel> reefLevelSupplier) {
+    m_targetReefLevelSupplier = reefLevelSupplier;
+
+    if (!getHasAlgae()) {
+      m_pickedUpAlgaeFromFloor = false;
+    }
+  }
+
   public void setTargetReefLevel(ReefLevel level) {
-    m_targetReefLevelSupplier = () -> level;
+    setTargetReefLevelSupplier(() -> level);
   }
 
   public void setTargetReefLevel(ReefLevel coralLevel, ReefLevel algaeLevel) {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_targetReefLevelSupplier = () -> coralLevel;
+      setTargetReefLevel(coralLevel);
     } else {
-      m_targetReefLevelSupplier = () -> algaeLevel;
+      setTargetReefLevel(algaeLevel);
     }
   }
 
   public void setTargetReefLevel(
       ReefLevel coralLevel, ReefLevel waitingForAlgaeLevel, ReefLevel hasAlgaeLevel) {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_targetReefLevelSupplier = () -> coralLevel;
+      setTargetReefLevel(coralLevel);
     } else {
-      m_targetReefLevelSupplier = () -> getHasAlgae() ? hasAlgaeLevel : waitingForAlgaeLevel;
+      setTargetReefLevelSupplier(
+          () -> m_pickedUpAlgaeFromFloor ? hasAlgaeLevel : waitingForAlgaeLevel);
     }
   }
 
@@ -191,6 +205,11 @@ public class Superstructure implements Subsystem {
     m_logger.log("Game Piece Mode", m_gamePieceMode.toString());
     m_logger.log("State", m_state.toString());
 
+    m_logger.log("Manual Score", m_manualScore);
+    m_logger.log("Manual Intake", m_manualIntake);
+    m_logger.log("Manual Armivator", m_manualArmivator);
+    m_logger.log("Picked Up Algae From Floor", m_pickedUpAlgaeFromFloor);
+
     m_claw.log();
     m_climb.log();
     m_elevator.log();
@@ -209,6 +228,16 @@ public class Superstructure implements Subsystem {
       m_algaeSignaler.enable();
     } else {
       m_algaeSignaler.disable();
+    }
+
+    if (m_wrist.isHorizontal() && m_arm.isHorizontal()) {
+      m_wristAndArmHorizontalSignaler.enable();
+    } else {
+      m_wristAndArmHorizontalSignaler.disable();
+    }
+
+    if (m_targetReefLevelSupplier.get() == ReefLevel.AlgaeFloor && getHasAlgae()) {
+      m_pickedUpAlgaeFromFloor = true;
     }
   }
 
@@ -301,7 +330,7 @@ public class Superstructure implements Subsystem {
   }
 
   public void setClimbTarget(double target) {
-    m_climb.setTarget(target);
+    m_climb.setTargetAngleDeg(target);
   }
 
   public void clawIntake() {
@@ -309,6 +338,8 @@ public class Superstructure implements Subsystem {
       m_claw.setControl(Claw.ControlStatus.Off);
     } else if (m_gamePieceMode == GamePiece.Coral) {
       m_claw.setControl(Claw.ControlStatus.IntakeCoral);
+    } else if (m_targetReefLevelSupplier.get() == ReefLevel.AlgaeFloor) {
+      m_claw.setControl(Claw.ControlStatus.IntakeAlgaeFromFloor);
     } else {
       m_claw.setControl(Claw.ControlStatus.IntakeAlgae);
     }
@@ -316,9 +347,17 @@ public class Superstructure implements Subsystem {
 
   public void clawScore() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_claw.setControl(Claw.ControlStatus.ScoreCoral);
+      if (m_targetReefLevelSupplier.get() == ReefLevel.L_1) {
+        m_claw.setControl(Claw.ControlStatus.ScoreCoralLevelOne);
+      } else {
+        m_claw.setControl(Claw.ControlStatus.ScoreCoral);
+      }
     } else {
-      m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
+      if (m_targetReefLevelSupplier.get() == ReefLevel.Processor) {
+        m_claw.setControl(Claw.ControlStatus.ScoreAlgaeProcessor);
+      } else {
+        m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
+      }
     }
   }
 
@@ -326,7 +365,7 @@ public class Superstructure implements Subsystem {
     return m_claw.getHasAlgae();
   }
 
-  private ReefLevel getAlgaePresetFromReefFace(ReefFace face) {
+  public ReefLevel getAlgaePresetFromReefFace(ReefFace face) {
     return switch (face) {
       case A, C, E -> ReefLevel.AlgaeHigh;
       case B, D, F -> ReefLevel.AlgaeLow;
@@ -395,6 +434,13 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case Scoring:
+            if (m_manualScore
+                && (m_gamePieceMode == GamePiece.Coral
+                    || m_targetReefLevelSupplier.get() == ReefLevel.Processor
+                    || m_targetReefLevelSupplier.get() == ReefLevel.Net)) {
+              clawScore();
+            }
+
             armTargetReefLevel();
             elevatorTargetReefLevel();
             wristTargetReefLevel();
@@ -417,13 +463,6 @@ public class Superstructure implements Subsystem {
 
             m_manualArmivator = false;
             break;
-        }
-
-        if (m_manualScore
-            && (m_gamePieceMode == GamePiece.Coral
-                || m_targetReefLevelSupplier.get() == ReefLevel.Processor
-                || m_targetReefLevelSupplier.get() == ReefLevel.Net)) {
-          clawScore();
         }
         break;
       case Zero:

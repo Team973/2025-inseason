@@ -25,7 +25,6 @@ public class Elevator implements Subsystem {
 
   private double m_targetPostionHeightinches;
   private double m_targetpositionLeway = 0.1;
-  private double m_manualPower;
 
   private int m_elevatorHomedCount = 0;
 
@@ -55,15 +54,9 @@ public class Elevator implements Subsystem {
   private boolean m_hallZeroingEnabled = true;
 
   public static enum ControlStatus {
-    Manual,
     TargetPostion,
     Zero,
     Off,
-  }
-
-  public void setmotorManualOutput(double joystick) {
-    m_manualPower = joystick * 0.1;
-    m_controlStatus = ControlStatus.Manual;
   }
 
   private double heightInchesToMotorRotations(double postionHeight) {
@@ -75,15 +68,15 @@ public class Elevator implements Subsystem {
   }
 
   public static class Presets {
-    private static final double LEVEL_1 = 3.5;
-    private static final double LEVEL_2 = 16.0;
+    private static final double LEVEL_1 = 1.5;
+    private static final double LEVEL_2 = 15.5;
     private static final double LEVEL_3 = 2.5;
     private static final double LEVEL_4 = 27.0;
     public static final double CORAL_STOW = 0.0;
 
-    private static final double NET = 29.0;
-    private static final double ALGAE_HIGH = 2.0;
-    private static final double ALGAE_LOW = 14.5;
+    private static final double NET = 30.0;
+    private static final double ALGAE_HIGH = 4.5;
+    private static final double ALGAE_LOW = 17.5;
     private static final double ALGAE_FLOOR = 0.0;
     public static final double ALGAE_STOW = 1.0;
   }
@@ -166,11 +159,13 @@ public class Elevator implements Subsystem {
     m_controlStatus = status;
   }
 
-  public boolean motorAtTarget() {
-    return (Math.abs(
-            m_targetPostionHeightinches
-                - motorRotationsToHeightInches(m_motorRight.getPosition().getValueAsDouble()))
+  private boolean motorAtTarget(double motorRot) {
+    return (Math.abs(m_targetPostionHeightinches - motorRotationsToHeightInches(motorRot))
         < m_targetpositionLeway);
+  }
+
+  public boolean motorAtTarget() {
+    return motorAtTarget(m_motorRight.getPosition().getValueAsDouble());
   }
 
   public void setTargetPostion(double targetPostionHeightinches) {
@@ -245,9 +240,6 @@ public class Elevator implements Subsystem {
   @Override
   public void update() {
     switch (m_controlStatus) {
-      case Manual:
-        m_motorRight.setControl(ControlMode.DutyCycleOut, m_manualPower, 0);
-        break;
       case TargetPostion:
         m_motorRight.setControl(
             ControlMode.MotionMagicVoltage,
@@ -263,21 +255,23 @@ public class Elevator implements Subsystem {
     }
   }
 
-  public double getHeightInches() {
-    return motorRotationsToHeightInches(m_motorRight.getPosition().getValueAsDouble());
+  public double getHeightInchesFromMotorRot(double motorRot) {
+    return motorRotationsToHeightInches(motorRot);
   }
 
   @Override
   public void log() {
-    m_logger.log("currentPostionHeightInches", getHeightInches());
-    m_logger.log("targetPostionReached", motorAtTarget());
-    m_logger.log("targetPostionHeightInches", m_targetPostionHeightinches);
+    double motorRightRot = m_motorRight.getPosition().getValueAsDouble();
+
     m_motorLeft.log();
     m_motorRight.log();
+
+    m_logger.log("currentPostionHeightInches", getHeightInchesFromMotorRot(motorRightRot));
+    m_logger.log("targetPostionReached", motorAtTarget(motorRightRot));
+    m_logger.log("targetPostionHeightInches", m_targetPostionHeightinches);
+
     m_logger.log("elevatorMode", m_controlStatus.toString());
-    m_logger.log(
-        "motorErrorInches",
-        motorRotationsToHeightInches(m_motorRight.getClosedLoopError().getValueAsDouble()));
+
     m_logger.log("hallSesnsorReturnElevator", hallsensor());
 
     m_logger.log("Level 1 Offset", m_levelOneOffset);

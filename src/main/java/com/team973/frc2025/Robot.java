@@ -17,6 +17,7 @@ import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.Superstructure.GamePiece;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.Wrist;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
@@ -120,6 +121,7 @@ public class Robot extends TimedRobot {
   private final double m_lowBatterMimiumVoltage = 12.1;
 
   private boolean m_climbReachedHorizontal = false;
+  private boolean m_needsToStowAfterAlgaePickUp = true;
 
   public static enum ControlStatus {
     HighBattery,
@@ -134,6 +136,14 @@ public class Robot extends TimedRobot {
 
     m_readyToScore.set(m_superstructure.readyToScore());
     m_readyToBackOff.set(m_superstructure.readyToBackOff());
+
+    if (!m_superstructure.getHasAlgae()) {
+      m_needsToStowAfterAlgaePickUp = true;
+    } else if (m_superstructure.getTargetReefLevel() == ReefLevel.AlgaeFloor
+        && m_needsToStowAfterAlgaePickUp) {
+      m_superstructure.setManualArmivator(false);
+      m_needsToStowAfterAlgaePickUp = false;
+    }
 
     m_syncSensorsLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
@@ -157,8 +167,8 @@ public class Robot extends TimedRobot {
 
     m_logger.log("Ready To Score", m_readyToScore.get());
     m_logger.log("Ready To Back Off", m_readyToBackOff.get());
-    m_logger.log("Get Alliance Cache Call Count", AllianceCache.m_numberOfGetCalls.get());
     m_logger.log("Match Time", Timer.getMatchTime());
+    m_logger.log("Needs To Stow After Algae Pickup", m_needsToStowAfterAlgaePickUp);
   }
 
   private void updateJoysticks() {
@@ -326,9 +336,7 @@ public class Robot extends TimedRobot {
 
       if (m_driverStick.getLeftBumperButtonPressed()) {
         m_superstructure.setManualArmivator(true);
-      }
-
-      if (m_driverStick.getLeftTriggerPressed()) {
+      } else if (m_driverStick.getLeftTriggerPressed()) {
         m_superstructure.setManualArmivator(false);
       }
 
@@ -364,14 +372,22 @@ public class Robot extends TimedRobot {
       }
 
       if (m_coDriverStick.getAButtonPressed()) {
-        m_superstructure.setTargetReefLevel(
-            ReefLevel.L_1, ReefLevel.AlgaeFloor, ReefLevel.Processor);
+        m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeFloor);
+        if (m_superstructure.getGamePieceMode() == GamePiece.Coral) {
+          m_driveController
+              .getDriveWithLimelight()
+              .setTargetSide(DriveWithLimelight.ReefSide.LevelOneCenter);
+        }
       } else if (m_coDriverStick.getXButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
       } else if (m_coDriverStick.getBButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
       } else if (m_coDriverStick.getYButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.Net);
+
+        if (m_superstructure.getGamePieceMode() == GamePiece.Algae) {
+          m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Net);
+        }
       }
 
       if (m_coDriverStick.getRightBumperButtonPressed()) {
@@ -424,11 +440,7 @@ public class Robot extends TimedRobot {
       new PerfLogger(m_logger.subLogger("perf/disabledPeriodic", 0.25));
 
   private void maybeUpdateScoringSelection() {
-    if (m_superstructure.getTargetReefLevel() == ReefLevel.Net) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Net);
-    } else if (m_superstructure.getTargetReefLevel() == ReefLevel.Processor) {
-      m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Processor);
-    } else if (m_frontFace.isActive()) {
+    if (m_frontFace.isActive()) {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.A);
     } else if (m_frontRightFace.isActive()) {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.B);
@@ -444,13 +456,25 @@ public class Robot extends TimedRobot {
 
     if (m_superstructure.getGamePieceMode() == Superstructure.GamePiece.Algae) {
       m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
-    } else if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
-      m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.LevelOne);
     } else if (m_driverStick.getRightTrigger()) {
       if (m_leftReefSide.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
+        if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
+          m_driveController
+              .getDriveWithLimelight()
+              .setTargetSide(DriveWithLimelight.ReefSide.LevelOneLeft);
+        } else {
+          m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
+        }
       } else if (m_rightReefSide.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Right);
+        if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
+          m_driveController
+              .getDriveWithLimelight()
+              .setTargetSide(DriveWithLimelight.ReefSide.LevelOneRight);
+        } else {
+          m_driveController
+              .getDriveWithLimelight()
+              .setTargetSide(DriveWithLimelight.ReefSide.Right);
+        }
       }
     }
   }
