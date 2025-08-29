@@ -17,6 +17,7 @@ import com.team973.lib.util.SwerveModuleConfig;
 import com.team973.lib.util.mechanisms.GearedMechanism;
 import com.team973.lib.util.mechanisms.LinearMechanism;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
@@ -39,6 +40,10 @@ public class SwerveModule {
   private final GearedMechanism m_angleMechanism = new GearedMechanism(DriveInfo.ANGLE_GEAR_RATIO);
 
   private SwerveModuleState m_lastState;
+
+  private Translation2d m_arcDisplacement;
+  private double m_lastDrivePos;
+  private Rotation2d m_lastAnglePos;
 
   private final TalonFXConfiguration m_driveMotorConfig;
 
@@ -99,6 +104,10 @@ public class SwerveModule {
     m_allStatusSignals.add(m_angleMotorVelocityStatusSignal);
 
     m_lastState = getState();
+    m_arcDisplacement = new Translation2d();
+
+    m_lastDrivePos = getDriveMotorMeters();
+    m_lastAnglePos = getAngleMotorRotation2d();
   }
 
   private void configAngleEncoder() {
@@ -264,7 +273,20 @@ public class SwerveModule {
           ControlMode.PositionVoltage,
           m_angleMechanism.getRotorRotationFromOutputRotation(desiredState.angle).getRotations());
     }
+
     m_lastState = desiredState;
+  }
+
+  public void update() {
+    double distanceDiff = getDriveMotorMeters() - m_lastDrivePos;
+    Rotation2d angleDiff = getAngleMotorRotation2d().minus(m_lastAnglePos);
+
+    double radius = distanceDiff / angleDiff.getRadians();
+    Translation2d centerOfArcToPrevPos =
+        new Translation2d(radius, m_lastAnglePos.minus(Rotation2d.kCCW_Pi_2));
+    Translation2d centerOfArcToCurrPos = centerOfArcToPrevPos.rotateBy(angleDiff);
+
+    m_arcDisplacement = centerOfArcToCurrPos.minus(centerOfArcToPrevPos);
   }
 
   public void driveBrake() {
@@ -275,6 +297,10 @@ public class SwerveModule {
   public void driveNeutral() {
     m_driveMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     m_driveMotor.setConfig(m_driveMotorConfig);
+  }
+
+  public Translation2d getDisplacement() {
+    return m_arcDisplacement;
   }
 
   public void log() {

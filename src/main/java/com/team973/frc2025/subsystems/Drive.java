@@ -260,6 +260,12 @@ public class Drive implements Subsystem {
     m_estimatedVelocity.set(m_poseEstimator.getVelocityMetersPerSeconds());
   }
 
+  private void updateSwerveModules() {
+    for (SwerveModule s : m_swerveModules) {
+      s.update();
+    }
+  }
+
   @Override
   public void update() {
     Pose2d robot_pose_vel =
@@ -276,6 +282,7 @@ public class Drive implements Subsystem {
         DriveInfo.SWERVE_KINEMATICS.toSwerveModuleStates(updated_chassis_speeds);
 
     setModuleStates(swerveModuleStates);
+    updateSwerveModules();
   }
 
   public void reset() {
