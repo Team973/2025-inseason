@@ -276,6 +276,10 @@ public class Drive implements Subsystem {
         DriveInfo.SWERVE_KINEMATICS.toSwerveModuleStates(updated_chassis_speeds);
 
     setModuleStates(swerveModuleStates);
+
+    for (SwerveModule s : m_swerveModules) {
+      s.update();
+    }
   }
 
   public void reset() {

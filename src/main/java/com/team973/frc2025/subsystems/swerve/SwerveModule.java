@@ -40,6 +40,10 @@ public class SwerveModule {
 
   private SwerveModuleState m_lastState;
 
+  private double m_lastAngleMotorPos;
+  private double m_driveMotorOffset;
+  // private double m_driveMotorOffsetMeters;
+
   private final TalonFXConfiguration m_driveMotorConfig;
 
   private final StatusSignal<Angle> m_driveMotorPositionStatusSignal;
@@ -99,6 +103,9 @@ public class SwerveModule {
     m_allStatusSignals.add(m_angleMotorVelocityStatusSignal);
 
     m_lastState = getState();
+
+    m_lastAngleMotorPos = m_angleMotor.getPosition().getValueAsDouble();
+    m_driveMotorOffset = 0.0;
   }
 
   private void configAngleEncoder() {
@@ -200,6 +207,15 @@ public class SwerveModule {
         Rotation2d.fromRotations(compensatedRotations));
   }
 
+  // public double getUpdatedDriveMotorMeters() {
+  //   double compensatedRotations =
+  //       BaseStatusSignal.getLatencyCompensatedValue(
+  //               m_driveMotorPositionStatusSignal, m_driveMotorVelocityStatusSignal)
+  //           .magnitude();
+  //   return m_driveMechanism.getOutputDistanceFromRotorRotation(
+  //       Rotation2d.fromRotations(compensatedRotations + m_driveMotorOffset));
+  // }
+
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(getDriveMotorMeters(), getAngleMotorRotation2d());
   }
@@ -277,6 +293,16 @@ public class SwerveModule {
     m_driveMotor.setConfig(m_driveMotorConfig);
   }
 
+  public void update() {
+    double angleMotorPos = m_angleMotor.getPosition().getValueAsDouble();
+    double angleMotorDelta = angleMotorPos - m_lastAngleMotorPos;
+
+    m_driveMotorOffset += angleMotorDelta * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT;
+    // m_driveMotorOffsetMeters += angleMotorDelta * DriveInfo.ANGLE_MOTOR_TO_DRIVE_METERS;
+
+    m_lastAngleMotorPos = angleMotorPos;
+  }
+
   public void log() {
     m_driveMotor.log();
     m_angleMotor.log();
@@ -292,5 +318,11 @@ public class SwerveModule {
     m_logger.log(
         "steer/currentPosRot",
         m_angleMechanism.getRotorRotationFromOutputRotation(currentState.angle).getRotations());
+    m_logger.log(
+        "Updated Drive Motor Pos",
+        m_driveMotor.getPosition().getValueAsDouble() + m_driveMotorOffset);
+    // m_logger.log(
+    //     "Updated Drive Meters",
+    //     m_driveMotor.getPosition().getValueAsDouble() + m_driveMotorOffsetMeters);
   }
 }
