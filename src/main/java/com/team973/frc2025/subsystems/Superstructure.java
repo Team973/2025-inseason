@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
@@ -16,6 +17,7 @@ public class Superstructure implements Subsystem {
   private final Arm m_arm;
   private final Wrist m_wrist;
   private final DriveController m_driveController;
+  private final RobotInfo.ArmInfo m_ArmInfo = RobotConfig.get().ARM_INFO;
 
   private final Logger m_logger;
 
@@ -132,11 +134,11 @@ public class Superstructure implements Subsystem {
   }
 
   public boolean readyToScore() {
-    if (m_arm.getTargetPosition() == Arm.CORAL_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == m_ArmInfo.CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
-    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG
+    if (m_arm.getTargetPosition() == m_ArmInfo.ALGAE_STOW_POSITION_DEG
         && m_targetReefLevelSupplier.get() != ReefLevel.Processor) {
       return false;
     }
@@ -248,9 +250,9 @@ public class Superstructure implements Subsystem {
 
   private void armStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_arm.setTargetDeg(Arm.CORAL_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(m_ArmInfo.CORAL_STOW_POSITION_DEG);
     } else {
-      m_arm.setTargetDeg(Arm.ALGAE_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(m_ArmInfo.ALGAE_STOW_POSITION_DEG);
     }
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }

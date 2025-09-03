@@ -20,7 +20,6 @@ import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.GamePiece;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.Wrist;
-import com.team973.frc2025.subsystems.composables.DriveWithJoysticks;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.AllianceCache;
@@ -44,8 +43,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
-  private final RobotConfig m_robotConfig = new RobotConfig();
-  private final RobotInfo m_robotInfo = new RobotInfo(m_robotConfig);
+  private final RobotInfo m_robotInfo = RobotConfig.get();
   private final AtomicBoolean m_readyToScore = new AtomicBoolean(false);
   private final AtomicBoolean m_readyToBackOff = new AtomicBoolean(false);
 
@@ -57,11 +55,11 @@ public class Robot extends TimedRobot {
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger", 0.2));
-  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager", 0.2), m_candleManger, m_robotInfo);
-  private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger, m_robotInfo);
+  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager", 0.2), m_candleManger);
+  private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
   private final Elevator m_elevator =
       new Elevator(m_logger.subLogger("elevator", 0.2), m_candleManger, m_robotInfo);
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2), m_candleManger, m_robotInfo);
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2), m_candleManger);
   private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2), m_robotInfo);
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(
@@ -118,6 +116,8 @@ public class Robot extends TimedRobot {
       m_sideSelector.range(Rotation2d.fromDegrees(270), Rotation2d.fromDegrees(90), 0.5);
   private final JoystickField.Range m_rightReefSide =
       m_sideSelector.range(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(90), 0.5);
+
+  private final RobotInfo.ClimbInfo m_climbInfo = m_robotInfo.CLIMB_INFO;
 
   private double m_lastBatteryVoltageHighMSTimestamp;
   private final double m_lowBatteryTimeOutMs = 1000.0;
@@ -190,7 +190,6 @@ public class Robot extends TimedRobot {
     m_candleManger.addSignaler(m_lowBatterySignaler);
     m_candleManger.addSignaler(m_crashSignaler);
     ChoreoAllianceFlipUtil.setYear(2025);
-    DriveWithJoysticks.getDriveInfo(m_robotInfo.DriveInfo);
   }
 
   private PerfLogger m_robotPeriodicLogger =
@@ -406,12 +405,12 @@ public class Robot extends TimedRobot {
 
       if (Timer.getMatchTime() < 45.0) {
         if (m_coDriverStick.getRightTriggerPressed()) {
-          m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
+          m_superstructure.setClimbTarget(m_climbInfo.HORIZONTAL_POSITION_DEG);
           m_superstructure.setState(Superstructure.State.Climb);
 
           m_climbReachedHorizontal = true;
         } else if (m_coDriverStick.getLeftTriggerPressed() && m_climbReachedHorizontal) {
-          m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
+          m_superstructure.setClimbTarget(m_climbInfo.CLIMB_POSITION_DEG);
         } else if (Math.abs(climbStick) > 0.25) {
           m_superstructure.incrementClimbTarget(climbStick);
         }

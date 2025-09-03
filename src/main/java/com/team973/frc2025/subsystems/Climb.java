@@ -3,6 +3,7 @@ package com.team973.frc2025.subsystems;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
@@ -13,34 +14,25 @@ import com.team973.lib.util.Subsystem;
 public class Climb implements Subsystem {
   private final RobotInfo m_robotInfo;
   private final RobotInfo.ClimbInfo m_climbInfo;
-  private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 5.0;
-  private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
-
-  public static final double HORIZONTAL_POSITION_DEG = 100.0;
-  public static final double CLIMB_POSITION_DEG = 263.0;
-
-  private static final double STOP_POSITION_DEG = 263.0;
 
   private final Logger m_logger;
 
   private final GreyTalonFX m_climb;
 
-  private final SolidSignaler m_climbHorizontalSignaler = new SolidSignaler(RobotInfo.Colors.HOT_PINK, 100.0, SignalerInfo.CLIMB_HORIZONTAL_PRIORITY);
+  private final SolidSignaler m_climbHorizontalSignaler =
+      new SolidSignaler(RobotInfo.Colors.HOT_PINK, 100.0, SignalerInfo.CLIMB_HORIZONTAL_PRIORITY);
 
-  private final BlinkingSignaler m_climbStopSignaler = new BlinkingSignaler(
-    Colors.GREEN,
-    Colors.OFF,
-    500.0,
-    100.0,
-    SignalerInfo.CLIMB_STOP_PRIORITY);
+  private final BlinkingSignaler m_climbStopSignaler =
+      new BlinkingSignaler(
+          Colors.GREEN, Colors.OFF, 500.0, 100.0, SignalerInfo.CLIMB_STOP_PRIORITY);
 
   private double m_targetPosition;
 
-  public Climb(Logger logger, CANdleManger candle, RobotInfo robotInfo) {
-    m_robotInfo = robotInfo;
-    m_climbInfo = robotInfo.new ClimbInfo();
+  public Climb(Logger logger, CANdleManger candle) {
+    m_robotInfo = RobotConfig.get();
+    m_climbInfo = m_robotInfo.CLIMB_INFO;
     m_logger = logger;
-    m_climb = new GreyTalonFX(23, m_robotInfo.CANIVORE_CANBUS, m_logger.subLogger("climb motor"));
+    m_climb = new GreyTalonFX(23, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("climb motor"));
     m_climb.setConfig(defaultMotorConfig());
 
     m_climb.setPosition(0);
@@ -50,7 +42,7 @@ public class Climb implements Subsystem {
     candle.addSignaler(m_climbStopSignaler);
   }
 
-  private static TalonFXConfiguration defaultMotorConfig() {
+  private TalonFXConfiguration defaultMotorConfig() {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
     defaultMotorConfig.Slot0.kS = 0.0;
     defaultMotorConfig.Slot0.kV = 0.15;
@@ -58,9 +50,12 @@ public class Climb implements Subsystem {
     defaultMotorConfig.Slot0.kP = 6.4;
     defaultMotorConfig.Slot0.kI = 0.0;
     defaultMotorConfig.Slot0.kD = 0.04;
-    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = MOTION_MAGIC_CRUISE_VELOCITY * 0.5;
-    defaultMotorConfig.MotionMagic.MotionMagicAcceleration = MOTION_MAGIC_CRUISE_VELOCITY * 10.0;
-    defaultMotorConfig.MotionMagic.MotionMagicJerk = MOTION_MAGIC_CRUISE_VELOCITY * 100.0;
+    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        m_climbInfo.MOTION_MAGIC_CRUISE_VELOCITY * 0.5;
+    defaultMotorConfig.MotionMagic.MotionMagicAcceleration =
+        m_climbInfo.MOTION_MAGIC_CRUISE_VELOCITY * 10.0;
+    defaultMotorConfig.MotionMagic.MotionMagicJerk =
+        m_climbInfo.MOTION_MAGIC_CRUISE_VELOCITY * 100.0;
     // slot 1 is for velocity
     defaultMotorConfig.Slot1.kS = 0.0;
     defaultMotorConfig.Slot1.kV = 0;
@@ -85,7 +80,8 @@ public class Climb implements Subsystem {
 
   public void incrementTarget(double increment) {
     m_targetPosition =
-        m_climb.getPosition().getValueAsDouble() + (increment * JOYSTICK_TO_MOTOR_ROTATIONS);
+        m_climb.getPosition().getValueAsDouble()
+            + (increment * m_climbInfo.JOYSTICK_TO_MOTOR_ROTATIONS);
   }
 
   public double getClimbDegFromMotorRot(double rot) {
@@ -114,9 +110,9 @@ public class Climb implements Subsystem {
   public void syncSensors() {
     double climbPosition = m_climb.getPosition().getValueAsDouble();
 
-    if (getClimbAngleDegFromMotorRot(climbPosition) >= STOP_POSITION_DEG) {
+    if (getClimbAngleDegFromMotorRot(climbPosition) >= m_climbInfo.STOP_POSITION_DEG) {
       m_climbStopSignaler.enable();
-    } else if (getClimbAngleDegFromMotorRot(climbPosition) >= HORIZONTAL_POSITION_DEG) {
+    } else if (getClimbAngleDegFromMotorRot(climbPosition) >= m_climbInfo.HORIZONTAL_POSITION_DEG) {
       m_climbHorizontalSignaler.enable();
     }
   }

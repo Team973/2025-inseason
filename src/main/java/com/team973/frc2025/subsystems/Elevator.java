@@ -14,7 +14,6 @@ import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator implements Subsystem {
-  private final RobotInfo m_robotInfo;
   private final RobotInfo.ElevatorInfo m_elevatorInfo;
   private static final double MOTOR_GEAR_RATIO = 10.0 / 56.0;
 
@@ -86,13 +85,12 @@ public class Elevator implements Subsystem {
   public Elevator(Logger logger, CANdleManger candle, RobotInfo robotInfo) {
     m_logger = logger;
     m_candleManger = candle;
-    m_robotInfo = robotInfo;
     m_elevatorInfo = robotInfo.new ElevatorInfo();
     m_candleManger.addSignaler(m_elevatorHomedBlinker);
-    m_motorRight = new GreyTalonFX(21, m_robotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorRight"));
+    m_motorRight = new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorRight"));
     m_motorLeft =
-        new GreyTalonFX(20, m_robotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft", 0.5));
-    m_hallSensor =  new DigitalInput(m_elevatorInfo.HALL_SENSOR_ID);
+        new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft", 0.5));
+    m_hallSensor = new DigitalInput(m_elevatorInfo.HALL_SENSOR_ID);
 
     TalonFXConfiguration leftMotorConfig = defaultElevatorMotorConfig();
     // looking at it from the front left is clockwise and right is counter clockwise

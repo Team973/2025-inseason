@@ -7,8 +7,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
@@ -26,6 +26,8 @@ import java.util.List;
 
 public class SwerveModule {
   public final int moduleNumber;
+  private final RobotInfo m_robotInfo;
+  private final RobotInfo.DriveInfo m_driveInfo;
   private final Rotation2d m_angleOffset;
 
   private final GreyTalonFX m_angleMotor;
@@ -34,9 +36,8 @@ public class SwerveModule {
 
   private final Logger m_logger;
 
-  private final LinearMechanism m_driveMechanism =
-      new LinearMechanism(DriveInfo.DRIVE_GEAR_RATIO, DriveInfo.WHEEL_DIAMETER_METERS);
-  private final GearedMechanism m_angleMechanism = new GearedMechanism(DriveInfo.ANGLE_GEAR_RATIO);
+  private final LinearMechanism m_driveMechanism;
+  private final GearedMechanism m_angleMechanism;
 
   private SwerveModuleState m_lastState;
 
@@ -53,6 +54,12 @@ public class SwerveModule {
     this.moduleNumber = moduleNumber;
     m_logger = logger;
     m_angleOffset = Rotation2d.fromDegrees(moduleConfig.angleOffset);
+    m_robotInfo = RobotConfig.get();
+    m_driveInfo = m_robotInfo.DRIVE_INFO;
+
+    m_driveMechanism =
+        new LinearMechanism(m_driveInfo.DRIVE_GEAR_RATIO, m_driveInfo.WHEEL_DIAMETER_METERS);
+    m_angleMechanism = new GearedMechanism(m_driveInfo.ANGLE_GEAR_RATIO);
 
     /* Angle Encoder Config */
     m_angleEncoder =
@@ -114,10 +121,10 @@ public class SwerveModule {
     motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-    motorConfig.Slot0.kP = DriveInfo.ANGLE_KP;
-    motorConfig.Slot0.kI = DriveInfo.ANGLE_KI;
-    motorConfig.Slot0.kD = DriveInfo.ANGLE_KD;
-    motorConfig.Slot0.kS = DriveInfo.ANGLE_KF;
+    motorConfig.Slot0.kP = m_driveInfo.ANGLE_KP;
+    motorConfig.Slot0.kI = m_driveInfo.ANGLE_KI;
+    motorConfig.Slot0.kD = m_driveInfo.ANGLE_KD;
+    motorConfig.Slot0.kS = m_driveInfo.ANGLE_KF;
 
     motorConfig.CurrentLimits.StatorCurrentLimit = 100.0;
     motorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -136,10 +143,10 @@ public class SwerveModule {
     m_driveMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_driveMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    m_driveMotorConfig.Slot0.kP = DriveInfo.DRIVE_KP;
-    m_driveMotorConfig.Slot0.kI = DriveInfo.DRIVE_KI;
-    m_driveMotorConfig.Slot0.kD = DriveInfo.DRIVE_KD;
-    m_driveMotorConfig.Slot0.kV = DriveInfo.DRIVE_KF;
+    m_driveMotorConfig.Slot0.kP = m_driveInfo.DRIVE_KP;
+    m_driveMotorConfig.Slot0.kI = m_driveInfo.DRIVE_KI;
+    m_driveMotorConfig.Slot0.kD = m_driveInfo.DRIVE_KD;
+    m_driveMotorConfig.Slot0.kV = m_driveInfo.DRIVE_KF;
 
     m_driveMotorConfig.CurrentLimits.StatorCurrentLimit = 100.0;
     m_driveMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -253,7 +260,7 @@ public class SwerveModule {
     if (!ignoreJitter) {
       desiredState.angle =
           (Math.abs(desiredState.speedMetersPerSecond)
-                  <= (DriveInfo.MAX_VELOCITY_METERS_PER_SECOND * 0.01))
+                  <= (m_driveInfo.MAX_VELOCITY_METERS_PER_SECOND * 0.01))
               ? m_lastState.angle
               : desiredState.angle;
     }

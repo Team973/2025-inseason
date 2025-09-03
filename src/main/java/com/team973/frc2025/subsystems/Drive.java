@@ -22,7 +22,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Drive implements Subsystem {
-  private RobotInfo m_robotInfo;
   private RobotInfo.DriveInfo m_driveInfo;
 
   private static final Translation2d[] MODULE_LOCATIONS = {
@@ -56,14 +55,11 @@ public class Drive implements Subsystem {
   private final MegaTagSupplier m_rightLLSupplier;
   private final MegaTagSupplier m_backLLSupplier;
 
-
-
   public Drive(GreyPigeon pigeon, DriveController driveController, Logger logger) {
     m_pigeon = pigeon;
     m_driveController = driveController;
     m_logger = logger;
-    
-    
+
     m_swerveModules =
         new SwerveModule[] {
           new SwerveModule(0, m_driveInfo.FRONT_LEFT_CONSTANTS, logger.subLogger("swerve/mod0")),

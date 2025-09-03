@@ -5,7 +5,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.WristInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
@@ -14,7 +13,6 @@ import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 
 public class Wrist implements Subsystem {
-  private final RobotInfo m_robotInfo;
   private final RobotInfo.WristInfo m_wristInfo;
   private final Logger m_logger;
 
@@ -43,15 +41,14 @@ public class Wrist implements Subsystem {
 
   public Wrist(Logger logger, RobotInfo robotInfo) {
     m_logger = logger;
-    m_robotInfo = robotInfo;
     m_wristInfo = robotInfo.new WristInfo();
 
     m_wristMotor =
         new GreyTalonFX(
-            m_wristInfo.MOTOR_CAN_ID, m_robotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
+            m_wristInfo.MOTOR_CAN_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
     m_wristEncoder =
         new GreyCANCoder(
-            m_wristInfo.ENCODER_CAN_ID, m_robotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+            m_wristInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
     TalonFXConfiguration wristMotorConfig = new TalonFXConfiguration();
     wristMotorConfig.Slot0.kS = 0.0;
