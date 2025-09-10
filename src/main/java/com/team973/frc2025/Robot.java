@@ -17,17 +17,18 @@ import com.team973.frc2025.subsystems.DriveController.ControllerOption;
 import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.Superstructure.GamePiece;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.Wrist;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
+import com.team973.lib.util.AllianceCache;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Joystick;
 import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.PerfLogger;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -52,12 +53,13 @@ public class Robot extends TimedRobot {
       new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
-  private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger"));
-  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager"), m_candleManger);
+  private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger", 0.2));
+  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager", 0.2), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
-  private final Elevator m_elevator = new Elevator(m_logger.subLogger("elevator"), m_candleManger);
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm"), m_candleManger);
-  private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist"));
+  private final Elevator m_elevator =
+      new Elevator(m_logger.subLogger("elevator", 0.2), m_candleManger);
+  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2), m_candleManger);
+  private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2));
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(
           RobotInfo.Colors.ORANGE, 3000, RobotInfo.SignalerInfo.LOW_BATTER_SIGNALER_PRIORTY);
@@ -74,7 +76,15 @@ public class Robot extends TimedRobot {
           RobotInfo.SignalerInfo.CRASH_SIGNALER_PRIORITY);
 
   private final Superstructure m_superstructure =
-      new Superstructure(m_claw, m_climb, m_elevator, m_arm, m_wrist, m_driveController);
+      new Superstructure(
+          m_claw,
+          m_climb,
+          m_elevator,
+          m_arm,
+          m_wrist,
+          m_driveController,
+          m_logger.subLogger("superstructure"),
+          m_candleManger);
 
   private final AutoManager m_autoManager =
       new AutoManager(m_logger.subLogger("auto"), m_driveController, m_superstructure);
@@ -110,6 +120,9 @@ public class Robot extends TimedRobot {
   private final double m_lowBatteryTimeOutMs = 1000.0;
   private final double m_lowBatterMimiumVoltage = 12.1;
 
+  private boolean m_climbReachedHorizontal = false;
+  private boolean m_needsToStowAfterAlgaePickUp = true;
+
   public static enum ControlStatus {
     HighBattery,
     LowBattery,
@@ -123,6 +136,14 @@ public class Robot extends TimedRobot {
 
     m_readyToScore.set(m_superstructure.readyToScore());
     m_readyToBackOff.set(m_superstructure.readyToBackOff());
+
+    if (!m_superstructure.getHasAlgae()) {
+      m_needsToStowAfterAlgaePickUp = true;
+    } else if (m_superstructure.getTargetReefLevel() == ReefLevel.AlgaeFloor
+        && m_needsToStowAfterAlgaePickUp) {
+      m_superstructure.setManualArmivator(false);
+      m_needsToStowAfterAlgaePickUp = false;
+    }
 
     m_syncSensorsLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
@@ -146,6 +167,8 @@ public class Robot extends TimedRobot {
 
     m_logger.log("Ready To Score", m_readyToScore.get());
     m_logger.log("Ready To Back Off", m_readyToBackOff.get());
+    m_logger.log("Match Time", Timer.getMatchTime());
+    m_logger.log("Needs To Stow After Algae Pickup", m_needsToStowAfterAlgaePickUp);
   }
 
   private void updateJoysticks() {
@@ -168,6 +191,8 @@ public class Robot extends TimedRobot {
 
   private PerfLogger m_robotPeriodicLogger =
       new PerfLogger(m_logger.subLogger("perf/robotPeriodic", 0.25));
+  private PerfLogger m_autoPeriodicLogger =
+      new PerfLogger(m_logger.subLogger("perf/autoPeriodic", 0.25));
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -179,6 +204,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     try {
+      double startTime = Timer.getFPGATimestamp();
+
       m_ledOff.enable();
 
       m_logger.log("logCount", m_logger.getCount());
@@ -194,7 +221,7 @@ public class Robot extends TimedRobot {
         m_crashSignaler.enable();
         CrashTracker.resetExceptionHappened();
       }
-      double startTime = Timer.getFPGATimestamp();
+
       logSubsystems();
 
       updateJoysticks();
@@ -205,24 +232,22 @@ public class Robot extends TimedRobot {
     }
   }
 
-  private void setPoseFromAuto() {
-    m_driveController.resetOdometry(m_autoManager.getStartingPose(m_alliance));
+  private void setPoseFromAuto(Alliance alliance) {
+    m_driveController.resetOdometry(m_autoManager.getStartingPose(alliance));
   }
 
-  private boolean m_allianceInitialized = false;
-  private Alliance m_alliance;
+  private boolean m_initialized;
 
   private void maybeInitAlliance() {
-    if (m_allianceInitialized) {
+    if (m_initialized) {
       return;
     }
-    Optional<Alliance> alliance = DriverStation.getAlliance();
+    Optional<Alliance> alliance = AllianceCache.Get();
     if (!alliance.isPresent()) {
       return;
     }
-    m_allianceInitialized = true;
-    m_alliance = alliance.get();
-    setPoseFromAuto();
+    m_initialized = true;
+    setPoseFromAuto(alliance.get());
   }
 
   /**
@@ -238,8 +263,11 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     try {
+      m_driveController.setRobotIsAutonomous(true);
       m_autoManager.init();
-      m_driveController.resetOdometry(m_autoManager.getStartingPose(m_alliance));
+      m_driveController.resetOdometry(m_autoManager.getStartingPose(AllianceCache.Get().get()));
+
+      m_elevator.setHallZeroingEnabled(false);
     } catch (Exception e) {
       CrashTracker.logException("Auto Init", e);
     }
@@ -249,13 +277,18 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     try {
+      double startTime = Timer.getFPGATimestamp();
+
       syncSensors();
       // TODO: we're doing this badly to make it work
       m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
       // TODO: Figure out why autos don't work if updateSubsystems() comes before
       // automanager.run().
-      m_autoManager.run(m_alliance);
+      m_autoManager.run(AllianceCache.Get().get());
+
       updateSubsystems();
+
+      m_autoPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
     } catch (Exception e) {
       CrashTracker.logException("Auto Periodic", e);
     }
@@ -265,7 +298,10 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     try {
+      m_driveController.setRobotIsAutonomous(false);
       m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
+
+      m_elevator.setHallZeroingEnabled(false);
     } catch (Exception e) {
       CrashTracker.logException("Teleop Init", e);
     }
@@ -280,7 +316,7 @@ public class Robot extends TimedRobot {
       maybeUpdateScoringSelection();
 
       double allianceScalar = 1.0;
-      if (m_alliance == Alliance.Red) {
+      if (AllianceCache.Get().get() == Alliance.Red) {
         // Our gyroscope is blue-centric meaning that facing away from the alliance wall
         // is a 0 degree heading. But the driver station is facing 180 when we are on
         // the
@@ -302,9 +338,7 @@ public class Robot extends TimedRobot {
 
       if (m_driverStick.getLeftBumperButtonPressed()) {
         m_superstructure.setManualArmivator(true);
-      }
-
-      if (m_driverStick.getLeftTriggerPressed()) {
+      } else if (m_driverStick.getLeftTriggerPressed()) {
         m_superstructure.setManualArmivator(false);
       }
 
@@ -329,24 +363,33 @@ public class Robot extends TimedRobot {
       }
       double climbStick = m_coDriverStick.getLeftYAxis();
 
-      // if (m_coDriverStick.getPOVTopPressed()) {
-      //   m_superstructure.incrementElevatorOffset(0.5);
-      // } else if (m_coDriverStick.getPOVBottomPressed()) {
-      //   m_superstructure.incrementElevatorOffset(-0.5);
-      // } else if (m_coDriverStick.getPOVRightPressed()) {
-      //   m_superstructure.incrementArmOffset(1.0);
-      // } else if (m_coDriverStick.getPOVLeftPressed()) {
-      //   m_superstructure.incrementArmOffset(-1.0);
-      // }
+      if (m_coDriverStick.getPOVTopPressed()) {
+        m_superstructure.incrementElevatorOffset(0.5);
+      } else if (m_coDriverStick.getPOVBottomPressed()) {
+        m_superstructure.incrementElevatorOffset(-0.5);
+      } else if (m_coDriverStick.getPOVRightPressed()) {
+        m_superstructure.incrementArmOffset(1.0);
+      } else if (m_coDriverStick.getPOVLeftPressed()) {
+        m_superstructure.incrementArmOffset(-1.0);
+      }
 
       if (m_coDriverStick.getAButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeLow);
+        m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeFloor);
+        if (m_superstructure.getGamePieceMode() == GamePiece.Coral) {
+          m_driveController
+              .getDriveWithLimelight()
+              .setTargetSide(DriveWithLimelight.ReefSide.LevelOneCenter);
+        }
       } else if (m_coDriverStick.getXButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
       } else if (m_coDriverStick.getBButtonPressed()) {
         m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
       } else if (m_coDriverStick.getYButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.AlgaeHigh);
+        m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.Net);
+
+        if (m_superstructure.getGamePieceMode() == GamePiece.Algae) {
+          m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Net);
+        }
       }
 
       if (m_coDriverStick.getRightBumperButtonPressed()) {
@@ -359,13 +402,17 @@ public class Robot extends TimedRobot {
         m_superstructure.setManualIntake(true);
       }
 
-      if (m_coDriverStick.getRightTriggerPressed()) {
-        // m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
-        // m_superstructure.setState(Superstructure.State.Climb);
-      } else if (m_coDriverStick.getLeftTriggerPressed()) {
-        // m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
-      } else if (Math.abs(climbStick) > 0.25) {
-        m_superstructure.incrementClimbTarget(climbStick);
+      if (Timer.getMatchTime() < 45.0) {
+        if (m_coDriverStick.getRightTriggerPressed()) {
+          m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
+          m_superstructure.setState(Superstructure.State.Climb);
+
+          m_climbReachedHorizontal = true;
+        } else if (m_coDriverStick.getLeftTriggerPressed() && m_climbReachedHorizontal) {
+          m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
+        } else if (Math.abs(climbStick) > 0.25) {
+          m_superstructure.incrementClimbTarget(climbStick);
+        }
       }
 
       if (m_coDriverStick.getStartButtonPressed()) {
@@ -373,7 +420,7 @@ public class Robot extends TimedRobot {
         // inputs in alliance-wall centric coordinates. The robot itself though is
         // tracking angle in blue-centric coordinates. So when on the red alliance,
         // their zero position is actually 180 in blue-centric coordinates.
-        if (m_alliance == Alliance.Blue) {
+        if (AllianceCache.Get().get() == Alliance.Blue) {
           m_driveController.resetAngle(Rotation2d.fromDegrees(0));
         } else {
           m_driveController.resetAngle(Rotation2d.fromDegrees(180));
@@ -387,7 +434,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_elevator.setHallZeroingEnabled(true);
+  }
 
   private PerfLogger m_disabledPeriodicLogger =
       new PerfLogger(m_logger.subLogger("perf/disabledPeriodic", 0.25));
@@ -407,11 +456,27 @@ public class Robot extends TimedRobot {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.F);
     }
 
-    if (m_driverStick.getRightTrigger()) {
+    if (m_superstructure.getGamePieceMode() == Superstructure.GamePiece.Algae) {
+      m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
+    } else if (m_driverStick.getRightTrigger()) {
       if (m_leftReefSide.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
+        if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
+          m_driveController
+              .getDriveWithLimelight()
+              .setTargetSide(DriveWithLimelight.ReefSide.LevelOneLeft);
+        } else {
+          m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
+        }
       } else if (m_rightReefSide.isActive()) {
-        m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Right);
+        if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
+          m_driveController
+              .getDriveWithLimelight()
+              .setTargetSide(DriveWithLimelight.ReefSide.LevelOneRight);
+        } else {
+          m_driveController
+              .getDriveWithLimelight()
+              .setTargetSide(DriveWithLimelight.ReefSide.Right);
+        }
       }
     }
   }
@@ -431,10 +496,10 @@ public class Robot extends TimedRobot {
 
       if (m_coDriverStick.getAButtonPressed()) {
         m_autoManager.increment();
-        setPoseFromAuto();
+        setPoseFromAuto(AllianceCache.Get().get());
       } else if (m_coDriverStick.getBButtonPressed()) {
         m_autoManager.decrement();
-        setPoseFromAuto();
+        setPoseFromAuto(AllianceCache.Get().get());
       }
       SmartDashboard.putString(
           "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));

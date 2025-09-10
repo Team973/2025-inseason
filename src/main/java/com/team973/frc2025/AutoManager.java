@@ -2,11 +2,13 @@ package com.team973.frc2025;
 
 import choreo.util.ChoreoAllianceFlipUtil;
 import com.team973.frc2025.auto.modes.BabyBird;
+import com.team973.frc2025.auto.modes.CenterAuto;
 import com.team973.frc2025.auto.modes.DriveTestAuto;
 import com.team973.frc2025.auto.modes.LeftSideAuto;
 import com.team973.frc2025.auto.modes.NoAuto;
 import com.team973.frc2025.auto.modes.NoAutoAllianceWallCenter;
 import com.team973.frc2025.auto.modes.RightSideAuto;
+import com.team973.frc2025.auto.modes.ScoreTestAuto;
 import com.team973.frc2025.auto.modes.TaxiAuto;
 import com.team973.frc2025.auto.modes.TestAuto;
 import com.team973.frc2025.subsystems.DriveController;
@@ -27,19 +29,32 @@ public class AutoManager {
   private final AutoMode m_testAuto;
   private final AutoMode m_driveTestAuto;
   private final AutoMode m_leftSideAuto;
+  private final AutoMode m_leftSideBabybirdAuto;
   private final AutoMode m_rightSideAuto;
+  // private final AutoMode m_rightSideBabybirdAuto;
   private final AutoMode m_noAutoAllianceWallCenter;
+  private final AutoMode m_centerAuto;
   private final AutoMode m_babyBirdAuto;
+  private final AutoMode m_scoreTestAuto;
 
   public AutoManager(Logger logger, DriveController drive, Superstructure superstructure) {
     m_noAuto = new NoAuto(logger);
     m_taxiAuto = new TaxiAuto(logger.subLogger("taxi"), drive);
     m_testAuto = new TestAuto(logger.subLogger("test"), drive, superstructure);
     m_driveTestAuto = new DriveTestAuto(logger.subLogger("driveTest"), drive);
-    m_leftSideAuto = new LeftSideAuto(logger.subLogger("LeftSideAuto"), superstructure, drive);
-    m_rightSideAuto = new RightSideAuto(logger.subLogger("RightSideAuto"), superstructure, drive);
+    m_leftSideAuto =
+        new LeftSideAuto(logger.subLogger("LeftSideAuto"), superstructure, drive, false);
+    m_leftSideBabybirdAuto =
+        new LeftSideAuto(logger.subLogger("LeftSideBabybirdAuto"), superstructure, drive, true);
+    m_rightSideAuto =
+        new RightSideAuto(logger.subLogger("RightSideAuto"), superstructure, drive, false);
+    // m_rightSideBabybirdAuto =
+    //     new RightSideAuto(logger.subLogger("RightSideBabybirdAuto"), superstructure, drive,
+    // true);
     m_noAutoAllianceWallCenter = new NoAutoAllianceWallCenter(logger);
+    m_centerAuto = new CenterAuto(logger.subLogger("CenterAuto"), superstructure, drive);
     m_babyBirdAuto = new BabyBird(logger, drive, superstructure);
+    m_scoreTestAuto = new ScoreTestAuto(logger.subLogger("ScoreTestAuto"), drive, superstructure);
 
     m_availableAutos =
         Arrays.asList(
@@ -49,8 +64,12 @@ public class AutoManager {
             m_driveTestAuto,
             m_noAutoAllianceWallCenter,
             m_leftSideAuto,
+            m_leftSideBabybirdAuto,
             m_rightSideAuto,
-            m_babyBirdAuto);
+            // m_rightSideBabybirdAuto,
+            m_centerAuto,
+            m_babyBirdAuto,
+            m_scoreTestAuto);
   }
 
   public void increment() {

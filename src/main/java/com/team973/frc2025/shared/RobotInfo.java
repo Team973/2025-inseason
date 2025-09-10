@@ -35,7 +35,7 @@ public final class RobotInfo {
     public static final int ENCODER_CAN_ID = 32;
     public static final double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
 
-    public static final double ENCODER_OFFSET_ROTATIONS = -0.0027;
+    public static final double ENCODER_OFFSET_ROTATIONS = -0.1663;
   }
 
   public static class ElevatorInfo {
@@ -55,7 +55,7 @@ public final class RobotInfo {
   public static class WristInfo {
     public static final int MOTOR_CAN_ID = 31;
     public static final int ENCODER_CAN_ID = 35;
-    public static final double ENCODER_OFFSET_ROTATIONS = 0.2524;
+    public static final double ENCODER_OFFSET_ROTATIONS = -0.0596 + 0.25;
     public static final double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS =
         10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
   }
@@ -70,8 +70,10 @@ public final class RobotInfo {
     public static final int CLIMB_STOP_PRIORITY = 6;
     public static final int CLIMB_HORIZONTAL_PRIORITY = 7;
     public static final int ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY = 10;
-    public static final int ARM_HALL_SENSOR_SIGNALER_PRIORTY = 11;
     public static final int PEICE_IN_CLAW_SIGNALER_PRIORTY = 50;
+    public static final int ALGAE_MODE_SIGNALER_PRIORITY = 60;
+    public static final int ARM_HORIZONTAL_SIGNALER_PRIORTY = 97;
+    public static final int WRIST_HORIZONTAL_SIGNLAER_PRIORITY = 98;
     public static final int LOW_BATTER_SIGNALER_PRIORTY = 99;
     public static final int OFF_SIGNALER_PRIORTY = 100;
   }
@@ -209,6 +211,7 @@ public final class RobotInfo {
   public static class Colors {
     public static final Color RED = new Color(255, 0, 0);
     public static final Color GREEN = new Color(0, 255, 0);
+    public static final Color YELLOW = new Color(255, 255, 0);
     public static final Color BLUE = new Color(0, 0, 255);
     public static final Color OFF = new Color(0, 0, 0);
     public static final Color ORANGE = new Color(255, 100, 25);

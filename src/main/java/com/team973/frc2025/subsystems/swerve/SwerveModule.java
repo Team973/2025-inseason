@@ -57,19 +57,25 @@ public class SwerveModule {
     /* Angle Encoder Config */
     m_angleEncoder =
         new GreyCANCoder(
-            moduleConfig.cancoderID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Angle Encoder"));
+            moduleConfig.cancoderID,
+            RobotInfo.CANIVORE_CANBUS,
+            logger.subLogger("Angle Encoder", 0.2));
     configAngleEncoder();
 
     /* Angle Motor Config */
     m_angleMotor =
         new GreyTalonFX(
-            moduleConfig.angleMotorID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Angle Motor"));
+            moduleConfig.angleMotorID,
+            RobotInfo.CANIVORE_CANBUS,
+            logger.subLogger("Angle Motor", 0.1));
     configAngleMotor();
 
     /* Drive Motor Config */
     m_driveMotor =
         new GreyTalonFX(
-            moduleConfig.driveMotorID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Drive Motor"));
+            moduleConfig.driveMotorID,
+            RobotInfo.CANIVORE_CANBUS,
+            logger.subLogger("Drive Motor", 0.1));
     m_driveMotorConfig = m_driveMotor.getCurrentConfig();
     configDriveMotor();
 
