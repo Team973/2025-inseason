@@ -65,8 +65,6 @@ public class Robot extends TimedRobot {
   private final SolidSignaler m_ledOff =
       new SolidSignaler(RobotInfo.Colors.OFF, 0, RobotInfo.SignalerInfo.OFF_SIGNALER_PRIORTY);
 
-  private Logger testLogger = new Logger("test");
-
   private final BlinkingSignaler m_crashSignaler =
       new BlinkingSignaler(
           RobotInfo.Colors.RED,
