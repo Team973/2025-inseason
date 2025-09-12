@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
@@ -59,6 +60,7 @@ public class Drive implements Subsystem {
     m_pigeon = pigeon;
     m_driveController = driveController;
     m_logger = logger;
+    m_driveInfo = RobotConfig.get().DRIVE_INFO;
 
     m_swerveModules =
         new SwerveModule[] {

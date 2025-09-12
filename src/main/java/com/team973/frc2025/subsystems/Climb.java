@@ -44,12 +44,12 @@ public class Climb implements Subsystem {
 
   private TalonFXConfiguration defaultMotorConfig() {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
-    defaultMotorConfig.Slot0.kS = 0.0;
-    defaultMotorConfig.Slot0.kV = 0.15;
-    defaultMotorConfig.Slot0.kA = 0.01;
-    defaultMotorConfig.Slot0.kP = 6.4;
-    defaultMotorConfig.Slot0.kI = 0.0;
-    defaultMotorConfig.Slot0.kD = 0.04;
+    defaultMotorConfig.Slot0.kS = m_climbInfo.CLIMB_MM_KS;
+    defaultMotorConfig.Slot0.kV = m_climbInfo.CLIMB_MM_KV;
+    defaultMotorConfig.Slot0.kA = m_climbInfo.CLIMB_MM_KA;
+    defaultMotorConfig.Slot0.kP = m_climbInfo.CLIMB_MM_KP;
+    defaultMotorConfig.Slot0.kI = m_climbInfo.CLIMB_MM_KI;
+    defaultMotorConfig.Slot0.kD = m_climbInfo.CLIMB_MM_KD;
     defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
         m_climbInfo.MOTION_MAGIC_CRUISE_VELOCITY * 0.5;
     defaultMotorConfig.MotionMagic.MotionMagicAcceleration =
@@ -57,21 +57,15 @@ public class Climb implements Subsystem {
     defaultMotorConfig.MotionMagic.MotionMagicJerk =
         m_climbInfo.MOTION_MAGIC_CRUISE_VELOCITY * 100.0;
     // slot 1 is for velocity
-    defaultMotorConfig.Slot1.kS = 0.0;
-    defaultMotorConfig.Slot1.kV = 0;
-    defaultMotorConfig.Slot1.kA = 0.0;
-    defaultMotorConfig.Slot1.kP = 6.4;
-    defaultMotorConfig.Slot1.kI = 0.0;
-    defaultMotorConfig.Slot1.kD = 0.04;
+    defaultMotorConfig.Slot1.kS = m_climbInfo.CLIMB_V_KS;
+    defaultMotorConfig.Slot1.kV = m_climbInfo.CLIMB_V_KV;
+    defaultMotorConfig.Slot1.kA = m_climbInfo.CLIMB_V_KA;
+    defaultMotorConfig.Slot1.kP = m_climbInfo.CLIMB_V_KP;
+    defaultMotorConfig.Slot1.kI = m_climbInfo.CLIMB_V_KI;
+    defaultMotorConfig.Slot1.kD = m_climbInfo.CLIMB_V_KD;
 
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
-
-    defaultMotorConfig.Voltage.PeakForwardVoltage = 12.0;
-    defaultMotorConfig.Voltage.PeakReverseVoltage = 0.0;
+    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
+        m_climbInfo.CLIMB_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD;
 
     defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     defaultMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

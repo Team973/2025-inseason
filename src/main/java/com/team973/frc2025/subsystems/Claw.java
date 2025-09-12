@@ -94,7 +94,7 @@ public class Claw implements Subsystem {
   }
 
   public TalonFXConfiguration defaultClawMotorConfig() {
-    TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
+    TalonFXConfiguration defaultMotorConfig = m_clawInfo.MOTOR_CONFIG.getConfig();
 
     // Slot 0 PID constants are for velocity voltage
     defaultMotorConfig.Slot0.kS = m_clawInfo.CLAW_KS;
@@ -103,16 +103,6 @@ public class Claw implements Subsystem {
     defaultMotorConfig.Slot0.kP = m_clawInfo.CLAW_KP;
     defaultMotorConfig.Slot0.kI = m_clawInfo.CLAW_KI;
     defaultMotorConfig.Slot0.kD = m_clawInfo.CLAW_KD;
-
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = m_clawInfo.CLAW_SATOR_CURRENT_LIMIT;
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
-        m_clawInfo.CLAW_SATOR_CURRENT_LIMIT_ENABLE;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = m_clawInfo.CLAW_SUPPLY_CURRENT_LIMIT;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
-        m_clawInfo.CLAW_SUPPLY_CURRENT_LIMIT_ENABLE;
-
-    defaultMotorConfig.Voltage.PeakForwardVoltage = m_clawInfo.CLAW_PEAK_FORDWARD_VOLTAGE;
-    defaultMotorConfig.Voltage.PeakReverseVoltage = m_clawInfo.CLAW_PEAK_REVERSE_VOLTAGE;
 
     defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
         m_clawInfo.CLAW_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD;

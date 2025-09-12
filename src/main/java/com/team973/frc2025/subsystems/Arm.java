@@ -27,6 +27,16 @@ public class Arm implements Subsystem {
 
   private final SolidSignaler m_armHorizontalSigaler;
 
+  private double m_levelOneOffset = 0.0;
+  private double m_levelTwoOffset = 0.0;
+  private double m_levelThreeOffset = 0.0;
+  private double m_levelFourOffset = 0.0;
+
+  private double m_netOffset = 0.0;
+  private double m_algaeHighOffset = 0.0;
+  private double m_algaeLowOffset = 0.0;
+  private double m_algaeFloorOffset = 0.0;
+
   public static enum ControlStatus {
     TargetPostion,
     Off,
@@ -111,21 +121,21 @@ public class Arm implements Subsystem {
   public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return m_armInfo.LEVEL_ONE_POSITION_DEG + m_armInfo.m_levelOneOffset;
+        return m_armInfo.LEVEL_ONE_POSITION_DEG + m_levelOneOffset;
       case L_2:
-        return m_armInfo.LEVEL_TWO_POSITION_DEG + m_armInfo.m_levelTwoOffset;
+        return m_armInfo.LEVEL_TWO_POSITION_DEG + m_levelTwoOffset;
       case L_3:
-        return m_armInfo.LEVEL_THREE_POSITION_DEG + m_armInfo.m_levelThreeOffset;
+        return m_armInfo.LEVEL_THREE_POSITION_DEG + m_levelThreeOffset;
       case L_4:
-        return m_armInfo.LEVEL_FOUR_POSITION_DEG + m_armInfo.m_levelFourOffset;
+        return m_armInfo.LEVEL_FOUR_POSITION_DEG + m_levelFourOffset;
       case Net:
-        return m_armInfo.NET_POSITION_DEG + m_armInfo.m_netOffset;
+        return m_armInfo.NET_POSITION_DEG + m_netOffset;
       case AlgaeHigh:
-        return m_armInfo.m_netOffset + m_armInfo.m_algaeHighOffset;
+        return m_netOffset + m_algaeHighOffset;
       case AlgaeLow:
-        return m_armInfo.ALGAE_LOW_POSITION_DEG + m_armInfo.m_algaeLowOffset;
+        return m_armInfo.ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
       case AlgaeFloor:
-        return m_armInfo.ALGAE_FLOOR_POSITION_DEG + m_armInfo.m_algaeFloorOffset;
+        return m_armInfo.ALGAE_FLOOR_POSITION_DEG + m_algaeFloorOffset;
       case Processor:
         return m_armInfo.ALGAE_STOW_POSITION_DEG;
       case Horizontal:
@@ -166,28 +176,28 @@ public class Arm implements Subsystem {
   public void incrementOffset(double increment, ReefLevel level) {
     switch (level) {
       case L_1:
-        m_armInfo.m_levelOneOffset += increment;
+        m_levelOneOffset += increment;
         break;
       case L_2:
-        m_armInfo.m_levelTwoOffset += increment;
+        m_levelTwoOffset += increment;
         break;
       case L_3:
-        m_armInfo.m_levelThreeOffset += increment;
+        m_levelThreeOffset += increment;
         break;
       case L_4:
-        m_armInfo.m_levelFourOffset += increment;
+        m_levelFourOffset += increment;
         break;
       case Net:
-        m_armInfo.m_netOffset += increment;
+        m_netOffset += increment;
         break;
       case AlgaeHigh:
-        m_armInfo.m_algaeHighOffset += increment;
+        m_algaeHighOffset += increment;
         break;
       case AlgaeLow:
-        m_armInfo.m_algaeLowOffset += increment;
+        m_algaeLowOffset += increment;
         break;
       case AlgaeFloor:
-        m_armInfo.m_algaeFloorOffset += increment;
+        m_algaeFloorOffset += increment;
         break;
       case Processor:
         break;
@@ -210,14 +220,14 @@ public class Arm implements Subsystem {
 
     m_logger.log("getCanCoderPostion", getCanCoderPostionDeg());
 
-    m_logger.log("Level 1 Offset", m_armInfo.m_levelOneOffset);
-    m_logger.log("Level 2 Offset", m_armInfo.m_levelTwoOffset);
-    m_logger.log("Level 3 Offset", m_armInfo.m_levelThreeOffset);
-    m_logger.log("Level 4 Offset", m_armInfo.m_levelFourOffset);
-    m_logger.log("Net Offset", m_armInfo.m_netOffset);
-    m_logger.log("Algae Low Offset", m_armInfo.m_algaeLowOffset);
-    m_logger.log("Algae High Offset", m_armInfo.m_algaeHighOffset);
-    m_logger.log("Algae Floor Offset", m_armInfo.m_algaeFloorOffset);
+    m_logger.log("Level 1 Offset", m_levelOneOffset);
+    m_logger.log("Level 2 Offset", m_levelTwoOffset);
+    m_logger.log("Level 3 Offset", m_levelThreeOffset);
+    m_logger.log("Level 4 Offset", m_levelFourOffset);
+    m_logger.log("Net Offset", m_netOffset);
+    m_logger.log("Algae Low Offset", m_algaeLowOffset);
+    m_logger.log("Algae High Offset", m_algaeHighOffset);
+    m_logger.log("Algae Floor Offset", m_algaeFloorOffset);
 
     m_logger.log("Is Horizontal", isHorizontal());
   }
