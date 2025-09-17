@@ -7,20 +7,11 @@ package com.team973.frc2025;
 import choreo.util.ChoreoAllianceFlipUtil;
 import com.team973.frc2025.shared.CrashTracker;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.subsystems.Arm;
 import com.team973.frc2025.subsystems.BlinkingSignaler;
 import com.team973.frc2025.subsystems.CANdleManger;
-import com.team973.frc2025.subsystems.Claw;
-import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
-import com.team973.frc2025.subsystems.Elevator;
 import com.team973.frc2025.subsystems.SolidSignaler;
-import com.team973.frc2025.subsystems.Superstructure;
-import com.team973.frc2025.subsystems.Superstructure.GamePiece;
-import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
-import com.team973.frc2025.subsystems.Wrist;
-import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.AllianceCache;
 import com.team973.lib.util.Conversions;
@@ -33,7 +24,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -54,12 +44,13 @@ public class Robot extends TimedRobot {
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger", 0.2));
-  private final Climb m_climb = new Climb(m_logger.subLogger("climb manager", 0.2), m_candleManger);
-  private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
-  private final Elevator m_elevator =
-      new Elevator(m_logger.subLogger("elevator", 0.2), m_candleManger);
-  private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2), m_candleManger);
-  private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2));
+  // private final Climb m_climb = new Climb(m_logger.subLogger("climb manager", 0.2),
+  // m_candleManger);
+  // private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
+  // private final Elevator m_elevator =
+  //     new Elevator(m_logger.subLogger("elevator", 0.2), m_candleManger);
+  // private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2), m_candleManger);
+  // private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2));
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(
           RobotInfo.Colors.ORANGE, 3000, RobotInfo.SignalerInfo.LOW_BATTER_SIGNALER_PRIORTY);
@@ -75,19 +66,19 @@ public class Robot extends TimedRobot {
           1000,
           RobotInfo.SignalerInfo.CRASH_SIGNALER_PRIORITY);
 
-  private final Superstructure m_superstructure =
-      new Superstructure(
-          m_claw,
-          m_climb,
-          m_elevator,
-          m_arm,
-          m_wrist,
-          m_driveController,
-          m_logger.subLogger("superstructure"),
-          m_candleManger);
+  // private final Superstructure m_superstructure =
+  //     new Superstructure(
+  //         m_claw,
+  //         m_climb,
+  //         m_elevator,
+  //         m_arm,
+  //         m_wrist,
+  //         m_driveController,
+  //         m_logger.subLogger("superstructure"),
+  //         m_candleManger);
 
-  private final AutoManager m_autoManager =
-      new AutoManager(m_logger.subLogger("auto"), m_driveController, m_superstructure);
+  // private final AutoManager m_autoManager =
+  //     new AutoManager(m_logger.subLogger("auto"), m_driveController, m_superstructure);
 
   private PerfLogger m_syncSensorsLogger =
       new PerfLogger(m_logger.subLogger("perf/syncSensors", 0.25));
@@ -132,18 +123,18 @@ public class Robot extends TimedRobot {
     double startTime = Timer.getFPGATimestamp();
     m_driveController.syncSensors();
     m_candleManger.syncSensors();
-    m_superstructure.syncSensors();
+    // m_superstructure.syncSensors();
 
-    m_readyToScore.set(m_superstructure.readyToScore());
-    m_readyToBackOff.set(m_superstructure.readyToBackOff());
+    // m_readyToScore.set(m_superstructure.readyToScore());
+    // m_readyToBackOff.set(m_superstructure.readyToBackOff());
 
-    if (!m_superstructure.getHasAlgae()) {
-      m_needsToStowAfterAlgaePickUp = true;
-    } else if (m_superstructure.getTargetReefLevel() == ReefLevel.AlgaeFloor
-        && m_needsToStowAfterAlgaePickUp) {
-      m_superstructure.setManualArmivator(false);
-      m_needsToStowAfterAlgaePickUp = false;
-    }
+    // if (!m_superstructure.getHasAlgae()) {
+    //   m_needsToStowAfterAlgaePickUp = true;
+    // } else if (m_superstructure.getTargetReefLevel() == ReefLevel.AlgaeFloor
+    //     && m_needsToStowAfterAlgaePickUp) {
+    //   m_superstructure.setManualArmivator(false);
+    //   m_needsToStowAfterAlgaePickUp = false;
+    // }
 
     m_syncSensorsLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
@@ -151,18 +142,18 @@ public class Robot extends TimedRobot {
   private void updateSubsystems() {
     m_driveController.update();
     m_candleManger.update();
-    m_superstructure.update();
+    // m_superstructure.update();
   }
 
   private void resetSubsystems() {
     m_driveController.reset();
-    m_superstructure.reset();
+    // m_superstructure.reset();
     m_candleManger.reset();
   }
 
   private void logSubsystems() {
     m_driveController.log();
-    m_superstructure.log();
+    // m_superstructure.log();
     m_candleManger.log();
 
     m_logger.log("Ready To Score", m_readyToScore.get());
@@ -231,7 +222,7 @@ public class Robot extends TimedRobot {
   }
 
   private void setPoseFromAuto(Alliance alliance) {
-    m_driveController.resetOdometry(m_autoManager.getStartingPose(alliance));
+    // m_driveController.resetOdometry(m_autoManager.getStartingPose(alliance));
   }
 
   private boolean m_initialized;
@@ -262,10 +253,10 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     try {
       m_driveController.setRobotIsAutonomous(true);
-      m_autoManager.init();
-      m_driveController.resetOdometry(m_autoManager.getStartingPose(AllianceCache.Get().get()));
+      // m_autoManager.init();
+      // m_driveController.resetOdometry(m_autoManager.getStartingPose(AllianceCache.Get().get()));
 
-      m_elevator.setHallZeroingEnabled(false);
+      // m_elevator.setHallZeroingEnabled(false);
     } catch (Exception e) {
       CrashTracker.logException("Auto Init", e);
     }
@@ -282,7 +273,7 @@ public class Robot extends TimedRobot {
       m_driveController.getDriveWithJoysticks().updateInput(0.0, 0.0, 0.0);
       // TODO: Figure out why autos don't work if updateSubsystems() comes before
       // automanager.run().
-      m_autoManager.run(AllianceCache.Get().get());
+      // m_autoManager.run(AllianceCache.Get().get());
 
       updateSubsystems();
 
@@ -299,7 +290,7 @@ public class Robot extends TimedRobot {
       m_driveController.setRobotIsAutonomous(false);
       m_driveController.setControllerOption(DriveController.ControllerOption.DriveWithJoysticks);
 
-      m_elevator.setHallZeroingEnabled(false);
+      // m_elevator.setHallZeroingEnabled(false);
     } catch (Exception e) {
       CrashTracker.logException("Teleop Init", e);
     }
@@ -334,84 +325,84 @@ public class Robot extends TimedRobot {
               allianceScalar * m_driverStick.getLeftXAxis(),
               m_driverStick.getRightXAxis() * 0.8);
 
-      if (m_driverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.setManualArmivator(true);
-      } else if (m_driverStick.getLeftTriggerPressed()) {
-        m_superstructure.setManualArmivator(false);
-      }
+      // if (m_driverStick.getLeftBumperButtonPressed()) {
+      //   m_superstructure.setManualArmivator(true);
+      // } else if (m_driverStick.getLeftTriggerPressed()) {
+      //   m_superstructure.setManualArmivator(false);
+      // }
 
-      if (m_driverStick.getRightBumperButtonPressed()) {
-        m_superstructure.setManualScore(true);
-      } else if (m_driverStick.getRightBumperButtonReleased()) {
-        m_superstructure.setManualScore(false);
-      }
+      // if (m_driverStick.getRightBumperButtonPressed()) {
+      //   m_superstructure.setManualScore(true);
+      // } else if (m_driverStick.getRightBumperButtonReleased()) {
+      //   m_superstructure.setManualScore(false);
+      // }
 
       if (m_driverStick.getRightTrigger()) {
         m_driveController.setControllerOption(ControllerOption.DriveWithLimelight);
         m_driveController.getDriveWithLimelight().targetReefPosition();
-        m_superstructure.setState(Superstructure.State.Score);
+        // m_superstructure.setState(Superstructure.State.Score);
       } else {
         m_driveController.setControllerOption(ControllerOption.DriveWithJoysticks);
 
-        if (m_coDriverStick.getBackButton()) {
-          m_superstructure.setState(Superstructure.State.Zero);
-        } else {
-          m_superstructure.setState(Superstructure.State.Manual);
-        }
+        // if (m_coDriverStick.getBackButton()) {
+        //   m_superstructure.setState(Superstructure.State.Zero);
+        // } else {
+        //   m_superstructure.setState(Superstructure.State.Manual);
+        // }
       }
       double climbStick = m_coDriverStick.getLeftYAxis();
 
-      if (m_coDriverStick.getPOVTopPressed()) {
-        m_superstructure.incrementElevatorOffset(0.5);
-      } else if (m_coDriverStick.getPOVBottomPressed()) {
-        m_superstructure.incrementElevatorOffset(-0.5);
-      } else if (m_coDriverStick.getPOVRightPressed()) {
-        m_superstructure.incrementArmOffset(1.0);
-      } else if (m_coDriverStick.getPOVLeftPressed()) {
-        m_superstructure.incrementArmOffset(-1.0);
-      }
+      // if (m_coDriverStick.getPOVTopPressed()) {
+      //   m_superstructure.incrementElevatorOffset(0.5);
+      // } else if (m_coDriverStick.getPOVBottomPressed()) {
+      //   m_superstructure.incrementElevatorOffset(-0.5);
+      // } else if (m_coDriverStick.getPOVRightPressed()) {
+      //   m_superstructure.incrementArmOffset(1.0);
+      // } else if (m_coDriverStick.getPOVLeftPressed()) {
+      //   m_superstructure.incrementArmOffset(-1.0);
+      // }
 
-      if (m_coDriverStick.getAButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeFloor);
-        if (m_superstructure.getGamePieceMode() == GamePiece.Coral) {
-          m_driveController
-              .getDriveWithLimelight()
-              .setTargetSide(DriveWithLimelight.ReefSide.LevelOneCenter);
-        }
-      } else if (m_coDriverStick.getXButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
-      } else if (m_coDriverStick.getBButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
-      } else if (m_coDriverStick.getYButtonPressed()) {
-        m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.Net);
+      // if (m_coDriverStick.getAButtonPressed()) {
+      //   m_superstructure.setTargetReefLevel(ReefLevel.L_1, ReefLevel.AlgaeFloor);
+      //   if (m_superstructure.getGamePieceMode() == GamePiece.Coral) {
+      //     m_driveController
+      //         .getDriveWithLimelight()
+      //         .setTargetSide(DriveWithLimelight.ReefSide.LevelOneCenter);
+      //   }
+      // } else if (m_coDriverStick.getXButtonPressed()) {
+      //   m_superstructure.setTargetReefLevel(ReefLevel.L_2, ReefLevel.AlgaeLow);
+      // } else if (m_coDriverStick.getBButtonPressed()) {
+      //   m_superstructure.setTargetReefLevel(ReefLevel.L_3, ReefLevel.AlgaeHigh);
+      // } else if (m_coDriverStick.getYButtonPressed()) {
+      //   m_superstructure.setTargetReefLevel(ReefLevel.L_4, ReefLevel.Net);
 
-        if (m_superstructure.getGamePieceMode() == GamePiece.Algae) {
-          m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Net);
-        }
-      }
+      //   if (m_superstructure.getGamePieceMode() == GamePiece.Algae) {
+      //     m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.Net);
+      //   }
+      // }
 
-      if (m_coDriverStick.getRightBumperButtonPressed()) {
-        m_superstructure.toggleGamePieceMode();
-      }
+      // if (m_coDriverStick.getRightBumperButtonPressed()) {
+      //   m_superstructure.toggleGamePieceMode();
+      // }
 
-      if (m_coDriverStick.getLeftBumperButtonPressed()) {
-        m_superstructure.setManualIntake(false);
-      } else if (m_coDriverStick.getLeftBumperButtonReleased()) {
-        m_superstructure.setManualIntake(true);
-      }
+      // if (m_coDriverStick.getLeftBumperButtonPressed()) {
+      //   m_superstructure.setManualIntake(false);
+      // } else if (m_coDriverStick.getLeftBumperButtonReleased()) {
+      //   m_superstructure.setManualIntake(true);
+      // }
 
-      if (Timer.getMatchTime() < 45.0) {
-        if (m_coDriverStick.getRightTriggerPressed()) {
-          m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
-          m_superstructure.setState(Superstructure.State.Climb);
+      // if (Timer.getMatchTime() < 45.0) {
+      //   if (m_coDriverStick.getRightTriggerPressed()) {
+      //     m_superstructure.setClimbTarget(Climb.HORIZONTAL_POSITION_DEG);
+      //     m_superstructure.setState(Superstructure.State.Climb);
 
-          m_climbReachedHorizontal = true;
-        } else if (m_coDriverStick.getLeftTriggerPressed() && m_climbReachedHorizontal) {
-          m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
-        } else if (Math.abs(climbStick) > 0.25) {
-          m_superstructure.incrementClimbTarget(climbStick);
-        }
-      }
+      //     m_climbReachedHorizontal = true;
+      //   } else if (m_coDriverStick.getLeftTriggerPressed() && m_climbReachedHorizontal) {
+      //     m_superstructure.setClimbTarget(Climb.CLIMB_POSITION_DEG);
+      //   } else if (Math.abs(climbStick) > 0.25) {
+      //     m_superstructure.incrementClimbTarget(climbStick);
+      //   }
+      // }
 
       if (m_coDriverStick.getStartButtonPressed()) {
         // The drivers will always just point the robot _away_ from them. They give
@@ -433,7 +424,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    m_elevator.setHallZeroingEnabled(true);
+    // m_elevator.setHallZeroingEnabled(true);
   }
 
   private PerfLogger m_disabledPeriodicLogger =
@@ -454,29 +445,31 @@ public class Robot extends TimedRobot {
       m_driveController.getDriveWithLimelight().setTargetReefFace(ReefFace.F);
     }
 
-    if (m_superstructure.getGamePieceMode() == Superstructure.GamePiece.Algae) {
-      m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
-    } else if (m_driverStick.getRightTrigger()) {
-      if (m_leftReefSide.isActive()) {
-        if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
-          m_driveController
-              .getDriveWithLimelight()
-              .setTargetSide(DriveWithLimelight.ReefSide.LevelOneLeft);
-        } else {
-          m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
-        }
-      } else if (m_rightReefSide.isActive()) {
-        if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
-          m_driveController
-              .getDriveWithLimelight()
-              .setTargetSide(DriveWithLimelight.ReefSide.LevelOneRight);
-        } else {
-          m_driveController
-              .getDriveWithLimelight()
-              .setTargetSide(DriveWithLimelight.ReefSide.Right);
-        }
-      }
-    }
+    // if (m_superstructure.getGamePieceMode() == Superstructure.GamePiece.Algae) {
+    //
+    // m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Center);
+    // } else if (m_driverStick.getRightTrigger()) {
+    //   if (m_leftReefSide.isActive()) {
+    //     if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
+    //       m_driveController
+    //           .getDriveWithLimelight()
+    //           .setTargetSide(DriveWithLimelight.ReefSide.LevelOneLeft);
+    //     } else {
+    //
+    // m_driveController.getDriveWithLimelight().setTargetSide(DriveWithLimelight.ReefSide.Left);
+    //     }
+    //   } else if (m_rightReefSide.isActive()) {
+    //     if (m_superstructure.getTargetReefLevel() == ReefLevel.L_1) {
+    //       m_driveController
+    //           .getDriveWithLimelight()
+    //           .setTargetSide(DriveWithLimelight.ReefSide.LevelOneRight);
+    //     } else {
+    //       m_driveController
+    //           .getDriveWithLimelight()
+    //           .setTargetSide(DriveWithLimelight.ReefSide.Right);
+    //     }
+    //   }
+    // }
   }
 
   /** This function is called periodically when disabled. */
@@ -493,14 +486,14 @@ public class Robot extends TimedRobot {
       maybeUpdateScoringSelection();
 
       if (m_coDriverStick.getAButtonPressed()) {
-        m_autoManager.increment();
+        // m_autoManager.increment();
         setPoseFromAuto(AllianceCache.Get().get());
       } else if (m_coDriverStick.getBButtonPressed()) {
-        m_autoManager.decrement();
+        // m_autoManager.decrement();
         setPoseFromAuto(AllianceCache.Get().get());
       }
-      SmartDashboard.putString(
-          "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
+      // SmartDashboard.putString(
+      //     "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
 
       m_disabledPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
     } catch (Exception e) {
