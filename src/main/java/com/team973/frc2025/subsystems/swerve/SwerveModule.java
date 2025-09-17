@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 
 public class SwerveModule {
   public final int moduleNumber;
@@ -42,7 +43,7 @@ public class SwerveModule {
 
   private double m_lastAngleMotorPos;
   private double m_driveMotorOffset;
-  // private double m_driveMotorOffsetMeters;
+  private double m_driveMotorFeedForward;
 
   private final TalonFXConfiguration m_driveMotorConfig;
 
@@ -201,20 +202,12 @@ public class SwerveModule {
   public double getDriveMotorMeters() {
     double compensatedRotations =
         BaseStatusSignal.getLatencyCompensatedValue(
-                m_driveMotorPositionStatusSignal, m_driveMotorVelocityStatusSignal)
-            .magnitude();
+                    m_driveMotorPositionStatusSignal, m_driveMotorVelocityStatusSignal)
+                .magnitude()
+            + m_driveMotorOffset;
     return m_driveMechanism.getOutputDistanceFromRotorRotation(
         Rotation2d.fromRotations(compensatedRotations));
   }
-
-  // public double getUpdatedDriveMotorMeters() {
-  //   double compensatedRotations =
-  //       BaseStatusSignal.getLatencyCompensatedValue(
-  //               m_driveMotorPositionStatusSignal, m_driveMotorVelocityStatusSignal)
-  //           .magnitude();
-  //   return m_driveMechanism.getOutputDistanceFromRotorRotation(
-  //       Rotation2d.fromRotations(compensatedRotations + m_driveMotorOffset));
-  // }
 
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(getDriveMotorMeters(), getAngleMotorRotation2d());
@@ -262,7 +255,9 @@ public class SwerveModule {
 
     if (desiredState.speedMetersPerSecond != m_lastState.speedMetersPerSecond) {
       m_driveMotor.setControl(
-          ControlMode.VelocityVoltage, desiredFalconVelocityInRPS.getRotations());
+          ControlMode.VelocityVoltage,
+          0.0, // desiredFalconVelocityInRPS.getRotations()
+          getDriveMotorFeedForward().getAsDouble());
     }
 
     // Prevent rotating module if speed is less then 1%. Prevents jittering.
@@ -283,6 +278,10 @@ public class SwerveModule {
     m_lastState = desiredState;
   }
 
+  private DoubleSupplier getDriveMotorFeedForward() {
+    return () -> m_driveMotorFeedForward;
+  }
+
   public void driveBrake() {
     m_driveMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_driveMotor.setConfig(m_driveMotorConfig);
@@ -296,9 +295,15 @@ public class SwerveModule {
   public void update() {
     double angleMotorPos = m_angleMotor.getPosition().getValueAsDouble();
     double angleMotorDelta = angleMotorPos - m_lastAngleMotorPos;
+    double angleMotorVelocity = m_angleMotor.getVelocity().getValueAsDouble();
+
+    m_driveMotorFeedForward = -angleMotorVelocity * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT;
+    // (ar/s) * (dr/ar) = (dr/s)
 
     m_driveMotorOffset += angleMotorDelta * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT;
-    // m_driveMotorOffsetMeters += angleMotorDelta * DriveInfo.ANGLE_MOTOR_TO_DRIVE_METERS;
+    // m_driveMotor.setPosition(
+    //     m_driveMotor.getPosition().getValueAsDouble()
+    //         + (angleMotorDelta * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT));
 
     m_lastAngleMotorPos = angleMotorPos;
   }
@@ -321,8 +326,5 @@ public class SwerveModule {
     m_logger.log(
         "Updated Drive Motor Pos",
         m_driveMotor.getPosition().getValueAsDouble() + m_driveMotorOffset);
-    // m_logger.log(
-    //     "Updated Drive Meters",
-    //     m_driveMotor.getPosition().getValueAsDouble() + m_driveMotorOffsetMeters);
   }
 }
