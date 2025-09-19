@@ -23,7 +23,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.DoubleSupplier;
 
 public class SwerveModule {
   public final int moduleNumber;
@@ -41,6 +40,9 @@ public class SwerveModule {
 
   private SwerveModuleState m_lastState;
 
+  private Rotation2d m_desiredFalconVelocityInRPS;
+
+  private double m_angleMotorTargetPos;
   private double m_lastAngleMotorPos;
   private double m_driveMotorOffset;
   private double m_driveMotorFeedForward;
@@ -250,15 +252,8 @@ public class SwerveModule {
     // CTRE is not
     desiredState = CTREModuleState.optimize(desiredState, getState().angle);
 
-    Rotation2d desiredFalconVelocityInRPS =
+    m_desiredFalconVelocityInRPS =
         m_driveMechanism.getRotorRotationFromOutputDistance(desiredState.speedMetersPerSecond);
-
-    if (desiredState.speedMetersPerSecond != m_lastState.speedMetersPerSecond) {
-      m_driveMotor.setControl(
-          ControlMode.VelocityVoltage,
-          0.0, // desiredFalconVelocityInRPS.getRotations()
-          getDriveMotorFeedForward().getAsDouble());
-    }
 
     // Prevent rotating module if speed is less then 1%. Prevents jittering.
     if (!ignoreJitter) {
@@ -269,17 +264,10 @@ public class SwerveModule {
               : desiredState.angle;
     }
 
-    // Prevent module rotation if angle is the same as the previous angle.
-    if (desiredState.angle != m_lastState.angle) {
-      m_angleMotor.setControl(
-          ControlMode.PositionVoltage,
-          m_angleMechanism.getRotorRotationFromOutputRotation(desiredState.angle).getRotations());
-    }
-    m_lastState = desiredState;
-  }
+    m_angleMotorTargetPos =
+        m_angleMechanism.getRotorRotationFromOutputRotation(desiredState.angle).getRotations();
 
-  private DoubleSupplier getDriveMotorFeedForward() {
-    return () -> m_driveMotorFeedForward;
+    m_lastState = desiredState;
   }
 
   public void driveBrake() {
@@ -292,12 +280,16 @@ public class SwerveModule {
     m_driveMotor.setConfig(m_driveMotorConfig);
   }
 
-  public void update() {
+  public void syncSensors() {
     double angleMotorPos = m_angleMotor.getPosition().getValueAsDouble();
     double angleMotorDelta = angleMotorPos - m_lastAngleMotorPos;
     double angleMotorVelocity = m_angleMotor.getVelocity().getValueAsDouble();
 
-    m_driveMotorFeedForward = -angleMotorVelocity * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT;
+    m_driveMotorFeedForward =
+        Math.abs(Rotation2d.fromRotations(angleMotorVelocity).getRadians())
+                > (DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * 0.01)
+            ? -angleMotorVelocity * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT
+            : 0.0;
     // (ar/s) * (dr/ar) = (dr/s)
 
     m_driveMotorOffset += angleMotorDelta * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT;
@@ -306,6 +298,15 @@ public class SwerveModule {
     //         + (angleMotorDelta * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT));
 
     m_lastAngleMotorPos = angleMotorPos;
+  }
+
+  public void update() {
+    m_driveMotor.setControl(
+        ControlMode.VelocityVoltage,
+        0.0, // desiredFalconVelocityInRPS.getRotations()
+        m_driveMotorFeedForward);
+
+    m_angleMotor.setControl(ControlMode.PositionVoltage, m_angleMotorTargetPos);
   }
 
   public void log() {

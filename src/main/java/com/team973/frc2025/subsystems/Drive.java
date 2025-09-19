@@ -251,6 +251,10 @@ public class Drive implements Subsystem {
     m_leftLLSupplier.syncSensors();
     m_rightLLSupplier.syncSensors();
     m_backLLSupplier.syncSensors();
+
+    for (SwerveModule s : m_swerveModules) {
+      s.syncSensors();
+    }
   }
 
   public synchronized void syncSensorsHighFreq() {
@@ -277,9 +281,7 @@ public class Drive implements Subsystem {
 
     setModuleStates(swerveModuleStates);
 
-    for (SwerveModule s : m_swerveModules) {
-      s.update();
-    }
+    m_swerveModules[0].update();
   }
 
   public void reset() {
