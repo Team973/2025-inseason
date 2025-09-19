@@ -78,7 +78,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
       if (m_poseEstimator == null) {
         m_poseEstimator =
             new SwerveDrivePoseEstimator(
-                m_driveInfo.SWERVE_KINEMATICS,
+                m_driveInfo.getSwerveDriveKinmatics(),
                 gyroAngle,
                 modulePositions,
                 new Pose2d(0, 0, gyroAngle));
@@ -91,6 +91,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
       m_driveController.syncSensorsHighFreq();
       m_driveController.update();
     } catch (Exception e) {
+      e.printStackTrace();
       CrashTracker.logException("Update odometry", e);
     }
   }

@@ -4,7 +4,6 @@ import com.team973.lib.devices.GreyTalonFX.GreyTalonFXConfig;
 import com.team973.lib.util.SwerveModuleConfig;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.util.Color;
 
 /** Robot info, specs, dimensions. */
@@ -87,7 +86,7 @@ public class RobotInfo {
     public double ARM_PEAK_REVERSE_VOLTAGE = -12.0;
   }
 
-  public class ElevatorInfo {
+  public static class ElevatorInfo {
     public int HALL_SENSOR_ID = 0;
 
     public double MOTOR_GEAR_RATIO = 10.0 / 56.0;
@@ -116,7 +115,7 @@ public class RobotInfo {
     public double ELEVATOR_V_KS = 0.0;
     public double ELEVATOR_V_KV = 0.0;
     public double ELEVATOR_V_KA = 0.0;
-    public double ELEVATOR_V_KP = 125.0;
+    public double ELEVATOR_V_KP = 0.0;
     public double ELEVATOR_V_KI = 0.0;
     public double ELEVATOR_V_KD = 0.0;
 
@@ -128,7 +127,7 @@ public class RobotInfo {
     public double ELEVATOR_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD = 0.02;
   }
 
-  public class ClawInfo {
+  public static class ClawInfo {
     public int RIGHT_MOTOR_ID = 36;
     public int LEFT_MOTOR_ID = 35;
     public int CONVEYOR_MOTOR_ID = 34;
@@ -154,7 +153,7 @@ public class RobotInfo {
     public double CLAW_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD = 0.02;
   }
 
-  public class WristInfo {
+  public static class WristInfo {
     public int MOTOR_CAN_ID = 31;
     public int ENCODER_CAN_ID = 35;
     public double ENCODER_OFFSET_ROTATIONS = -0.0596 + 0.25;
@@ -195,7 +194,7 @@ public class RobotInfo {
     public double WRIST_PEAK_REVERSE_VOLTAGE = -12.0;
   }
 
-  public class ClimbInfo {
+  public static class ClimbInfo {
     public double MOTOR_ROT_PER_CLIMB_ROT =
         1.0 / ((10.0 / 64.0) * (20.0 / 72.0) * (20.0 / 84.0) * (9.0 / 30.0));
 
@@ -247,22 +246,22 @@ public class RobotInfo {
     public int FRONT_LEFT_MODULE_DRIVE_MOTOR = 2;
     public int FRONT_LEFT_MODULE_STEER_MOTOR = 3;
     public int FRONT_LEFT_MODULE_STEER_ENCODER = 4;
-    public static double FRONT_LEFT_MODULE_STEER_OFFSET = fromBotVersion(-743.027, 264.902);
+    public double FRONT_LEFT_MODULE_STEER_OFFSET = -743.027;
 
     public int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 8;
     public int FRONT_RIGHT_MODULE_STEER_MOTOR = 9;
     public int FRONT_RIGHT_MODULE_STEER_ENCODER = 10;
-    public static double FRONT_RIGHT_MODULE_STEER_OFFSET = fromBotVersion(-684.931, 153.721);
+    public double FRONT_RIGHT_MODULE_STEER_OFFSET = -684.931;
 
     public int BACK_LEFT_MODULE_DRIVE_MOTOR = 5;
     public int BACK_LEFT_MODULE_STEER_MOTOR = 6;
     public int BACK_LEFT_MODULE_STEER_ENCODER = 7;
-    public static double BACK_LEFT_MODULE_STEER_OFFSET = fromBotVersion(-1249.628, 50.713);
+    public double BACK_LEFT_MODULE_STEER_OFFSET = -1249.628;
 
     public int BACK_RIGHT_MODULE_DRIVE_MOTOR = 11;
     public int BACK_RIGHT_MODULE_STEER_MOTOR = 12;
     public int BACK_RIGHT_MODULE_STEER_ENCODER = 13;
-    public static double BACK_RIGHT_MODULE_STEER_OFFSET = fromBotVersion(-490.517, 100.107);
+    public double BACK_RIGHT_MODULE_STEER_OFFSET = -490.517;
 
     public double DRIVE_GEAR_RATIO = (10.0 / 54.0) * (40.0 / 16.0) * (15.0 / 45.0); // x3:10, 6.48:1
 
@@ -330,42 +329,22 @@ public class RobotInfo {
             FRONT_RIGHT_MODULE_STEER_MOTOR,
             FRONT_RIGHT_MODULE_STEER_ENCODER,
             FRONT_RIGHT_MODULE_STEER_OFFSET);
-    public SwerveModuleConfig BACK_LEFT_CONSTANTS =
-        new SwerveModuleConfig(
-            BACK_LEFT_MODULE_DRIVE_MOTOR,
-            BACK_LEFT_MODULE_STEER_MOTOR,
-            BACK_LEFT_MODULE_STEER_ENCODER,
-            BACK_LEFT_MODULE_STEER_OFFSET);
-    public SwerveModuleConfig BACK_RIGHT_CONSTANTS =
-        new SwerveModuleConfig(
-            BACK_RIGHT_MODULE_DRIVE_MOTOR,
-            BACK_RIGHT_MODULE_STEER_MOTOR,
-            BACK_RIGHT_MODULE_STEER_ENCODER,
-            BACK_RIGHT_MODULE_STEER_OFFSET);
+    private boolean m_SwerveDriveKinematicsIntilaized = false;
 
-    public SwerveDriveKinematics SWERVE_KINEMATICS =
-        new SwerveDriveKinematics(
-            new Translation2d(TRACKWIDTH_METERS / 2.0, WHEELBASE_METERS / 2.0),
-            new Translation2d(TRACKWIDTH_METERS / 2.0, -WHEELBASE_METERS / 2.0),
-            new Translation2d(-TRACKWIDTH_METERS / 2.0, WHEELBASE_METERS / 2.0),
-            new Translation2d(-TRACKWIDTH_METERS / 2.0, -WHEELBASE_METERS / 2.0));
+    private SwerveDriveKinematics SWERVE_KINEMATICS;
 
-    public TrajectoryConfig TRAJECTORY_CONFIG =
-        new TrajectoryConfig(MAX_VELOCITY_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND)
-            .setKinematics(SWERVE_KINEMATICS);
-    public TrajectoryConfig REVERSE_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(MAX_VELOCITY_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND)
-            .setKinematics(SWERVE_KINEMATICS)
-            .setReversed(true);
-    public TrajectoryConfig TESTING_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(
-                MAX_VELOCITY_METERS_PER_SECOND * 0.65, MAX_ACCELERATION_METERS_PER_SECOND * 0.65)
-            .setKinematics(SWERVE_KINEMATICS);
-    public TrajectoryConfig TESTING_REVERSE_TRAJECTORY_CONFIG =
-        new TrajectoryConfig(
-                MAX_VELOCITY_METERS_PER_SECOND * 0.65, MAX_ACCELERATION_METERS_PER_SECOND * 0.65)
-            .setKinematics(SWERVE_KINEMATICS)
-            .setReversed(true);
+    public synchronized SwerveDriveKinematics getSwerveDriveKinmatics() {
+
+      if (!m_SwerveDriveKinematicsIntilaized) {
+        SWERVE_KINEMATICS =
+            new SwerveDriveKinematics(
+                new Translation2d(TRACKWIDTH_METERS / 2.0, WHEELBASE_METERS / 2.0),
+                new Translation2d(TRACKWIDTH_METERS / 2.0, -WHEELBASE_METERS / 2.0),
+                new Translation2d(-TRACKWIDTH_METERS / 2.0, WHEELBASE_METERS / 2.0),
+                new Translation2d(-TRACKWIDTH_METERS / 2.0, -WHEELBASE_METERS / 2.0));
+      }
+      return SWERVE_KINEMATICS;
+    }
   }
 
   public static class Colors {

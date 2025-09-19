@@ -12,7 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class DriveWithJoysticks extends DriveComposable {
-  private static RobotInfo.DriveInfo m_driveInfo;
+  private RobotInfo.DriveInfo m_driveInfo;
   private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(10);
 
   private RotationControl m_rotationControl = RotationControl.OpenLoop;
@@ -28,11 +28,9 @@ public class DriveWithJoysticks extends DriveComposable {
   private double m_yAxis = 0.0;
   private double m_rot = 0.0;
 
-  public void getDriveInfo() {
+  public DriveWithJoysticks() {
     m_driveInfo = RobotConfig.get().DRIVE_INFO;
   }
-
-  public DriveWithJoysticks() {}
 
   public void setRotationControl(RotationControl rotationControl) {
     m_rotationControl = rotationControl;

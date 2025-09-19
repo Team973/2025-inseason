@@ -89,7 +89,7 @@ public class OdometrySupplier {
         BaseStatusSignal.getLatencyCompensatedValue(m_yawGetter, m_angularVelocity);
     m_swerveOdometry =
         new SwerveDriveOdometry(
-            m_driveInfo.SWERVE_KINEMATICS,
+            m_driveInfo.getSwerveDriveKinmatics(),
             Rotation2d.fromDegrees(yawDegrees.magnitude()),
             getPositions());
     m_lastPoseMeters = getPoseMeters();

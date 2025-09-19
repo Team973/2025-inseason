@@ -76,7 +76,7 @@ public class Elevator implements Subsystem {
   public Elevator(Logger logger, CANdleManger candle, RobotInfo robotInfo) {
     m_logger = logger;
     m_candleManger = candle;
-    m_elevatorInfo = robotInfo.new ElevatorInfo();
+    m_elevatorInfo = robotInfo.ELEVATOR_INFO;
     m_candleManger.addSignaler(m_elevatorHomedBlinker);
     m_motorRight = new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorRight"));
     m_motorLeft =

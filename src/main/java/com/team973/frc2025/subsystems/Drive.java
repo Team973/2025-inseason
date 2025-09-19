@@ -10,6 +10,7 @@ import com.team973.frc2025.subsystems.swerve.SwerveModule;
 import com.team973.lib.devices.GreyPigeon;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import com.team973.lib.util.SwerveModuleConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -62,12 +63,41 @@ public class Drive implements Subsystem {
     m_logger = logger;
     m_driveInfo = RobotConfig.get().DRIVE_INFO;
 
+    System.out.println("Front_left_constants" + m_driveInfo.FRONT_LEFT_CONSTANTS);
     m_swerveModules =
         new SwerveModule[] {
-          new SwerveModule(0, m_driveInfo.FRONT_LEFT_CONSTANTS, logger.subLogger("swerve/mod0")),
-          new SwerveModule(1, m_driveInfo.FRONT_RIGHT_CONSTANTS, logger.subLogger("swerve/mod1")),
-          new SwerveModule(2, m_driveInfo.BACK_LEFT_CONSTANTS, logger.subLogger("swerve/mod2")),
-          new SwerveModule(3, m_driveInfo.BACK_RIGHT_CONSTANTS, logger.subLogger("swerve/mod3"))
+          new SwerveModule(
+              0,
+              new SwerveModuleConfig(
+                  m_driveInfo.FRONT_LEFT_MODULE_DRIVE_MOTOR,
+                  m_driveInfo.FRONT_LEFT_MODULE_STEER_MOTOR,
+                  m_driveInfo.FRONT_LEFT_MODULE_STEER_ENCODER,
+                  m_driveInfo.FRONT_LEFT_MODULE_STEER_OFFSET),
+              logger.subLogger("swerve/mod0")),
+          new SwerveModule(
+              1,
+              new SwerveModuleConfig(
+                  m_driveInfo.FRONT_RIGHT_MODULE_DRIVE_MOTOR,
+                  m_driveInfo.FRONT_RIGHT_MODULE_STEER_MOTOR,
+                  m_driveInfo.FRONT_RIGHT_MODULE_STEER_ENCODER,
+                  m_driveInfo.FRONT_RIGHT_MODULE_STEER_OFFSET),
+              logger.subLogger("swerve/mod1")),
+          new SwerveModule(
+              2,
+              new SwerveModuleConfig(
+                  m_driveInfo.BACK_LEFT_MODULE_DRIVE_MOTOR,
+                  m_driveInfo.BACK_LEFT_MODULE_STEER_MOTOR,
+                  m_driveInfo.BACK_LEFT_MODULE_STEER_ENCODER,
+                  m_driveInfo.BACK_LEFT_MODULE_STEER_OFFSET),
+              logger.subLogger("swerve/mod2")),
+          new SwerveModule(
+              3,
+              new SwerveModuleConfig(
+                  m_driveInfo.BACK_RIGHT_MODULE_DRIVE_MOTOR,
+                  m_driveInfo.BACK_RIGHT_MODULE_STEER_MOTOR,
+                  m_driveInfo.BACK_RIGHT_MODULE_STEER_ENCODER,
+                  m_driveInfo.BACK_RIGHT_MODULE_STEER_OFFSET),
+              logger.subLogger("swerve/mod3"))
         };
     m_odometrySupplier =
         new OdometrySupplier(m_pigeon, m_swerveModules, logger.subLogger("providers/odometry"));
@@ -279,7 +309,7 @@ public class Drive implements Subsystem {
         new ChassisSpeeds(twist_vel.dx / 0.03, twist_vel.dy / 0.03, twist_vel.dtheta / 0.03);
 
     SwerveModuleState[] swerveModuleStates =
-        m_driveInfo.SWERVE_KINEMATICS.toSwerveModuleStates(updated_chassis_speeds);
+        m_driveInfo.getSwerveDriveKinmatics().toSwerveModuleStates(updated_chassis_speeds);
 
     setModuleStates(swerveModuleStates);
   }

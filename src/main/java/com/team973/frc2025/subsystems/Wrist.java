@@ -4,6 +4,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyCANCoder;
@@ -25,7 +26,7 @@ public class Wrist implements Subsystem {
 
   public Wrist(Logger logger, RobotInfo robotInfo) {
     m_logger = logger;
-    m_wristInfo = robotInfo.new WristInfo();
+    m_wristInfo = RobotConfig.get().WRIST_INFO;
 
     m_wristMotor =
         new GreyTalonFX(
@@ -175,6 +176,7 @@ public class Wrist implements Subsystem {
     m_logger.log("wristMode", m_controlStatus.toString());
     m_logger.log("getCanCoderPostion", getCanCoderPostion());
     m_logger.log("Is Horizontal", isHorizontal());
+    m_logger.log("Level 3 taget pos", m_wristInfo.LEVEL_THREE_POSITION_DEG);
   }
 
   @Override
