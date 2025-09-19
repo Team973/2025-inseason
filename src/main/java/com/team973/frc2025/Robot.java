@@ -208,6 +208,8 @@ public class Robot extends TimedRobot {
 
       m_ledOff.enable();
 
+      m_logger.log("logCount", m_logger.getCount());
+
       if (RobotController.getBatteryVoltage() > m_lowBatterMimiumVoltage) {
         m_lastBatteryVoltageHighMSTimestamp = Conversions.Time.getMsecTime();
         m_lowBatterySignaler.disable();
