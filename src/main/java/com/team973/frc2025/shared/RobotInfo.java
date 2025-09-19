@@ -117,7 +117,7 @@ public final class RobotInfo {
     public static final double ANGLE_ROT_TO_DRIVE_ROT =
         ANGLE_GEAR_RATIO
             * WHEEL_TURN_ROT_TO_WHEEL_DRIVE_ROT
-            * (1.0 / DRIVE_GEAR_RATIO); // 6.0 / 13.0;
+            * (1.0 / DRIVE_GEAR_RATIO);
 
     // ar * (wt/ar) * (wd/wt) * (dr/wd) = dr
 
@@ -144,7 +144,7 @@ public final class RobotInfo {
     public static final double ANGLE_KV = 0.0;
 
     /* Drive Motor PID Values */
-    public static final double DRIVE_KP = 0.38;
+    public static final double DRIVE_KP = 0.04; // 0.38;
     public static final double DRIVE_KI = 0.0;
     public static final double DRIVE_KD = 0.0;
     public static final double DRIVE_KF = 0.12;
