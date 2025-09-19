@@ -111,6 +111,16 @@ public final class RobotInfo {
     public static final double WHEEL_DIAMETER_METERS = 0.1016;
     public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
 
+    public static final double WHEEL_TURN_ROT_TO_WHEEL_DRIVE_ROT = (40.0 / 16.0) * (15.0 / 45.0);
+    // wt * (wd/wt) = wd
+
+    public static final double ANGLE_ROT_TO_DRIVE_ROT =
+        ANGLE_GEAR_RATIO
+            * WHEEL_TURN_ROT_TO_WHEEL_DRIVE_ROT
+            * (1.0 / DRIVE_GEAR_RATIO);
+
+    // ar * (wt/ar) * (wd/wt) * (dr/wd) = dr
+
     /**
      * The left-to-right distance between the drivetrain wheels Should be measured from center to
      * center.
@@ -134,7 +144,7 @@ public final class RobotInfo {
     public static final double ANGLE_KV = 0.0;
 
     /* Drive Motor PID Values */
-    public static final double DRIVE_KP = 0.38;
+    public static final double DRIVE_KP = 0.04; // 0.38;
     public static final double DRIVE_KI = 0.0;
     public static final double DRIVE_KD = 0.0;
     public static final double DRIVE_KF = 0.12;

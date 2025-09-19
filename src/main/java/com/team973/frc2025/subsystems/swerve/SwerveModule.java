@@ -40,6 +40,13 @@ public class SwerveModule {
 
   private SwerveModuleState m_lastState;
 
+  private Rotation2d m_desiredFalconVelocityInRPS;
+
+  private double m_angleMotorTargetPos;
+  private double m_lastAngleMotorPos;
+  private double m_driveMotorOffset;
+  private double m_driveMotorFeedForward;
+
   private final TalonFXConfiguration m_driveMotorConfig;
 
   private final StatusSignal<Angle> m_driveMotorPositionStatusSignal;
@@ -99,6 +106,9 @@ public class SwerveModule {
     m_allStatusSignals.add(m_angleMotorVelocityStatusSignal);
 
     m_lastState = getState();
+
+    m_lastAngleMotorPos = m_angleMotor.getPosition().getValueAsDouble();
+    m_driveMotorOffset = 0.0;
   }
 
   private void configAngleEncoder() {
@@ -194,8 +204,9 @@ public class SwerveModule {
   public double getDriveMotorMeters() {
     double compensatedRotations =
         BaseStatusSignal.getLatencyCompensatedValue(
-                m_driveMotorPositionStatusSignal, m_driveMotorVelocityStatusSignal)
-            .magnitude();
+                    m_driveMotorPositionStatusSignal, m_driveMotorVelocityStatusSignal)
+                .magnitude()
+            + m_driveMotorOffset;
     return m_driveMechanism.getOutputDistanceFromRotorRotation(
         Rotation2d.fromRotations(compensatedRotations));
   }
@@ -241,13 +252,8 @@ public class SwerveModule {
     // CTRE is not
     desiredState = CTREModuleState.optimize(desiredState, getState().angle);
 
-    Rotation2d desiredFalconVelocityInRPS =
+    m_desiredFalconVelocityInRPS =
         m_driveMechanism.getRotorRotationFromOutputDistance(desiredState.speedMetersPerSecond);
-
-    if (desiredState.speedMetersPerSecond != m_lastState.speedMetersPerSecond) {
-      m_driveMotor.setControl(
-          ControlMode.VelocityVoltage, desiredFalconVelocityInRPS.getRotations());
-    }
 
     // Prevent rotating module if speed is less then 1%. Prevents jittering.
     if (!ignoreJitter) {
@@ -258,12 +264,9 @@ public class SwerveModule {
               : desiredState.angle;
     }
 
-    // Prevent module rotation if angle is the same as the previous angle.
-    if (desiredState.angle != m_lastState.angle) {
-      m_angleMotor.setControl(
-          ControlMode.PositionVoltage,
-          m_angleMechanism.getRotorRotationFromOutputRotation(desiredState.angle).getRotations());
-    }
+    m_angleMotorTargetPos =
+        m_angleMechanism.getRotorRotationFromOutputRotation(desiredState.angle).getRotations();
+
     m_lastState = desiredState;
   }
 
@@ -275,6 +278,35 @@ public class SwerveModule {
   public void driveNeutral() {
     m_driveMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     m_driveMotor.setConfig(m_driveMotorConfig);
+  }
+
+  public void syncSensors() {
+    double angleMotorPos = m_angleMotor.getPosition().getValueAsDouble();
+    double angleMotorDelta = angleMotorPos - m_lastAngleMotorPos;
+    double angleMotorVelocity = m_angleMotor.getVelocity().getValueAsDouble();
+
+    m_driveMotorFeedForward =
+        Math.abs(Rotation2d.fromRotations(angleMotorVelocity).getRadians())
+                > (DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * 0.01)
+            ? -angleMotorVelocity * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT
+            : 0.0;
+    // (ar/s) * (dr/ar) = (dr/s)
+
+    m_driveMotorOffset += angleMotorDelta * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT;
+    // m_driveMotor.setPosition(
+    //     m_driveMotor.getPosition().getValueAsDouble()
+    //         + (angleMotorDelta * DriveInfo.ANGLE_ROT_TO_DRIVE_ROT));
+
+    m_lastAngleMotorPos = angleMotorPos;
+  }
+
+  public void update() {
+    m_driveMotor.setControl(
+        ControlMode.VelocityVoltage,
+        0.0, // desiredFalconVelocityInRPS.getRotations()
+        m_driveMotorFeedForward);
+
+    m_angleMotor.setControl(ControlMode.PositionVoltage, m_angleMotorTargetPos);
   }
 
   public void log() {
@@ -292,5 +324,8 @@ public class SwerveModule {
     m_logger.log(
         "steer/currentPosRot",
         m_angleMechanism.getRotorRotationFromOutputRotation(currentState.angle).getRotations());
+    m_logger.log(
+        "Updated Drive Motor Pos",
+        m_driveMotor.getPosition().getValueAsDouble() + m_driveMotorOffset);
   }
 }
