@@ -9,7 +9,6 @@ import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
-import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 
@@ -152,15 +151,16 @@ public class Wrist implements Subsystem {
 
   @Override
   public void update() {
-    switch (m_controlStatus) {
-      case TargetPostion:
-        m_wristMotor.setControl(
-            ControlMode.MotionMagicVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
-        break;
-      case Off:
-        m_wristMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
-        break;
-    }
+    // switch (m_controlStatus) {
+    //   case TargetPostion:
+    //     m_wristMotor.setControl(
+    //         ControlMode.MotionMagicVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg),
+    // 0);
+    //     break;
+    //   case Off:
+    //     m_wristMotor.setControl(ControlMode.DutyCycleOut, 0, 0);
+    //     break;
+    // }
   }
 
   @Override

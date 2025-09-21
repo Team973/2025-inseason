@@ -7,7 +7,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
-import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
@@ -231,20 +230,20 @@ public class Elevator implements Subsystem {
 
   @Override
   public void update() {
-    switch (m_controlStatus) {
-      case TargetPostion:
-        m_motorRight.setControl(
-            ControlMode.MotionMagicVoltage,
-            heightInchesToMotorRotations(m_targetPostionHeightinches),
-            0);
-        break;
-      case Zero:
-        m_motorRight.setControl(ControlMode.DutyCycleOut, -0.1);
-        break;
-      case Off:
-        m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
-        break;
-    }
+    // switch (m_controlStatus) {
+    //   case TargetPostion:
+    //     m_motorRight.setControl(
+    //         ControlMode.MotionMagicVoltage,
+    //         heightInchesToMotorRotations(m_targetPostionHeightinches),
+    //         0);
+    //     break;
+    //   case Zero:
+    //     m_motorRight.setControl(ControlMode.DutyCycleOut, -0.1);
+    //     break;
+    //   case Off:
+    //     m_motorRight.setControl(ControlMode.DutyCycleOut, 0, 0);
+    //     break;
+    // }
   }
 
   public double getHeightInchesFromMotorRot(double motorRot) {
