@@ -156,7 +156,7 @@ public class RobotInfo {
   public static class WristInfo {
     public int MOTOR_CAN_ID = 31;
     public int ENCODER_CAN_ID = 35;
-    public double ENCODER_OFFSET_ROTATIONS = -0.0596 + 0.25;
+    public double ENCODER_OFFSET_ROTATIONS = -0.0288 + 0.25;
     public double WRIST_ROTATIONS_PER_MOTOR_ROTATIONS = 10.0 / 46.0 * 14.0 / 72.0 * 34.0 / 60.0;
     public double HORIZONTAL_POSITION_DEG = -90.0;
 
