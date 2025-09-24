@@ -30,6 +30,7 @@ public class RobotConfig {
       Yaml yaml = new Yaml();
       m_robotInfo = yaml.loadAs(yamlContent, RobotInfo.class);
       m_initialized = true;
+
     } catch (MarkedYAMLException e) {
       System.err.println("YAML parsing error:");
       System.err.println("  " + e.getMessage());
