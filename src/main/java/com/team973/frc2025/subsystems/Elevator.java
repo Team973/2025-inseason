@@ -78,7 +78,7 @@ public class Elevator implements Subsystem {
     private static final double ALGAE_HIGH = 4.5;
     private static final double ALGAE_LOW = 17.5;
     private static final double ALGAE_FLOOR = 0.0;
-    public static final double ALGAE_STOW = 1.0;
+    public static final double ALGAE_STOW = 4.0;
   }
 
   public Elevator(Logger logger, CANdleManger candle) {
