@@ -6,6 +6,7 @@ import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.Supplier;
 
@@ -457,11 +458,13 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case BackOff:
-            armStow();
-            elevatorStow();
-            wristStow();
+            if (m_gamePieceMode == GamePiece.Coral || DriverStation.isTeleop()) {
+              armStow();
+              elevatorStow();
+              wristStow();
+              m_manualArmivator = false;
+            }
 
-            m_manualArmivator = false;
             break;
         }
         break;

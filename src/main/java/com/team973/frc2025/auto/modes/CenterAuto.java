@@ -3,6 +3,7 @@ package com.team973.frc2025.auto.modes;
 import com.team973.frc2025.auto.commands.PickupAlgaeCommand;
 import com.team973.frc2025.auto.commands.ScoreAlgaeInNetCommand;
 import com.team973.frc2025.auto.commands.ScoreCoralCommand;
+import com.team973.frc2025.auto.commands.util.LambdaCommand;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
@@ -20,6 +21,7 @@ public class CenterAuto extends AutoMode {
         new Pose2d(7.18, 4, Rotation2d.fromDegrees(180)),
         new ScoreCoralCommand(drive, superstructure, ReefFace.D, ReefLevel.L_4, ReefSide.Right),
         new PickupAlgaeCommand(drive, superstructure, ReefFace.D),
+        new LambdaCommand(() -> superstructure.setTargetReefLevel(ReefLevel.AlgaeHigh)),
         new ScoreAlgaeInNetCommand(drive, superstructure),
         new PickupAlgaeCommand(drive, superstructure, ReefFace.E),
         new ScoreAlgaeInNetCommand(drive, superstructure));
