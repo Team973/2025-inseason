@@ -131,7 +131,7 @@ public class Arm implements Subsystem {
       case Net:
         return m_armInfo.NET_POSITION_DEG + m_netOffset;
       case AlgaeHigh:
-        return m_netOffset + m_algaeHighOffset;
+        return m_armInfo.ALGAE_HIGH_POSITION_DEG + m_algaeHighOffset;
       case AlgaeLow:
         return m_armInfo.ALGAE_LOW_POSITION_DEG + m_algaeLowOffset;
       case AlgaeFloor:

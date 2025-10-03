@@ -47,7 +47,7 @@ public class RobotInfo {
     public int ENCODER_CAN_ID = 32;
     public double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
 
-    public double ENCODER_OFFSET_ROTATIONS = -0.210;
+    public double ENCODER_OFFSET_ROTATIONS = 0.098;
 
     public double HORIZONTAL_POSITION_DEG = 0.0;
 
@@ -128,8 +128,7 @@ public class RobotInfo {
   }
 
   public static class ClawInfo {
-    public int RIGHT_MOTOR_ID = 36;
-    public int LEFT_MOTOR_ID = 35;
+    public int CLAW_MOTOR_ID = 36;
     public int CONVEYOR_MOTOR_ID = 34;
 
     public int CONVEYOR_BACK_SENSOR_ID = 2;
