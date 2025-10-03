@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems;
 
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
@@ -11,12 +12,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.Supplier;
 
 public class Superstructure implements Subsystem {
+  private final RobotInfo.ElevatorInfo m_elevatorInfo;
+  private final RobotInfo.WristInfo m_wristInfo;
   private final Claw m_claw;
   private final Climb m_climb;
   private final Elevator m_elevator;
   private final Arm m_arm;
   private final Wrist m_wrist;
   private final DriveController m_driveController;
+  private final RobotInfo.ArmInfo m_armInfo;
 
   private final Logger m_logger;
 
@@ -78,6 +82,9 @@ public class Superstructure implements Subsystem {
     m_arm = arm;
     m_wrist = wrist;
     m_driveController = driveController;
+    m_elevatorInfo = RobotConfig.get().ELEVATOR_INFO;
+    m_wristInfo = RobotConfig.get().WRIST_INFO;
+    m_armInfo = RobotConfig.get().ARM_INFO;
 
     m_logger = logger;
 
@@ -133,30 +140,30 @@ public class Superstructure implements Subsystem {
   }
 
   public boolean readyToScore() {
-    if (m_arm.getTargetPosition() == Arm.CORAL_STOW_POSITION_DEG) {
+    if (m_arm.getTargetPosition() == m_armInfo.CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
-    if (m_arm.getTargetPosition() == Arm.ALGAE_STOW_POSITION_DEG
+    if (m_arm.getTargetPosition() == m_armInfo.ALGAE_STOW_POSITION_DEG
         && m_targetReefLevelSupplier.get() != ReefLevel.Processor) {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == Elevator.Presets.CORAL_STOW) {
+    if (m_elevator.getTargetPosition() == m_elevatorInfo.CORAL_STOW) {
       return false;
     }
 
-    if (m_elevator.getTargetPosition() == Elevator.Presets.ALGAE_STOW
+    if (m_elevator.getTargetPosition() == m_elevatorInfo.ALGAE_STOW
         && m_targetReefLevelSupplier.get() != ReefLevel.Processor) {
       return false;
     }
 
-    if (m_wrist.getTargetPosition() == Wrist.WITH_CORAL_STOW_POSTION_DEG
-        || m_wrist.getTargetPosition() == Wrist.WITHOUT_CORAL_STOW_POSITION_DEG) {
+    if (m_wrist.getTargetPosition() == m_wristInfo.WITH_CORAL_STOW_POSTION_DEG
+        || m_wrist.getTargetPosition() == m_wristInfo.WITHOUT_CORAL_STOW_POSITION_DEG) {
       return false;
     }
 
-    if (m_wrist.getTargetPosition() == Wrist.ALGAE_STOW_POSITION_DEG
+    if (m_wrist.getTargetPosition() == m_wristInfo.ALGAE_STOW_POSITION_DEG
         && m_targetReefLevelSupplier.get() != ReefLevel.Processor) {
       return false;
     }
@@ -249,9 +256,9 @@ public class Superstructure implements Subsystem {
 
   private void armStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_arm.setTargetDeg(Arm.CORAL_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(m_armInfo.CORAL_STOW_POSITION_DEG);
     } else {
-      m_arm.setTargetDeg(Arm.ALGAE_STOW_POSITION_DEG);
+      m_arm.setTargetDeg(m_armInfo.ALGAE_STOW_POSITION_DEG);
     }
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }
@@ -264,18 +271,18 @@ public class Superstructure implements Subsystem {
 
   private void elevatorStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_elevator.setTargetPostion(Elevator.Presets.CORAL_STOW);
+      m_elevator.setTargetPostion(m_elevatorInfo.CORAL_STOW);
     } else {
-      m_elevator.setTargetPostion(Elevator.Presets.ALGAE_STOW);
+      m_elevator.setTargetPostion(m_elevatorInfo.ALGAE_STOW);
     }
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }
 
   private void wristStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
-      m_wrist.setTargetDeg(Wrist.WITHOUT_CORAL_STOW_POSITION_DEG);
+      m_wrist.setTargetDeg(m_wristInfo.WITHOUT_CORAL_STOW_POSITION_DEG);
     } else {
-      m_wrist.setTargetDeg(Wrist.ALGAE_STOW_POSITION_DEG);
+      m_wrist.setTargetDeg(m_wristInfo.ALGAE_STOW_POSITION_DEG);
     }
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }

@@ -4,8 +4,8 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.WristInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
@@ -14,6 +14,7 @@ import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 
 public class Wrist implements Subsystem {
+  private final RobotInfo.WristInfo m_wristInfo;
   private final Logger m_logger;
 
   private final GreyTalonFX m_wristMotor;
@@ -21,50 +22,45 @@ public class Wrist implements Subsystem {
 
   private ControlStatus m_controlStatus = ControlStatus.Off;
 
-  private static final double HORIZONTAL_POSITION_DEG = -90.0;
-
-  private static final double LEVEL_FOUR_POSITION_DEG = -193.0;
-  private static final double LEVEL_THREE_POSITION_DEG = -189.0;
-  private static final double LEVEL_TWO_POSITION_DEG = -56.0;
-  private static final double LEVEL_ONE_POSITION_DEG = -4.0;
-
-  public static final double WITHOUT_CORAL_STOW_POSITION_DEG = -18.0;
-  public static final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
-
-  private static final double NET_POSITION_DEG = -45.0;
-  private static final double ALGAE_HIGH_POSITION_DEG = -149.0;
-  private static final double ALGAE_LOW_POSITION_DEG = -34.0;
-  private static final double ALGAE_FLOOR_POSITION_DEG = -88.0;
-  public static final double ALGAE_STOW_POSITION_DEG = -2.0;
-
   private double m_wristTargetPostionDeg = 0.0;
 
-  public Wrist(Logger logger) {
+  public Wrist(Logger logger, RobotInfo robotInfo) {
     m_logger = logger;
+    m_wristInfo = RobotConfig.get().WRIST_INFO;
 
     m_wristMotor =
         new GreyTalonFX(
-            WristInfo.MOTOR_CAN_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
+            m_wristInfo.MOTOR_CAN_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));
     m_wristEncoder =
         new GreyCANCoder(
-            WristInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
+            m_wristInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
 
     TalonFXConfiguration wristMotorConfig = new TalonFXConfiguration();
-    wristMotorConfig.Slot0.kS = 0.0;
-    wristMotorConfig.Slot0.kV = 0.0;
-    wristMotorConfig.Slot0.kA = 0.0;
-    wristMotorConfig.Slot0.kP = 10.0; // 10
-    wristMotorConfig.Slot0.kI = 0.0;
-    wristMotorConfig.Slot0.kD = 0.0;
-    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 51.0;
-    wristMotorConfig.MotionMagic.MotionMagicAcceleration = 590.0;
-    wristMotorConfig.MotionMagic.MotionMagicJerk = 5900.0;
-    wristMotorConfig.CurrentLimits.StatorCurrentLimit = 20.0;
-    wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    wristMotorConfig.CurrentLimits.SupplyCurrentLimit = 15.0;
-    wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    wristMotorConfig.Voltage.PeakForwardVoltage = 12.0;
-    wristMotorConfig.Voltage.PeakReverseVoltage = -12.0;
+    wristMotorConfig.Slot0.kS = m_wristInfo.WRIST_KS;
+    wristMotorConfig.Slot0.kV = m_wristInfo.WRIST_KV;
+    wristMotorConfig.Slot0.kA = m_wristInfo.WRIST_KA;
+    wristMotorConfig.Slot0.kP = m_wristInfo.WRIST_KP;
+    wristMotorConfig.Slot0.kI = m_wristInfo.WRIST_KI;
+    wristMotorConfig.Slot0.kD = m_wristInfo.WRIST_KD;
+
+    // Motion Magic settings
+    wristMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        m_wristInfo.WRIST_MOTION_MAGIC_CRUISE_VELOCITY;
+    wristMotorConfig.MotionMagic.MotionMagicAcceleration =
+        m_wristInfo.WRIST_MOTION_MAGIC_ACCELERATION;
+    wristMotorConfig.MotionMagic.MotionMagicJerk = m_wristInfo.WRIST_MOTION_MAGIC_JERK;
+
+    // Current limits
+    wristMotorConfig.CurrentLimits.StatorCurrentLimit = m_wristInfo.WRIST_SATOR_CURRENT_LIMIT;
+    wristMotorConfig.CurrentLimits.StatorCurrentLimitEnable =
+        m_wristInfo.WRIST_SATOR_CURRENT_LIMIT_ENABLE;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimit = m_wristInfo.WRIST_SUPPLY_CURRENT_LIMIT;
+    wristMotorConfig.CurrentLimits.SupplyCurrentLimitEnable =
+        m_wristInfo.WRIST_SUPPLY_CURRENT_LIMIT_ENABLE;
+
+    // Voltage limits
+    wristMotorConfig.Voltage.PeakForwardVoltage = m_wristInfo.WRIST_PEAK_FORDWARD_VOLTAGE;
+    wristMotorConfig.Voltage.PeakReverseVoltage = m_wristInfo.WRIST_PEAK_REVERSE_VOLTAGE;
     wristMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     wristMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_wristMotor.setConfig(wristMotorConfig);
@@ -80,11 +76,11 @@ public class Wrist implements Subsystem {
   }
 
   private double wristDegToMotorRotations(double wristPostionDeg) {
-    return wristPostionDeg / 360.0 / WristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
+    return wristPostionDeg / 360.0 / m_wristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
 
   private double motorRotationsToWristDeg(double motorPostion) {
-    return motorPostion * WristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
+    return motorPostion * m_wristInfo.WRIST_ROTATIONS_PER_MOTOR_ROTATIONS * 360.0;
   }
 
   public double getWristPostionDegFromMotorRot(double motorRot) {
@@ -98,25 +94,25 @@ public class Wrist implements Subsystem {
   public double getTargetDegFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return LEVEL_ONE_POSITION_DEG;
+        return m_wristInfo.LEVEL_ONE_POSITION_DEG;
       case L_2:
-        return LEVEL_TWO_POSITION_DEG;
+        return m_wristInfo.LEVEL_TWO_POSITION_DEG;
       case L_3:
-        return LEVEL_THREE_POSITION_DEG;
+        return m_wristInfo.LEVEL_THREE_POSITION_DEG;
       case L_4:
-        return LEVEL_FOUR_POSITION_DEG;
+        return m_wristInfo.LEVEL_FOUR_POSITION_DEG;
       case AlgaeHigh:
-        return ALGAE_HIGH_POSITION_DEG;
+        return m_wristInfo.ALGAE_HIGH_POSITION_DEG;
       case AlgaeLow:
-        return ALGAE_LOW_POSITION_DEG;
+        return m_wristInfo.ALGAE_LOW_POSITION_DEG;
       case AlgaeFloor:
-        return ALGAE_FLOOR_POSITION_DEG;
+        return m_wristInfo.ALGAE_FLOOR_POSITION_DEG;
       case Net:
-        return NET_POSITION_DEG;
+        return m_wristInfo.NET_POSITION_DEG;
       case Processor:
-        return ALGAE_STOW_POSITION_DEG;
+        return m_wristInfo.ALGAE_STOW_POSITION_DEG;
       case Horizontal:
-        return HORIZONTAL_POSITION_DEG;
+        return m_wristInfo.HORIZONTAL_POSITION_DEG;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }
@@ -128,7 +124,7 @@ public class Wrist implements Subsystem {
 
   private double getCanCoderPostion() {
     return (m_wristEncoder.getAbsolutePosition().getValueAsDouble()
-            - WristInfo.ENCODER_OFFSET_ROTATIONS)
+            - m_wristInfo.ENCODER_OFFSET_ROTATIONS)
         * 360.0;
   }
 
@@ -180,6 +176,7 @@ public class Wrist implements Subsystem {
     m_logger.log("wristMode", m_controlStatus.toString());
     m_logger.log("getCanCoderPostion", getCanCoderPostion());
     m_logger.log("Is Horizontal", isHorizontal());
+    m_logger.log("Level 3 taget pos", m_wristInfo.LEVEL_THREE_POSITION_DEG);
   }
 
   @Override

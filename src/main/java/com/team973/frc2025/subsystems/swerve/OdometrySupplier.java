@@ -3,8 +3,8 @@ package com.team973.frc2025.subsystems.swerve;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.lib.devices.GreyPigeon;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.PerfLogger;
@@ -30,6 +30,8 @@ public class OdometrySupplier {
         double sampleTime, Rotation2d yawDegrees, SwerveModulePosition[] modulePositions);
   }
 
+  private final RobotInfo.DriveInfo m_driveInfo;
+
   private List<OdometryReceiver> m_receivers = new ArrayList<OdometryReceiver>();
 
   private final BaseStatusSignal[] m_allStatusSignals;
@@ -52,6 +54,8 @@ public class OdometrySupplier {
     m_thread = new Thread(this::run);
     m_thread.setName("swerve.OdometryPoseSupplier");
     m_thread.setDaemon(false);
+
+    m_driveInfo = RobotConfig.get().DRIVE_INFO;
 
     m_pigeon = pigeon;
     m_swerveModules = swerveModules;
@@ -78,14 +82,14 @@ public class OdometrySupplier {
     m_allStatusSignals[i++] = m_angularVelocity;
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY, m_allStatusSignals);
+        m_driveInfo.STATUS_SIGNAL_FREQUENCY, m_allStatusSignals);
 
     BaseStatusSignal.waitForAll(1.0, m_allStatusSignals);
     Measure<AngleUnit> yawDegrees =
         BaseStatusSignal.getLatencyCompensatedValue(m_yawGetter, m_angularVelocity);
     m_swerveOdometry =
         new SwerveDriveOdometry(
-            DriveInfo.SWERVE_KINEMATICS,
+            m_driveInfo.getSwerveDriveKinmatics(),
             Rotation2d.fromDegrees(yawDegrees.magnitude()),
             getPositions());
     m_lastPoseMeters = getPoseMeters();
@@ -110,7 +114,7 @@ public class OdometrySupplier {
     return m_lastPoseMeters
         .minus(getPoseMeters())
         .getTranslation()
-        .times(1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY);
+        .times(1.0 / m_driveInfo.STATUS_SIGNAL_FREQUENCY);
   }
 
   public synchronized void resetPosition(Pose2d pose) {
@@ -142,7 +146,7 @@ public class OdometrySupplier {
       // this long for new signal. We expect to get a signal in at most 1/freq
       StatusCode status =
           BaseStatusSignal.waitForAll(
-              2.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY, m_allStatusSignals);
+              2.0 / m_driveInfo.STATUS_SIGNAL_FREQUENCY, m_allStatusSignals);
 
       double runStartedAt = Timer.getFPGATimestamp();
       doCycle();

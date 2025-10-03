@@ -632,4 +632,27 @@ public class GreyTalonFX extends TalonFX {
   public void logFault(String faultName, boolean value) {
     SmartDashboard.putBoolean("TalonFX/" + m_deviceID + " Faults/" + faultName, value);
   }
+
+  public static class GreyTalonFXConfig {
+
+    public TalonFXConfiguration getConfig() {
+      TalonFXConfiguration config = new TalonFXConfiguration();
+
+      config.CurrentLimits.StatorCurrentLimit = STATOR_CURRENT_LIMIT;
+      config.CurrentLimits.StatorCurrentLimitEnable = STATOR_CURRENT_LIMIT_ENABLE;
+      config.CurrentLimits.SupplyCurrentLimit = SUPPLY_CURRENT_LIMIT;
+      config.CurrentLimits.SupplyCurrentLimitEnable = SUPPLY_CURRENT_LIMIT_ENABLE;
+      config.Voltage.PeakForwardVoltage = PEAK_FORDWARD_VOLTAGE;
+      config.Voltage.PeakReverseVoltage = PEAK_REVERSE_VOLTAGE;
+      return config;
+    }
+
+    public double STATOR_CURRENT_LIMIT = 60.0;
+    public boolean STATOR_CURRENT_LIMIT_ENABLE = true;
+    public double SUPPLY_CURRENT_LIMIT = 40.0;
+    public boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
+
+    public double PEAK_FORDWARD_VOLTAGE = 12.0;
+    public double PEAK_REVERSE_VOLTAGE = -12.0;
+  }
 }

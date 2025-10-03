@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems.swerve;
 
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.CrashTracker;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.DriveController;
@@ -18,6 +19,8 @@ import edu.wpi.first.math.numbers.N3;
 
 public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
 
+  private final RobotInfo.DriveInfo m_driveInfo;
+
   private SwerveDrivePoseEstimator m_poseEstimator;
   private final GreyPigeon m_pigeon;
   private Pose2d m_lastPoseMeters;
@@ -31,6 +34,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
       DriveController m_DriveController,
       OdometrySupplier odometrySupplier,
       Logger logger) {
+    m_driveInfo = RobotConfig.get().DRIVE_INFO;
 
     m_pigeon = pigeon;
     m_driveController = m_DriveController;
@@ -55,7 +59,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
     return m_lastPoseMeters
         .minus(getPoseMeters())
         .getTranslation()
-        .times(RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY);
+        .times(m_driveInfo.STATUS_SIGNAL_FREQUENCY);
   }
 
   public synchronized void resetPosition(Pose2d pose) {
@@ -74,7 +78,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
       if (m_poseEstimator == null) {
         m_poseEstimator =
             new SwerveDrivePoseEstimator(
-                RobotInfo.DriveInfo.SWERVE_KINEMATICS,
+                m_driveInfo.getSwerveDriveKinmatics(),
                 gyroAngle,
                 modulePositions,
                 new Pose2d(0, 0, gyroAngle));
@@ -87,6 +91,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
       m_driveController.syncSensorsHighFreq();
       m_driveController.update();
     } catch (Exception e) {
+      e.printStackTrace();
       CrashTracker.logException("Update odometry", e);
     }
   }
