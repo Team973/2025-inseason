@@ -6,7 +6,7 @@ public abstract class DownloadDogLogs extends DefaultTask {
   @TaskAction
   public void downloadDogLogs() {
     def logPath = "/home/lvuser/logs/"
-    def robotHostName = "lvuser@10.9.73.2"
+    def robotHostName = "lvuser@roborio-${project.frc.getTeamNumber()}-frc.local"
     def sshOps = "-o StrictHostKeyChecking=no"
 
     String[] getOldLogsCmds
