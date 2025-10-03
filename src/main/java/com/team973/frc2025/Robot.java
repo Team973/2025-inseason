@@ -75,6 +75,9 @@ public class Robot extends TimedRobot {
           1000,
           RobotInfo.SignalerInfo.CRASH_SIGNALER_PRIORITY);
 
+  private final BlinkingSignaler m_demoSignaler =
+      new BlinkingSignaler(RobotInfo.Colors.ORANGE, RobotInfo.Colors.OFF, 1000, 2000, 5);
+
   private final Superstructure m_superstructure =
       new Superstructure(
           m_claw,
@@ -186,6 +189,7 @@ public class Robot extends TimedRobot {
     m_candleManger.addSignaler(m_ledOff);
     m_candleManger.addSignaler(m_lowBatterySignaler);
     m_candleManger.addSignaler(m_crashSignaler);
+    m_candleManger.addSignaler(m_demoSignaler);
     ChoreoAllianceFlipUtil.setYear(2025);
   }
 
@@ -501,6 +505,8 @@ public class Robot extends TimedRobot {
       }
       SmartDashboard.putString(
           "DB/String 5", String.valueOf(m_autoManager.getSelectedMode().getName()));
+
+      m_demoSignaler.enable();
 
       m_disabledPeriodicLogger.observe(Timer.getFPGATimestamp() - startTime);
     } catch (Exception e) {

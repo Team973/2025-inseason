@@ -66,7 +66,7 @@ public final class RobotInfo {
   }
 
   public static class SignalerInfo {
-    public static final int CRASH_SIGNALER_PRIORITY = 5;
+    public static final int CRASH_SIGNALER_PRIORITY = 4;
     public static final int CLIMB_STOP_PRIORITY = 6;
     public static final int CLIMB_HORIZONTAL_PRIORITY = 7;
     public static final int ELEVATOR_HALL_SENSOR_SIGNALER_PRIORITY = 10;
@@ -214,7 +214,7 @@ public final class RobotInfo {
     public static final Color YELLOW = new Color(255, 255, 0);
     public static final Color BLUE = new Color(0, 0, 255);
     public static final Color OFF = new Color(0, 0, 0);
-    public static final Color ORANGE = new Color(255, 100, 25);
+    public static final Color ORANGE = new Color(255, 60, 0);
     public static final Color PINK = new Color(255, 105, 180);
     public static final Color PURPLE = new Color(128, 0, 128);
     public static final Color CYAN = new Color(0, 255, 255);

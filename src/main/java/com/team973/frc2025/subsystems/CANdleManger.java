@@ -20,7 +20,7 @@ public class CANdleManger implements Subsystem {
     configAll.statusLedOffWhenActive = true;
     configAll.disableWhenLOS = false;
     configAll.stripType = LEDStripType.GRB;
-    configAll.brightnessScalar = 0.1;
+    configAll.brightnessScalar = 1;
     configAll.vBatOutputMode = VBatOutputMode.Modulated;
     m_candle.configAllSettings(configAll, 100);
 
@@ -43,7 +43,6 @@ public class CANdleManger implements Subsystem {
 
   @Override
   public void update() {
-
     for (ISignaler current : m_priortyQue) {
       if (current.isEnabled()) {
         current.update(m_candle);
