@@ -47,8 +47,6 @@ public class RobotInfo {
     public int ENCODER_CAN_ID = 32;
     public double ARM_ROTATIONS_PER_MOTOR_ROTATIONS = (10.0 / 84.0) * (16.0 / 108.0);
 
-    public double ENCODER_OFFSET_ROTATIONS = 0.098;
-
     public double HORIZONTAL_POSITION_DEG = 0.0;
 
     public double LEVEL_FOUR_POSITION_DEG = 65.0;
@@ -84,6 +82,7 @@ public class RobotInfo {
 
     public double ARM_PEAK_FORDWARD_VOLTAGE = 12.0;
     public double ARM_PEAK_REVERSE_VOLTAGE = -12.0;
+    public static final double ENCODER_OFFSET_ROTATIONS = 0.098;
   }
 
   public static class ElevatorInfo {
