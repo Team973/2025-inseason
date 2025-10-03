@@ -328,13 +328,12 @@ public class RobotInfo {
             FRONT_RIGHT_MODULE_STEER_MOTOR,
             FRONT_RIGHT_MODULE_STEER_ENCODER,
             FRONT_RIGHT_MODULE_STEER_OFFSET);
-    private boolean m_SwerveDriveKinematicsIntilaized = false;
 
     private SwerveDriveKinematics SWERVE_KINEMATICS;
 
     public synchronized SwerveDriveKinematics getSwerveDriveKinmatics() {
 
-      if (!m_SwerveDriveKinematicsIntilaized) {
+      if (SWERVE_KINEMATICS == null) {
         SWERVE_KINEMATICS =
             new SwerveDriveKinematics(
                 new Translation2d(TRACKWIDTH_METERS / 2.0, WHEELBASE_METERS / 2.0),
