@@ -5,8 +5,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.ClawInfo;
+import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
@@ -16,7 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 
 public class Claw implements Subsystem {
-  private static final double ALGAE_SENSOR_STRENGTH_THRESHOLD = 2500.0;
+  private final RobotInfo m_robotInfo;
+  private final RobotInfo.ClawInfo m_clawInfo;
 
   private final Logger m_logger;
 
@@ -29,9 +31,7 @@ public class Claw implements Subsystem {
 
   private ControlStatus m_mode = ControlStatus.Off;
 
-  private final SolidSignaler m_clawHasPeiceSignaler =
-      new SolidSignaler(
-          RobotInfo.Colors.GREEN, 0, RobotInfo.SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
+  private final SolidSignaler m_clawHasPeiceSignaler;
 
   private double m_targetHoldPosition = 0;
   private double m_coralBackUpRot = 3.0;
@@ -54,22 +54,27 @@ public class Claw implements Subsystem {
   public Claw(Logger logger, CANdleManger candle) {
     m_logger = logger;
     m_caNdle = candle;
+    m_robotInfo = RobotConfig.get();
+    m_clawInfo = m_robotInfo.CLAW_INFO;
+
+    m_clawHasPeiceSignaler =
+        new SolidSignaler(RobotInfo.Colors.GREEN, 0, SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
 
     m_caNdle.addSignaler(m_clawHasPeiceSignaler);
     m_clawMotor =
         new GreyTalonFX(
-            ClawInfo.RIGHT_MOTOR_ID,
+            m_clawInfo.CLAW_MOTOR_ID,
             RobotInfo.CANIVORE_CANBUS,
             m_logger.subLogger("clawMotor", 0.2));
     m_conveyor =
         new GreyTalonFX(
-            ClawInfo.CONVEYOR_MOTOR_ID,
+            m_clawInfo.CONVEYOR_MOTOR_ID,
             RobotInfo.CANIVORE_CANBUS,
             m_logger.subLogger("conveyorMotor", 0.2));
 
-    m_backClawSensor = new DigitalInput(ClawInfo.CONVEYOR_BACK_SENSOR_ID);
-    m_frontClawSensor = new DigitalInput(ClawInfo.CONVEYOR_FRONT_SENSOR_ID);
-    m_clawAlgaeSensor = new CANrange(ClawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
+    m_backClawSensor = new DigitalInput(m_clawInfo.CONVEYOR_BACK_SENSOR_ID);
+    m_frontClawSensor = new DigitalInput(m_clawInfo.CONVEYOR_FRONT_SENSOR_ID);
+    m_clawAlgaeSensor = new CANrange(m_clawInfo.CLAW_ALGAE_CAN_ID, RobotInfo.CANIVORE_CANBUS);
 
     TalonFXConfiguration rightMotorConfig = defaultClawMotorConfig();
     rightMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -79,8 +84,8 @@ public class Claw implements Subsystem {
 
     conveyorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-    conveyorConfig.Slot0.kP = 0.3;
-    conveyorConfig.Slot0.kV = 0.1;
+    conveyorConfig.Slot0.kP = m_clawInfo.CONVEYOR_KP;
+    conveyorConfig.Slot0.kV = m_clawInfo.CONVEYOR_KV;
 
     m_conveyor.setConfig(conveyorConfig);
 
@@ -88,26 +93,19 @@ public class Claw implements Subsystem {
     m_clawAlgaeSensor.getConfigurator().apply(algaeSensorConfig);
   }
 
-  public static TalonFXConfiguration defaultClawMotorConfig() {
-    TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
+  public TalonFXConfiguration defaultClawMotorConfig() {
+    TalonFXConfiguration defaultMotorConfig = m_clawInfo.MOTOR_CONFIG.getConfig();
 
     // Slot 0 PID constants are for velocity voltage
-    defaultMotorConfig.Slot0.kS = 0.0;
-    defaultMotorConfig.Slot0.kV = 0.125 * 10.0 / 10.5;
-    defaultMotorConfig.Slot0.kA = 0.0;
-    defaultMotorConfig.Slot0.kP = 0.3;
-    defaultMotorConfig.Slot0.kI = 0.0;
-    defaultMotorConfig.Slot0.kD = 0.0;
+    defaultMotorConfig.Slot0.kS = m_clawInfo.CLAW_KS;
+    defaultMotorConfig.Slot0.kV = m_clawInfo.CLAW_KV;
+    defaultMotorConfig.Slot0.kA = m_clawInfo.CLAW_KA;
+    defaultMotorConfig.Slot0.kP = m_clawInfo.CLAW_KP;
+    defaultMotorConfig.Slot0.kI = m_clawInfo.CLAW_KI;
+    defaultMotorConfig.Slot0.kD = m_clawInfo.CLAW_KD;
 
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-
-    defaultMotorConfig.Voltage.PeakForwardVoltage = 12.0;
-    defaultMotorConfig.Voltage.PeakReverseVoltage = -12.0;
-
-    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
+    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
+        m_clawInfo.CLAW_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD;
 
     defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
@@ -132,7 +130,7 @@ public class Claw implements Subsystem {
 
   private Optional<Double> getAlgaeDistance() {
     if (m_clawAlgaeSensor.getSignalStrength().getValueAsDouble()
-        < ALGAE_SENSOR_STRENGTH_THRESHOLD) {
+        < m_clawInfo.ALGAE_SENSOR_STRENGTH_THRESHOLD) {
       return Optional.empty();
     }
 

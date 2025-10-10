@@ -14,7 +14,7 @@ import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator implements Subsystem {
-  private static final double MOTOR_GEAR_RATIO = 10.0 / 56.0;
+  private final RobotInfo.ElevatorInfo m_elevatorInfo;
 
   private final Logger m_logger;
 
@@ -30,7 +30,7 @@ public class Elevator implements Subsystem {
 
   private boolean m_lastHallSensorMode = true;
 
-  private final DigitalInput m_hallSensor = new DigitalInput(RobotInfo.ElevatorInfo.HALL_SENSOR_ID);
+  private final DigitalInput m_hallSensor;
 
   private final SolidSignaler m_elevatorHomedBlinker =
       new SolidSignaler(
@@ -47,8 +47,6 @@ public class Elevator implements Subsystem {
   private double m_algaeHighOffset = 0.0;
   private double m_algaeLowOffset = 0.0;
   private double m_algaeFloorOffset = 0.0;
-
-  private double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
   private CANdleManger m_candleManger;
 
   private boolean m_hallZeroingEnabled = true;
@@ -60,34 +58,30 @@ public class Elevator implements Subsystem {
   }
 
   private double heightInchesToMotorRotations(double postionHeight) {
-    return postionHeight / MOTOR_GEAR_RATIO / 5.0 / 36.0 / Conversions.Distance.INCH_PER_MM;
+    return postionHeight
+        / m_elevatorInfo.MOTOR_GEAR_RATIO
+        / 5.0
+        / 36.0
+        / Conversions.Distance.INCH_PER_MM;
   }
 
   private double motorRotationsToHeightInches(double motorPostion) {
-    return motorPostion * MOTOR_GEAR_RATIO * 5.0 * 36.0 * Conversions.Distance.INCH_PER_MM;
+    return motorPostion
+        * m_elevatorInfo.MOTOR_GEAR_RATIO
+        * 5.0
+        * 36.0
+        * Conversions.Distance.INCH_PER_MM;
   }
 
-  public static class Presets {
-    private static final double LEVEL_1 = 1.5;
-    private static final double LEVEL_2 = 15.5;
-    private static final double LEVEL_3 = 2.5;
-    private static final double LEVEL_4 = 27.0;
-    public static final double CORAL_STOW = 0.0;
-
-    private static final double NET = 30.0;
-    private static final double ALGAE_HIGH = 4.5;
-    private static final double ALGAE_LOW = 17.5;
-    private static final double ALGAE_FLOOR = 0.0;
-    public static final double ALGAE_STOW = 4.0;
-  }
-
-  public Elevator(Logger logger, CANdleManger candle) {
+  public Elevator(Logger logger, CANdleManger candle, RobotInfo robotInfo) {
     m_logger = logger;
     m_candleManger = candle;
+    m_elevatorInfo = robotInfo.ELEVATOR_INFO;
     m_candleManger.addSignaler(m_elevatorHomedBlinker);
     m_motorRight = new GreyTalonFX(21, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorRight"));
     m_motorLeft =
         new GreyTalonFX(20, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("motorLeft", 0.5));
+    m_hallSensor = new DigitalInput(m_elevatorInfo.HALL_SENSOR_ID);
 
     TalonFXConfiguration leftMotorConfig = defaultElevatorMotorConfig();
     // looking at it from the front left is clockwise and right is counter clockwise
@@ -102,31 +96,28 @@ public class Elevator implements Subsystem {
     m_motorRight.setPosition(0.0);
   }
 
-  private static TalonFXConfiguration defaultElevatorMotorConfig() {
-    TalonFXConfiguration defaultElevatorMotorConfig = new TalonFXConfiguration();
+  private TalonFXConfiguration defaultElevatorMotorConfig() {
+    TalonFXConfiguration defaultElevatorMotorConfig = m_elevatorInfo.MOTOR_CONFIG.getConfig();
     // slot zero is for motion maginc
-    defaultElevatorMotorConfig.Slot0.kS = 0.0;
-    defaultElevatorMotorConfig.Slot0.kV = 0.15;
-    defaultElevatorMotorConfig.Slot0.kA = 0.01;
-    defaultElevatorMotorConfig.Slot0.kP = 4.0;
-    defaultElevatorMotorConfig.Slot0.kI = 0.0;
-    defaultElevatorMotorConfig.Slot0.kD = 0.0;
+    defaultElevatorMotorConfig.Slot0.kS = m_elevatorInfo.ELEVATOR_MM_KS;
+    defaultElevatorMotorConfig.Slot0.kV = m_elevatorInfo.ELEVATOR_MM_KV;
+    defaultElevatorMotorConfig.Slot0.kA = m_elevatorInfo.ELEVATOR_MM_KA;
+    defaultElevatorMotorConfig.Slot0.kP = m_elevatorInfo.ELEVATOR_MM_KP;
+    defaultElevatorMotorConfig.Slot0.kI = m_elevatorInfo.ELEVATOR_MM_KI;
+    defaultElevatorMotorConfig.Slot0.kD = m_elevatorInfo.ELEVATOR_MM_KD;
     // slot one is velocity
-    defaultElevatorMotorConfig.Slot1.kS = 0.0;
-    defaultElevatorMotorConfig.Slot1.kV = 0.0;
-    defaultElevatorMotorConfig.Slot1.kA = 0.0;
-    defaultElevatorMotorConfig.Slot1.kP = 125.0;
-    defaultElevatorMotorConfig.Slot1.kI = 0.0;
-    defaultElevatorMotorConfig.Slot1.kD = 0.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 65.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = 390.0;
-    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk = 2000.0;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
-    defaultElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    defaultElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    defaultElevatorMotorConfig.Voltage.PeakForwardVoltage = 12;
-    defaultElevatorMotorConfig.Voltage.PeakReverseVoltage = -12;
+    defaultElevatorMotorConfig.Slot1.kS = m_elevatorInfo.ELEVATOR_V_KS;
+    defaultElevatorMotorConfig.Slot1.kV = m_elevatorInfo.ELEVATOR_V_KV;
+    defaultElevatorMotorConfig.Slot1.kA = m_elevatorInfo.ELEVATOR_V_KA;
+    defaultElevatorMotorConfig.Slot1.kP = m_elevatorInfo.ELEVATOR_V_KP;
+    defaultElevatorMotorConfig.Slot1.kI = m_elevatorInfo.ELEVATOR_V_KI;
+    defaultElevatorMotorConfig.Slot1.kD = m_elevatorInfo.ELEVATOR_V_KD;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        m_elevatorInfo.ELEVATOR_MOTION_MAGIC_CRUISE_VELOCITY;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
+        m_elevatorInfo.ELEVATOR_MOTION_MAGIC_ACCELERATION;
+    defaultElevatorMotorConfig.MotionMagic.MotionMagicJerk =
+        m_elevatorInfo.ELEVATOR_MOTION_MAGIC_JERK;
     defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.00;
     defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     return defaultElevatorMotorConfig;
@@ -142,7 +133,8 @@ public class Elevator implements Subsystem {
 
   private void maybeHomeElevator() {
     if (!m_lastHallSensorMode && hallsensor()) {
-      m_motorRight.setPosition(heightInchesToMotorRotations(ELEVATOR_HOMING_POSTION_HEIGHT));
+      m_motorRight.setPosition(
+          heightInchesToMotorRotations(m_elevatorInfo.ELEVATOR_HOMING_POSTION_HEIGHT));
       m_elevatorHomedBlinker.enable();
       m_elevatorHomedCount++;
     }
@@ -213,25 +205,25 @@ public class Elevator implements Subsystem {
   public double getTargetPositionFromLevel(ReefLevel level) {
     switch (level) {
       case L_1:
-        return Presets.LEVEL_1 + m_levelOneOffset;
+        return m_elevatorInfo.LEVEL_1 + m_levelOneOffset;
       case L_2:
-        return Presets.LEVEL_2 + m_levelTwoOffset;
+        return m_elevatorInfo.LEVEL_2 + m_levelTwoOffset;
       case L_3:
-        return Presets.LEVEL_3 + m_levelThreeOffset;
+        return m_elevatorInfo.LEVEL_3 + m_levelThreeOffset;
       case L_4:
-        return Presets.LEVEL_4 + m_levelFourOffset;
+        return m_elevatorInfo.LEVEL_4 + m_levelFourOffset;
       case Net:
-        return Presets.NET + m_netOffset;
+        return m_elevatorInfo.NET + m_netOffset;
       case AlgaeHigh:
-        return Presets.ALGAE_HIGH + m_algaeHighOffset;
+        return m_elevatorInfo.ALGAE_HIGH + m_algaeHighOffset;
       case AlgaeLow:
-        return Presets.ALGAE_LOW + m_algaeLowOffset;
+        return m_elevatorInfo.ALGAE_LOW + m_algaeLowOffset;
       case AlgaeFloor:
-        return Presets.ALGAE_FLOOR + m_algaeFloorOffset;
+        return m_elevatorInfo.ALGAE_FLOOR + m_algaeFloorOffset;
       case Processor:
-        return Presets.ALGAE_STOW;
+        return m_elevatorInfo.ALGAE_STOW;
       case Horizontal:
-        return Presets.CORAL_STOW;
+        return m_elevatorInfo.CORAL_STOW;
       default:
         throw new IllegalArgumentException(String.valueOf(level));
     }

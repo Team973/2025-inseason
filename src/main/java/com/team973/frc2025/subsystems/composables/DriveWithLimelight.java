@@ -1,5 +1,6 @@
 package com.team973.frc2025.subsystems.composables;
 
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Drive;
 import com.team973.lib.util.AprilTag;
@@ -49,6 +50,8 @@ public class DriveWithLimelight extends DriveComposable {
 
   private TargetStage m_targetStage = TargetStage.MoveToApproach;
 
+  private final RobotInfo.DriveInfo m_driveInfo;
+
   private final AtomicReference<Pose2d> m_providedPose;
 
   public enum ReefSide {
@@ -79,6 +82,8 @@ public class DriveWithLimelight extends DriveComposable {
     MoveToBackOff,
     BackOff
   }
+
+  public static void getRobotInfo() {}
 
   public static class TargetPositions {
     private static final double REEF_WIDTH_METERS = 0.33;
@@ -279,7 +284,8 @@ public class DriveWithLimelight extends DriveComposable {
 
   public DriveWithLimelight(
       Logger logger, AtomicBoolean readyToScore, AtomicBoolean readyToBackOff) {
-    double controlPeriodSeconds = 1.0 / RobotInfo.DriveInfo.STATUS_SIGNAL_FREQUENCY;
+    m_driveInfo = RobotConfig.get().DRIVE_INFO;
+    double controlPeriodSeconds = 1.0 / m_driveInfo.STATUS_SIGNAL_FREQUENCY;
     m_xController =
         new ProfiledPIDController(
             4.0, 0, 0, new TrapezoidProfile.Constraints(1.6, 0.4), controlPeriodSeconds);

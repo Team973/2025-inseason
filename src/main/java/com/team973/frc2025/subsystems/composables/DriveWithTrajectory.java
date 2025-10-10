@@ -2,7 +2,8 @@ package com.team973.frc2025.subsystems.composables;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
-import com.team973.frc2025.shared.RobotInfo.DriveInfo;
+import com.team973.frc2025.RobotConfig;
+import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Drive;
 import com.team973.lib.util.AllianceCache;
 import com.team973.lib.util.Conversions;
@@ -24,6 +25,8 @@ public class DriveWithTrajectory extends DriveComposable {
   private static final SwerveSample NULL_SAMPLE =
       new SwerveSample(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new double[0], new double[0]);
 
+  private final RobotInfo.DriveInfo m_driveInfo;
+
   private final GreyHolonomicDriveController m_controller;
   private final Logger m_logger;
 
@@ -43,6 +46,7 @@ public class DriveWithTrajectory extends DriveComposable {
   private final PerfLogger m_findChassisSpeedsPerfLogger;
 
   public DriveWithTrajectory(Logger logger, Drive drive) {
+    m_driveInfo = RobotConfig.get().DRIVE_INFO;
     m_controller =
         new GreyHolonomicDriveController(
             new PIDController(5.0, 0.0, 0.0),
@@ -52,7 +56,7 @@ public class DriveWithTrajectory extends DriveComposable {
                 0.0,
                 0.0,
                 new TrapezoidProfile.Constraints(
-                    DriveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 7.0)));
+                    m_driveInfo.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND, 7.0)));
     m_logger = logger;
     m_initPerfLogger = new PerfLogger(logger.subLogger("init"));
     m_getOutputPerfLogger = new PerfLogger(logger.subLogger("getOutput"));

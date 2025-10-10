@@ -3,21 +3,17 @@ package com.team973.frc2025.subsystems;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.frc2025.shared.RobotInfo.ClimbInfo;
+import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 
 public class Climb implements Subsystem {
-  private static final double JOYSTICK_TO_MOTOR_ROTATIONS = 5.0;
-  private static final double MOTION_MAGIC_CRUISE_VELOCITY = JOYSTICK_TO_MOTOR_ROTATIONS * 20.0;
-
-  public static final double HORIZONTAL_POSITION_DEG = 100.0;
-  public static final double CLIMB_POSITION_DEG = 263.0;
-
-  private static final double STOP_POSITION_DEG = 263.0;
+  private final RobotInfo m_robotInfo;
+  private final RobotInfo.ClimbInfo m_climbInfo;
 
   private final Logger m_logger;
 
@@ -28,15 +24,13 @@ public class Climb implements Subsystem {
 
   private final BlinkingSignaler m_climbStopSignaler =
       new BlinkingSignaler(
-          RobotInfo.Colors.GREEN,
-          RobotInfo.Colors.OFF,
-          500.0,
-          100.0,
-          SignalerInfo.CLIMB_STOP_PRIORITY);
+          Colors.GREEN, Colors.OFF, 500.0, 100.0, SignalerInfo.CLIMB_STOP_PRIORITY);
 
   private double m_targetPosition;
 
   public Climb(Logger logger, CANdleManger candle) {
+    m_robotInfo = RobotConfig.get();
+    m_climbInfo = m_robotInfo.CLIMB_INFO;
     m_logger = logger;
     m_climb = new GreyTalonFX(23, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("climb motor"));
     m_climb.setConfig(defaultMotorConfig());
@@ -48,33 +42,30 @@ public class Climb implements Subsystem {
     candle.addSignaler(m_climbStopSignaler);
   }
 
-  private static TalonFXConfiguration defaultMotorConfig() {
+  private TalonFXConfiguration defaultMotorConfig() {
     TalonFXConfiguration defaultMotorConfig = new TalonFXConfiguration();
-    defaultMotorConfig.Slot0.kS = 0.0;
-    defaultMotorConfig.Slot0.kV = 0.15;
-    defaultMotorConfig.Slot0.kA = 0.01;
-    defaultMotorConfig.Slot0.kP = 6.4;
-    defaultMotorConfig.Slot0.kI = 0.0;
-    defaultMotorConfig.Slot0.kD = 0.04;
-    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity = MOTION_MAGIC_CRUISE_VELOCITY * 0.5;
-    defaultMotorConfig.MotionMagic.MotionMagicAcceleration = MOTION_MAGIC_CRUISE_VELOCITY * 10.0;
-    defaultMotorConfig.MotionMagic.MotionMagicJerk = MOTION_MAGIC_CRUISE_VELOCITY * 100.0;
+    defaultMotorConfig.Slot0.kS = m_climbInfo.CLIMB_MM_KS;
+    defaultMotorConfig.Slot0.kV = m_climbInfo.CLIMB_MM_KV;
+    defaultMotorConfig.Slot0.kA = m_climbInfo.CLIMB_MM_KA;
+    defaultMotorConfig.Slot0.kP = m_climbInfo.CLIMB_MM_KP;
+    defaultMotorConfig.Slot0.kI = m_climbInfo.CLIMB_MM_KI;
+    defaultMotorConfig.Slot0.kD = m_climbInfo.CLIMB_MM_KD;
+    defaultMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        m_climbInfo.MOTION_MAGIC_CRUISE_VELOCITY * 0.5;
+    defaultMotorConfig.MotionMagic.MotionMagicAcceleration =
+        m_climbInfo.MOTION_MAGIC_CRUISE_VELOCITY * 10.0;
+    defaultMotorConfig.MotionMagic.MotionMagicJerk =
+        m_climbInfo.MOTION_MAGIC_CRUISE_VELOCITY * 100.0;
     // slot 1 is for velocity
-    defaultMotorConfig.Slot1.kS = 0.0;
-    defaultMotorConfig.Slot1.kV = 0;
-    defaultMotorConfig.Slot1.kA = 0.0;
-    defaultMotorConfig.Slot1.kP = 6.4;
-    defaultMotorConfig.Slot1.kI = 0.0;
-    defaultMotorConfig.Slot1.kD = 0.04;
+    defaultMotorConfig.Slot1.kS = m_climbInfo.CLIMB_V_KS;
+    defaultMotorConfig.Slot1.kV = m_climbInfo.CLIMB_V_KV;
+    defaultMotorConfig.Slot1.kA = m_climbInfo.CLIMB_V_KA;
+    defaultMotorConfig.Slot1.kP = m_climbInfo.CLIMB_V_KP;
+    defaultMotorConfig.Slot1.kI = m_climbInfo.CLIMB_V_KI;
+    defaultMotorConfig.Slot1.kD = m_climbInfo.CLIMB_V_KD;
 
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimit = 60;
-    defaultMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    defaultMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
-
-    defaultMotorConfig.Voltage.PeakForwardVoltage = 12.0;
-    defaultMotorConfig.Voltage.PeakReverseVoltage = 0.0;
+    defaultMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod =
+        m_climbInfo.CLIMB_VOLTAGE_CLOSED_LOOP_RAMP_PERIOD;
 
     defaultMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     defaultMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -83,11 +74,12 @@ public class Climb implements Subsystem {
 
   public void incrementTarget(double increment) {
     m_targetPosition =
-        m_climb.getPosition().getValueAsDouble() + (increment * JOYSTICK_TO_MOTOR_ROTATIONS);
+        m_climb.getPosition().getValueAsDouble()
+            + (increment * m_climbInfo.JOYSTICK_TO_MOTOR_ROTATIONS);
   }
 
   public double getClimbDegFromMotorRot(double rot) {
-    return (rot / ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT) * 360.0;
+    return (rot / m_climbInfo.MOTOR_ROT_PER_CLIMB_ROT) * 360.0;
   }
 
   public double getClimbAngleDegFromMotorRot(double motorRot) {
@@ -95,7 +87,7 @@ public class Climb implements Subsystem {
   }
 
   public void setTargetAngleDeg(double target) {
-    m_targetPosition = (target / 360.0) * ClimbInfo.MOTOR_ROT_PER_CLIMB_ROT;
+    m_targetPosition = (target / 360.0) * m_climbInfo.MOTOR_ROT_PER_CLIMB_ROT;
   }
 
   @Override
@@ -112,9 +104,9 @@ public class Climb implements Subsystem {
   public void syncSensors() {
     double climbPosition = m_climb.getPosition().getValueAsDouble();
 
-    if (getClimbAngleDegFromMotorRot(climbPosition) >= STOP_POSITION_DEG) {
+    if (getClimbAngleDegFromMotorRot(climbPosition) >= m_climbInfo.STOP_POSITION_DEG) {
       m_climbStopSignaler.enable();
-    } else if (getClimbAngleDegFromMotorRot(climbPosition) >= HORIZONTAL_POSITION_DEG) {
+    } else if (getClimbAngleDegFromMotorRot(climbPosition) >= m_climbInfo.HORIZONTAL_POSITION_DEG) {
       m_climbHorizontalSignaler.enable();
     }
   }
