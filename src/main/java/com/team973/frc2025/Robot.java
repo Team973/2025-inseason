@@ -333,8 +333,8 @@ public class Robot extends TimedRobot {
       m_driveController
           .getDriveWithJoysticks()
           .updateInput(
-              -allianceScalar * m_driverStick.getLeftYAxis(),
-              allianceScalar * m_driverStick.getLeftXAxis(),
+              -allianceScalar * m_driverStick.getLeftYAxis() * 0.7,
+              allianceScalar * m_driverStick.getLeftXAxis() * 0.7,
               m_driverStick.getRightXAxis() * 0.8);
 
       if (m_driverStick.getLeftBumperButtonPressed()) {
