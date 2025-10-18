@@ -333,9 +333,9 @@ public class Robot extends TimedRobot {
       m_driveController
           .getDriveWithJoysticks()
           .updateInput(
-              -allianceScalar * m_driverStick.getLeftYAxis(),
-              allianceScalar * m_driverStick.getLeftXAxis(),
-              m_driverStick.getRightXAxis() * 0.8);
+              -allianceScalar * m_driverStick.getLeftYAxis() * 0.3,
+              allianceScalar * m_driverStick.getLeftXAxis() * 0.3,
+              m_driverStick.getRightXAxis() * 0.8 * 0.5);
 
       if (m_driverStick.getLeftBumperButtonPressed()) {
         m_superstructure.setManualArmivator(true);
