@@ -167,7 +167,7 @@ public class RobotInfo {
     public final double WITHOUT_CORAL_STOW_POSITION_DEG = -22.0;
     public final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
 
-    public double NET_POSITION_DEG = -105.0; // -20.0;
+    public double NET_POSITION_DEG = -45.0; // -20.0;
     public double ALGAE_HIGH_POSITION_DEG = -149.0;
     public double ALGAE_LOW_POSITION_DEG = -34.0;
     public double ALGAE_FLOOR_POSITION_DEG = -88.0;
