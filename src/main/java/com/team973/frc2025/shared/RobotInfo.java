@@ -244,22 +244,22 @@ public class RobotInfo {
     public int FRONT_LEFT_MODULE_DRIVE_MOTOR = 2;
     public int FRONT_LEFT_MODULE_STEER_MOTOR = 3;
     public int FRONT_LEFT_MODULE_STEER_ENCODER = 4;
-    public double FRONT_LEFT_MODULE_STEER_OFFSET = -743.027;
+    public double FRONT_LEFT_MODULE_STEER_OFFSET = -95.273;
 
     public int FRONT_RIGHT_MODULE_DRIVE_MOTOR = 8;
     public int FRONT_RIGHT_MODULE_STEER_MOTOR = 9;
     public int FRONT_RIGHT_MODULE_STEER_ENCODER = 10;
-    public double FRONT_RIGHT_MODULE_STEER_OFFSET = -684.931;
+    public double FRONT_RIGHT_MODULE_STEER_OFFSET = 152.929;
 
     public int BACK_LEFT_MODULE_DRIVE_MOTOR = 5;
     public int BACK_LEFT_MODULE_STEER_MOTOR = 6;
     public int BACK_LEFT_MODULE_STEER_ENCODER = 7;
-    public double BACK_LEFT_MODULE_STEER_OFFSET = -1249.628;
+    public double BACK_LEFT_MODULE_STEER_OFFSET = 44.472;
 
     public int BACK_RIGHT_MODULE_DRIVE_MOTOR = 11;
     public int BACK_RIGHT_MODULE_STEER_MOTOR = 12;
     public int BACK_RIGHT_MODULE_STEER_ENCODER = 13;
-    public double BACK_RIGHT_MODULE_STEER_OFFSET = -490.517;
+    public double BACK_RIGHT_MODULE_STEER_OFFSET = 100.458;
 
     public double DRIVE_GEAR_RATIO = (10.0 / 54.0) * (40.0 / 16.0) * (15.0 / 45.0); // x3:10, 6.48:1
 

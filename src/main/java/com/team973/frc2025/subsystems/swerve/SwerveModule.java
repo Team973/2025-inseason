@@ -291,6 +291,8 @@ public class SwerveModule {
 
     SwerveModuleState currentState = getState();
 
+    m_logger.log("encoderDeg", getCanCoderRotation2d().getDegrees());
+
     m_logger.log("drive/targetVelMPS", m_lastState.speedMetersPerSecond);
     m_logger.log("drive/currentVelMPS", currentState.speedMetersPerSecond);
     m_logger.log(
