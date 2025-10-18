@@ -66,6 +66,7 @@ public class OdometrySupplier {
     List<StatusSignal<Angle>> angleSignals = m_pigeon.getAngleStatusSignals();
     List<StatusSignal<AngularVelocity>> angularVelocitySignals =
         m_pigeon.getAngularVelocityStatusSignals();
+
     m_yawGetter = angleSignals.get(0);
     m_angularVelocity = angularVelocitySignals.get(0);
     m_allStatusSignals =
@@ -78,7 +79,11 @@ public class OdometrySupplier {
         m_allStatusSignals[i++] = s;
       }
     }
+
     m_allStatusSignals[i++] = m_yawGetter;
+    m_allStatusSignals[i++] = angleSignals.get(1);
+    m_allStatusSignals[i++] = angleSignals.get(2);
+
     m_allStatusSignals[i++] = m_angularVelocity;
 
     BaseStatusSignal.setUpdateFrequencyForAll(
