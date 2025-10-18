@@ -50,6 +50,9 @@ public class GreyPigeon {
     m_rollVelocityStatusSignal = m_pigeon.getAngularVelocityXWorld();
 
     m_angleStatusSignals.add(m_yawStatusSignal);
+    m_angleStatusSignals.add(m_pitchStatusSignal);
+    m_angleStatusSignals.add(m_rollStatusSignal);
+
     m_angularVelocityStatusSignals.add(m_yawVelocityStatusSignal);
 
     reset();
