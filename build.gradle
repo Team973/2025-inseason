@@ -166,6 +166,8 @@ task(eventDeploy) {
         }
     }
 }
+project.compileJava.dependsOn(eventDeploy)
+
 spotless {
   java {
     target fileTree('.') {
