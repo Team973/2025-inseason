@@ -82,7 +82,7 @@ public class RobotInfo {
 
     public double ARM_PEAK_FORDWARD_VOLTAGE = 12.0;
     public double ARM_PEAK_REVERSE_VOLTAGE = -12.0;
-    public final double ENCODER_OFFSET_ROTATIONS = 0.098;
+    public double ENCODER_OFFSET_ROTATIONS = 0.085;
   }
 
   public static class ElevatorInfo {
