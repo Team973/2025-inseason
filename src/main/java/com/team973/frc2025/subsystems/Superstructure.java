@@ -465,12 +465,10 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case BackOff:
-            if (m_gamePieceMode == GamePiece.Coral || DriverStation.isTeleop()) {
               armStow();
               elevatorStow();
               wristStow();
               m_manualArmivator = false;
-            }
 
             break;
         }

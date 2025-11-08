@@ -25,23 +25,35 @@ public class DriveWithLimelight extends DriveComposable {
 
   private static final double TARGET_ANGLE_TOLERANCE_DEG = 6.0;
 
-  public static final double CORAL_X_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double CORAL_X_MAX_ACCELERATION_CONSTRAINTS = 0.4;
+  public static final double CORAL_MAX_VELOCITY_CONSTRAINTS = 1.6;
+  public static final double CORAL_MAX_ACCELERATION_CONSTRAINTS = 0.4;
 
-  public static final double CORAL_Y_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double CORAL_Y_MAX_ACCELERATION_CONSTRAINTS = 0.4;
+  public static final double ALGAE_MAX_VELOCITY_CONSTRAINTS = 1.6;
+  public static final double ALGAE_MAX_ACCELERATION_CONSTRAINTS = 0.1;
 
-  public static final double CORAL_THETA_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double CORAL_THETA_MAX_ACCELERATION_CONSTRAINTS = 0.4;
+  public static TrapezoidProfile.Constraints m_coralXConstraint =
+      new TrapezoidProfile.Constraints(
+          CORAL_MAX_VELOCITY_CONSTRAINTS, CORAL_MAX_ACCELERATION_CONSTRAINTS);
 
-  public static final double ALGAE_X_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double ALGAE_X_MAX_ACCELERATION_CONSTRAINTS = 0.1;
+  public static TrapezoidProfile.Constraints m_coralYConstraint =
+      new TrapezoidProfile.Constraints(
+          CORAL_MAX_VELOCITY_CONSTRAINTS, CORAL_MAX_ACCELERATION_CONSTRAINTS);
 
-  public static final double ALGAE_Y_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double ALGAE_Y_MAX_ACCELERATION_CONSTRAINTS = 0.1;
+  public static TrapezoidProfile.Constraints m_coralThetaConstraint =
+      new TrapezoidProfile.Constraints(
+          CORAL_MAX_VELOCITY_CONSTRAINTS, CORAL_MAX_ACCELERATION_CONSTRAINTS);
 
-  public static final double ALGAE_THETA_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double ALGAE_THETA_MAX_ACCELERATION_CONSTRAINTS = 0.1;
+  public static TrapezoidProfile.Constraints m_algaeXConstraint =
+      new TrapezoidProfile.Constraints(
+          ALGAE_MAX_VELOCITY_CONSTRAINTS, ALGAE_MAX_ACCELERATION_CONSTRAINTS);
+
+  public static TrapezoidProfile.Constraints m_algaeYConstraint =
+      new TrapezoidProfile.Constraints(
+          ALGAE_MAX_VELOCITY_CONSTRAINTS, ALGAE_MAX_ACCELERATION_CONSTRAINTS);
+
+  public static TrapezoidProfile.Constraints m_algaeThetaConstraint =
+      new TrapezoidProfile.Constraints(
+          ALGAE_MAX_VELOCITY_CONSTRAINTS, ALGAE_MAX_ACCELERATION_CONSTRAINTS);
 
   private final ProfiledPIDController m_xController;
   private final ProfiledPIDController m_yController;
@@ -304,30 +316,10 @@ public class DriveWithLimelight extends DriveComposable {
       Logger logger, AtomicBoolean readyToScore, AtomicBoolean readyToBackOff) {
     m_driveInfo = RobotConfig.get().DRIVE_INFO;
     double controlPeriodSeconds = 1.0 / m_driveInfo.STATUS_SIGNAL_FREQUENCY;
-    m_xController =
-        new ProfiledPIDController(
-            4.0,
-            0,
-            0,
-            new TrapezoidProfile.Constraints(
-                CORAL_X_MAX_VELOCITY_CONSTRAINTS, CORAL_X_MAX_ACCELERATION_CONSTRAINTS),
-            controlPeriodSeconds);
-    m_yController =
-        new ProfiledPIDController(
-            4.0,
-            0,
-            0,
-            new TrapezoidProfile.Constraints(
-                CORAL_Y_MAX_VELOCITY_CONSTRAINTS, CORAL_Y_MAX_ACCELERATION_CONSTRAINTS),
-            controlPeriodSeconds);
+    m_xController = new ProfiledPIDController(4.0, 0, 0, m_coralXConstraint, controlPeriodSeconds);
+    m_yController = new ProfiledPIDController(4.0, 0, 0, m_coralYConstraint, controlPeriodSeconds);
     m_thetaController =
-        new ProfiledPIDController(
-            8.0,
-            0,
-            0,
-            new TrapezoidProfile.Constraints(
-                CORAL_THETA_MAX_VELOCITY_CONSTRAINTS, CORAL_THETA_MAX_ACCELERATION_CONSTRAINTS),
-            controlPeriodSeconds);
+        new ProfiledPIDController(8.0, 0, 0, m_coralThetaConstraint, controlPeriodSeconds);
 
     m_thetaController.enableContinuousInput(
         Units.degreesToRadians(0.0), Units.degreesToRadians(360.0));
@@ -355,30 +347,18 @@ public class DriveWithLimelight extends DriveComposable {
     m_targetReefFace = face;
 
     if (m_targetReefFace == ReefFace.Net) {
-      m_xController.setConstraints(
-          new TrapezoidProfile.Constraints(
-              ALGAE_X_MAX_VELOCITY_CONSTRAINTS, ALGAE_X_MAX_ACCELERATION_CONSTRAINTS));
+      m_xController.setConstraints(m_algaeXConstraint);
 
-      m_yController.setConstraints(
-          new TrapezoidProfile.Constraints(
-              ALGAE_Y_MAX_VELOCITY_CONSTRAINTS, ALGAE_Y_MAX_ACCELERATION_CONSTRAINTS));
+      m_yController.setConstraints(m_algaeYConstraint);
 
-      m_thetaController.setConstraints(
-          new TrapezoidProfile.Constraints(
-              ALGAE_THETA_MAX_VELOCITY_CONSTRAINTS, ALGAE_THETA_MAX_ACCELERATION_CONSTRAINTS));
+      m_thetaController.setConstraints(m_algaeThetaConstraint);
     } else {
 
-      m_xController.setConstraints(
-          new TrapezoidProfile.Constraints(
-              CORAL_X_MAX_VELOCITY_CONSTRAINTS, CORAL_X_MAX_ACCELERATION_CONSTRAINTS));
+      m_xController.setConstraints(m_coralXConstraint);
 
-      m_yController.setConstraints(
-          new TrapezoidProfile.Constraints(
-              CORAL_Y_MAX_VELOCITY_CONSTRAINTS, CORAL_Y_MAX_ACCELERATION_CONSTRAINTS));
+      m_yController.setConstraints(m_coralYConstraint);
 
-      m_thetaController.setConstraints(
-          new TrapezoidProfile.Constraints(
-              CORAL_THETA_MAX_VELOCITY_CONSTRAINTS, CORAL_THETA_MAX_ACCELERATION_CONSTRAINTS));
+      m_thetaController.setConstraints(m_coralThetaConstraint);
     }
 
     m_approachPoseLog = getTargetReefPosition().getApproachPose();
