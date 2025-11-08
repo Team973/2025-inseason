@@ -82,7 +82,7 @@ public class RobotInfo {
 
     public double ARM_PEAK_FORDWARD_VOLTAGE = 12.0;
     public double ARM_PEAK_REVERSE_VOLTAGE = -12.0;
-    public final double ENCODER_OFFSET_ROTATIONS = 0.0036;
+    public double ENCODER_OFFSET_ROTATIONS = 0.0036;
   }
 
   public static class ElevatorInfo {
@@ -164,8 +164,8 @@ public class RobotInfo {
     public double LEVEL_ONE_POSITION_DEG = 4.0;
     public double CORAL_STOW_POSITION_DEG = -17.0;
 
-    public final double WITHOUT_CORAL_STOW_POSITION_DEG = -22.0;
-    public final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
+    public double WITHOUT_CORAL_STOW_POSITION_DEG = -22.0;
+    public double WITH_CORAL_STOW_POSTION_DEG = 0.0;
 
     public double NET_POSITION_DEG = -45.0; // -20.0;
     public double ALGAE_HIGH_POSITION_DEG = -149.0;
