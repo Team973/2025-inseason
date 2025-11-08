@@ -354,7 +354,7 @@ public class DriveWithLimelight extends DriveComposable {
   public void setTargetReefFace(ReefFace face) {
     m_targetReefFace = face;
 
-    if (m_targetReefFace == ReefFace.C) {
+    if (m_targetReefFace == ReefFace.Net) {
       m_xController.setConstraints(
           new TrapezoidProfile.Constraints(
               ALGAE_X_MAX_VELOCITY_CONSTRAINTS, ALGAE_X_MAX_ACCELERATION_CONSTRAINTS));
