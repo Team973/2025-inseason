@@ -35,13 +35,13 @@ public class DriveWithLimelight extends DriveComposable {
   public static final double CORAL_THETA_MAX_ACCELERATION_CONSTRAINTS = 0.4;
 
   public static final double ALGAE_X_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double ALGAE_X_MAX_ACCELERATION_CONSTRAINTS = 0.2;
+  public static final double ALGAE_X_MAX_ACCELERATION_CONSTRAINTS = 0.1;
 
   public static final double ALGAE_Y_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double ALGAE_Y_MAX_ACCELERATION_CONSTRAINTS = 0.2;
+  public static final double ALGAE_Y_MAX_ACCELERATION_CONSTRAINTS = 0.1;
 
   public static final double ALGAE_THETA_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double ALGAE_THETA_MAX_ACCELERATION_CONSTRAINTS = 0.2;
+  public static final double ALGAE_THETA_MAX_ACCELERATION_CONSTRAINTS = 0.1;
 
   private final ProfiledPIDController m_xController;
   private final ProfiledPIDController m_yController;
