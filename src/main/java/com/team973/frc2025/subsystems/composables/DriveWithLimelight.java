@@ -35,8 +35,8 @@ public class DriveWithLimelight extends DriveComposable {
   public static final double ELV_HIGH_MAX_VELOCITY_CONSTRAINTS = 1.6;
   public static final double ELV_HIGH_MAX_ACCELERATION_CONSTRAINTS = 0.4;
   // elevator low consits of L1-3 and algae
-  public static final double ELV_LOW_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double ELV_LOW_MAX_ACCELERATION_CONSTRAINTS = 0.6;
+  public static final double ELV_LOW_MAX_VELOCITY_CONSTRAINTS = 2.0;
+  public static final double ELV_LOW_MAX_ACCELERATION_CONSTRAINTS = 1.0;
 
   public static TrapezoidProfile.Constraints m_coralXConstraint =
       new TrapezoidProfile.Constraints(
