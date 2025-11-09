@@ -3,7 +3,6 @@ package com.team973.frc2025.subsystems.composables;
 import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Drive;
-import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.util.AprilTag;
 import com.team973.lib.util.DriveComposable;
@@ -37,7 +36,7 @@ public class DriveWithLimelight extends DriveComposable {
   public static final double ELV_HIGH_MAX_ACCELERATION_CONSTRAINTS = 0.4;
   // elevator low consits of L1-3 and algae
   public static final double ELV_LOW_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double ELV_LOW_MAX_ACCELERATION_CONSTRAINTS = 0.45;
+  public static final double ELV_LOW_MAX_ACCELERATION_CONSTRAINTS = 0.6;
 
   public static TrapezoidProfile.Constraints m_coralXConstraint =
       new TrapezoidProfile.Constraints(
@@ -382,6 +381,7 @@ public class DriveWithLimelight extends DriveComposable {
   public ReefFace getTargetReefFace() {
     return m_targetReefFace;
   }
+
   public void setConstraints(ReefLevel level) {
     if (level == ReefLevel.Net) {
       m_xController.setConstraints(m_netXConstraint);
