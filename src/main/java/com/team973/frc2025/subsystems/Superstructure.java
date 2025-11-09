@@ -503,6 +503,7 @@ public class Superstructure implements Subsystem {
     }
 
     m_lastState = m_state;
+    m_driveController.getDriveWithLimelight().setConstraints(m_targetReefLevelSupplier.get());
 
     m_claw.update();
     m_climb.update();

@@ -3,6 +3,8 @@ package com.team973.frc2025.subsystems.composables;
 import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Drive;
+import com.team973.frc2025.subsystems.Superstructure;
+import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.util.AprilTag;
 import com.team973.lib.util.DriveComposable;
 import com.team973.lib.util.Logger;
@@ -28,8 +30,14 @@ public class DriveWithLimelight extends DriveComposable {
   public static final double CORAL_MAX_VELOCITY_CONSTRAINTS = 1.6;
   public static final double CORAL_MAX_ACCELERATION_CONSTRAINTS = 0.4;
 
-  public static final double ALGAE_MAX_VELOCITY_CONSTRAINTS = 1.6;
-  public static final double ALGAE_MAX_ACCELERATION_CONSTRAINTS = 0.1;
+  public static final double NET_MAX_VELOCITY_CONSTRAINTS = 1.6;
+  public static final double NET_MAX_ACCELERATION_CONSTRAINTS = 0.1;
+  // elevator high consits of L4 and algae high
+  public static final double ELV_HIGH_MAX_VELOCITY_CONSTRAINTS = 1.6;
+  public static final double ELV_HIGH_MAX_ACCELERATION_CONSTRAINTS = 0.4;
+  // elevator low consits of L1-3 and algae
+  public static final double ELV_LOW_MAX_VELOCITY_CONSTRAINTS = 1.6;
+  public static final double ELV_LOW_MAX_ACCELERATION_CONSTRAINTS = 0.45;
 
   public static TrapezoidProfile.Constraints m_coralXConstraint =
       new TrapezoidProfile.Constraints(
@@ -42,18 +50,40 @@ public class DriveWithLimelight extends DriveComposable {
   public static TrapezoidProfile.Constraints m_coralThetaConstraint =
       new TrapezoidProfile.Constraints(
           CORAL_MAX_VELOCITY_CONSTRAINTS, CORAL_MAX_ACCELERATION_CONSTRAINTS);
-
-  public static TrapezoidProfile.Constraints m_algaeXConstraint =
+  // net is the real net notnet something
+  public static TrapezoidProfile.Constraints m_netXConstraint =
       new TrapezoidProfile.Constraints(
-          ALGAE_MAX_VELOCITY_CONSTRAINTS, ALGAE_MAX_ACCELERATION_CONSTRAINTS);
+          NET_MAX_VELOCITY_CONSTRAINTS, NET_MAX_ACCELERATION_CONSTRAINTS);
 
-  public static TrapezoidProfile.Constraints m_algaeYConstraint =
+  public static TrapezoidProfile.Constraints m_netYConstraint =
       new TrapezoidProfile.Constraints(
-          ALGAE_MAX_VELOCITY_CONSTRAINTS, ALGAE_MAX_ACCELERATION_CONSTRAINTS);
+          NET_MAX_VELOCITY_CONSTRAINTS, NET_MAX_ACCELERATION_CONSTRAINTS);
 
-  public static TrapezoidProfile.Constraints m_algaeThetaConstraint =
+  public static TrapezoidProfile.Constraints m_netThetaConstraint =
       new TrapezoidProfile.Constraints(
-          ALGAE_MAX_VELOCITY_CONSTRAINTS, ALGAE_MAX_ACCELERATION_CONSTRAINTS);
+          NET_MAX_VELOCITY_CONSTRAINTS, NET_MAX_ACCELERATION_CONSTRAINTS);
+  public static TrapezoidProfile.Constraints m_elvHighXConstraint =
+      new TrapezoidProfile.Constraints(
+          ELV_HIGH_MAX_VELOCITY_CONSTRAINTS, ELV_HIGH_MAX_ACCELERATION_CONSTRAINTS);
+
+  public static TrapezoidProfile.Constraints m_elvHighYConstraint =
+      new TrapezoidProfile.Constraints(
+          ELV_HIGH_MAX_VELOCITY_CONSTRAINTS, ELV_HIGH_MAX_ACCELERATION_CONSTRAINTS);
+
+  public static TrapezoidProfile.Constraints m_elvHighThetaConstraint =
+      new TrapezoidProfile.Constraints(
+          ELV_HIGH_MAX_VELOCITY_CONSTRAINTS, ELV_HIGH_MAX_ACCELERATION_CONSTRAINTS);
+  public static TrapezoidProfile.Constraints m_elvLowXConstraint =
+      new TrapezoidProfile.Constraints(
+          ELV_LOW_MAX_VELOCITY_CONSTRAINTS, ELV_LOW_MAX_ACCELERATION_CONSTRAINTS);
+
+  public static TrapezoidProfile.Constraints m_elvLowYConstraint =
+      new TrapezoidProfile.Constraints(
+          ELV_LOW_MAX_VELOCITY_CONSTRAINTS, ELV_LOW_MAX_ACCELERATION_CONSTRAINTS);
+
+  public static TrapezoidProfile.Constraints m_elvLowThetaConstraint =
+      new TrapezoidProfile.Constraints(
+          ELV_LOW_MAX_VELOCITY_CONSTRAINTS, ELV_LOW_MAX_ACCELERATION_CONSTRAINTS);
 
   private final ProfiledPIDController m_xController;
   private final ProfiledPIDController m_yController;
@@ -345,28 +375,27 @@ public class DriveWithLimelight extends DriveComposable {
 
   public void setTargetReefFace(ReefFace face) {
     m_targetReefFace = face;
-
-    if (m_targetReefFace == ReefFace.Net) {
-      m_xController.setConstraints(m_algaeXConstraint);
-
-      m_yController.setConstraints(m_algaeYConstraint);
-
-      m_thetaController.setConstraints(m_algaeThetaConstraint);
-    } else {
-
-      m_xController.setConstraints(m_coralXConstraint);
-
-      m_yController.setConstraints(m_coralYConstraint);
-
-      m_thetaController.setConstraints(m_coralThetaConstraint);
-    }
-
     m_approachPoseLog = getTargetReefPosition().getApproachPose();
     m_scoringPoseLog = getTargetReefPosition().getScoringPose();
   }
 
   public ReefFace getTargetReefFace() {
     return m_targetReefFace;
+  }
+  public void setConstraints(ReefLevel level) {
+    if (level == ReefLevel.Net) {
+      m_xController.setConstraints(m_netXConstraint);
+      m_yController.setConstraints(m_netYConstraint);
+      m_thetaController.setConstraints(m_netThetaConstraint);
+    } else if (level == ReefLevel.L_4 || level == ReefLevel.AlgaeHigh) {
+      m_xController.setConstraints(m_elvHighXConstraint);
+      m_yController.setConstraints(m_elvHighYConstraint);
+      m_thetaController.setConstraints(m_netThetaConstraint);
+    } else {
+      m_xController.setConstraints(m_elvLowXConstraint);
+      m_yController.setConstraints(m_elvLowYConstraint);
+      m_thetaController.setConstraints(m_elvLowThetaConstraint);
+    }
   }
 
   private TargetPositionRelativeToAprilTag getPositionFromReefSide(
