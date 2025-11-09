@@ -382,7 +382,7 @@ public class DriveWithLimelight extends DriveComposable {
     return m_targetReefFace;
   }
 
-  public void setConstraints(ReefLevel level) {
+  public synchronized void setConstraints(ReefLevel level) {
     if (level == ReefLevel.Net) {
       m_xController.setConstraints(m_netXConstraint);
       m_yController.setConstraints(m_netYConstraint);
@@ -396,6 +396,8 @@ public class DriveWithLimelight extends DriveComposable {
       m_yController.setConstraints(m_elvLowYConstraint);
       m_thetaController.setConstraints(m_elvLowThetaConstraint);
     }
+    m_logger.log("XcontrolerConstraints", m_xController.getConstraints().maxAcceleration);
+    m_logger.log("XcontrolerConstraints", m_xController.getConstraints().maxVelocity);
   }
 
   private TargetPositionRelativeToAprilTag getPositionFromReefSide(
