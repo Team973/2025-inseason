@@ -27,7 +27,7 @@ public class AutoManager {
   private int m_selectedMode = 0;
 
   private PerfLogger m_runPerfLogger;
-  
+
   private final AutoMode m_noAuto;
   private final AutoMode m_taxiAuto;
   private final AutoMode m_testAuto;

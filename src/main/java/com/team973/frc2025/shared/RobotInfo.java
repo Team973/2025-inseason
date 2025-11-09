@@ -53,7 +53,7 @@ public class RobotInfo {
     public double LEVEL_THREE_POSITION_DEG = 59.0;
     public double LEVEL_TWO_POSITION_DEG = -61.0;
     public double LEVEL_ONE_POSITION_DEG = -64.0;
-    public double CORAL_STOW_POSITION_DEG = -88.0;
+    public double CORAL_STOW_POSITION_DEG = -87.0;
 
     public double NET_POSITION_DEG = 74.0;
     public double ALGAE_HIGH_POSITION_DEG = 57.5;
