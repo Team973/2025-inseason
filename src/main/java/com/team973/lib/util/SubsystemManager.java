@@ -33,5 +33,5 @@ public abstract class SubsystemManager {
   public abstract DriveController initDriveController(
       Logger logger, AtomicBoolean readyToScore, AtomicBoolean readyToBackOff);
 
-  public abstract void runSim();
+  public abstract void simulationUpdate();
 }

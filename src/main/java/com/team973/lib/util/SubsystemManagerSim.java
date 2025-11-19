@@ -56,7 +56,7 @@ public class SubsystemManagerSim extends SubsystemManager {
         m_pigeon);
   }
 
-  public void runSim() {
+  public void simulationUpdate() {
     m_pigeon.simulationUpdate();
 
     getLogger().log("robotTruthPose", m_swerveDriveSimulation.getSimulatedDriveTrainPose());

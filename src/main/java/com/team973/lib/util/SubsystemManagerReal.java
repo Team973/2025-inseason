@@ -32,5 +32,5 @@ public class SubsystemManagerReal extends SubsystemManager {
         m_pigeon);
   }
 
-  public void runSim() {}
+  public void simulationUpdate() {}
 }
