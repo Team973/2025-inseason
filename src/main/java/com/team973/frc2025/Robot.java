@@ -28,6 +28,7 @@ import com.team973.lib.util.Joystick;
 import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.PerfLogger;
+import com.team973.lib.util.SubsystemManager;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -48,12 +49,12 @@ public class Robot extends TimedRobot {
   private final AtomicBoolean m_readyToBackOff = new AtomicBoolean(false);
 
   private final Logger m_logger = new Logger("robot");
+
+  private final SubsystemManager m_subsystemManager = SubsystemManager.init(m_robotInfo);
+
   private final DriveController m_driveController =
-      new DriveController(m_logger.subLogger("drive", 0.05), m_readyToScore, m_readyToBackOff);
-  private final Joystick m_driverStick =
-      new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
-  private final Joystick m_coDriverStick =
-      new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
+      m_subsystemManager.initDriveController(
+          m_logger.subLogger("drive", 0.05), m_readyToScore, m_readyToBackOff);
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger", 0.2));
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager", 0.2), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
@@ -61,6 +62,12 @@ public class Robot extends TimedRobot {
       new Elevator(m_logger.subLogger("elevator", 0.2), m_candleManger, m_robotInfo);
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2), m_candleManger);
   private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2), m_robotInfo);
+
+  private final Joystick m_driverStick =
+      new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
+  private final Joystick m_coDriverStick =
+      new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
+
   private final SolidSignaler m_lowBatterySignaler =
       new SolidSignaler(
           RobotInfo.Colors.ORANGE, 3000, RobotInfo.SignalerInfo.LOW_BATTER_SIGNALER_PRIORTY);

@@ -6,11 +6,10 @@ import com.team973.frc2025.shared.RobotInfo.DriveInfo;
 import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.frc2025.subsystems.swerve.MegaTagSupplier;
 import com.team973.frc2025.subsystems.swerve.OdometrySupplier;
-import com.team973.frc2025.subsystems.swerve.SwerveModule;
+import com.team973.frc2025.subsystems.swerve.SwerveModuleIO;
 import com.team973.lib.devices.GreyPigeon;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
-import com.team973.lib.util.SwerveModuleConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,7 +34,7 @@ public class Drive implements Subsystem {
 
   private final Logger m_logger;
 
-  private final SwerveModule[] m_swerveModules;
+  private final SwerveModuleIO[] m_swerveModules;
   private ChassisSpeeds m_currentChassisSpeeds;
 
   private AtomicReference<Pose2d> m_estimatedPose = new AtomicReference<>(new Pose2d());
@@ -57,48 +56,22 @@ public class Drive implements Subsystem {
   private final MegaTagSupplier m_rightLLSupplier;
   private final MegaTagSupplier m_backLLSupplier;
 
-  public Drive(GreyPigeon pigeon, DriveController driveController, Logger logger) {
+  public Drive(
+      GreyPigeon pigeon,
+      DriveController driveController,
+      SwerveModuleIO frontLeft,
+      SwerveModuleIO frontRight,
+      SwerveModuleIO backLeft,
+      SwerveModuleIO backRight,
+      Logger logger) {
     m_pigeon = pigeon;
     m_driveController = driveController;
     m_logger = logger;
     m_driveInfo = RobotConfig.get().DRIVE_INFO;
 
     System.out.println("Front_left_constants" + m_driveInfo.FRONT_LEFT_CONSTANTS);
-    m_swerveModules =
-        new SwerveModule[] {
-          new SwerveModule(
-              0,
-              new SwerveModuleConfig(
-                  m_driveInfo.FRONT_LEFT_MODULE_DRIVE_MOTOR,
-                  m_driveInfo.FRONT_LEFT_MODULE_STEER_MOTOR,
-                  m_driveInfo.FRONT_LEFT_MODULE_STEER_ENCODER,
-                  m_driveInfo.FRONT_LEFT_MODULE_STEER_OFFSET),
-              logger.subLogger("swerve/mod0")),
-          new SwerveModule(
-              1,
-              new SwerveModuleConfig(
-                  m_driveInfo.FRONT_RIGHT_MODULE_DRIVE_MOTOR,
-                  m_driveInfo.FRONT_RIGHT_MODULE_STEER_MOTOR,
-                  m_driveInfo.FRONT_RIGHT_MODULE_STEER_ENCODER,
-                  m_driveInfo.FRONT_RIGHT_MODULE_STEER_OFFSET),
-              logger.subLogger("swerve/mod1")),
-          new SwerveModule(
-              2,
-              new SwerveModuleConfig(
-                  m_driveInfo.BACK_LEFT_MODULE_DRIVE_MOTOR,
-                  m_driveInfo.BACK_LEFT_MODULE_STEER_MOTOR,
-                  m_driveInfo.BACK_LEFT_MODULE_STEER_ENCODER,
-                  m_driveInfo.BACK_LEFT_MODULE_STEER_OFFSET),
-              logger.subLogger("swerve/mod2")),
-          new SwerveModule(
-              3,
-              new SwerveModuleConfig(
-                  m_driveInfo.BACK_RIGHT_MODULE_DRIVE_MOTOR,
-                  m_driveInfo.BACK_RIGHT_MODULE_STEER_MOTOR,
-                  m_driveInfo.BACK_RIGHT_MODULE_STEER_ENCODER,
-                  m_driveInfo.BACK_RIGHT_MODULE_STEER_OFFSET),
-              logger.subLogger("swerve/mod3"))
-        };
+    m_swerveModules = new SwerveModuleIO[] {frontLeft, frontRight, backLeft, backRight};
+
     m_odometrySupplier =
         new OdometrySupplier(m_pigeon, m_swerveModules, logger.subLogger("providers/odometry"));
 
@@ -187,7 +160,7 @@ public class Drive implements Subsystem {
     // Side effect: any drive input that goes above the anti-jitter threshold
     // overrides this
     int index = 0;
-    for (SwerveModule mod : m_swerveModules) {
+    for (SwerveModuleIO mod : m_swerveModules) {
       double angleToCenter =
           Math.atan2(MODULE_LOCATIONS[index].getY(), MODULE_LOCATIONS[index].getX());
       index++;
@@ -203,10 +176,10 @@ public class Drive implements Subsystem {
 
     double states[] = new double[8];
     int index = 0;
-    for (SwerveModule mod : m_swerveModules) {
-      mod.setDesiredState(desiredStates[mod.moduleNumber]);
-      states[index] = desiredStates[mod.moduleNumber].angle.getDegrees();
-      states[index + 1] = desiredStates[mod.moduleNumber].speedMetersPerSecond;
+    for (SwerveModuleIO mod : m_swerveModules) {
+      mod.setDesiredState(desiredStates[mod.getModuleNumber()]);
+      states[index] = desiredStates[mod.getModuleNumber()].angle.getDegrees();
+      states[index + 1] = desiredStates[mod.getModuleNumber()].speedMetersPerSecond;
       index += 2;
     }
 
@@ -238,7 +211,7 @@ public class Drive implements Subsystem {
   }
 
   public void resetModules() {
-    for (SwerveModule mod : m_swerveModules) {
+    for (SwerveModuleIO mod : m_swerveModules) {
       mod.resetToAbsolute();
     }
   }
@@ -262,7 +235,7 @@ public class Drive implements Subsystem {
     double states[] = new double[8];
     int index = 0;
 
-    for (SwerveModule mod : m_swerveModules) {
+    for (SwerveModuleIO mod : m_swerveModules) {
       mod.log();
       states[index] = mod.getState().angle.getDegrees();
       states[index + 1] = mod.getState().speedMetersPerSecond;

@@ -1,10 +1,17 @@
 package com.team973.frc2025.shared;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import com.team973.lib.devices.GreyTalonFX.GreyTalonFXConfig;
 import com.team973.lib.util.SwerveModuleConfig;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Color;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 /** Robot info, specs, dimensions. */
 public class RobotInfo {
@@ -327,6 +334,18 @@ public class RobotInfo {
             FRONT_RIGHT_MODULE_STEER_MOTOR,
             FRONT_RIGHT_MODULE_STEER_ENCODER,
             FRONT_RIGHT_MODULE_STEER_OFFSET);
+    public SwerveModuleConfig BACK_LEFT_CONSTANTS =
+        new SwerveModuleConfig(
+            BACK_LEFT_MODULE_DRIVE_MOTOR,
+            BACK_LEFT_MODULE_STEER_MOTOR,
+            BACK_LEFT_MODULE_STEER_ENCODER,
+            BACK_LEFT_MODULE_STEER_OFFSET);
+    public SwerveModuleConfig BACK_RIGHT_CONSTANTS =
+        new SwerveModuleConfig(
+            BACK_RIGHT_MODULE_DRIVE_MOTOR,
+            BACK_RIGHT_MODULE_STEER_MOTOR,
+            BACK_RIGHT_MODULE_STEER_ENCODER,
+            BACK_RIGHT_MODULE_STEER_OFFSET);
 
     private SwerveDriveKinematics SWERVE_KINEMATICS;
 
@@ -341,6 +360,27 @@ public class RobotInfo {
                 new Translation2d(-TRACKWIDTH_METERS / 2.0, -WHEELBASE_METERS / 2.0));
       }
       return SWERVE_KINEMATICS;
+    }
+
+    public DriveTrainSimulationConfig getDriveTrainSimulationConfig() {
+      return DriveTrainSimulationConfig.Default()
+          // Specify gyro type (for realistic gyro drifting and error simulation)
+          .withGyro(COTS.ofPigeon2())
+          // Specify swerve module (for realistic swerve dynamics)
+          .withSwerveModule(
+              COTS.ofMark4(
+                  DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
+                  DCMotor.getKrakenX60(1), // Steer motor is a Kraken
+                  COTS.WHEELS.COLSONS.cof, // Use the COF for Colson Wheels
+                  3)) // L3 Gear ratio
+          // Configures the track length and track width (spacing between swerve modules)
+          .withTrackLengthTrackWidth(Inches.of(26), Inches.of(26))
+          // Configures the bumper size (dimensions of the robot bumper)
+          .withBumperSize(Inches.of(34), Inches.of(34));
+    }
+
+    public Pose2d getSimStartingPose() {
+      return new Pose2d(7.18, 5.7, Rotation2d.fromDegrees(180));
     }
   }
 

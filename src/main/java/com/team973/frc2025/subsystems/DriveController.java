@@ -3,6 +3,7 @@ package com.team973.frc2025.subsystems;
 import com.team973.frc2025.subsystems.composables.DriveWithJoysticks;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithTrajectory;
+import com.team973.frc2025.subsystems.swerve.SwerveModuleIO;
 import com.team973.lib.devices.GreyPigeon;
 import com.team973.lib.util.DriveComposable;
 import com.team973.lib.util.Logger;
@@ -50,9 +51,16 @@ public class DriveController implements Subsystem {
     m_drive.startOdometrey();
   }
 
-  public DriveController(Logger logger, AtomicBoolean readyToScore, AtomicBoolean readyToBackOff) {
+  public DriveController(
+      Logger logger,
+      AtomicBoolean readyToScore,
+      AtomicBoolean readyToBackOff,
+      SwerveModuleIO frontLeft,
+      SwerveModuleIO frontRight,
+      SwerveModuleIO backLeft,
+      SwerveModuleIO backRight) {
     m_pigeon = new GreyPigeon(logger.subLogger("pigeon"));
-    m_drive = new Drive(m_pigeon, this, logger);
+    m_drive = new Drive(m_pigeon, this, frontLeft, frontRight, backLeft, backRight, logger);
 
     m_logger = logger.subLogger("controller");
 
