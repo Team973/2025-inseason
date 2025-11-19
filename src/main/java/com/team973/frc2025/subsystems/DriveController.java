@@ -15,7 +15,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DriveController implements Subsystem {
-  private final GreyPigeon m_pigeon;
   private final Drive m_drive;
 
   private final Logger m_logger;
@@ -58,9 +57,9 @@ public class DriveController implements Subsystem {
       SwerveModuleIO frontLeft,
       SwerveModuleIO frontRight,
       SwerveModuleIO backLeft,
-      SwerveModuleIO backRight) {
-    m_pigeon = new GreyPigeon(logger.subLogger("pigeon"));
-    m_drive = new Drive(m_pigeon, this, frontLeft, frontRight, backLeft, backRight, logger);
+      SwerveModuleIO backRight,
+      GreyPigeon pigeon) {
+    m_drive = new Drive(pigeon, this, frontLeft, frontRight, backLeft, backRight, logger);
 
     m_logger = logger.subLogger("controller");
 

@@ -58,6 +58,8 @@ public class GreyPigeon {
     reset();
   }
 
+  public void simulationUpdate() {}
+
   public StandardizedRotation3d getOffset() {
     return m_offset;
   }

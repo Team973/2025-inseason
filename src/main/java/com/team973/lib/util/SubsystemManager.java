@@ -7,23 +7,31 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class SubsystemManager {
   private final RobotInfo m_robotInfo;
+  private final Logger m_logger;
 
-  protected SubsystemManager(RobotInfo robotInfo) {
+  protected SubsystemManager(RobotInfo robotInfo, Logger logger) {
     m_robotInfo = robotInfo;
+    m_logger = logger;
   }
 
   protected RobotInfo getRobotInfo() {
     return m_robotInfo;
   }
 
-  public static SubsystemManager init(RobotInfo robotInfo) {
+  protected Logger getLogger() {
+    return m_logger;
+  }
+
+  public static SubsystemManager init(RobotInfo robotInfo, Logger logger) {
     if (Robot.isReal()) {
-      return new SubsystemManagerReal(robotInfo);
+      return new SubsystemManagerReal(robotInfo, logger);
     }
 
-    return new SubsystemManagerSim(robotInfo);
+    return new SubsystemManagerSim(robotInfo, logger);
   }
 
   public abstract DriveController initDriveController(
       Logger logger, AtomicBoolean readyToScore, AtomicBoolean readyToBackOff);
+
+  public abstract void runSim();
 }
