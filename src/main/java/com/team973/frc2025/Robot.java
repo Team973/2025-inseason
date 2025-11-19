@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.ironmaple.simulation.SimulatedArena;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -50,7 +51,7 @@ public class Robot extends TimedRobot {
 
   private final Logger m_logger = new Logger("robot");
 
-  private final SubsystemManager m_subsystemManager = SubsystemManager.init(m_robotInfo);
+  private final SubsystemManager m_subsystemManager = SubsystemManager.init(m_robotInfo, m_logger);
 
   private final DriveController m_driveController =
       m_subsystemManager.initDriveController(
@@ -525,4 +526,13 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+  @Override
+  public void simulationInit() {}
+
+  @Override
+  public void simulationPeriodic() {
+    SimulatedArena.getInstance().simulationPeriodic();
+    m_subsystemManager.runSim();
+  }
 }
