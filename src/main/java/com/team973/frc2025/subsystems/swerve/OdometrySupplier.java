@@ -39,7 +39,7 @@ public class OdometrySupplier {
   private final StatusSignal<AngularVelocity> m_angularVelocity;
 
   private final SwerveDriveOdometry m_swerveOdometry;
-  private final SwerveModule[] m_swerveModules;
+  private final SwerveModuleIO[] m_swerveModules;
   private final GreyPigeon m_pigeon;
   private PerfLogger m_loopPeriodTracker;
   private PerfLogger m_loopDurationTracker;
@@ -50,7 +50,7 @@ public class OdometrySupplier {
 
   private Logger m_perfLogger;
 
-  public OdometrySupplier(GreyPigeon pigeon, SwerveModule[] swerveModules, Logger logger) {
+  public OdometrySupplier(GreyPigeon pigeon, SwerveModuleIO[] swerveModules, Logger logger) {
     m_thread = new Thread(this::run);
     m_thread.setName("swerve.OdometryPoseSupplier");
     m_thread.setDaemon(false);
@@ -74,7 +74,7 @@ public class OdometrySupplier {
             [4 * m_swerveModules.length + angleSignals.size() + angularVelocitySignals.size()];
 
     int i = 0;
-    for (SwerveModule mod : m_swerveModules) {
+    for (SwerveModuleIO mod : m_swerveModules) {
       for (BaseStatusSignal s : mod.allStatusSignals()) {
         m_allStatusSignals[i++] = s;
       }
@@ -189,7 +189,7 @@ public class OdometrySupplier {
   public SwerveModulePosition[] getPositions() {
     var positions = new SwerveModulePosition[4];
     for (var mod : m_swerveModules) {
-      positions[mod.moduleNumber] = mod.getPosition();
+      positions[mod.getModuleNumber()] = mod.getPosition();
     }
     return positions;
   }

@@ -24,15 +24,15 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SwerveModule {
+public class SwerveModule implements SwerveModuleIO {
   public final int moduleNumber;
   private final RobotInfo m_robotInfo;
   private final RobotInfo.DriveInfo m_driveInfo;
   private final Rotation2d m_angleOffset;
 
-  private final GreyTalonFX m_angleMotor;
-  private final GreyTalonFX m_driveMotor;
-  private final GreyCANCoder m_angleEncoder;
+  protected final GreyTalonFX m_angleMotor;
+  protected final GreyTalonFX m_driveMotor;
+  protected final GreyCANCoder m_angleEncoder;
 
   private final Logger m_logger;
 
@@ -157,6 +157,11 @@ public class SwerveModule {
 
     m_driveMotor.setConfig(m_driveMotorConfig);
     m_driveMotor.setPosition(0.0);
+  }
+
+  @Override
+  public int getModuleNumber() {
+    return moduleNumber;
   }
 
   public Rotation2d getCanCoderRotation2d() {
