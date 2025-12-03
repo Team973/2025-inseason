@@ -1,7 +1,10 @@
 package com.team973.lib.util;
 
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.frc2025.subsystems.Elevator;
+import com.team973.frc2025.subsystems.ElevatorIO;
 import com.team973.frc2025.subsystems.swerve.SwerveModule;
 import com.team973.lib.devices.GreyPigeon;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -30,6 +33,10 @@ public class SubsystemManagerReal extends SubsystemManager {
         new SwerveModule(
             3, getRobotInfo().DRIVE_INFO.BACK_RIGHT_CONSTANTS, logger.subLogger("swerve/mod3")),
         m_pigeon);
+  }
+
+  public ElevatorIO initElevator(Logger logger, CANdleManger candle, RobotInfo robotInfo) {
+    return new Elevator(logger, candle, robotInfo);
   }
 
   public void simulationUpdate() {}

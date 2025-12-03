@@ -3,6 +3,7 @@ package com.team973.frc2025.shared;
 import static edu.wpi.first.units.Units.Inches;
 
 import com.team973.lib.devices.GreyTalonFX.GreyTalonFXConfig;
+import com.team973.lib.util.Conversions;
 import com.team973.lib.util.SwerveModuleConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -96,6 +97,8 @@ public class RobotInfo {
     public int HALL_SENSOR_ID = 0;
 
     public double MOTOR_GEAR_RATIO = 10.0 / 56.0;
+    public double MOTOR_ROT_TO_HEIGHT_INCHES =
+        MOTOR_GEAR_RATIO * 5.0 * 36.0 * Conversions.Distance.INCH_PER_MM;
 
     public double ELEVATOR_HOMING_POSTION_HEIGHT = 0.25;
 
