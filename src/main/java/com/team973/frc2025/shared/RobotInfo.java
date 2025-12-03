@@ -322,30 +322,38 @@ public class RobotInfo {
     /** Measured Max Angular Speed: 12.65 RadPS */
     public double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = 13.3;
 
-    public SwerveModuleConfig FRONT_LEFT_CONSTANTS =
-        new SwerveModuleConfig(
-            FRONT_LEFT_MODULE_DRIVE_MOTOR,
-            FRONT_LEFT_MODULE_STEER_MOTOR,
-            FRONT_LEFT_MODULE_STEER_ENCODER,
-            FRONT_LEFT_MODULE_STEER_OFFSET);
-    public SwerveModuleConfig FRONT_RIGHT_CONSTANTS =
-        new SwerveModuleConfig(
-            FRONT_RIGHT_MODULE_DRIVE_MOTOR,
-            FRONT_RIGHT_MODULE_STEER_MOTOR,
-            FRONT_RIGHT_MODULE_STEER_ENCODER,
-            FRONT_RIGHT_MODULE_STEER_OFFSET);
-    public SwerveModuleConfig BACK_LEFT_CONSTANTS =
-        new SwerveModuleConfig(
-            BACK_LEFT_MODULE_DRIVE_MOTOR,
-            BACK_LEFT_MODULE_STEER_MOTOR,
-            BACK_LEFT_MODULE_STEER_ENCODER,
-            BACK_LEFT_MODULE_STEER_OFFSET);
-    public SwerveModuleConfig BACK_RIGHT_CONSTANTS =
-        new SwerveModuleConfig(
-            BACK_RIGHT_MODULE_DRIVE_MOTOR,
-            BACK_RIGHT_MODULE_STEER_MOTOR,
-            BACK_RIGHT_MODULE_STEER_ENCODER,
-            BACK_RIGHT_MODULE_STEER_OFFSET);
+    public SwerveModuleConfig frontLeftConstants() {
+      return new SwerveModuleConfig(
+          FRONT_LEFT_MODULE_DRIVE_MOTOR,
+          FRONT_LEFT_MODULE_STEER_MOTOR,
+          FRONT_LEFT_MODULE_STEER_ENCODER,
+          FRONT_LEFT_MODULE_STEER_OFFSET);
+    }
+
+    public SwerveModuleConfig frontRightConstants() {
+      return new SwerveModuleConfig(
+          FRONT_RIGHT_MODULE_DRIVE_MOTOR,
+          FRONT_RIGHT_MODULE_STEER_MOTOR,
+          FRONT_RIGHT_MODULE_STEER_ENCODER,
+          FRONT_RIGHT_MODULE_STEER_OFFSET);
+    }
+
+    public SwerveModuleConfig backLeftConstants() {
+
+      return new SwerveModuleConfig(
+          BACK_LEFT_MODULE_DRIVE_MOTOR,
+          BACK_LEFT_MODULE_STEER_MOTOR,
+          BACK_LEFT_MODULE_STEER_ENCODER,
+          BACK_LEFT_MODULE_STEER_OFFSET);
+    }
+
+    public SwerveModuleConfig backRightConstants() {
+      return new SwerveModuleConfig(
+          BACK_RIGHT_MODULE_DRIVE_MOTOR,
+          BACK_RIGHT_MODULE_STEER_MOTOR,
+          BACK_RIGHT_MODULE_STEER_ENCODER,
+          BACK_RIGHT_MODULE_STEER_OFFSET);
+    }
 
     private SwerveDriveKinematics SWERVE_KINEMATICS;
 

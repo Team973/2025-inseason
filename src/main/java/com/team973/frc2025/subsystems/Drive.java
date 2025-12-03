@@ -69,7 +69,7 @@ public class Drive implements Subsystem {
     m_logger = logger;
     m_driveInfo = RobotConfig.get().DRIVE_INFO;
 
-    System.out.println("Front_left_constants" + m_driveInfo.FRONT_LEFT_CONSTANTS);
+    System.out.println("Front_left_constants" + m_driveInfo.frontLeftConstants());
     m_swerveModules = new SwerveModuleIO[] {frontLeft, frontRight, backLeft, backRight};
 
     m_odometrySupplier =

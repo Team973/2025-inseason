@@ -36,22 +36,22 @@ public class SubsystemManagerSim extends SubsystemManager {
         new SwerveModuleSim(
             0,
             m_swerveDriveSimulation.getModules()[0],
-            getRobotInfo().DRIVE_INFO.FRONT_LEFT_CONSTANTS,
+            getRobotInfo().DRIVE_INFO.frontLeftConstants(),
             logger.subLogger("swerve/mod0")),
         new SwerveModuleSim(
             1,
             m_swerveDriveSimulation.getModules()[1],
-            getRobotInfo().DRIVE_INFO.FRONT_RIGHT_CONSTANTS,
+            getRobotInfo().DRIVE_INFO.frontRightConstants(),
             logger.subLogger("swerve/mod1")),
         new SwerveModuleSim(
             2,
             m_swerveDriveSimulation.getModules()[2],
-            getRobotInfo().DRIVE_INFO.BACK_LEFT_CONSTANTS,
+            getRobotInfo().DRIVE_INFO.backLeftConstants(),
             logger.subLogger("swerve/mod2")),
         new SwerveModuleSim(
             3,
             m_swerveDriveSimulation.getModules()[3],
-            getRobotInfo().DRIVE_INFO.BACK_RIGHT_CONSTANTS,
+            getRobotInfo().DRIVE_INFO.backRightConstants(),
             logger.subLogger("swerve/mod3")),
         m_pigeon);
   }

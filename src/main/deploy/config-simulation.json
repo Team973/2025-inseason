@@ -1,0 +1,11 @@
+// Anything here will get used when the robot is running in simulation. These
+// values are treated as overrides --- they overwrite anything in the
+// "config-common.json" file.
+{
+    "DRIVE_INFO": {
+        "BACK_LEFT_MODULE_STEER_OFFSET": 0.0,
+        "BACK_RIGHT_MODULE_STEER_OFFSET": 0.0,
+        "FRONT_RIGHT_MODULE_STEER_OFFSET": 0.0,
+        "FRONT_LEFT_MODULE_STEER_OFFSET": 0.0
+    }
+}
