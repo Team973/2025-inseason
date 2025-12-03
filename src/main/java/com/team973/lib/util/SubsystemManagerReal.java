@@ -22,13 +22,13 @@ public class SubsystemManagerReal extends SubsystemManager {
         readyToScore,
         readyToBackOff,
         new SwerveModule(
-            0, getRobotInfo().DRIVE_INFO.FRONT_LEFT_CONSTANTS, logger.subLogger("swerve/mod0")),
+            0, getRobotInfo().DRIVE_INFO.frontLeftConstants(), logger.subLogger("swerve/mod0")),
         new SwerveModule(
-            1, getRobotInfo().DRIVE_INFO.FRONT_RIGHT_CONSTANTS, logger.subLogger("swerve/mod1")),
+            1, getRobotInfo().DRIVE_INFO.frontRightConstants(), logger.subLogger("swerve/mod1")),
         new SwerveModule(
-            2, getRobotInfo().DRIVE_INFO.BACK_LEFT_CONSTANTS, logger.subLogger("swerve/mod2")),
+            2, getRobotInfo().DRIVE_INFO.backLeftConstants(), logger.subLogger("swerve/mod2")),
         new SwerveModule(
-            3, getRobotInfo().DRIVE_INFO.BACK_RIGHT_CONSTANTS, logger.subLogger("swerve/mod3")),
+            3, getRobotInfo().DRIVE_INFO.backRightConstants(), logger.subLogger("swerve/mod3")),
         m_pigeon);
   }
 

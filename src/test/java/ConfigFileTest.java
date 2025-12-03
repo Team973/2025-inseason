@@ -10,7 +10,7 @@ public class ConfigFileTest {
   /**
    * Get the config using the same codepath that the robot will use (RobotConfig.get()).
    *
-   * We expect that tests are always running in simulation mode so we will also test that the
+   * <p>We expect that tests are always running in simulation mode so we will also test that the
    * swerve module offsets are 0 (since they should always be zero in simulation).
    */
   @Test
