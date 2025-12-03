@@ -1,1 +1,4 @@
+// You probably don't want to be putting anything here. The `config-common.json` file
+// should have the robot config and the `config-simulation.json` file should have anything
+// which needs to be overridden for simulation.
 {}

@@ -1,5 +1,6 @@
 package com.team973.frc2025;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.team973.frc2025.shared.RobotInfo;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -64,6 +65,7 @@ public class RobotConfig {
       ObjectMapper mapper = new ObjectMapper();
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
       mapper.setDefaultMergeable(true);
+      mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
       try {
         mapper.readerForUpdating(res).readValue(new File(absPathForConfigSource(src)));
       } catch (com.fasterxml.jackson.core.JsonParseException e) {
