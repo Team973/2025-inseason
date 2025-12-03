@@ -8,17 +8,15 @@ import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
-import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
-import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
-public class Elevator implements Subsystem {
+public class Elevator implements ElevatorIO {
   private final RobotInfo.ElevatorInfo m_elevatorInfo;
 
   private final Logger m_logger;
 
-  private final GreyTalonFX m_motorRight;
+  protected final GreyTalonFX m_motorRight;
   private final GreyTalonFX m_motorLeft;
 
   private ControlStatus m_controlStatus = ControlStatus.Off;
@@ -58,19 +56,11 @@ public class Elevator implements Subsystem {
   }
 
   private double heightInchesToMotorRotations(double postionHeight) {
-    return postionHeight
-        / m_elevatorInfo.MOTOR_GEAR_RATIO
-        / 5.0
-        / 36.0
-        / Conversions.Distance.INCH_PER_MM;
+    return postionHeight / m_elevatorInfo.MOTOR_ROT_TO_HEIGHT_INCHES;
   }
 
   private double motorRotationsToHeightInches(double motorPostion) {
-    return motorPostion
-        * m_elevatorInfo.MOTOR_GEAR_RATIO
-        * 5.0
-        * 36.0
-        * Conversions.Distance.INCH_PER_MM;
+    return motorPostion * m_elevatorInfo.MOTOR_ROT_TO_HEIGHT_INCHES;
   }
 
   public Elevator(Logger logger, CANdleManger candle, RobotInfo robotInfo) {

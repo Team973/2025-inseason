@@ -14,7 +14,7 @@ import com.team973.frc2025.subsystems.Claw;
 import com.team973.frc2025.subsystems.Climb;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.DriveController.ControllerOption;
-import com.team973.frc2025.subsystems.Elevator;
+import com.team973.frc2025.subsystems.ElevatorIO;
 import com.team973.frc2025.subsystems.SolidSignaler;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.frc2025.subsystems.Superstructure.GamePiece;
@@ -59,8 +59,9 @@ public class Robot extends TimedRobot {
   private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger", 0.2));
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager", 0.2), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
-  private final Elevator m_elevator =
-      new Elevator(m_logger.subLogger("elevator", 0.2), m_candleManger, m_robotInfo);
+  private final ElevatorIO m_elevator =
+      m_subsystemManager.initElevator(
+          m_logger.subLogger("elevator", 0.2), m_candleManger, m_robotInfo);
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2), m_candleManger);
   private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2), m_robotInfo);
 

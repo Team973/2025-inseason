@@ -2,7 +2,9 @@ package com.team973.lib.util;
 
 import com.team973.frc2025.Robot;
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.frc2025.subsystems.ElevatorIO;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class SubsystemManager {
@@ -32,6 +34,8 @@ public abstract class SubsystemManager {
 
   public abstract DriveController initDriveController(
       Logger logger, AtomicBoolean readyToScore, AtomicBoolean readyToBackOff);
+
+  public abstract ElevatorIO initElevator(Logger logger, CANdleManger candle, RobotInfo robotInfo);
 
   public abstract void simulationUpdate();
 }

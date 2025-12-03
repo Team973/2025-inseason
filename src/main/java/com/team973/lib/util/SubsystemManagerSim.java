@@ -1,17 +1,24 @@
 package com.team973.lib.util;
 
 import com.team973.frc2025.shared.RobotInfo;
+import com.team973.frc2025.subsystems.CANdleManger;
 import com.team973.frc2025.subsystems.DriveController;
+import com.team973.frc2025.subsystems.ElevatorIO;
+import com.team973.frc2025.subsystems.ElevatorSim;
 import com.team973.frc2025.subsystems.swerve.SwerveModuleSim;
 import com.team973.lib.devices.GreyPigeon;
 import com.team973.lib.devices.GreyPigeonSim;
+import edu.wpi.first.math.geometry.Pose3d;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 public class SubsystemManagerSim extends SubsystemManager {
   private final SwerveDriveSimulation m_swerveDriveSimulation;
   private final GreyPigeon m_pigeon;
+
+  private Supplier<Pose3d> m_elevatorPoseSupplier;
 
   public SubsystemManagerSim(RobotInfo robotInfo, Logger logger) {
     super(robotInfo, logger);
@@ -56,9 +63,18 @@ public class SubsystemManagerSim extends SubsystemManager {
         m_pigeon);
   }
 
+  public ElevatorIO initElevator(Logger logger, CANdleManger candle, RobotInfo robotInfo) {
+    ElevatorSim elevator = new ElevatorSim(logger, candle, robotInfo);
+
+    m_elevatorPoseSupplier = () -> elevator.getPose();
+
+    return elevator;
+  }
+
   public void simulationUpdate() {
     m_pigeon.simulationUpdate();
 
     getLogger().log("robotTruthPose", m_swerveDriveSimulation.getSimulatedDriveTrainPose());
+    getLogger().log("components", new Pose3d[] {m_elevatorPoseSupplier.get()});
   }
 }

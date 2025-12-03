@@ -16,7 +16,7 @@ public class Superstructure implements Subsystem {
   private final RobotInfo.WristInfo m_wristInfo;
   private final Claw m_claw;
   private final Climb m_climb;
-  private final Elevator m_elevator;
+  private final ElevatorIO m_elevator;
   private final Arm m_arm;
   private final Wrist m_wrist;
   private final DriveController m_driveController;
@@ -70,7 +70,7 @@ public class Superstructure implements Subsystem {
   public Superstructure(
       Claw claw,
       Climb climb,
-      Elevator elevator,
+      ElevatorIO elevator,
       Arm arm,
       Wrist wrist,
       DriveController driveController,
