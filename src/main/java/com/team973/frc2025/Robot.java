@@ -29,6 +29,7 @@ import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.PerfLogger;
 import com.team973.lib.util.SubsystemManager;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -66,7 +67,7 @@ public class Robot extends TimedRobot {
   private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2), m_robotInfo);
 
   private final Joystick m_driverStick =
-      new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
+      new Joystick(0, Joystick.Type.XboxController, m_logger.subLogger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
 
@@ -534,6 +535,9 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
+
     m_subsystemManager.simulationUpdate();
+
+    m_logger.log("components", new Pose3d[] {m_elevator.getPose()});
   }
 }

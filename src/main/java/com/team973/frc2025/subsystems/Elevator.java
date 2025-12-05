@@ -9,6 +9,7 @@ import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator implements ElevatorIO {
@@ -111,6 +112,10 @@ public class Elevator implements ElevatorIO {
     defaultElevatorMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.00;
     defaultElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     return defaultElevatorMotorConfig;
+  }
+
+  public Pose3d getPose() {
+    return new Pose3d();
   }
 
   public void setHallZeroingEnabled(boolean zeroingMode) {
