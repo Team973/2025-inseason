@@ -5,6 +5,7 @@ import com.team973.frc2025.shared.RobotInfo;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 public class ElevatorSim extends Elevator {
@@ -35,7 +36,7 @@ public class ElevatorSim extends Elevator {
   }
 
   public Pose3d getPose() {
-    return new Pose3d();
+    return new Pose3d(0, 0, m_sim.getPositionMeters(), new Rotation3d());
   }
 
   public void syncSensors() {

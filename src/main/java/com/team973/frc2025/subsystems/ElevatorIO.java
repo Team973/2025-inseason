@@ -2,6 +2,7 @@ package com.team973.frc2025.subsystems;
 
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.util.Subsystem;
+import edu.wpi.first.math.geometry.Pose3d;
 
 public interface ElevatorIO extends Subsystem {
   public void setHallZeroingEnabled(boolean zeroingMode);
@@ -21,4 +22,6 @@ public interface ElevatorIO extends Subsystem {
   public double getTargetPositionFromLevel(ReefLevel level);
 
   public double getHeightInchesFromMotorRot(double motorRot);
+
+  public Pose3d getPose();
 }
