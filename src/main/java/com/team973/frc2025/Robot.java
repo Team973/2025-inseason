@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
   private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2), m_robotInfo);
 
   private final Joystick m_driverStick =
-      new Joystick(0, Joystick.Type.XboxController, m_logger.subLogger("driverStick"));
+      new Joystick(0, Joystick.Type.SickStick, m_logger.subLogger("driverStick"));
   private final Joystick m_coDriverStick =
       new Joystick(1, Joystick.Type.XboxController, m_logger.subLogger("coDriverStick"));
 
