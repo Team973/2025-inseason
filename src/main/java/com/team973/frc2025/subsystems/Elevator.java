@@ -8,8 +8,10 @@ import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
+import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator implements ElevatorIO {
@@ -115,7 +117,12 @@ public class Elevator implements ElevatorIO {
   }
 
   public Pose3d getPose() {
-    return new Pose3d();
+    return new Pose3d(
+        0,
+        0,
+        getHeightInchesFromMotorRot(m_motorRight.getPosition().getValueAsDouble())
+            * Conversions.Distance.METERS_PER_INCH,
+        new Rotation3d());
   }
 
   public void setHallZeroingEnabled(boolean zeroingMode) {
