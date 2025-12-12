@@ -15,14 +15,18 @@ import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.Superstructure;
 import com.team973.lib.util.AutoMode;
 import com.team973.lib.util.Logger;
+import com.team973.lib.util.PerfLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.Arrays;
 import java.util.List;
 
 public class AutoManager {
   private final List<AutoMode> m_availableAutos;
   private int m_selectedMode = 0;
+
+  private PerfLogger m_runPerfLogger;
 
   private final AutoMode m_noAuto;
   private final AutoMode m_taxiAuto;
@@ -55,6 +59,8 @@ public class AutoManager {
     m_centerAuto = new CenterAuto(logger.subLogger("CenterAuto"), superstructure, drive);
     m_babyBirdAuto = new BabyBird(logger, drive, superstructure);
     m_scoreTestAuto = new ScoreTestAuto(logger.subLogger("ScoreTestAuto"), drive, superstructure);
+
+    m_runPerfLogger = new PerfLogger(logger.subLogger("perf/run", 0.25));
 
     m_availableAutos =
         Arrays.asList(
@@ -99,8 +105,11 @@ public class AutoManager {
   }
 
   public void run(Alliance alliance) {
+    double startTime = Timer.getFPGATimestamp();
     getSelectedMode().run(alliance);
     getSelectedMode().log(alliance);
+
+    m_runPerfLogger.observe(Timer.getFPGATimestamp() - startTime);
   }
 
   public void init() {

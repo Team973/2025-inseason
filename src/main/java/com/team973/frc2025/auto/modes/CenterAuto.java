@@ -22,7 +22,9 @@ public class CenterAuto extends AutoMode {
         new ScoreCoralCommand(drive, superstructure, ReefFace.D, ReefLevel.L_4, ReefSide.Right),
         new PickupAlgaeCommand(drive, superstructure, ReefFace.D),
         new LambdaCommand(() -> superstructure.setTargetReefLevel(ReefLevel.AlgaeHigh)),
-        new ScoreAlgaeInNetCommand(drive, superstructure));
+        new ScoreAlgaeInNetCommand(drive, superstructure),
+        new LambdaCommand(() -> superstructure.setTargetReefLevel(ReefLevel.L_1)));
+
     // Scoring the second algae caused the robot to finish auto on the taxi line, so in order to
     // guarantee us taxi points we are no longer retrieving or scoring it.
     // new PickupAlgaeCommand(drive, superstructure, ReefFace.E),

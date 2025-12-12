@@ -7,7 +7,6 @@ import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.Supplier;
 
@@ -465,12 +464,10 @@ public class Superstructure implements Subsystem {
             wristTargetReefLevel();
             break;
           case BackOff:
-            if (m_gamePieceMode == GamePiece.Coral || DriverStation.isTeleop()) {
-              armStow();
-              elevatorStow();
-              wristStow();
-              m_manualArmivator = false;
-            }
+            armStow();
+            elevatorStow();
+            wristStow();
+            m_manualArmivator = false;
 
             break;
         }
@@ -506,6 +503,7 @@ public class Superstructure implements Subsystem {
     }
 
     m_lastState = m_state;
+    m_driveController.getDriveWithLimelight().setConstraints(m_targetReefLevelSupplier.get());
 
     m_claw.update();
     m_climb.update();

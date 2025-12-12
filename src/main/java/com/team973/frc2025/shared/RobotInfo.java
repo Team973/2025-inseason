@@ -61,7 +61,7 @@ public class RobotInfo {
     public double LEVEL_THREE_POSITION_DEG = 59.0;
     public double LEVEL_TWO_POSITION_DEG = -61.0;
     public double LEVEL_ONE_POSITION_DEG = -64.0;
-    public double CORAL_STOW_POSITION_DEG = -88.0;
+    public double CORAL_STOW_POSITION_DEG = -87.0;
 
     public double NET_POSITION_DEG = 74.0;
     public double ALGAE_HIGH_POSITION_DEG = 57.5;
@@ -90,7 +90,7 @@ public class RobotInfo {
 
     public double ARM_PEAK_FORDWARD_VOLTAGE = 12.0;
     public double ARM_PEAK_REVERSE_VOLTAGE = -12.0;
-    public final double ENCODER_OFFSET_ROTATIONS = 0.098;
+    public double ENCODER_OFFSET_ROTATIONS = 0.0014;
   }
 
   public static class ElevatorInfo {
@@ -172,10 +172,10 @@ public class RobotInfo {
     public double LEVEL_THREE_POSITION_DEG = -191.0;
     public double LEVEL_TWO_POSITION_DEG = -56.0;
     public double LEVEL_ONE_POSITION_DEG = 4.0;
-    public double CORAL_STOW_POSITION_DEG = -18.0;
+    public double CORAL_STOW_POSITION_DEG = -17.0;
 
-    public final double WITHOUT_CORAL_STOW_POSITION_DEG = -22.0;
-    public final double WITH_CORAL_STOW_POSTION_DEG = 0.0;
+    public double WITHOUT_CORAL_STOW_POSITION_DEG = -17.0;
+    public double WITH_CORAL_STOW_POSTION_DEG = 0.0;
 
     public double NET_POSITION_DEG = -45.0; // -20.0;
     public double ALGAE_HIGH_POSITION_DEG = -149.0;
