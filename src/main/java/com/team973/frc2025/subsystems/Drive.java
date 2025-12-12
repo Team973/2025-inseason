@@ -7,7 +7,7 @@ import com.team973.frc2025.subsystems.swerve.GreyPoseEstimator;
 import com.team973.frc2025.subsystems.swerve.MegaTagSupplier;
 import com.team973.frc2025.subsystems.swerve.OdometrySupplier;
 import com.team973.frc2025.subsystems.swerve.SwerveModuleIO;
-import com.team973.lib.devices.GreyPigeon;
+import com.team973.lib.devices.GreyPigeonIO;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,7 +49,7 @@ public class Drive implements Subsystem {
 
   private DriveController m_driveController;
 
-  private final GreyPigeon m_pigeon;
+  private final GreyPigeonIO m_pigeon;
 
   private final OdometrySupplier m_odometrySupplier;
   private final MegaTagSupplier m_leftLLSupplier;
@@ -57,7 +57,7 @@ public class Drive implements Subsystem {
   private final MegaTagSupplier m_backLLSupplier;
 
   public Drive(
-      GreyPigeon pigeon,
+      GreyPigeonIO pigeon,
       DriveController driveController,
       SwerveModuleIO frontLeft,
       SwerveModuleIO frontRight,
@@ -143,7 +143,7 @@ public class Drive implements Subsystem {
     m_odometrySupplier.start();
   }
 
-  public GreyPigeon getPigeon() {
+  public GreyPigeonIO getPigeon() {
     return m_pigeon;
   }
 

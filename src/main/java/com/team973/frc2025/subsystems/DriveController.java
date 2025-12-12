@@ -4,7 +4,7 @@ import com.team973.frc2025.subsystems.composables.DriveWithJoysticks;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithTrajectory;
 import com.team973.frc2025.subsystems.swerve.SwerveModuleIO;
-import com.team973.lib.devices.GreyPigeon;
+import com.team973.lib.devices.GreyPigeonIO;
 import com.team973.lib.util.DriveComposable;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
@@ -58,7 +58,7 @@ public class DriveController implements Subsystem {
       SwerveModuleIO frontRight,
       SwerveModuleIO backLeft,
       SwerveModuleIO backRight,
-      GreyPigeon pigeon) {
+      GreyPigeonIO pigeon) {
     m_drive = new Drive(pigeon, this, frontLeft, frontRight, backLeft, backRight, logger);
 
     m_logger = logger.subLogger("controller");
@@ -103,7 +103,7 @@ public class DriveController implements Subsystem {
     return getDriveWithLimelight().isNearApproach(getPose());
   }
 
-  public synchronized GreyPigeon getPigeon() {
+  public synchronized GreyPigeonIO getPigeon() {
     return m_drive.getPigeon();
   }
 

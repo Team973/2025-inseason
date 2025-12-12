@@ -6,7 +6,7 @@ import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.subsystems.DriveController;
 import com.team973.frc2025.subsystems.swerve.MegaTagSupplier.MegaTagReceiver;
 import com.team973.frc2025.subsystems.swerve.OdometrySupplier.OdometryReceiver;
-import com.team973.lib.devices.GreyPigeon;
+import com.team973.lib.devices.GreyPigeonIO;
 import com.team973.lib.util.Logger;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -22,7 +22,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
   private final RobotInfo.DriveInfo m_driveInfo;
 
   private SwerveDrivePoseEstimator m_poseEstimator;
-  private final GreyPigeon m_pigeon;
+  private final GreyPigeonIO m_pigeon;
   private Pose2d m_lastPoseMeters;
   private final OdometrySupplier m_odometrySupplier;
   private final Logger m_logger;
@@ -30,7 +30,7 @@ public class GreyPoseEstimator implements OdometryReceiver, MegaTagReceiver {
   private DriveController m_driveController;
 
   public GreyPoseEstimator(
-      GreyPigeon pigeon,
+      GreyPigeonIO pigeon,
       DriveController m_DriveController,
       OdometrySupplier odometrySupplier,
       Logger logger) {

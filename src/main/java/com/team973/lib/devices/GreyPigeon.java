@@ -14,7 +14,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.ArrayList;
 
 /** GreyPigeon - Pigeon2 wrapper class */
-public class GreyPigeon {
+public class GreyPigeon implements GreyPigeonIO {
   public final Pigeon2 m_pigeon;
   private StandardizedRotation3d m_offset;
 
