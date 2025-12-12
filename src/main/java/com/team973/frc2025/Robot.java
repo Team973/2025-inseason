@@ -22,6 +22,7 @@ import com.team973.frc2025.subsystems.Superstructure.ReefLevel;
 import com.team973.frc2025.subsystems.Wrist;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
+import com.team973.lib.devices.GreyPigeonIO;
 import com.team973.lib.util.AllianceCache;
 import com.team973.lib.util.Conversions;
 import com.team973.lib.util.Joystick;
@@ -29,7 +30,6 @@ import com.team973.lib.util.JoystickField;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.PerfLogger;
 import com.team973.lib.util.SubsystemManager;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
@@ -47,22 +47,20 @@ import org.ironmaple.simulation.SimulatedArena;
  */
 public class Robot extends TimedRobot {
   private final RobotInfo m_robotInfo = RobotConfig.get();
-  private final AtomicBoolean m_readyToScore = new AtomicBoolean(false);
-  private final AtomicBoolean m_readyToBackOff = new AtomicBoolean(false);
 
   private final Logger m_logger = new Logger("robot");
 
   private final SubsystemManager m_subsystemManager = SubsystemManager.init(m_robotInfo, m_logger);
 
-  private final DriveController m_driveController =
-      m_subsystemManager.initDriveController(
-          m_logger.subLogger("drive", 0.05), m_readyToScore, m_readyToBackOff);
-  private final CANdleManger m_candleManger = new CANdleManger(new Logger("candle manger", 0.2));
+  private final AtomicBoolean m_readyToScore = m_subsystemManager.getReadyToScore();
+  private final AtomicBoolean m_readyToBackOff = m_subsystemManager.getReadyToBackOff();
+
+  private final GreyPigeonIO m_pigeon = m_subsystemManager.getPigeon();
+  private final DriveController m_driveController = m_subsystemManager.getDriveController();
+  private final CANdleManger m_candleManger = m_subsystemManager.getCANdleManager();
   private final Climb m_climb = new Climb(m_logger.subLogger("climb manager", 0.2), m_candleManger);
   private final Claw m_claw = new Claw(m_logger.subLogger("claw", 0.2), m_candleManger);
-  private final ElevatorIO m_elevator =
-      m_subsystemManager.initElevator(
-          m_logger.subLogger("elevator", 0.2), m_candleManger, m_robotInfo);
+  private final ElevatorIO m_elevator = m_subsystemManager.getElevator();
   private final Arm m_arm = new Arm(m_logger.subLogger("Arm", 0.2), m_candleManger);
   private final Wrist m_wrist = new Wrist(m_logger.subLogger("wrist", 0.2), m_robotInfo);
 
@@ -174,6 +172,8 @@ public class Robot extends TimedRobot {
   }
 
   private void logSubsystems() {
+    m_subsystemManager.log();
+
     m_driveController.log();
     m_superstructure.log();
     m_candleManger.log();
@@ -182,8 +182,6 @@ public class Robot extends TimedRobot {
     m_logger.log("Ready To Back Off", m_readyToBackOff.get());
     m_logger.log("Match Time", Timer.getMatchTime());
     m_logger.log("Needs To Stow After Algae Pickup", m_needsToStowAfterAlgaePickUp);
-
-    m_logger.log("components", new Pose3d[] {m_elevator.getPose()});
   }
 
   private void updateJoysticks() {
@@ -538,6 +536,6 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
 
-    m_subsystemManager.simulationUpdate();
+    m_pigeon.simulationUpdate();
   }
 }

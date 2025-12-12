@@ -1,6 +1,6 @@
 package com.team973.frc2025.subsystems.swerve;
 
-import com.team973.lib.devices.GreyPigeon;
+import com.team973.lib.devices.GreyPigeonIO;
 import com.team973.lib.devices.LimelightHelpers;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.PerfLogger;
@@ -28,7 +28,7 @@ public class MegaTagSupplier {
   }
 
   private final String m_llName;
-  private final GreyPigeon m_pigeon;
+  private final GreyPigeonIO m_pigeon;
   private List<MegaTagReceiver> m_receivers = new ArrayList<MegaTagReceiver>();
   private Alliance m_alliance;
   private final Logger m_perfLogger;
@@ -39,7 +39,7 @@ public class MegaTagSupplier {
   private boolean m_allianceInitialized;
 
   public MegaTagSupplier(
-      String llName, GreyPigeon pigeon, Pose3d cameraPoseRobotSpace, Logger logger) {
+      String llName, GreyPigeonIO pigeon, Pose3d cameraPoseRobotSpace, Logger logger) {
     m_llName = llName;
     m_pigeon = pigeon;
     m_perfLogger = logger.subLogger("perf", 0.25);

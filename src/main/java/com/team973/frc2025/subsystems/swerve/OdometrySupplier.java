@@ -5,7 +5,7 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
-import com.team973.lib.devices.GreyPigeon;
+import com.team973.lib.devices.GreyPigeonIO;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.PerfLogger;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -40,7 +40,7 @@ public class OdometrySupplier {
 
   private final SwerveDriveOdometry m_swerveOdometry;
   private final SwerveModuleIO[] m_swerveModules;
-  private final GreyPigeon m_pigeon;
+  private final GreyPigeonIO m_pigeon;
   private PerfLogger m_loopPeriodTracker;
   private PerfLogger m_loopDurationTracker;
   private final Thread m_thread;
@@ -50,7 +50,7 @@ public class OdometrySupplier {
 
   private Logger m_perfLogger;
 
-  public OdometrySupplier(GreyPigeon pigeon, SwerveModuleIO[] swerveModules, Logger logger) {
+  public OdometrySupplier(GreyPigeonIO pigeon, SwerveModuleIO[] swerveModules, Logger logger) {
     m_thread = new Thread(this::run);
     m_thread.setName("swerve.OdometryPoseSupplier");
     m_thread.setDaemon(false);
