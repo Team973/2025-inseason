@@ -182,6 +182,8 @@ public class Robot extends TimedRobot {
     m_logger.log("Ready To Back Off", m_readyToBackOff.get());
     m_logger.log("Match Time", Timer.getMatchTime());
     m_logger.log("Needs To Stow After Algae Pickup", m_needsToStowAfterAlgaePickUp);
+
+    m_logger.log("components", new Pose3d[] {m_elevator.getPose()});
   }
 
   private void updateJoysticks() {
@@ -537,7 +539,5 @@ public class Robot extends TimedRobot {
     SimulatedArena.getInstance().simulationPeriodic();
 
     m_subsystemManager.simulationUpdate();
-
-    m_logger.log("components", new Pose3d[] {m_elevator.getPose()});
   }
 }
