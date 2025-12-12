@@ -25,8 +25,8 @@ public class ElevatorSim extends Elevator {
         new edu.wpi.first.wpilibj.simulation.ElevatorSim(
             DCMotor.getKrakenX60(2),
             1.0 / robotInfo.ELEVATOR_INFO.MOTOR_GEAR_RATIO,
-            17.0,
-            0.02,
+            5.0,
+            0.029,
             0.0,
             Conversions.Distance.METERS_PER_INCH * 30.0,
             true,
