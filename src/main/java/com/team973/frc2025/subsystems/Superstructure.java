@@ -4,6 +4,7 @@ import com.team973.frc2025.RobotConfig;
 import com.team973.frc2025.shared.RobotInfo;
 import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
+import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
@@ -45,8 +46,7 @@ public class Superstructure implements Subsystem {
     Manual,
     Score,
     Zero,
-    Climb,
-    Off
+    Climb
   }
 
   public enum ReefLevel {
@@ -105,8 +105,20 @@ public class Superstructure implements Subsystem {
     m_manualScore = score;
   }
 
+  public boolean getManualScore() {
+    return m_manualScore;
+  }
+
   public void setManualIntake(boolean intake) {
     m_manualIntake = intake;
+  }
+
+  public boolean getManualIntake() {
+    return m_manualIntake;
+  }
+
+  public boolean getManualArmivator() {
+    return m_manualArmivator;
   }
 
   private void setTargetReefLevelSupplier(Supplier<ReefLevel> reefLevelSupplier) {
@@ -249,12 +261,12 @@ public class Superstructure implements Subsystem {
     }
   }
 
-  private void armTargetReefLevel() {
+  public void armTargetReefLevel() {
     m_arm.setTargetDeg(m_arm.getTargetDegFromLevel(m_targetReefLevelSupplier.get()));
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }
 
-  private void armStow() {
+  public void armStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
       m_arm.setTargetDeg(m_armInfo.CORAL_STOW_POSITION_DEG);
     } else {
@@ -263,13 +275,13 @@ public class Superstructure implements Subsystem {
     m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
   }
 
-  private void elevatorTargetReefLevel() {
+  public void elevatorTargetReefLevel() {
     m_elevator.setTargetPostion(
         m_elevator.getTargetPositionFromLevel(m_targetReefLevelSupplier.get()));
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }
 
-  private void elevatorStow() {
+  public void elevatorStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
       m_elevator.setTargetPostion(m_elevatorInfo.CORAL_STOW);
     } else {
@@ -278,7 +290,7 @@ public class Superstructure implements Subsystem {
     m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
   }
 
-  private void wristStow() {
+  public void wristStow() {
     if (m_gamePieceMode == GamePiece.Coral) {
       m_wrist.setTargetDeg(m_wristInfo.WITHOUT_CORAL_STOW_POSITION_DEG);
     } else {
@@ -287,7 +299,7 @@ public class Superstructure implements Subsystem {
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
 
-  private void wristTargetReefLevel() {
+  public void wristTargetReefLevel() {
     m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevelSupplier.get()));
     m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
   }
@@ -369,6 +381,18 @@ public class Superstructure implements Subsystem {
     }
   }
 
+  public void clawReverse() {
+    m_claw.setControl(Claw.ControlStatus.Reverse);
+  }
+
+  public void clawOff() {
+    m_claw.setControl(Claw.ControlStatus.Off);
+  }
+
+  public void zeroElevator() {
+    m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
+  }
+
   public boolean getHasAlgae() {
     return m_claw.getHasAlgae();
   }
@@ -383,6 +407,14 @@ public class Superstructure implements Subsystem {
 
   public ReefLevel getTargetReefLevel() {
     return m_targetReefLevelSupplier.get();
+  }
+
+  public DriveWithLimelight.TargetStage getDriveWithLimelightTargetStage() {
+    return m_driveController.getDriveWithLimelight().getTargetStage();
+  }
+
+  public boolean isDriveNearApproach() {
+    return m_driveController.isNearApproach();
   }
 
   public void update() {
@@ -492,12 +524,6 @@ public class Superstructure implements Subsystem {
         wristTargetReefLevel();
 
         m_manualArmivator = true;
-        break;
-      case Off:
-        m_claw.setControl(Claw.ControlStatus.Off);
-        m_arm.setControlStatus(Arm.ControlStatus.Off);
-        m_elevator.setControlStatus(Elevator.ControlStatus.Off);
-        m_wrist.setControlStatus(Wrist.ControlStatus.Off);
         break;
     }
 
