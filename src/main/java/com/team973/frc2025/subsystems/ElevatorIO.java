@@ -18,10 +18,6 @@ public abstract class ElevatorIO extends Subsystem<ElevatorIO.State> {
     super(State.Off);
 
     m_stateMap = new StateMap<>(State.class);
-
-    m_stateMap.put(State.TargetPostion);
-    m_stateMap.put(State.Zero);
-    m_stateMap.put(State.Off);
   }
 
   public StateMap<State> getStateMap() {

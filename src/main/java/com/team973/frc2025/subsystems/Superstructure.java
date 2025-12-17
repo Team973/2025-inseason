@@ -70,6 +70,7 @@ public class Superstructure extends Subsystem<Superstructure.State> {
     Algae
   }
 
+  @SuppressWarnings("unchecked")
   public Superstructure(
       Claw claw,
       Climb climb,
@@ -93,12 +94,13 @@ public class Superstructure extends Subsystem<Superstructure.State> {
 
     m_logger = logger;
 
-    m_stateMap = new StateMap<>(State.class);
-
-    m_stateMap.put(State.Manual, new ManualState(this));
-    m_stateMap.put(State.Score, new ScoreState(this));
-    m_stateMap.put(State.Zero, new ZeroState(this));
-    m_stateMap.put(State.Climb, new ClimbState(this));
+    m_stateMap =
+        new StateMap<>(
+            State.class,
+            new StateMap.Entry<State>(State.Manual, new ManualState(this)),
+            new StateMap.Entry<State>(State.Score, new ScoreState(this)),
+            new StateMap.Entry<State>(State.Zero, new ZeroState(this)),
+            new StateMap.Entry<State>(State.Climb, new ClimbState(this)));
 
     candle.addSignaler(m_algaeSignaler);
   }
