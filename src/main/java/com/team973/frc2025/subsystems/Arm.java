@@ -44,6 +44,8 @@ public class Arm extends Subsystem<Arm.State> {
   }
 
   public Arm(Logger logger, CANdleManger candle) {
+    super(State.Off);
+
     m_robotInfo = RobotConfig.get();
     m_armInfo = m_robotInfo.ARM_INFO;
     m_logger = logger;

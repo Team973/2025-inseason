@@ -53,6 +53,8 @@ public class Claw extends Subsystem<Claw.State> {
   }
 
   public Claw(Logger logger, CANdleManger candle) {
+    super(State.Off);
+
     m_logger = logger;
     m_caNdle = candle;
     m_robotInfo = RobotConfig.get();
