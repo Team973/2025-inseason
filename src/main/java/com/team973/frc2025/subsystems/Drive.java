@@ -56,8 +56,6 @@ public class Drive extends Subsystem.Stateless {
   private final MegaTagSupplier m_rightLLSupplier;
   private final MegaTagSupplier m_backLLSupplier;
 
-  public enum State {}
-
   public Drive(
       GreyPigeonIO pigeon,
       DriveController driveController,
