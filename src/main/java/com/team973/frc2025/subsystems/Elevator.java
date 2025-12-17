@@ -14,15 +14,13 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DigitalInput;
 
-public class Elevator implements ElevatorIO {
+public class Elevator extends ElevatorIO {
   private final RobotInfo.ElevatorInfo m_elevatorInfo;
 
   private final Logger m_logger;
 
   protected final GreyTalonFX m_motorRight;
   private final GreyTalonFX m_motorLeft;
-
-  private ControlStatus m_controlStatus = ControlStatus.Off;
 
   private double m_targetPostionHeightinches;
   private double m_targetpositionLeway = 0.1;
@@ -51,12 +49,6 @@ public class Elevator implements ElevatorIO {
   private CANdleManger m_candleManger;
 
   private boolean m_hallZeroingEnabled = true;
-
-  public static enum ControlStatus {
-    TargetPostion,
-    Zero,
-    Off,
-  }
 
   private double heightInchesToMotorRotations(double postionHeight) {
     return postionHeight / m_elevatorInfo.MOTOR_ROT_TO_HEIGHT_INCHES;
@@ -149,10 +141,6 @@ public class Elevator implements ElevatorIO {
     m_elevatorHomedCount++;
   }
 
-  public void setControlStatus(ControlStatus status) {
-    m_controlStatus = status;
-  }
-
   private boolean motorAtTarget(double motorRot) {
     return (Math.abs(m_targetPostionHeightinches - motorRotationsToHeightInches(motorRot))
         < m_targetpositionLeway);
@@ -164,7 +152,7 @@ public class Elevator implements ElevatorIO {
 
   public void setTargetPostion(double targetPostionHeightinches) {
     m_targetPostionHeightinches = targetPostionHeightinches;
-    m_controlStatus = ControlStatus.TargetPostion;
+    setState(State.TargetPostion);
   }
 
   public void incrementOffset(double offset, ReefLevel level) {
@@ -233,7 +221,7 @@ public class Elevator implements ElevatorIO {
 
   @Override
   public void update() {
-    switch (m_controlStatus) {
+    switch (getState()) {
       case TargetPostion:
         m_motorRight.setControl(
             ControlMode.MotionMagicVoltage,
@@ -264,7 +252,7 @@ public class Elevator implements ElevatorIO {
     m_logger.log("targetPostionReached", motorAtTarget(motorRightRot));
     m_logger.log("targetPostionHeightInches", m_targetPostionHeightinches);
 
-    m_logger.log("elevatorMode", m_controlStatus.toString());
+    m_logger.log("elevatorMode", getState().toString());
 
     m_logger.log("hallSesnsorReturnElevator", hallsensor());
 

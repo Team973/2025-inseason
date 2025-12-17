@@ -34,4 +34,6 @@ public class ManualState implements SubsystemState {
       m_superstructure.wristStow();
     }
   }
+
+  public void exit() {}
 }

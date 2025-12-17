@@ -77,4 +77,6 @@ public class ScoreState implements SubsystemState {
         break;
     }
   }
+
+  public void exit() {}
 }

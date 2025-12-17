@@ -19,4 +19,8 @@ public class ZeroState implements SubsystemState {
     m_superstructure.armStow();
     m_superstructure.clawIntake();
   }
+
+  public void exit() {
+    m_superstructure.homeElevator();
+  }
 }

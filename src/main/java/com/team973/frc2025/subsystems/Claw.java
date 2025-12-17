@@ -11,12 +11,13 @@ import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
+import com.team973.lib.util.StateMap;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 
-public class Claw implements Subsystem {
+public class Claw extends Subsystem<Claw.State> {
   private final RobotInfo m_robotInfo;
   private final RobotInfo.ClawInfo m_clawInfo;
 
@@ -29,9 +30,9 @@ public class Claw implements Subsystem {
   private final DigitalInput m_frontClawSensor;
   private final CANrange m_clawAlgaeSensor;
 
-  private ControlStatus m_mode = ControlStatus.Off;
-
   private final SolidSignaler m_clawHasPeiceSignaler;
+
+  private final StateMap<State> m_stateMap;
 
   private double m_targetHoldPosition = 0;
   private double m_coralBackUpRot = 3.0;
@@ -39,7 +40,7 @@ public class Claw implements Subsystem {
 
   private CANdleManger m_caNdle;
 
-  public static enum ControlStatus {
+  public enum State {
     IntakeCoral,
     IntakeAlgae,
     IntakeAlgaeFromFloor,
@@ -59,6 +60,18 @@ public class Claw implements Subsystem {
 
     m_clawHasPeiceSignaler =
         new SolidSignaler(RobotInfo.Colors.GREEN, 0, SignalerInfo.PEICE_IN_CLAW_SIGNALER_PRIORTY);
+
+    m_stateMap = new StateMap<>(State.class);
+
+    m_stateMap.put(State.IntakeCoral);
+    m_stateMap.put(State.IntakeAlgae);
+    m_stateMap.put(State.IntakeAlgaeFromFloor);
+    m_stateMap.put(State.ScoreCoral);
+    m_stateMap.put(State.ScoreCoralLevelOne);
+    m_stateMap.put(State.ScoreAlgae);
+    m_stateMap.put(State.ScoreAlgaeProcessor);
+    m_stateMap.put(State.Reverse);
+    m_stateMap.put(State.Off);
 
     m_caNdle.addSignaler(m_clawHasPeiceSignaler);
     m_clawMotor =
@@ -112,6 +125,10 @@ public class Claw implements Subsystem {
     return defaultMotorConfig;
   }
 
+  public StateMap<State> getStateMap() {
+    return m_stateMap;
+  }
+
   public boolean motorAtTarget() {
     return (Math.abs(m_targetHoldPosition - m_clawMotor.getPosition().getValueAsDouble()) < 0.1);
   }
@@ -157,7 +174,7 @@ public class Claw implements Subsystem {
   public void update() {
     Optional<Double> algaeDistance = getAlgaeDistance();
 
-    switch (m_mode) {
+    switch (getState()) {
       case IntakeCoral:
         if (getClawFrontSensor()) {
           // Too far forward --- back up!
@@ -226,10 +243,6 @@ public class Claw implements Subsystem {
     }
   }
 
-  public void setControl(ControlStatus mode) {
-    m_mode = mode;
-  }
-
   public void incrementBackup(double increment) {
     m_coralBackUpRot += increment;
   }
@@ -249,7 +262,7 @@ public class Claw implements Subsystem {
 
     m_logger.log("target hold postion", m_targetHoldPosition);
     m_logger.log("target rotations hit", motorAtTarget());
-    m_logger.log("mode", m_mode.toString());
+    m_logger.log("mode", getState().toString());
     m_logger.log("AlgaeCANdistance", m_clawAlgaeSensor.getDistance().getValueAsDouble());
 
     SmartDashboard.putString("DB/String 4", "Coral Backup: " + m_coralBackUpRot);
