@@ -2,14 +2,22 @@ package com.team973.lib.util;
 
 /** Base interface for all subsystems */
 public abstract class Subsystem<K extends Enum<K>> {
-  public abstract static class Stateless extends Subsystem<Stateless.EmptyEnum> {
-    private final StateMap<EmptyEnum> m_stateMap = new StateMap<>(EmptyEnum.class);
+  public abstract static class Stateless extends Subsystem<Stateless.FakeState> {
+    private final StateMap<FakeState> m_stateMap = new StateMap<>(FakeState.class);
 
-    public enum EmptyEnum {}
+    public enum FakeState {
+      InitialState
+    }
 
-    public StateMap<EmptyEnum> getStateMap() {
+    public Stateless() {
+      super(FakeState.InitialState);
+    }
+
+    public StateMap<FakeState> getStateMap() {
       return m_stateMap;
     }
+
+    public abstract void update();
   }
 
   private K m_currentState;
@@ -19,8 +27,6 @@ public abstract class Subsystem<K extends Enum<K>> {
     m_currentState = initialState;
     m_lastState = initialState;
   }
-
-  public Subsystem() {}
 
   public abstract StateMap<K> getStateMap();
 
@@ -51,9 +57,6 @@ public abstract class Subsystem<K extends Enum<K>> {
    * on the subsystem.
    */
   public abstract void syncSensors();
-
-  /** Update the subsystem. Call this periodically when the robot is enabled. */
-  // public abstract void update();
 
   /** Reset the subsystem. */
   public abstract void reset();
