@@ -58,9 +58,6 @@ public class Arm extends Subsystem<Arm.State> {
 
     m_stateMap = new StateMap<>(State.class);
 
-    m_stateMap.put(State.TargetPostion);
-    m_stateMap.put(State.Off);
-
     candle.addSignaler(m_armHorizontalSigaler);
 
     TalonFXConfiguration armMotorConfig = new TalonFXConfiguration();

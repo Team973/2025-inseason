@@ -38,9 +38,6 @@ public class Wrist extends Subsystem<Wrist.State> {
 
     m_stateMap = new StateMap<>(State.class);
 
-    m_stateMap.put(State.TargetPostion);
-    m_stateMap.put(State.Off);
-
     m_wristMotor =
         new GreyTalonFX(
             m_wristInfo.MOTOR_CAN_ID, RobotInfo.CANIVORE_CANBUS, m_logger.subLogger("WristMotor"));

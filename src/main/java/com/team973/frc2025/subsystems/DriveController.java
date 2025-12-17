@@ -76,10 +76,6 @@ public class DriveController extends Subsystem<DriveController.ControllerOption>
 
     m_controllerOptionMap = new StateMap<>(ControllerOption.class);
 
-    m_controllerOptionMap.put(ControllerOption.DriveWithJoysticks);
-    m_controllerOptionMap.put(ControllerOption.DriveWithTrajectory);
-    m_controllerOptionMap.put(ControllerOption.DriveWithLimelight);
-
     m_currentChassisSpeeds = new ChassisSpeeds();
   }
 

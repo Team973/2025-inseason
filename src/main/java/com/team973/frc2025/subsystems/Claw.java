@@ -65,16 +65,6 @@ public class Claw extends Subsystem<Claw.State> {
 
     m_stateMap = new StateMap<>(State.class);
 
-    m_stateMap.put(State.IntakeCoral);
-    m_stateMap.put(State.IntakeAlgae);
-    m_stateMap.put(State.IntakeAlgaeFromFloor);
-    m_stateMap.put(State.ScoreCoral);
-    m_stateMap.put(State.ScoreCoralLevelOne);
-    m_stateMap.put(State.ScoreAlgae);
-    m_stateMap.put(State.ScoreAlgaeProcessor);
-    m_stateMap.put(State.Reverse);
-    m_stateMap.put(State.Off);
-
     m_caNdle.addSignaler(m_clawHasPeiceSignaler);
     m_clawMotor =
         new GreyTalonFX(
