@@ -12,16 +12,17 @@ import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
+import com.team973.lib.util.StateMap;
 import com.team973.lib.util.Subsystem;
 
-public class Arm implements Subsystem {
+public class Arm extends Subsystem<Arm.State> {
   private final RobotInfo m_robotInfo;
   private final RobotInfo.ArmInfo m_armInfo;
   private final Logger m_logger;
   private final GreyTalonFX m_armMotor;
   private final GreyCANCoder m_armEncoder;
 
-  private ControlStatus m_controlStatus = ControlStatus.Off;
+  private final StateMap<State> m_stateMap;
 
   private double m_armTargetPostionDeg;
 
@@ -37,7 +38,7 @@ public class Arm implements Subsystem {
   private double m_algaeLowOffset = 0.0;
   private double m_algaeFloorOffset = 0.0;
 
-  public static enum ControlStatus {
+  public enum State {
     TargetPostion,
     Off,
   }
@@ -52,6 +53,11 @@ public class Arm implements Subsystem {
             m_armInfo.ENCODER_CAN_ID, RobotInfo.CANIVORE_CANBUS, logger.subLogger("Encoder"));
     m_armHorizontalSigaler =
         new SolidSignaler(RobotInfo.Colors.BLUE, 250, SignalerInfo.ARM_HORIZONTAL_SIGNALER_PRIORTY);
+
+    m_stateMap = new StateMap<>(State.class);
+
+    m_stateMap.put(State.TargetPostion);
+    m_stateMap.put(State.Off);
 
     candle.addSignaler(m_armHorizontalSigaler);
 
@@ -86,6 +92,10 @@ public class Arm implements Subsystem {
     m_armMotor.setPosition(armDegToMotorRotations(getCanCoderPostionDeg()));
   }
 
+  public StateMap<State> getStateMap() {
+    return m_stateMap;
+  }
+
   private double armDegToMotorRotations(double armPostionDeg) {
     return armPostionDeg / 360.0 / m_armInfo.ARM_ROTATIONS_PER_MOTOR_ROTATIONS;
   }
@@ -102,7 +112,7 @@ public class Arm implements Subsystem {
 
   public void setTargetDeg(double setPostionDeg) {
     m_armTargetPostionDeg = setPostionDeg;
-    m_controlStatus = ControlStatus.TargetPostion;
+    setState(State.TargetPostion);
   }
 
   public boolean motorAtTargetRotation() {
@@ -151,7 +161,7 @@ public class Arm implements Subsystem {
 
   @Override
   public void update() {
-    switch (m_controlStatus) {
+    switch (getState()) {
       case TargetPostion:
         m_armMotor.setControl(
             ControlMode.MotionMagicVoltage,
@@ -167,10 +177,6 @@ public class Arm implements Subsystem {
 
   public double getArmPostionDegFromMotorRot(double motorRot) {
     return motorRotationsToArmDeg(motorRot);
-  }
-
-  public void setControlStatus(ControlStatus status) {
-    m_controlStatus = status;
   }
 
   public void incrementOffset(double increment, ReefLevel level) {
@@ -215,7 +221,7 @@ public class Arm implements Subsystem {
 
     m_logger.log("armDegPostion", getArmPostionDegFromMotorRot(motorRot));
     m_logger.log("armTargetPostionDeg", m_armTargetPostionDeg);
-    m_logger.log("armMode", m_controlStatus.toString());
+    m_logger.log("armMode", getState().toString());
     m_logger.log("ArmFeedForwardTarget", getFeedForwardTargetAngleFromMotorRot(motorRot));
 
     m_logger.log("getCanCoderPostion", getCanCoderPostionDeg());

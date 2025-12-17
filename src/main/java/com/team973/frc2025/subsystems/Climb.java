@@ -11,7 +11,7 @@ import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.util.Logger;
 import com.team973.lib.util.Subsystem;
 
-public class Climb implements Subsystem {
+public class Climb extends Subsystem.Stateless {
   private final RobotInfo m_robotInfo;
   private final RobotInfo.ClimbInfo m_climbInfo;
 

@@ -24,4 +24,6 @@ public class ClimbState implements SubsystemState {
 
     m_superstructure.setManualArmivator(true);
   }
+
+  public void exit() {}
 }

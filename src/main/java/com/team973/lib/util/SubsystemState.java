@@ -4,4 +4,6 @@ public interface SubsystemState {
   public void init();
 
   public void run();
+
+  public void exit();
 }

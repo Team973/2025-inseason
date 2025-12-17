@@ -22,8 +22,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Drive implements Subsystem {
-  private RobotInfo.DriveInfo m_driveInfo;
+public class Drive extends Subsystem.Stateless {
+  private final RobotInfo.DriveInfo m_driveInfo;
 
   private static final Translation2d[] MODULE_LOCATIONS = {
     new Translation2d(DriveInfo.TRACKWIDTH_METERS / 2.0, DriveInfo.WHEELBASE_METERS / 2.0),
@@ -55,6 +55,8 @@ public class Drive implements Subsystem {
   private final MegaTagSupplier m_leftLLSupplier;
   private final MegaTagSupplier m_rightLLSupplier;
   private final MegaTagSupplier m_backLLSupplier;
+
+  public enum State {}
 
   public Drive(
       GreyPigeonIO pigeon,

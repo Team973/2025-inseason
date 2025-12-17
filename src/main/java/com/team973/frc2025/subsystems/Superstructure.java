@@ -6,13 +6,17 @@ import com.team973.frc2025.shared.RobotInfo.Colors;
 import com.team973.frc2025.shared.RobotInfo.SignalerInfo;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight;
 import com.team973.frc2025.subsystems.composables.DriveWithLimelight.ReefFace;
+import com.team973.frc2025.subsystems.states.ClimbState;
+import com.team973.frc2025.subsystems.states.ManualState;
+import com.team973.frc2025.subsystems.states.ScoreState;
+import com.team973.frc2025.subsystems.states.ZeroState;
 import com.team973.lib.util.Logger;
+import com.team973.lib.util.StateMap;
 import com.team973.lib.util.Subsystem;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.Supplier;
 
-public class Superstructure implements Subsystem {
+public class Superstructure extends Subsystem<Superstructure.State> {
   private final RobotInfo.ElevatorInfo m_elevatorInfo;
   private final RobotInfo.WristInfo m_wristInfo;
   private final Claw m_claw;
@@ -31,8 +35,7 @@ public class Superstructure implements Subsystem {
       new SolidSignaler(
           RobotInfo.Colors.YELLOW, 250, RobotInfo.SignalerInfo.WRIST_HORIZONTAL_SIGNLAER_PRIORITY);
 
-  private State m_state = State.Manual;
-  private State m_lastState = State.Manual;
+  private final StateMap<State> m_stateMap;
 
   private GamePiece m_gamePieceMode = GamePiece.Coral;
   private Supplier<ReefLevel> m_targetReefLevelSupplier = () -> ReefLevel.L_1;
@@ -76,6 +79,8 @@ public class Superstructure implements Subsystem {
       DriveController driveController,
       Logger logger,
       CANdleManger candle) {
+    super(State.Manual);
+
     m_claw = claw;
     m_climb = climb;
     m_elevator = elevator;
@@ -88,11 +93,18 @@ public class Superstructure implements Subsystem {
 
     m_logger = logger;
 
+    m_stateMap = new StateMap<>(State.class);
+
+    m_stateMap.put(State.Manual, new ManualState(this));
+    m_stateMap.put(State.Score, new ScoreState(this));
+    m_stateMap.put(State.Zero, new ZeroState(this));
+    m_stateMap.put(State.Climb, new ClimbState(this));
+
     candle.addSignaler(m_algaeSignaler);
   }
 
-  public void setState(State state) {
-    m_state = state;
+  public StateMap<State> getStateMap() {
+    return m_stateMap;
   }
 
   // public double setStowMode() {
@@ -223,7 +235,7 @@ public class Superstructure implements Subsystem {
     SmartDashboard.putString("DB/String 8", m_gamePieceMode.toString());
 
     m_logger.log("Game Piece Mode", m_gamePieceMode.toString());
-    m_logger.log("State", m_state.toString());
+    m_logger.log("State", getState().toString());
 
     m_logger.log("Manual Score", m_manualScore);
     m_logger.log("Manual Intake", m_manualIntake);
@@ -263,7 +275,7 @@ public class Superstructure implements Subsystem {
 
   public void armTargetReefLevel() {
     m_arm.setTargetDeg(m_arm.getTargetDegFromLevel(m_targetReefLevelSupplier.get()));
-    m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
+    m_arm.setState(Arm.State.TargetPostion);
   }
 
   public void armStow() {
@@ -272,13 +284,13 @@ public class Superstructure implements Subsystem {
     } else {
       m_arm.setTargetDeg(m_armInfo.ALGAE_STOW_POSITION_DEG);
     }
-    m_arm.setControlStatus(Arm.ControlStatus.TargetPostion);
+    m_arm.setState(Arm.State.TargetPostion);
   }
 
   public void elevatorTargetReefLevel() {
     m_elevator.setTargetPostion(
         m_elevator.getTargetPositionFromLevel(m_targetReefLevelSupplier.get()));
-    m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
+    m_elevator.setState(Elevator.State.TargetPostion);
   }
 
   public void elevatorStow() {
@@ -287,7 +299,7 @@ public class Superstructure implements Subsystem {
     } else {
       m_elevator.setTargetPostion(m_elevatorInfo.ALGAE_STOW);
     }
-    m_elevator.setControlStatus(Elevator.ControlStatus.TargetPostion);
+    m_elevator.setState(Elevator.State.TargetPostion);
   }
 
   public void wristStow() {
@@ -296,12 +308,12 @@ public class Superstructure implements Subsystem {
     } else {
       m_wrist.setTargetDeg(m_wristInfo.ALGAE_STOW_POSITION_DEG);
     }
-    m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
+    m_wrist.setState(Wrist.State.TargetPostion);
   }
 
   public void wristTargetReefLevel() {
     m_wrist.setTargetDeg(m_wrist.getTargetDegFromLevel(m_targetReefLevelSupplier.get()));
-    m_wrist.setControlStatus(Wrist.ControlStatus.TargetPostion);
+    m_wrist.setState(Wrist.State.TargetPostion);
   }
 
   public void incrementArmOffset(double increment) {
@@ -355,42 +367,46 @@ public class Superstructure implements Subsystem {
 
   public void clawIntake() {
     if (!m_manualIntake) {
-      m_claw.setControl(Claw.ControlStatus.Off);
+      m_claw.setState(Claw.State.Off);
     } else if (m_gamePieceMode == GamePiece.Coral) {
-      m_claw.setControl(Claw.ControlStatus.IntakeCoral);
+      m_claw.setState(Claw.State.IntakeCoral);
     } else if (m_targetReefLevelSupplier.get() == ReefLevel.AlgaeFloor) {
-      m_claw.setControl(Claw.ControlStatus.IntakeAlgaeFromFloor);
+      m_claw.setState(Claw.State.IntakeAlgaeFromFloor);
     } else {
-      m_claw.setControl(Claw.ControlStatus.IntakeAlgae);
+      m_claw.setState(Claw.State.IntakeAlgae);
     }
   }
 
   public void clawScore() {
     if (m_gamePieceMode == GamePiece.Coral) {
       if (m_targetReefLevelSupplier.get() == ReefLevel.L_1) {
-        m_claw.setControl(Claw.ControlStatus.ScoreCoralLevelOne);
+        m_claw.setState(Claw.State.ScoreCoralLevelOne);
       } else {
-        m_claw.setControl(Claw.ControlStatus.ScoreCoral);
+        m_claw.setState(Claw.State.ScoreCoral);
       }
     } else {
       if (m_targetReefLevelSupplier.get() == ReefLevel.Processor) {
-        m_claw.setControl(Claw.ControlStatus.ScoreAlgaeProcessor);
+        m_claw.setState(Claw.State.ScoreAlgaeProcessor);
       } else {
-        m_claw.setControl(Claw.ControlStatus.ScoreAlgae);
+        m_claw.setState(Claw.State.ScoreAlgae);
       }
     }
   }
 
   public void clawReverse() {
-    m_claw.setControl(Claw.ControlStatus.Reverse);
+    m_claw.setState(Claw.State.Reverse);
   }
 
   public void clawOff() {
-    m_claw.setControl(Claw.ControlStatus.Off);
+    m_claw.setState(Claw.State.Off);
   }
 
   public void zeroElevator() {
-    m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
+    m_elevator.setState(Elevator.State.Zero);
+  }
+
+  public void homeElevator() {
+    m_elevator.home();
   }
 
   public boolean getHasAlgae() {
@@ -418,120 +434,7 @@ public class Superstructure implements Subsystem {
   }
 
   public void update() {
-    switch (m_state) {
-      case Manual:
-        if (m_lastState != m_state) {
-          m_manualScore = false;
-          m_manualIntake = true;
-        }
-
-        if (m_manualScore) {
-          clawScore();
-        } else if (m_manualIntake) {
-          clawIntake();
-        } else {
-          m_claw.setControl(Claw.ControlStatus.Reverse);
-        }
-
-        if (m_manualArmivator) {
-          armTargetReefLevel();
-          elevatorTargetReefLevel();
-          wristTargetReefLevel();
-        } else {
-          armStow();
-          elevatorStow();
-          wristStow();
-        }
-
-        break;
-      case Score:
-        clawIntake();
-
-        if (m_lastState != m_state) {
-          m_manualScore = false;
-        }
-
-        switch (m_driveController.getDriveWithLimelight().getTargetStage()) {
-          case MoveToApproach:
-            if (m_driveController.isNearApproach()) {
-              armTargetReefLevel();
-              wristTargetReefLevel();
-              elevatorTargetReefLevel();
-
-              m_manualArmivator = true;
-            }
-            break;
-          case Approach:
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
-            wristTargetReefLevel();
-
-            m_manualArmivator = true;
-            break;
-          case MoveToScoring:
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
-            wristTargetReefLevel();
-            break;
-          case Scoring:
-            if (m_manualScore
-                && (m_gamePieceMode == GamePiece.Coral
-                    || m_targetReefLevelSupplier.get() == ReefLevel.Processor
-                    || m_targetReefLevelSupplier.get() == ReefLevel.Net)) {
-              clawScore();
-            }
-
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
-            wristTargetReefLevel();
-            break;
-          case MoveToBackOff:
-            if (m_gamePieceMode == GamePiece.Coral) {
-              m_claw.setControl(Claw.ControlStatus.Off);
-            } else {
-              clawIntake();
-            }
-
-            armTargetReefLevel();
-            elevatorTargetReefLevel();
-            wristTargetReefLevel();
-            break;
-          case BackOff:
-            if (m_gamePieceMode == GamePiece.Coral || DriverStation.isTeleop()) {
-              armStow();
-              elevatorStow();
-              wristStow();
-              m_manualArmivator = false;
-            }
-
-            break;
-        }
-        break;
-      case Zero:
-        m_elevator.setControlStatus(Elevator.ControlStatus.Zero);
-
-        wristStow();
-        armStow();
-        clawIntake();
-        break;
-      case Climb:
-        m_claw.setControl(Claw.ControlStatus.Off);
-
-        setTargetReefLevel(ReefLevel.Horizontal);
-
-        armTargetReefLevel();
-        elevatorTargetReefLevel();
-        wristTargetReefLevel();
-
-        m_manualArmivator = true;
-        break;
-    }
-
-    if (m_lastState == State.Zero && m_state != State.Zero) {
-      m_elevator.home();
-    }
-
-    m_lastState = m_state;
+    super.update();
 
     m_claw.update();
     m_climb.update();

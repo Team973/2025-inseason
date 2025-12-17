@@ -7,6 +7,7 @@ import com.team973.frc2025.subsystems.swerve.SwerveModuleIO;
 import com.team973.lib.devices.GreyPigeonIO;
 import com.team973.lib.util.DriveComposable;
 import com.team973.lib.util.Logger;
+import com.team973.lib.util.StateMap;
 import com.team973.lib.util.Subsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,16 +15,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class DriveController implements Subsystem {
+public class DriveController extends Subsystem<DriveController.ControllerOption> {
   private final Drive m_drive;
 
   private final Logger m_logger;
 
-  private ControllerOption m_controllerOption = ControllerOption.DriveWithJoysticks;
-
   private final DriveWithJoysticks m_driveWithJoysticks;
   private final DriveWithTrajectory m_driveWithTrajectory;
   private final DriveWithLimelight m_driveWithLimelight;
+
+  private final StateMap<ControllerOption> m_controllerOptionMap;
 
   private ChassisSpeeds m_currentChassisSpeeds;
 
@@ -59,6 +60,8 @@ public class DriveController implements Subsystem {
       SwerveModuleIO backLeft,
       SwerveModuleIO backRight,
       GreyPigeonIO pigeon) {
+    super(ControllerOption.DriveWithJoysticks);
+
     m_drive = new Drive(pigeon, this, frontLeft, frontRight, backLeft, backRight, logger);
 
     m_logger = logger.subLogger("controller");
@@ -71,20 +74,30 @@ public class DriveController implements Subsystem {
         new DriveWithLimelight(
             m_logger.subLogger("driveWithLimelight"), readyToScore, readyToBackOff);
 
+    m_controllerOptionMap = new StateMap<>(ControllerOption.class);
+
+    m_controllerOptionMap.put(ControllerOption.DriveWithJoysticks);
+    m_controllerOptionMap.put(ControllerOption.DriveWithTrajectory);
+    m_controllerOptionMap.put(ControllerOption.DriveWithLimelight);
+
     m_currentChassisSpeeds = new ChassisSpeeds();
   }
 
   public synchronized void setControllerOption(ControllerOption controllerOption) {
-    if (controllerOption != m_controllerOption) {
+    if (controllerOption != getState()) {
       m_driveWithJoysticks.reset(m_drive.getPoseEstimator().getPoseMeters().getRotation());
 
-      getComposableFromControllerOption(m_controllerOption).exit();
+      getComposableFromControllerOption(getState()).exit();
 
       getComposableFromControllerOption(controllerOption)
           .init(m_currentChassisSpeeds, m_robotIsAutonomous, getPose());
 
-      m_controllerOption = controllerOption;
+      setState(controllerOption);
     }
+  }
+
+  public StateMap<ControllerOption> getStateMap() {
+    return m_controllerOptionMap;
   }
 
   public DriveWithJoysticks getDriveWithJoysticks() {
@@ -134,7 +147,7 @@ public class DriveController implements Subsystem {
     m_logger.log("chassis speeds/vx", m_currentChassisSpeeds.vxMetersPerSecond);
     m_logger.log("chassis speeds/vy", m_currentChassisSpeeds.vyMetersPerSecond);
     m_logger.log("chassis speeds/omega RadPS", m_currentChassisSpeeds.omegaRadiansPerSecond);
-    m_logger.log("controller", m_controllerOption.toString());
+    m_logger.log("controller", getState().toString());
   }
 
   private DriveComposable getComposableFromControllerOption(ControllerOption option) {
@@ -172,7 +185,7 @@ public class DriveController implements Subsystem {
   @Override
   public synchronized void update() {
     ChassisSpeeds currentChassisSpeeds =
-        getComposableFromControllerOption(m_controllerOption)
+        getComposableFromControllerOption(getState())
             .getOutput(getPose(), m_drive.getPigeon().getAngularVelocity());
 
     if (currentChassisSpeeds != null) {

@@ -11,22 +11,35 @@ import com.team973.lib.devices.GreyCANCoder;
 import com.team973.lib.devices.GreyTalonFX;
 import com.team973.lib.devices.GreyTalonFX.ControlMode;
 import com.team973.lib.util.Logger;
+import com.team973.lib.util.StateMap;
 import com.team973.lib.util.Subsystem;
 
-public class Wrist implements Subsystem {
+public class Wrist extends Subsystem<Wrist.State> {
   private final RobotInfo.WristInfo m_wristInfo;
   private final Logger m_logger;
 
   private final GreyTalonFX m_wristMotor;
   private final GreyCANCoder m_wristEncoder;
 
-  private ControlStatus m_controlStatus = ControlStatus.Off;
+  private final StateMap<State> m_stateMap;
 
   private double m_wristTargetPostionDeg = 0.0;
 
+  public enum State {
+    TargetPostion,
+    Off,
+  }
+
   public Wrist(Logger logger, RobotInfo robotInfo) {
+    super(State.Off);
+
     m_logger = logger;
     m_wristInfo = RobotConfig.get().WRIST_INFO;
+
+    m_stateMap = new StateMap<>(State.class);
+
+    m_stateMap.put(State.TargetPostion);
+    m_stateMap.put(State.Off);
 
     m_wristMotor =
         new GreyTalonFX(
@@ -70,9 +83,8 @@ public class Wrist implements Subsystem {
     m_wristMotor.setPosition(wristDegToMotorRotations(getCanCoderPostion()));
   }
 
-  public static enum ControlStatus {
-    TargetPostion,
-    Off,
+  public StateMap<State> getStateMap() {
+    return m_stateMap;
   }
 
   private double wristDegToMotorRotations(double wristPostionDeg) {
@@ -85,10 +97,6 @@ public class Wrist implements Subsystem {
 
   public double getWristPostionDegFromMotorRot(double motorRot) {
     return motorRotationsToWristDeg(motorRot);
-  }
-
-  public void setControlStatus(ControlStatus targetpostion) {
-    m_controlStatus = targetpostion;
   }
 
   public double getTargetDegFromLevel(ReefLevel level) {
@@ -130,7 +138,7 @@ public class Wrist implements Subsystem {
 
   public void setTargetDeg(double setPostionDeg) {
     m_wristTargetPostionDeg = setPostionDeg;
-    m_controlStatus = ControlStatus.TargetPostion;
+    setState(State.TargetPostion);
   }
 
   private boolean motorAtTargetRotation(double motorRot) {
@@ -152,7 +160,7 @@ public class Wrist implements Subsystem {
 
   @Override
   public void update() {
-    switch (m_controlStatus) {
+    switch (getState()) {
       case TargetPostion:
         m_wristMotor.setControl(
             ControlMode.MotionMagicVoltage, wristDegToMotorRotations(m_wristTargetPostionDeg), 0);
@@ -173,7 +181,7 @@ public class Wrist implements Subsystem {
     m_logger.log("Motor At Target Rot", motorAtTargetRotation(motorRot));
     m_logger.log("wristDegPostion", getWristPostionDegFromMotorRot(motorRot));
     m_logger.log("wristTargetPostionDeg", m_wristTargetPostionDeg);
-    m_logger.log("wristMode", m_controlStatus.toString());
+    m_logger.log("wristMode", getState().toString());
     m_logger.log("getCanCoderPostion", getCanCoderPostion());
     m_logger.log("Is Horizontal", isHorizontal());
     m_logger.log("Level 3 taget pos", m_wristInfo.LEVEL_THREE_POSITION_DEG);
