@@ -2,18 +2,18 @@ package com.team973.lib.util;
 
 /** Base interface for all subsystems */
 public abstract class Subsystem<K extends Enum<K>> {
-  public abstract static class Stateless extends Subsystem<Stateless.FakeState> {
-    private final StateMap<FakeState> m_stateMap = new StateMap<>(FakeState.class);
+  public abstract static class Stateless extends Subsystem<Stateless.State> {
+    private final StateMap<State> m_stateMap = new StateMap<>(State.class);
 
-    public enum FakeState {
-      InitialState
+    public enum State {
+      SingleState
     }
 
     public Stateless() {
-      super(FakeState.InitialState);
+      super(State.SingleState);
     }
 
-    public StateMap<FakeState> getStateMap() {
+    public StateMap<State> getStateMap() {
       return m_stateMap;
     }
 
